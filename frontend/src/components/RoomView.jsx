@@ -10,8 +10,8 @@ import {
 } from '@livekit/components-react';
 import { RoomEvent } from 'livekit-client';
 import {
-  Mic, MicOff, Timer, MessageSquare, LogOut,
-  AlertCircle, Hand, VolumeX, UserX, PhoneOff, Settings, Users,
+  Mic, MicOff, Timer, FileText, MessageSquare, LogOut,
+  AlertCircle, Hand, VolumeX, UserX, PhoneOff, Settings,
 } from 'lucide-react';
 
 // ── Logo (navy, for light header) ───────────────────────────────────────────
