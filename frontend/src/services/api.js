@@ -64,3 +64,8 @@ export const closeRoom = async (code) => {
   const { data } = await api.delete(`/api/rooms/${code}`);
   return data;
 };
+
+export const getJaasToken = async (code) => {
+  const { data } = await api.get(`/api/rooms/${code}/token`);
+  return data; // { token, appId }
+};

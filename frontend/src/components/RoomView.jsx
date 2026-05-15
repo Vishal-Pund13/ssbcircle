@@ -1,11 +1,9 @@
 import { useEffect, useRef, useState } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
-import { getRoom } from '../services/api';
+import { getRoom, getJaasToken } from '../services/api';
 import { useAuth } from '../context/AuthContext';
 import GDTimer from './GDTimer';
 import GDPanel from './GDPanel';
-
-const JITSI_DOMAIN = import.meta.env.VITE_JITSI_DOMAIN || 'meet.jit.si';
 
 function CircleIcon() {
   return (
@@ -29,37 +27,47 @@ export default function RoomView() {
 
   const { user } = useAuth();
   const [room, setRoom] = useState(null);
-  const [fetchStatus, setFetchStatus] = useState('loading');
+  const [fetchStatus, setFetchStatus] = useState('loading'); // loading | done | error
   const [error, setError] = useState('');
   const [showTimer, setShowTimer] = useState(false);
   const [showPanel, setShowPanel] = useState(false);
 
   const isAdmin = room && user && room.created_by === user.id;
 
-  // 1. Fetch room
+  // 1. Fetch room + JaaS token in parallel
   useEffect(() => {
     let cancelled = false;
-    getRoom(code)
-      .then((data) => {
-        if (!cancelled) { setRoom(data); setFetchStatus('done'); }
+
+    Promise.all([getRoom(code), getJaasToken(code)])
+      .then(([roomData, tokenData]) => {
+        if (!cancelled) {
+          setRoom({ ...roomData, _jaasToken: tokenData.token, _jaasAppId: tokenData.appId });
+          setFetchStatus('done');
+        }
       })
       .catch((err) => {
         if (!cancelled) { setError(err.message); setFetchStatus('error'); }
       });
+
     return () => { cancelled = true; };
   }, [code]);
 
-  // 2. Load Jitsi
+  // 2. Load Jitsi once room + token are ready
   useEffect(() => {
-    if (!room) return;
+    if (!room || fetchStatus !== 'done') return;
 
     let script;
+    const JAAS_DOMAIN = '8x8.vc';
 
     function initJitsi() {
       if (!containerRef.current || !window.JitsiMeetExternalAPI) return;
 
-      const api = new window.JitsiMeetExternalAPI(JITSI_DOMAIN, {
-        roomName: room.jitsi_room_name,
+      // JaaS room name must be prefixed with AppID
+      const roomName = `${room._jaasAppId}/${room.jitsi_room_name}`;
+
+      const api = new window.JitsiMeetExternalAPI(JAAS_DOMAIN, {
+        roomName,
+        jwt: room._jaasToken,
         parentNode: containerRef.current,
         width: '100%',
         height: '100%',
@@ -81,7 +89,6 @@ export default function RoomView() {
           MOBILE_APP_PROMO: false,
           HIDE_INVITE_MORE_HEADER: true,
           PROVIDER_NAME: 'SSBCircle',
-          // hangup removed — use our Leave button to avoid 8x8 promo page
           TOOLBAR_BUTTONS: [
             'microphone',
             'chat',
@@ -96,14 +103,9 @@ export default function RoomView() {
         },
       });
 
-      // Enforce display name after joining (overrides any Jitsi default)
       api.addListener('videoConferenceJoined', () => {
-        if (user?.display_name) {
-          api.executeCommand('displayName', user.display_name);
-        }
-        if (user?.avatar_url) {
-          api.executeCommand('avatarUrl', user.avatar_url);
-        }
+        if (user?.display_name) api.executeCommand('displayName', user.display_name);
+        if (user?.avatar_url) api.executeCommand('avatarUrl', user.avatar_url);
       });
 
       api.addListener('readyToClose', handleLeave);
@@ -114,7 +116,7 @@ export default function RoomView() {
       initJitsi();
     } else {
       script = document.createElement('script');
-      script.src = `https://${JITSI_DOMAIN}/external_api.js`;
+      script.src = `https://${JAAS_DOMAIN}/external_api.js`;
       script.async = true;
       script.onload = initJitsi;
       script.onerror = () => {
@@ -162,7 +164,6 @@ export default function RoomView() {
 
       {/* ── Header ── */}
       <header className="flex items-center justify-between px-5 py-3 bg-[#0f1623] border-b border-white/5 shrink-0 z-10">
-        {/* Left: brand + topic */}
         <div className="flex items-center gap-3 min-w-0">
           <div className="flex items-center gap-2 shrink-0">
             <CircleIcon />
@@ -183,7 +184,6 @@ export default function RoomView() {
           )}
         </div>
 
-        {/* Right: tools + room code + leave */}
         <div className="flex items-center gap-1.5 shrink-0">
           {/* Timer */}
           <button
@@ -201,7 +201,7 @@ export default function RoomView() {
             Timer
           </button>
 
-          {/* Notes/Panel */}
+          {/* Notes */}
           <button
             onClick={() => setShowPanel((v) => !v)}
             title="Transcript & Notes"
@@ -227,7 +227,7 @@ export default function RoomView() {
           {/* Leave */}
           <button
             onClick={handleLeave}
-            className="flex items-center gap-1.5 ml-1 bg-red-500/10 hover:bg-red-500 text-red-400 hover:text-white text-xs font-semibold px-3 py-1.5 rounded-lg border border-red-500/20 hover:border-red-500 transition-all"
+            className="flex items-center gap-1.5 ml-1 bg-red-500/10 hover:bg-red-500 text-red-400 hover:text-white text-xs font-semibold px-3 py-1.5 rounded-lg border border-red-500/20 hover:border-red-500 transition-all cursor-pointer"
           >
             <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
@@ -244,7 +244,7 @@ export default function RoomView() {
             <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
             <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z" />
           </svg>
-          <p className="text-slate-400 text-sm">Loading room…</p>
+          <p className="text-slate-400 text-sm">Connecting to room…</p>
         </div>
       )}
 
@@ -252,7 +252,7 @@ export default function RoomView() {
       {fetchStatus === 'done' && (
         <div className="flex-1 w-full relative">
           <div ref={containerRef} className="absolute inset-0" />
-          {/* SSBCircle LIVE badge — covers Jitsi watermark */}
+          {/* SSBCircle LIVE badge */}
           <div
             className="absolute z-10 pointer-events-none"
             style={{ top: 0, left: 0, width: 200, height: 110,
@@ -269,10 +269,7 @@ export default function RoomView() {
         </div>
       )}
 
-      {/* ── Floating Timer ── */}
       {showTimer && <GDTimer onClose={() => setShowTimer(false)} />}
-
-      {/* ── Side Panel (transcript / notes / checklist) ── */}
       {showPanel && <GDPanel onClose={() => setShowPanel(false)} />}
     </div>
   );
