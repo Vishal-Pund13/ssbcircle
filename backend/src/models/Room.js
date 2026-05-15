@@ -11,7 +11,7 @@ function generateRoomCode() {
   return code;
 }
 
-async function createRoom(topic, userId, displayName) {
+async function createRoom(title, description, userId, displayName) {
   let roomCode;
   for (let attempts = 0; attempts < 10; attempts++) {
     const candidate = generateRoomCode();
@@ -22,9 +22,9 @@ async function createRoom(topic, userId, displayName) {
 
   const jitsiRoomName = `SSBCircle_${roomCode}`;
   const { rows } = await pool.query(
-    `INSERT INTO rooms (topic, room_code, jitsi_room_name, created_by, admin_username)
-     VALUES ($1, $2, $3, $4, $5) RETURNING *`,
-    [topic, roomCode, jitsiRoomName, userId || null, displayName || null]
+    `INSERT INTO rooms (topic, description, room_code, jitsi_room_name, created_by, admin_username)
+     VALUES ($1, $2, $3, $4, $5, $6) RETURNING *`,
+    [title, description || null, roomCode, jitsiRoomName, userId || null, displayName || null]
   );
   return rows[0];
 }

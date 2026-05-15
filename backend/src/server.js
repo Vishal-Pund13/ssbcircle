@@ -68,6 +68,7 @@ async function start() {
     // Safe migrations for existing rooms table
     await pool.query(`ALTER TABLE rooms ADD COLUMN IF NOT EXISTS created_by UUID REFERENCES users(id)`);
     await pool.query(`ALTER TABLE rooms ADD COLUMN IF NOT EXISTS admin_username VARCHAR(100)`);
+    await pool.query(`ALTER TABLE rooms ADD COLUMN IF NOT EXISTS description TEXT`);
 
     app.listen(PORT, () => console.log(`SSBCircle backend running on port ${PORT}`));
   } catch (err) {

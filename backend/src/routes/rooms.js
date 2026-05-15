@@ -7,15 +7,22 @@ const authMiddleware = require('../middleware/auth');
 // Create room — requires auth
 router.post('/', authMiddleware, async (req, res) => {
   try {
-    const { topic } = req.body;
-    if (!topic || typeof topic !== 'string') {
-      return res.status(400).json({ error: 'Topic is required' });
+    const { title, description } = req.body;
+
+    if (!title || typeof title !== 'string' || title.trim().length < 5) {
+      return res.status(400).json({ error: 'Room title must be at least 5 characters' });
     }
-    const trimmed = topic.trim();
-    if (trimmed.length < 3 || trimmed.length > 255) {
-      return res.status(400).json({ error: 'Topic must be between 3 and 255 characters' });
+    if (title.trim().length > 100) {
+      return res.status(400).json({ error: 'Room title must be under 100 characters' });
     }
-    const room = await createRoom(trimmed, req.userId, req.displayName);
+    if (!description || typeof description !== 'string' || description.trim().length < 10) {
+      return res.status(400).json({ error: 'Description must be at least 10 characters' });
+    }
+    if (description.trim().length > 500) {
+      return res.status(400).json({ error: 'Description must be under 500 characters' });
+    }
+
+    const room = await createRoom(title.trim(), description.trim(), req.userId, req.displayName);
     res.status(201).json({ room });
   } catch (err) {
     console.error('Create room error:', err);

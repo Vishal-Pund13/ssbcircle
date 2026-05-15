@@ -472,9 +472,16 @@ export default function RoomView() {
           {room && (
             <div className="flex items-center gap-2 min-w-0">
               <span className="w-px h-4 bg-gray-200 shrink-0"/>
-              <span className="text-gray-500 text-xs truncate max-w-[160px] sm:max-w-xs font-medium">
-                {room.topic}
-              </span>
+              <div className="min-w-0">
+                <span className="text-gray-700 text-xs font-semibold truncate block max-w-[140px] sm:max-w-xs">
+                  {room.topic}
+                </span>
+                {room.description && (
+                  <span className="text-gray-400 text-[10px] truncate block max-w-[140px] sm:max-w-xs">
+                    {room.description}
+                  </span>
+                )}
+              </div>
               {isAdmin && (
                 <span className="shrink-0 text-[10px] font-semibold px-2 py-0.5 rounded-full bg-brand-50 text-brand-600 border border-brand-100">
                   HOST

@@ -45,8 +45,8 @@ export const fetchMe = async () => {
 };
 
 // Rooms
-export const createRoom = async (topic) => {
-  const { data } = await api.post('/api/rooms', { topic });
+export const createRoom = async (title, description) => {
+  const { data } = await api.post('/api/rooms', { title, description });
   return data.room;
 };
 

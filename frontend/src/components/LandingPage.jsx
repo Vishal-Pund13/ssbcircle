@@ -73,9 +73,14 @@ function RoomCard({ room, user, onJoin, onDelete }) {
           </div>
         </div>
 
-        <p className="text-sm font-semibold text-gray-800 leading-snug line-clamp-2 flex-1">
-          {room.topic}
-        </p>
+        <div className="flex-1">
+          <p className="text-sm font-semibold text-gray-800 leading-snug mb-1">
+            {room.topic}
+          </p>
+          {room.description && (
+            <p className="text-xs text-gray-400 leading-relaxed line-clamp-2">{room.description}</p>
+          )}
+        </div>
 
         {room.admin_display_name && (
           <p className="text-xs text-gray-400">
@@ -190,48 +195,50 @@ export default function LandingPage() {
 
         {/* ── Hero ── */}
         <section className="border-b border-gray-100 py-12 sm:py-20 px-4 sm:px-6">
-          <div className="max-w-3xl mx-auto text-center">
-            <div className="inline-flex items-center gap-2 bg-emerald-50 text-emerald-700 text-xs font-semibold px-3 py-1.5 rounded-full mb-6 border border-emerald-100">
-              <span className="relative flex h-2 w-2">
-                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75" />
-                <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500" />
-              </span>
-              {!loading && rooms.length > 0
-                ? `${rooms.length} discussion${rooms.length > 1 ? 's' : ''} happening right now`
-                : 'Live voice rooms · Join any time'}
-            </div>
-
-            <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold text-gray-900 leading-[1.1] tracking-tight mb-5">
-              Practice GD with<br />
-              <span className="text-brand-600">real aspirants.</span>
-            </h1>
-            <p className="text-gray-500 text-base sm:text-lg leading-relaxed mb-8 max-w-xl mx-auto">
-              Create a voice room, share a 6-letter code, and practice SSB group discussions — with a live timer, transcript and self-evaluation tools.
-            </p>
-
-            {/* CTAs — stacked on mobile, row on sm+ */}
-            <div className="flex flex-col sm:flex-row items-center justify-center gap-3 mb-8">
-              <button onClick={() => navigate(user ? '/create' : '/register')}
-                className="btn-primary text-sm px-7 py-3 w-full sm:w-auto flex items-center justify-center gap-2">
-                {user ? 'Create a Room' : 'Get started free'}
-                <ArrowRight className="w-4 h-4" />
-              </button>
-              <button onClick={() => navigate(user ? '/join' : '/login')}
-                className="btn-secondary text-sm px-7 py-3 w-full sm:w-auto">
-                Join a Room
-              </button>
-            </div>
-
-            {/* Social proof */}
-            <div className="flex items-center justify-center gap-3">
-              <div className="flex -space-x-2">
-                {['A','V','R','S','P'].map((l, i) => (
-                  <div key={i} className="w-7 h-7 rounded-full bg-brand-600 border-2 border-white flex items-center justify-center text-[9px] font-bold text-white" style={{ opacity: 1 - i * 0.12 }}>{l}</div>
-                ))}
+          <div className="max-w-5xl mx-auto">
+            <div className="max-w-2xl">
+              <div className="inline-flex items-center gap-2 bg-emerald-50 text-emerald-700 text-xs font-semibold px-3 py-1.5 rounded-full mb-6 border border-emerald-100">
+                <span className="relative flex h-2 w-2">
+                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75" />
+                  <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500" />
+                </span>
+                {!loading && rooms.length > 0
+                  ? `${rooms.length} discussion${rooms.length > 1 ? 's' : ''} happening right now`
+                  : 'Live voice rooms · Join any time'}
               </div>
-              <p className="text-xs text-gray-500">
-                <span className="font-semibold text-gray-700">500+</span> aspirants joined · <span className="font-semibold text-gray-700">Free</span> forever
+
+              <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold text-gray-900 leading-[1.1] tracking-tight mb-5">
+                Practice GD with<br />
+                <span className="text-brand-600">real aspirants.</span>
+              </h1>
+              <p className="text-gray-500 text-base sm:text-lg leading-relaxed mb-8">
+                Create a voice room, share a 6-letter code, and practice SSB group discussions — with a live timer, transcript and self-evaluation tools.
               </p>
+
+              {/* CTAs — stacked on mobile, row on sm+ */}
+              <div className="flex flex-col sm:flex-row gap-3 mb-8">
+                <button onClick={() => navigate(user ? '/create' : '/register')}
+                  className="btn-primary text-sm px-7 py-3 w-full sm:w-auto flex items-center justify-center gap-2">
+                  {user ? 'Create a Room' : 'Get started free'}
+                  <ArrowRight className="w-4 h-4" />
+                </button>
+                <button onClick={() => navigate(user ? '/join' : '/login')}
+                  className="btn-secondary text-sm px-7 py-3 w-full sm:w-auto">
+                  Join a Room
+                </button>
+              </div>
+
+              {/* Social proof */}
+              <div className="flex items-center gap-3">
+                <div className="flex -space-x-2">
+                  {['A','V','R','S','P'].map((l, i) => (
+                    <div key={i} className="w-7 h-7 rounded-full bg-brand-600 border-2 border-white flex items-center justify-center text-[9px] font-bold text-white" style={{ opacity: 1 - i * 0.12 }}>{l}</div>
+                  ))}
+                </div>
+                <p className="text-xs text-gray-500">
+                  <span className="font-semibold text-gray-700">500+</span> aspirants joined · <span className="font-semibold text-gray-700">Free</span> forever
+                </p>
+              </div>
             </div>
           </div>
         </section>
