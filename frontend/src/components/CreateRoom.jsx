@@ -3,166 +3,91 @@ import { useNavigate, useLocation, Link } from 'react-router-dom';
 import { createRoom } from '../services/api';
 import { useAuth } from '../context/AuthContext';
 
-function CopyIcon() {
-  return (
-    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
-        d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
-    </svg>
-  );
-}
-
 export default function CreateRoom() {
   const navigate = useNavigate();
   const location = useLocation();
   const { user } = useAuth();
   const [topic, setTopic] = useState('');
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState('');
   const [room, setRoom] = useState(null);
   const [copied, setCopied] = useState(false);
+  const [error, setError] = useState('');
 
-  const shareUrl = room
-    ? `${window.location.origin}/join/${room.room_code}`
-    : '';
+  const shareUrl = room ? `${window.location.origin}/join/${room.room_code}` : '';
 
   async function handleSubmit(e) {
     e.preventDefault();
-    if (!user) {
-      navigate('/login', { state: { from: location } });
-      return;
-    }
-    const trimmed = topic.trim();
-    if (trimmed.length < 3) {
-      setError('Topic must be at least 3 characters');
-      return;
-    }
-    setError('');
-    setLoading(true);
-    try {
-      const created = await createRoom(trimmed);
-      setRoom(created);
-    } catch (err) {
-      setError(err.message);
-    } finally {
-      setLoading(false);
-    }
+    if (!user) { navigate('/login', { state: { from: location } }); return; }
+    if (topic.trim().length < 3) { setError('Topic must be at least 3 characters'); return; }
+    setLoading(true); setError('');
+    try { setRoom(await createRoom(topic.trim())); }
+    catch (err) { setError(err.message); }
+    finally { setLoading(false); }
   }
 
   async function handleCopy() {
-    try {
-      await navigator.clipboard.writeText(shareUrl);
-      setCopied(true);
-      setTimeout(() => setCopied(false), 2000);
-    } catch {
-      // fallback
-    }
+    try { await navigator.clipboard.writeText(shareUrl); setCopied(true); setTimeout(() => setCopied(false), 2000); }
+    catch {}
   }
 
-  if (room) {
-    return (
-      <div className="min-h-screen flex items-center justify-center px-4 bg-slate-50">
-        <div className="card w-full max-w-md text-center">
-          <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
-            <svg className="w-8 h-8 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-            </svg>
-          </div>
-
-          <h2 className="text-2xl font-bold text-slate-900 mb-1">Room Created!</h2>
-          <p className="text-slate-500 mb-6 text-sm">{room.topic}</p>
-
-          <div className="bg-primary-50 border border-primary-100 rounded-2xl p-5 mb-4">
-            <p className="text-xs text-primary-500 font-medium tracking-widest uppercase mb-2">Room Code</p>
-            <p className="text-4xl font-extrabold text-primary-600 tracking-widest">{room.room_code}</p>
-          </div>
-
-          <div className="flex items-center gap-2 mb-6">
-            <input
-              readOnly
-              value={shareUrl}
-              className="input-field text-sm flex-1"
-              onFocus={(e) => e.target.select()}
-            />
-            <button
-              onClick={handleCopy}
-              className="btn-primary px-4 py-3 flex items-center gap-1.5 shrink-0"
-              title="Copy link"
-            >
-              <CopyIcon />
-              {copied ? 'Copied!' : 'Copy'}
-            </button>
-          </div>
-
-          <div className="flex flex-col gap-3">
-            <button
-              onClick={() => navigate(`/room/${room.room_code}`)}
-              className="btn-primary w-full"
-            >
-              Enter Room
-            </button>
-            <button
-              onClick={() => { setRoom(null); setTopic(''); }}
-              className="text-slate-500 hover:text-slate-700 text-sm cursor-pointer"
-            >
-              Create another room
-            </button>
-          </div>
+  if (room) return (
+    <div className="min-h-screen bg-gray-50 flex items-center justify-center px-4">
+      <div className="w-full max-w-md bg-white border border-gray-200 rounded-xl shadow-sm p-8 text-center">
+        <div className="w-12 h-12 bg-green-50 rounded-full flex items-center justify-center mx-auto mb-4">
+          <svg className="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+          </svg>
         </div>
+        <h2 className="text-xl font-bold text-gray-900 mb-1">Room created</h2>
+        <p className="text-gray-400 text-sm mb-6">{room.topic}</p>
+
+        <div className="bg-gray-50 border border-gray-200 rounded-xl p-5 mb-5">
+          <p className="text-xs font-semibold text-gray-400 uppercase tracking-widest mb-2">Room Code</p>
+          <p className="text-4xl font-mono font-bold text-brand-600 tracking-[0.2em] mb-3">{room.room_code}</p>
+          <button onClick={handleCopy} className="text-xs text-gray-400 hover:text-brand-600 transition-colors cursor-pointer font-medium">
+            {copied ? '✓ Copied!' : '⧉ Copy invite link'}
+          </button>
+        </div>
+
+        <button onClick={() => navigate(`/room/${room.room_code}`)} className="btn-primary w-full py-2.5 mb-3">
+          Enter Room →
+        </button>
+        <button onClick={() => { setRoom(null); setTopic(''); }} className="text-sm text-gray-400 hover:text-gray-600 cursor-pointer">
+          Create another
+        </button>
       </div>
-    );
-  }
+    </div>
+  );
 
   return (
-    <div className="min-h-screen flex items-center justify-center px-4 bg-slate-50">
-      <div className="card w-full max-w-md">
-        <Link to="/" className="inline-flex items-center gap-1 text-sm text-slate-400 hover:text-slate-600 mb-6 transition-colors">
-          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-          </svg>
-          Back
+    <div className="min-h-screen bg-gray-50 flex items-center justify-center px-4">
+      <div className="w-full max-w-lg">
+        <Link to="/" className="inline-flex items-center gap-1.5 text-sm text-gray-400 hover:text-gray-600 mb-6 transition-colors">
+          ← Back
         </Link>
+        <div className="bg-white border border-gray-200 rounded-xl shadow-sm p-8">
+          <h1 className="text-xl font-bold text-gray-900 mb-1">Create a room</h1>
+          <p className="text-sm text-gray-400 mb-6">Enter a topic to start a group discussion.</p>
 
-        <h1 className="text-2xl font-bold text-slate-900 mb-2">Create a Room</h1>
-        <p className="text-slate-500 text-sm mb-6">Enter a topic to start a group discussion practice session.</p>
-
-        <form onSubmit={handleSubmit} noValidate>
-          <label className="block text-sm font-medium text-slate-700 mb-1.5" htmlFor="topic">
-            GD Topic
-          </label>
-          <textarea
-            id="topic"
-            rows={3}
-            className="input-field resize-none"
-            placeholder="e.g. Should India abolish reservations in government jobs?"
-            value={topic}
-            onChange={(e) => { setTopic(e.target.value); setError(''); }}
-            maxLength={255}
-            disabled={loading}
-          />
-          <div className="flex justify-between mt-1 mb-4">
-            {error ? (
-              <p className="text-sm text-red-500">{error}</p>
-            ) : (
-              <span />
-            )}
-            <span className="text-xs text-slate-400">{topic.length}/255</span>
-          </div>
-
-          <button type="submit" className="btn-primary w-full" disabled={loading}>
-            {loading ? (
-              <span className="flex items-center justify-center gap-2">
-                <svg className="animate-spin w-4 h-4" fill="none" viewBox="0 0 24 24">
-                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
-                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z" />
-                </svg>
-                Creating…
-              </span>
-            ) : (
-              'Create Room'
-            )}
-          </button>
-        </form>
+          <form onSubmit={handleSubmit}>
+            <label className="block text-xs font-semibold text-gray-600 mb-1.5">Discussion Topic</label>
+            <textarea
+              rows={3}
+              className="input-base resize-none"
+              placeholder='e.g. "Should India adopt AI in the defence sector?"'
+              value={topic}
+              onChange={e => { setTopic(e.target.value); setError(''); }}
+              maxLength={255} disabled={loading}
+            />
+            <div className="flex justify-between mt-1.5 mb-5">
+              {error ? <p className="text-xs text-red-500">{error}</p> : <span />}
+              <span className="text-[11px] text-gray-300">{topic.length}/255</span>
+            </div>
+            <button type="submit" className="btn-primary w-full py-2.5" disabled={loading}>
+              {loading ? 'Creating…' : 'Create Room'}
+            </button>
+          </form>
+        </div>
       </div>
     </div>
   );
