@@ -189,9 +189,9 @@ export default function LandingPage() {
       <main>
 
         {/* ── Hero ── */}
-        <section className="max-w-5xl mx-auto px-4 sm:px-6 pt-10 sm:pt-16 pb-10 sm:pb-14">
-          <div className="max-w-2xl">
-            <div className="inline-flex items-center gap-2 bg-emerald-50 text-emerald-700 text-xs font-semibold px-3 py-1.5 rounded-full mb-5 border border-emerald-100">
+        <section className="border-b border-gray-100 py-12 sm:py-20 px-4 sm:px-6">
+          <div className="max-w-3xl mx-auto text-center">
+            <div className="inline-flex items-center gap-2 bg-emerald-50 text-emerald-700 text-xs font-semibold px-3 py-1.5 rounded-full mb-6 border border-emerald-100">
               <span className="relative flex h-2 w-2">
                 <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75" />
                 <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500" />
@@ -201,27 +201,29 @@ export default function LandingPage() {
                 : 'Live voice rooms · Join any time'}
             </div>
 
-            <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold text-gray-900 leading-[1.1] tracking-tight mb-4 sm:mb-5">
+            <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold text-gray-900 leading-[1.1] tracking-tight mb-5">
               Practice GD with<br />
               <span className="text-brand-600">real aspirants.</span>
             </h1>
-            <p className="text-gray-500 text-base sm:text-lg leading-relaxed mb-6 sm:mb-8 max-w-lg">
+            <p className="text-gray-500 text-base sm:text-lg leading-relaxed mb-8 max-w-xl mx-auto">
               Create a voice room, share a 6-letter code, and practice SSB group discussions — with a live timer, transcript and self-evaluation tools.
             </p>
-            <div className="flex flex-col xs:flex-row gap-3">
+
+            {/* CTAs — stacked on mobile, row on sm+ */}
+            <div className="flex flex-col sm:flex-row items-center justify-center gap-3 mb-8">
               <button onClick={() => navigate(user ? '/create' : '/register')}
-                className="btn-primary text-sm px-5 py-3 w-full xs:w-auto flex items-center justify-center gap-2">
+                className="btn-primary text-sm px-7 py-3 w-full sm:w-auto flex items-center justify-center gap-2">
                 {user ? 'Create a Room' : 'Get started free'}
                 <ArrowRight className="w-4 h-4" />
               </button>
               <button onClick={() => navigate(user ? '/join' : '/login')}
-                className="btn-secondary text-sm px-5 py-3 w-full xs:w-auto">
+                className="btn-secondary text-sm px-7 py-3 w-full sm:w-auto">
                 Join a Room
               </button>
             </div>
 
             {/* Social proof */}
-            <div className="flex items-center gap-3 mt-6">
+            <div className="flex items-center justify-center gap-3">
               <div className="flex -space-x-2">
                 {['A','V','R','S','P'].map((l, i) => (
                   <div key={i} className="w-7 h-7 rounded-full bg-brand-600 border-2 border-white flex items-center justify-center text-[9px] font-bold text-white" style={{ opacity: 1 - i * 0.12 }}>{l}</div>
