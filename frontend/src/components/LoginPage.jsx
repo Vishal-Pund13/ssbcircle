@@ -6,13 +6,13 @@ import GoogleSignInButton from './GoogleSignInButton';
 function CircleIcon() {
   return (
     <svg viewBox="0 0 48 48" fill="none" className="w-8 h-8">
-      <circle cx="24" cy="24" r="22" stroke="#facc15" strokeWidth="3" />
-      <circle cx="14" cy="20" r="4" fill="#facc15" />
-      <circle cx="24" cy="14" r="4" fill="#facc15" />
-      <circle cx="34" cy="20" r="4" fill="#facc15" />
-      <circle cx="30" cy="32" r="4" fill="#facc15" />
-      <circle cx="18" cy="32" r="4" fill="#facc15" />
-      <path d="M14 20 L24 14 L34 20 L30 32 L18 32 Z" stroke="#facc15" strokeWidth="1.5" fill="none" />
+      <circle cx="24" cy="24" r="22" stroke="#4f46e5" strokeWidth="3" />
+      <circle cx="14" cy="20" r="4" fill="#4f46e5" />
+      <circle cx="24" cy="14" r="4" fill="#4f46e5" />
+      <circle cx="34" cy="20" r="4" fill="#4f46e5" />
+      <circle cx="30" cy="32" r="4" fill="#4f46e5" />
+      <circle cx="18" cy="32" r="4" fill="#4f46e5" />
+      <path d="M14 20 L24 14 L34 20 L30 32 L18 32 Z" stroke="#4f46e5" strokeWidth="1.5" fill="none" />
     </svg>
   );
 }
@@ -46,16 +46,16 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center px-4 bg-[#0f0f0f]">
+    <div className="min-h-screen flex flex-col items-center justify-center px-4 bg-slate-50">
       <div className="w-full max-w-sm">
         <Link to="/" className="flex items-center justify-center gap-2 mb-8">
           <CircleIcon />
-          <span className="text-xl font-extrabold text-white">SSBCircle</span>
+          <span className="text-xl font-bold text-primary-600">SSBCircle</span>
         </Link>
 
         <div className="card">
-          <h1 className="text-xl font-bold text-white mb-1">Welcome back</h1>
-          <p className="text-white/40 text-sm mb-6">Sign in to join discussions</p>
+          <h1 className="text-xl font-bold text-slate-900 mb-1">Welcome back</h1>
+          <p className="text-slate-500 text-sm mb-6">Sign in to join discussions</p>
 
           <GoogleSignInButton
             onSuccess={() => navigate(from, { replace: true })}
@@ -63,14 +63,14 @@ export default function LoginPage() {
           />
 
           <div className="flex items-center gap-3 my-5">
-            <div className="flex-1 h-px bg-white/10" />
-            <span className="text-xs text-white/30">or continue with email</span>
-            <div className="flex-1 h-px bg-white/10" />
+            <div className="flex-1 h-px bg-slate-200" />
+            <span className="text-xs text-slate-400">or continue with email</span>
+            <div className="flex-1 h-px bg-slate-200" />
           </div>
 
           <form onSubmit={handleSubmit} noValidate className="space-y-4">
             <div>
-              <label className="block text-sm font-medium text-white/60 mb-1.5">Username</label>
+              <label className="block text-sm font-medium text-slate-700 mb-1.5">Username</label>
               <input
                 name="username"
                 type="text"
@@ -83,7 +83,7 @@ export default function LoginPage() {
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-white/60 mb-1.5">Password</label>
+              <label className="block text-sm font-medium text-slate-700 mb-1.5">Password</label>
               <input
                 name="password"
                 type="password"
@@ -97,7 +97,7 @@ export default function LoginPage() {
             </div>
 
             {error && (
-              <p className="text-sm text-red-400 bg-red-500/10 border border-red-500/20 rounded-xl px-3 py-2">
+              <p className="text-sm text-red-500 bg-red-50 border border-red-100 rounded-xl px-3 py-2">
                 {error}
               </p>
             )}
@@ -116,9 +116,9 @@ export default function LoginPage() {
           </form>
         </div>
 
-        <p className="text-center text-sm text-white/30 mt-5">
+        <p className="text-center text-sm text-slate-500 mt-5">
           Don&apos;t have an account?{' '}
-          <Link to="/register" className="text-primary-400 font-semibold hover:underline">
+          <Link to="/register" className="text-primary-600 font-semibold hover:underline">
             Create one
           </Link>
         </p>

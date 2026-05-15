@@ -53,20 +53,20 @@ export default function JoinRoom() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center px-4 bg-[#0f0f0f]">
+    <div className="min-h-screen flex items-center justify-center px-4 bg-slate-50">
       <div className="card w-full max-w-md">
-        <Link to="/" className="inline-flex items-center gap-1 text-sm text-white/30 hover:text-white/60 mb-6 transition-colors">
+        <Link to="/" className="inline-flex items-center gap-1 text-sm text-slate-400 hover:text-slate-600 mb-6 transition-colors">
           <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
           </svg>
           Back
         </Link>
 
-        <h1 className="text-2xl font-bold text-white mb-2">Join a Room</h1>
-        <p className="text-white/40 text-sm mb-6">Enter the 6-character code shared by the room host.</p>
+        <h1 className="text-2xl font-bold text-slate-900 mb-2">Join a Room</h1>
+        <p className="text-slate-500 text-sm mb-6">Enter the 6-character code shared by the room host.</p>
 
         <form onSubmit={handleSubmit} noValidate>
-          <label className="block text-sm font-medium text-white/60 mb-1.5" htmlFor="code">
+          <label className="block text-sm font-medium text-slate-700 mb-1.5" htmlFor="code">
             Room Code
           </label>
           <input
@@ -81,7 +81,7 @@ export default function JoinRoom() {
             spellCheck={false}
             disabled={loading}
           />
-          {error && <p className="text-sm text-red-400 mt-2">{error}</p>}
+          {error && <p className="text-sm text-red-500 mt-2">{error}</p>}
 
           <button
             type="submit"
@@ -102,9 +102,9 @@ export default function JoinRoom() {
           </button>
         </form>
 
-        <p className="text-center text-sm text-white/30 mt-6">
+        <p className="text-center text-sm text-slate-400 mt-6">
           Don&apos;t have a code?{' '}
-          <Link to="/create" className="text-primary-400 hover:underline font-medium">
+          <Link to="/create" className="text-primary-600 hover:underline font-medium">
             Create a room
           </Link>
         </p>

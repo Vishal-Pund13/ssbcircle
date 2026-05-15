@@ -61,20 +61,20 @@ export default function CreateRoom() {
 
   if (room) {
     return (
-      <div className="min-h-screen flex items-center justify-center px-4 bg-[#0f0f0f]">
+      <div className="min-h-screen flex items-center justify-center px-4 bg-slate-50">
         <div className="card w-full max-w-md text-center">
-          <div className="w-16 h-16 bg-emerald-500/10 border border-emerald-500/20 rounded-full flex items-center justify-center mx-auto mb-4">
-            <svg className="w-8 h-8 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
+            <svg className="w-8 h-8 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
             </svg>
           </div>
 
-          <h2 className="text-2xl font-bold text-white mb-1">Room Created!</h2>
-          <p className="text-white/40 mb-6 text-sm">{room.topic}</p>
+          <h2 className="text-2xl font-bold text-slate-900 mb-1">Room Created!</h2>
+          <p className="text-slate-500 mb-6 text-sm">{room.topic}</p>
 
-          <div className="bg-primary-400/10 border border-primary-400/20 rounded-2xl p-5 mb-4">
-            <p className="text-xs text-primary-400/70 font-medium tracking-widest uppercase mb-2">Room Code</p>
-            <p className="text-4xl font-extrabold text-primary-400 tracking-widest">{room.room_code}</p>
+          <div className="bg-primary-50 border border-primary-100 rounded-2xl p-5 mb-4">
+            <p className="text-xs text-primary-500 font-medium tracking-widest uppercase mb-2">Room Code</p>
+            <p className="text-4xl font-extrabold text-primary-600 tracking-widest">{room.room_code}</p>
           </div>
 
           <div className="flex items-center gap-2 mb-6">
@@ -103,7 +103,7 @@ export default function CreateRoom() {
             </button>
             <button
               onClick={() => { setRoom(null); setTopic(''); }}
-              className="text-white/30 hover:text-white/60 text-sm transition-colors"
+              className="text-slate-500 hover:text-slate-700 text-sm cursor-pointer"
             >
               Create another room
             </button>
@@ -114,20 +114,20 @@ export default function CreateRoom() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center px-4 bg-[#0f0f0f]">
+    <div className="min-h-screen flex items-center justify-center px-4 bg-slate-50">
       <div className="card w-full max-w-md">
-        <Link to="/" className="inline-flex items-center gap-1 text-sm text-white/30 hover:text-white/60 mb-6 transition-colors">
+        <Link to="/" className="inline-flex items-center gap-1 text-sm text-slate-400 hover:text-slate-600 mb-6 transition-colors">
           <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
           </svg>
           Back
         </Link>
 
-        <h1 className="text-2xl font-bold text-white mb-2">Create a Room</h1>
-        <p className="text-white/40 text-sm mb-6">Enter a topic to start a group discussion practice session.</p>
+        <h1 className="text-2xl font-bold text-slate-900 mb-2">Create a Room</h1>
+        <p className="text-slate-500 text-sm mb-6">Enter a topic to start a group discussion practice session.</p>
 
         <form onSubmit={handleSubmit} noValidate>
-          <label className="block text-sm font-medium text-white/60 mb-1.5" htmlFor="topic">
+          <label className="block text-sm font-medium text-slate-700 mb-1.5" htmlFor="topic">
             GD Topic
           </label>
           <textarea
@@ -142,11 +142,11 @@ export default function CreateRoom() {
           />
           <div className="flex justify-between mt-1 mb-4">
             {error ? (
-              <p className="text-sm text-red-400">{error}</p>
+              <p className="text-sm text-red-500">{error}</p>
             ) : (
               <span />
             )}
-            <span className="text-xs text-white/20">{topic.length}/255</span>
+            <span className="text-xs text-slate-400">{topic.length}/255</span>
           </div>
 
           <button type="submit" className="btn-primary w-full" disabled={loading}>
