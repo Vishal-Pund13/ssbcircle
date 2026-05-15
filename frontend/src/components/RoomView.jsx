@@ -7,11 +7,13 @@ import GDPanel from './GDPanel';
 import {
   LiveKitRoom, RoomAudioRenderer,
   useParticipants, useLocalParticipant, useIsSpeaking, useRoomContext,
+  useTracks, VideoTrack,
 } from '@livekit/components-react';
-import { RoomEvent } from 'livekit-client';
+import { RoomEvent, Track } from 'livekit-client';
 import {
   Mic, MicOff, Timer, FileText, MessageSquare, LogOut,
   AlertCircle, Hand, VolumeX, UserX, PhoneOff, Settings,
+  ScreenShare, ScreenShareOff,
 } from 'lucide-react';
 
 // ── Logo (navy, for light header) ───────────────────────────────────────────
@@ -198,6 +200,10 @@ function VoiceRoomUI({ room, isAdmin, roomCode, showTimer, setShowTimer, showPan
   const { localParticipant } = useLocalParticipant();
   const isMuted = !localParticipant.isMicrophoneEnabled;
 
+  const screenTracks    = useTracks([{ source: Track.Source.ScreenShare, withPlaceholder: false }]);
+  const activeScreen    = screenTracks[0] ?? null;
+  const isScreenSharing = screenTracks.some(t => t.participant.isLocal);
+
   const [myHandRaised, setMyHandRaised] = useState(false);
   const [raisedHands,  setRaisedHands]  = useState(new Set());
   const [chatMessages, setChatMessages] = useState([]);
@@ -262,18 +268,41 @@ function VoiceRoomUI({ room, isAdmin, roomCode, showTimer, setShowTimer, showPan
     onLeave();
   }
 
+  async function toggleScreenShare() {
+    try { await localParticipant.setScreenShareEnabled(!isScreenSharing); }
+    catch { /* user cancelled or browser denied */ }
+  }
+
   function openChat() {
     setPanelTab('chat');
     setShowPanel(true);
     setUnreadChat(0);
   }
 
+  // Participant mini-tile for the screen-share sidebar strip
+  function MiniTile({ p }) {
+    const name     = p.name || p.identity;
+    const initials = name.split(' ').map(w => w[0]).join('').toUpperCase().slice(0, 2);
+    return (
+      <div className={`shrink-0 flex flex-col items-center gap-1 p-2 rounded-lg border transition-all ${
+        p.isSpeaking ? 'border-brand-600 bg-brand-50' : 'border-gray-200 bg-white'
+      }`}>
+        <div className={`w-9 h-9 rounded-full bg-brand-600 flex items-center justify-center text-[11px] font-bold text-white ${
+          p.isSpeaking ? 'ring-2 ring-brand-600/30' : ''
+        }`}>{initials}</div>
+        <span className="text-[9px] text-gray-500 truncate w-full text-center">{p.isLocal ? 'You' : name}</span>
+      </div>
+    );
+  }
+
   return (
     <>
       <RoomAudioRenderer />
 
-      <div className="flex-1 flex overflow-hidden relative">
-        {/* Admin panel */}
+      {/* ── Middle: admin panel + main + right panel ── */}
+      <div className="flex-1 flex overflow-hidden">
+
+        {/* Admin panel — left sidebar on desktop, full overlay on mobile */}
         {showAdmin && isAdmin && (
           <AdminPanel
             participants={participants}
@@ -285,38 +314,69 @@ function VoiceRoomUI({ room, isAdmin, roomCode, showTimer, setShowTimer, showPan
           />
         )}
 
-        {/* Main grid */}
-        <div className="flex-1 overflow-auto p-3 sm:p-6 bg-gray-50">
-          {participants.length === 0 ? (
-            <div className="flex flex-col items-center justify-center h-full text-center">
-              <div className="w-16 h-16 rounded-xl bg-white border border-gray-200 flex items-center justify-center mx-auto mb-4 shadow-sm">
-                <Mic className="w-7 h-7 text-gray-300"/>
+        {/* ── Main content area ── */}
+        <div className="flex-1 flex overflow-hidden bg-gray-50">
+
+          {activeScreen ? (
+            /* ── Screen share: video left + participant strip right ── */
+            <>
+              {/* Screen video */}
+              <div className="flex-1 bg-gray-900 relative overflow-hidden flex items-center justify-center">
+                <VideoTrack trackRef={activeScreen} className="max-w-full max-h-full object-contain" />
+                <div className="absolute top-3 left-3 flex items-center gap-1.5 bg-black/60 text-white text-xs px-2.5 py-1.5 rounded-full backdrop-blur-sm">
+                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
+                  {activeScreen.participant.isLocal
+                    ? 'You are'
+                    : `${activeScreen.participant.name || activeScreen.participant.identity} is`} sharing screen
+                </div>
               </div>
-              <p className="text-gray-600 font-semibold text-sm">Waiting for others to join…</p>
-              <p className="text-gray-400 text-xs mt-1">
-                Share the code{' '}
-                <span className="font-mono font-semibold text-brand-600 bg-brand-50 px-1.5 py-0.5 rounded">
-                  {room.room_code}
-                </span>
-              </p>
-            </div>
+
+              {/* Participant strip — right on desktop, bottom on mobile */}
+              <div className="flex sm:flex-col gap-2 p-2 bg-white border-t sm:border-t-0 sm:border-l border-gray-200 overflow-x-auto sm:overflow-y-auto sm:overflow-x-hidden sm:w-44 shrink-0">
+                {participants.map(p => <MiniTile key={p.identity} p={p} />)}
+              </div>
+            </>
           ) : (
-            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-2 sm:gap-4 max-w-4xl mx-auto">
-              {participants.map(p => (
-                <ParticipantTile
-                  key={p.identity}
-                  participant={p}
-                  handRaised={raisedHands.has(p.identity)}
-                  isAdmin={isAdmin}
-                  roomCode={roomCode}
-                  onMute={muteParticipant}
-                />
-              ))}
+            /* ── Normal participant grid — centered in available space ── */
+            <div className="flex-1 overflow-auto p-3 sm:p-6 flex items-center justify-center">
+              {participants.length === 0 ? (
+                <div className="text-center">
+                  <div className="w-16 h-16 rounded-xl bg-white border border-gray-200 flex items-center justify-center mx-auto mb-4 shadow-sm">
+                    <Mic className="w-7 h-7 text-gray-300"/>
+                  </div>
+                  <p className="text-gray-600 font-semibold text-sm">Waiting for others to join…</p>
+                  <p className="text-gray-400 text-xs mt-1">
+                    Share the code{' '}
+                    <span className="font-mono font-semibold text-brand-600 bg-brand-50 px-1.5 py-0.5 rounded">
+                      {room.room_code}
+                    </span>
+                  </p>
+                </div>
+              ) : (
+                <div className={`grid gap-2 sm:gap-4 w-full max-w-4xl mx-auto ${
+                  participants.length === 1 ? 'grid-cols-1 max-w-xs' :
+                  participants.length === 2 ? 'grid-cols-2 max-w-lg' :
+                  participants.length <= 4  ? 'grid-cols-2' :
+                  participants.length <= 6  ? 'grid-cols-2 sm:grid-cols-3' :
+                  'grid-cols-2 sm:grid-cols-3 lg:grid-cols-4'
+                }`}>
+                  {participants.map(p => (
+                    <ParticipantTile
+                      key={p.identity}
+                      participant={p}
+                      handRaised={raisedHands.has(p.identity)}
+                      isAdmin={isAdmin}
+                      roomCode={roomCode}
+                      onMute={muteParticipant}
+                    />
+                  ))}
+                </div>
+              )}
             </div>
           )}
         </div>
 
-        {/* Notes / chat panel */}
+        {/* Notes / chat panel — right sidebar */}
         {showPanel && (
           <GDPanel
             onClose={() => setShowPanel(false)}
@@ -328,83 +388,102 @@ function VoiceRoomUI({ room, isAdmin, roomCode, showTimer, setShowTimer, showPan
         )}
       </div>
 
-      {/* Bottom bar — scrollable on mobile */}
-      <div className="shrink-0 bg-white border-t border-gray-200 py-2.5 sm:py-3 px-3 sm:px-5 overflow-x-auto">
-      <div className="flex items-center justify-center gap-2 min-w-max mx-auto">
+      {/* ── Bottom bar — GMeet 3-group layout ── */}
+      <div className="shrink-0 bg-white border-t border-gray-200 py-2.5 sm:py-3 px-3 sm:px-5">
 
-        {/* Mic */}
-        <button onClick={() => localParticipant.setMicrophoneEnabled(isMuted)}
-          className={`flex items-center gap-1.5 px-4 py-2 rounded-lg text-sm font-semibold transition-all cursor-pointer border ${
-            isMuted
-              ? 'bg-red-50 text-red-600 border-red-200 hover:bg-red-100'
-              : 'bg-white text-gray-700 border-gray-200 hover:bg-gray-50'
-          }`}>
-          {isMuted ? <MicOff className="w-4 h-4"/> : <Mic className="w-4 h-4"/>}
-          <span className="hidden sm:inline">{isMuted ? 'Unmute' : 'Mute'}</span>
-        </button>
-
-        {/* Raise hand */}
-        <button onClick={toggleHand}
-          className={`flex items-center gap-1.5 px-4 py-2 rounded-lg text-sm font-semibold transition-all cursor-pointer border ${
-            myHandRaised
-              ? 'bg-amber-50 text-amber-600 border-amber-200'
-              : 'bg-white text-gray-600 border-gray-200 hover:bg-gray-50'
-          }`}>
-          <Hand className="w-4 h-4"/>
-          <span className="hidden sm:inline">{myHandRaised ? 'Lower Hand' : 'Raise Hand'}</span>
-        </button>
-
-        {/* Chat */}
-        <button onClick={openChat}
-          className="relative flex items-center gap-1.5 px-4 py-2 rounded-lg text-sm font-semibold bg-white text-gray-600 border border-gray-200 hover:bg-gray-50 transition-all cursor-pointer">
-          <MessageSquare className="w-4 h-4"/>
-          <span className="hidden sm:inline">Chat</span>
-          {unreadChat > 0 && (
-            <span className="absolute -top-1.5 -right-1.5 w-5 h-5 bg-brand-600 text-white text-[9px] font-bold rounded-full flex items-center justify-center">
-              {unreadChat > 9 ? '9+' : unreadChat}
-            </span>
-          )}
-        </button>
-
-        {/* Notes */}
-        <button onClick={() => { setPanelTab('transcript'); setShowPanel(v => !v); }}
-          className={`flex items-center gap-1.5 px-3 py-2 rounded-lg text-sm font-semibold transition-all cursor-pointer border ${
-            showPanel && panelTab !== 'chat'
-              ? 'bg-brand-600 text-white border-brand-600'
-              : 'bg-white text-gray-600 border-gray-200 hover:bg-gray-50'
-          }`}>
-          <FileText className="w-4 h-4"/>
-          <span className="hidden sm:inline">Notes</span>
-        </button>
-
-        {/* Admin controls */}
-        {isAdmin && (
-          <button onClick={() => setShowAdmin(v => !v)}
-            className={`flex items-center gap-1.5 px-3 py-2 rounded-lg text-sm font-semibold transition-all cursor-pointer border ${
-              showAdmin
-                ? 'bg-brand-600 text-white border-brand-600'
-                : 'bg-white text-gray-600 border-gray-200 hover:bg-gray-50'
-            }`}>
-            <Settings className="w-4 h-4"/>
-            <span className="hidden sm:inline">Controls</span>
+        {/* Mobile: single centered scrollable row */}
+        <div className="flex sm:hidden items-center justify-center gap-2 overflow-x-auto">
+          <button onClick={() => localParticipant.setMicrophoneEnabled(isMuted)}
+            className={`shrink-0 flex items-center gap-1.5 px-4 py-2 rounded-lg text-sm font-semibold transition-all cursor-pointer border ${isMuted ? 'bg-red-50 text-red-600 border-red-200' : 'bg-white text-gray-700 border-gray-200'}`}>
+            {isMuted ? <MicOff className="w-4 h-4"/> : <Mic className="w-4 h-4"/>}
           </button>
-        )}
-
-        {/* Count */}
-        <div className="flex items-center gap-1.5 px-3 py-2 bg-gray-50 border border-gray-200 rounded-lg text-xs text-gray-500 font-medium whitespace-nowrap">
-          <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse shrink-0"/>
-          {participants.length} in room
+          <button onClick={toggleHand}
+            className={`shrink-0 flex items-center gap-1.5 px-4 py-2 rounded-lg text-sm font-semibold transition-all cursor-pointer border ${myHandRaised ? 'bg-amber-50 text-amber-600 border-amber-200' : 'bg-white text-gray-600 border-gray-200'}`}>
+            <Hand className="w-4 h-4"/>
+          </button>
+          <button onClick={toggleScreenShare}
+            className={`shrink-0 flex items-center gap-1.5 px-3 py-2 rounded-lg text-sm font-semibold transition-all cursor-pointer border ${isScreenSharing ? 'bg-emerald-50 text-emerald-600 border-emerald-200' : 'bg-white text-gray-600 border-gray-200'}`}>
+            {isScreenSharing ? <ScreenShareOff className="w-4 h-4"/> : <ScreenShare className="w-4 h-4"/>}
+          </button>
+          <button onClick={openChat}
+            className="shrink-0 relative flex items-center gap-1.5 px-3 py-2 rounded-lg text-sm font-semibold bg-white text-gray-600 border border-gray-200 cursor-pointer">
+            <MessageSquare className="w-4 h-4"/>
+            {unreadChat > 0 && <span className="absolute -top-1.5 -right-1.5 w-5 h-5 bg-brand-600 text-white text-[9px] font-bold rounded-full flex items-center justify-center">{unreadChat > 9 ? '9+' : unreadChat}</span>}
+          </button>
+          <button onClick={() => { setPanelTab('transcript'); setShowPanel(v => !v); }}
+            className={`shrink-0 flex items-center gap-1.5 px-3 py-2 rounded-lg text-sm font-semibold transition-all cursor-pointer border ${showPanel && panelTab !== 'chat' ? 'bg-brand-600 text-white border-brand-600' : 'bg-white text-gray-600 border-gray-200'}`}>
+            <FileText className="w-4 h-4"/>
+          </button>
+          {isAdmin && (
+            <button onClick={() => setShowAdmin(v => !v)}
+              className={`shrink-0 flex items-center gap-1.5 px-3 py-2 rounded-lg text-sm font-semibold transition-all cursor-pointer border ${showAdmin ? 'bg-brand-600 text-white border-brand-600' : 'bg-white text-gray-600 border-gray-200'}`}>
+              <Settings className="w-4 h-4"/>
+            </button>
+          )}
+          <button onClick={onLeave}
+            className="shrink-0 flex items-center gap-1.5 px-3 py-2 rounded-lg text-sm font-semibold bg-red-500 hover:bg-red-600 text-white transition-colors cursor-pointer">
+            <LogOut className="w-4 h-4"/>
+          </button>
         </div>
 
-        {/* Leave */}
-        <button onClick={onLeave}
-          className="flex items-center gap-1.5 px-3 py-2 rounded-lg text-sm font-semibold bg-red-500 hover:bg-red-600 text-white transition-colors cursor-pointer">
-          <LogOut className="w-4 h-4"/>
-          <span className="hidden sm:inline">Leave</span>
-        </button>
+        {/* Desktop: 3-column GMeet layout */}
+        <div className="hidden sm:grid grid-cols-3 items-center">
 
-      </div>{/* end min-w-max */}
-      </div>{/* end overflow-x-auto */}
+          {/* Left — room info */}
+          <div className="flex items-center gap-3">
+            <div className="flex items-center gap-1.5 px-3 py-2 bg-gray-50 border border-gray-200 rounded-lg text-xs text-gray-500 font-medium">
+              <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse shrink-0"/>
+              {participants.length} in room
+            </div>
+            <span className="text-xs font-mono text-gray-400 px-2.5 py-2 border border-gray-200 rounded-lg bg-gray-50">
+              {room.room_code}
+            </span>
+          </div>
+
+          {/* Center — primary controls */}
+          <div className="flex items-center justify-center gap-2">
+            <button onClick={() => localParticipant.setMicrophoneEnabled(isMuted)}
+              className={`flex items-center gap-1.5 px-4 py-2 rounded-lg text-sm font-semibold transition-all cursor-pointer border ${isMuted ? 'bg-red-50 text-red-600 border-red-200 hover:bg-red-100' : 'bg-white text-gray-700 border-gray-200 hover:bg-gray-50'}`}>
+              {isMuted ? <MicOff className="w-4 h-4"/> : <Mic className="w-4 h-4"/>}
+              {isMuted ? 'Unmute' : 'Mute'}
+            </button>
+            <button onClick={toggleHand}
+              className={`flex items-center gap-1.5 px-4 py-2 rounded-lg text-sm font-semibold transition-all cursor-pointer border ${myHandRaised ? 'bg-amber-50 text-amber-600 border-amber-200' : 'bg-white text-gray-600 border-gray-200 hover:bg-gray-50'}`}>
+              <Hand className="w-4 h-4"/>
+              {myHandRaised ? 'Lower Hand' : 'Raise Hand'}
+            </button>
+            <button onClick={toggleScreenShare}
+              className={`flex items-center gap-1.5 px-3 py-2 rounded-lg text-sm font-semibold transition-all cursor-pointer border ${isScreenSharing ? 'bg-emerald-50 text-emerald-600 border-emerald-200 hover:bg-emerald-100' : 'bg-white text-gray-600 border-gray-200 hover:bg-gray-50'}`}>
+              {isScreenSharing ? <ScreenShareOff className="w-4 h-4"/> : <ScreenShare className="w-4 h-4"/>}
+              {isScreenSharing ? 'Stop Share' : 'Share Screen'}
+            </button>
+            <button onClick={onLeave}
+              className="flex items-center gap-1.5 px-4 py-2 rounded-lg text-sm font-semibold bg-red-500 hover:bg-red-600 text-white transition-colors cursor-pointer">
+              <LogOut className="w-4 h-4"/> Leave
+            </button>
+          </div>
+
+          {/* Right — secondary controls */}
+          <div className="flex items-center justify-end gap-2">
+            <button onClick={openChat}
+              className="relative flex items-center gap-1.5 px-3 py-2 rounded-lg text-sm font-semibold bg-white text-gray-600 border border-gray-200 hover:bg-gray-50 transition-all cursor-pointer">
+              <MessageSquare className="w-4 h-4"/> Chat
+              {unreadChat > 0 && <span className="absolute -top-1.5 -right-1.5 w-5 h-5 bg-brand-600 text-white text-[9px] font-bold rounded-full flex items-center justify-center">{unreadChat > 9 ? '9+' : unreadChat}</span>}
+            </button>
+            <button onClick={() => { setPanelTab('transcript'); setShowPanel(v => !v); }}
+              className={`flex items-center gap-1.5 px-3 py-2 rounded-lg text-sm font-semibold transition-all cursor-pointer border ${showPanel && panelTab !== 'chat' ? 'bg-brand-600 text-white border-brand-600' : 'bg-white text-gray-600 border-gray-200 hover:bg-gray-50'}`}>
+              <FileText className="w-4 h-4"/> Notes
+            </button>
+            {isAdmin && (
+              <button onClick={() => setShowAdmin(v => !v)}
+                className={`flex items-center gap-1.5 px-3 py-2 rounded-lg text-sm font-semibold transition-all cursor-pointer border ${showAdmin ? 'bg-brand-600 text-white border-brand-600' : 'bg-white text-gray-600 border-gray-200 hover:bg-gray-50'}`}>
+                <Settings className="w-4 h-4"/> Controls
+              </button>
+            )}
+          </div>
+
+        </div>
+      </div>
 
       {showTimer && <GDTimer onClose={() => setShowTimer(false)} />}
     </>

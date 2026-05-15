@@ -4,10 +4,13 @@ const { AccessToken } = require('livekit-server-sdk');
 const { createRoom, getRoomByCode, getActiveRooms, closeRoom } = require('../models/Room');
 const authMiddleware = require('../middleware/auth');
 
+const VALID_CATEGORIES = ['GD', 'PPDT', 'Lecturette', 'IO Practice'];
+const GD_SUBCATEGORIES = ['Defence', 'International Relations', 'Society', 'Economy', 'Science & Tech', 'Environment', 'Sports & Awards'];
+
 // Create room — requires auth
 router.post('/', authMiddleware, async (req, res) => {
   try {
-    const { title, description } = req.body;
+    const { title, description, category, subcategory } = req.body;
 
     if (!title || typeof title !== 'string' || title.trim().length < 5) {
       return res.status(400).json({ error: 'Room title must be at least 5 characters' });
@@ -21,8 +24,14 @@ router.post('/', authMiddleware, async (req, res) => {
     if (description.trim().length > 500) {
       return res.status(400).json({ error: 'Description must be under 500 characters' });
     }
+    if (!category || !VALID_CATEGORIES.includes(category)) {
+      return res.status(400).json({ error: 'Invalid category' });
+    }
+    if (subcategory && category === 'GD' && !GD_SUBCATEGORIES.includes(subcategory)) {
+      return res.status(400).json({ error: 'Invalid subcategory' });
+    }
 
-    const room = await createRoom(title.trim(), description.trim(), req.userId, req.displayName);
+    const room = await createRoom(title.trim(), description.trim(), category, subcategory || null, req.userId, req.displayName);
     res.status(201).json({ room });
   } catch (err) {
     console.error('Create room error:', err);

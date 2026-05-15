@@ -4,6 +4,16 @@ import { createRoom } from '../services/api';
 import { useAuth } from '../context/AuthContext';
 import { Copy, Check, ArrowRight, AlertCircle, Info } from 'lucide-react';
 
+const CATEGORIES = ['GD', 'PPDT', 'Lecturette', 'IO Practice'];
+const GD_SUBCATEGORIES = ['Defence', 'International Relations', 'Society', 'Economy', 'Science & Tech', 'Environment', 'Sports & Awards'];
+
+const CATEGORY_META = {
+  'GD':          { label: 'Group Discussion',                  desc: 'Topic-based group discussion' },
+  'PPDT':        { label: 'PPDT',                              desc: 'Picture Perception & Discussion' },
+  'Lecturette':  { label: 'Lecturette',                        desc: 'Individual talk on a topic' },
+  'IO Practice': { label: 'IO Practice',                       desc: 'Individual Obstacles practice' },
+};
+
 export default function CreateRoom() {
   const navigate  = useNavigate();
   const location  = useLocation();
@@ -11,6 +21,8 @@ export default function CreateRoom() {
 
   const [title,       setTitle]       = useState('');
   const [description, setDescription] = useState('');
+  const [category,    setCategory]    = useState('GD');
+  const [subcategory, setSubcategory] = useState('');
   const [loading,     setLoading]     = useState(false);
   const [room,        setRoom]        = useState(null);
   const [copied,      setCopied]      = useState(false);
@@ -20,10 +32,11 @@ export default function CreateRoom() {
 
   function validate() {
     const e = {};
-    if (title.trim().length < 5)   e.title = 'Title must be at least 5 characters';
-    if (title.trim().length > 100)  e.title = 'Title must be under 100 characters';
-    if (description.trim().length < 10)  e.description = 'Description must be at least 10 characters';
-    if (description.trim().length > 500) e.description = 'Description must be under 500 characters';
+    if (title.trim().length < 5)          e.title = 'Title must be at least 5 characters';
+    if (title.trim().length > 100)         e.title = 'Title must be under 100 characters';
+    if (description.trim().length < 10)    e.description = 'Description must be at least 10 characters';
+    if (description.trim().length > 500)   e.description = 'Description must be under 500 characters';
+    if (!CATEGORIES.includes(category))    e.category = 'Please select a category';
     return e;
   }
 
@@ -37,7 +50,7 @@ export default function CreateRoom() {
     setLoading(true);
     setErrors({});
     try {
-      const created = await createRoom(title.trim(), description.trim());
+      const created = await createRoom(title.trim(), description.trim(), category, subcategory || null);
       setRoom(created);
     } catch (err) {
       setErrors({ general: err.message });
@@ -64,6 +77,16 @@ export default function CreateRoom() {
           </div>
           <h2 className="text-xl font-bold text-gray-900 mb-1">Room Created!</h2>
           <p className="text-gray-400 text-sm mb-1 font-medium">{room.topic}</p>
+          <div className="flex items-center justify-center gap-1.5 mb-3">
+            <span className="text-xs font-semibold px-2 py-0.5 rounded-full bg-brand-600/10 text-brand-600 border border-brand-600/20">
+              {room.category}
+            </span>
+            {room.subcategory && (
+              <span className="text-xs font-medium px-2 py-0.5 rounded-full bg-gray-100 text-gray-500">
+                {room.subcategory}
+              </span>
+            )}
+          </div>
           {room.description && (
             <p className="text-gray-400 text-xs mb-5 max-w-xs mx-auto line-clamp-2">{room.description}</p>
           )}
@@ -81,7 +104,7 @@ export default function CreateRoom() {
             className="btn-primary w-full py-2.5 mb-3 flex items-center justify-center gap-2">
             Enter Room <ArrowRight className="w-4 h-4" />
           </button>
-          <button onClick={() => { setRoom(null); setTitle(''); setDescription(''); }}
+          <button onClick={() => { setRoom(null); setTitle(''); setDescription(''); setCategory('GD'); setSubcategory(''); }}
             className="text-sm text-gray-400 hover:text-gray-600 cursor-pointer transition-colors">
             Create another room
           </button>
@@ -89,6 +112,8 @@ export default function CreateRoom() {
       </div>
     );
   }
+
+  const isValid = title.trim().length >= 5 && description.trim().length >= 10;
 
   // ── Form ───────────────────────────────────────────────────────────────────
   return (
@@ -100,7 +125,7 @@ export default function CreateRoom() {
 
         <div className="bg-white border border-gray-200 rounded-xl shadow-sm p-6 sm:p-8">
           <h1 className="text-xl font-bold text-gray-900 mb-1">Create a Room</h1>
-          <p className="text-sm text-gray-400 mb-6">Give your room a clear title and purpose so others know what to expect.</p>
+          <p className="text-sm text-gray-400 mb-6">Give your room a clear title, purpose, and type.</p>
 
           {errors.general && (
             <div className="mb-4 flex items-center gap-2 text-sm text-red-600 bg-red-50 border border-red-100 rounded-lg px-3 py-2.5">
@@ -110,6 +135,60 @@ export default function CreateRoom() {
           )}
 
           <form onSubmit={handleSubmit} noValidate className="space-y-5">
+
+            {/* Category */}
+            <div>
+              <label className="text-xs font-semibold text-gray-600 block mb-2">
+                Room Type <span className="text-red-400">*</span>
+              </label>
+              <div className="grid grid-cols-2 gap-2">
+                {CATEGORIES.map(cat => (
+                  <button
+                    key={cat}
+                    type="button"
+                    onClick={() => { setCategory(cat); setSubcategory(''); setErrors(p => ({ ...p, category: '' })); }}
+                    className={`text-left px-3 py-2.5 rounded-lg border text-xs font-medium transition-all cursor-pointer ${
+                      category === cat
+                        ? 'border-brand-600 bg-brand-600/5 text-brand-600'
+                        : 'border-gray-200 text-gray-500 hover:border-gray-300 hover:bg-gray-50'
+                    }`}
+                  >
+                    <span className="block font-semibold">{cat}</span>
+                    <span className="block text-[10px] mt-0.5 opacity-70">{CATEGORY_META[cat].desc}</span>
+                  </button>
+                ))}
+              </div>
+              {errors.category && (
+                <p className="text-xs text-red-500 mt-1.5 flex items-center gap-1">
+                  <AlertCircle className="w-3 h-3 shrink-0" /> {errors.category}
+                </p>
+              )}
+            </div>
+
+            {/* GD Subcategory */}
+            {category === 'GD' && (
+              <div>
+                <label className="text-xs font-semibold text-gray-600 block mb-2">
+                  GD Topic Area <span className="text-gray-300 font-normal">(optional)</span>
+                </label>
+                <div className="flex flex-wrap gap-1.5">
+                  {GD_SUBCATEGORIES.map(sub => (
+                    <button
+                      key={sub}
+                      type="button"
+                      onClick={() => setSubcategory(p => p === sub ? '' : sub)}
+                      className={`px-2.5 py-1 rounded-full border text-[11px] font-medium transition-all cursor-pointer ${
+                        subcategory === sub
+                          ? 'border-brand-600 bg-brand-600 text-white'
+                          : 'border-gray-200 text-gray-500 hover:border-gray-300 hover:bg-gray-50'
+                      }`}
+                    >
+                      {sub}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            )}
 
             {/* Title */}
             <div>
@@ -179,13 +258,14 @@ export default function CreateRoom() {
 
             {/* Progress hints */}
             <div className="flex gap-2">
+              <div className={`flex-1 h-1 rounded-full transition-all ${category ? 'bg-brand-600' : 'bg-gray-100'}`} />
               <div className={`flex-1 h-1 rounded-full transition-all ${title.trim().length >= 5 ? 'bg-brand-600' : 'bg-gray-100'}`} />
               <div className={`flex-1 h-1 rounded-full transition-all ${description.trim().length >= 10 ? 'bg-brand-600' : 'bg-gray-100'}`} />
             </div>
 
             <button type="submit"
               className="btn-primary w-full py-2.5"
-              disabled={loading || title.trim().length < 5 || description.trim().length < 10}>
+              disabled={loading || !isValid}>
               {loading ? (
                 <span className="flex items-center justify-center gap-2">
                   <svg className="animate-spin w-4 h-4" fill="none" viewBox="0 0 24 24">

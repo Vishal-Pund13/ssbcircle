@@ -4,6 +4,17 @@ import { getActiveRooms, closeRoom } from '../services/api';
 import { useAuth } from '../context/AuthContext';
 import { Mic, Timer, FileText, CheckSquare, Lock, Radio, ArrowRight, Trash2 } from 'lucide-react';
 
+const CATEGORIES = ['All', 'GD', 'PPDT', 'Lecturette', 'IO Practice'];
+const GD_SUBCATEGORIES = ['Defence', 'International Relations', 'Society', 'Economy', 'Science & Tech', 'Environment', 'Sports & Awards'];
+const PAGE_SIZE = 6;
+
+const CATEGORY_COLORS = {
+  'GD':          'bg-blue-50 text-blue-700 border-blue-100',
+  'PPDT':        'bg-purple-50 text-purple-700 border-purple-100',
+  'Lecturette':  'bg-orange-50 text-orange-700 border-orange-100',
+  'IO Practice': 'bg-emerald-50 text-emerald-700 border-emerald-100',
+};
+
 function Logo() {
   return (
     <div className="flex items-center gap-2">
@@ -41,6 +52,7 @@ function timeAgo(dateStr) {
 function RoomCard({ room, user, onJoin, onDelete }) {
   const [deleting, setDeleting] = useState(false);
   const isCreator = user && room.created_by === user.id;
+  const colorClass = CATEGORY_COLORS[room.category] || 'bg-gray-100 text-gray-500 border-gray-200';
 
   async function handleDelete(e) {
     e.stopPropagation();
@@ -71,6 +83,20 @@ function RoomCard({ room, user, onJoin, onDelete }) {
               </button>
             )}
           </div>
+        </div>
+
+        {/* Category badges */}
+        <div className="flex items-center gap-1.5">
+          {room.category && (
+            <span className={`text-[10px] font-semibold px-2 py-0.5 rounded-full border ${colorClass}`}>
+              {room.category}
+            </span>
+          )}
+          {room.subcategory && (
+            <span className="text-[10px] font-medium px-2 py-0.5 rounded-full bg-gray-50 text-gray-400 border border-gray-100">
+              {room.subcategory}
+            </span>
+          )}
         </div>
 
         <div className="flex-1">
@@ -119,8 +145,11 @@ function Skeleton() {
 export default function LandingPage() {
   const navigate = useNavigate();
   const { user, logout } = useAuth();
-  const [rooms, setRooms] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const [rooms,       setRooms]       = useState([]);
+  const [loading,     setLoading]     = useState(true);
+  const [catFilter,   setCatFilter]   = useState('All');
+  const [subFilter,   setSubFilter]   = useState('');
+  const [visibleCount, setVisibleCount] = useState(PAGE_SIZE);
 
   async function fetchRooms() {
     try { setRooms(await getActiveRooms()); }
@@ -133,6 +162,25 @@ export default function LandingPage() {
     const t = setInterval(fetchRooms, 15000);
     return () => clearInterval(t);
   }, []);
+
+  // Reset visible count when filter changes
+  function handleCatFilter(cat) {
+    setCatFilter(cat);
+    setSubFilter('');
+    setVisibleCount(PAGE_SIZE);
+  }
+  function handleSubFilter(sub) {
+    setSubFilter(p => p === sub ? '' : sub);
+    setVisibleCount(PAGE_SIZE);
+  }
+
+  const filteredRooms = rooms.filter(r => {
+    if (catFilter !== 'All' && r.category !== catFilter) return false;
+    if (subFilter && r.subcategory !== subFilter) return false;
+    return true;
+  });
+  const displayedRooms = filteredRooms.slice(0, visibleCount);
+  const hasMore = filteredRooms.length > visibleCount;
 
   function handleJoin(code) {
     if (!user) { navigate('/login'); return; }
@@ -215,7 +263,6 @@ export default function LandingPage() {
                 Create a voice room, share a 6-letter code, and practice SSB group discussions — with a live timer, transcript and self-evaluation tools.
               </p>
 
-              {/* CTAs — stacked on mobile, row on sm+ */}
               <div className="flex flex-col sm:flex-row gap-3 mb-8">
                 <button onClick={() => navigate(user ? '/create' : '/register')}
                   className="btn-primary text-sm px-7 py-3 w-full sm:w-auto flex items-center justify-center gap-2">
@@ -228,7 +275,6 @@ export default function LandingPage() {
                 </button>
               </div>
 
-              {/* Social proof */}
               <div className="flex items-center gap-3">
                 <div className="flex -space-x-2">
                   {['A','V','R','S','P'].map((l, i) => (
@@ -281,16 +327,56 @@ export default function LandingPage() {
             </button>
           </div>
 
+          {/* ── Category filter tabs ── */}
+          <div className="mb-4">
+            <div className="flex gap-2 overflow-x-auto pb-1 scrollbar-hide">
+              {CATEGORIES.map(cat => (
+                <button
+                  key={cat}
+                  onClick={() => handleCatFilter(cat)}
+                  className={`shrink-0 px-3.5 py-1.5 rounded-full text-xs font-semibold border transition-all cursor-pointer ${
+                    catFilter === cat
+                      ? 'bg-brand-600 text-white border-brand-600'
+                      : 'bg-white text-gray-500 border-gray-200 hover:border-gray-300 hover:bg-gray-50'
+                  }`}
+                >
+                  {cat}
+                </button>
+              ))}
+            </div>
+
+            {/* GD subtopic chips */}
+            {catFilter === 'GD' && (
+              <div className="flex gap-1.5 flex-wrap mt-2.5">
+                {GD_SUBCATEGORIES.map(sub => (
+                  <button
+                    key={sub}
+                    onClick={() => handleSubFilter(sub)}
+                    className={`px-2.5 py-1 rounded-full border text-[11px] font-medium transition-all cursor-pointer ${
+                      subFilter === sub
+                        ? 'bg-blue-600 text-white border-blue-600'
+                        : 'bg-white text-gray-400 border-gray-200 hover:border-gray-300'
+                    }`}
+                  >
+                    {sub}
+                  </button>
+                ))}
+              </div>
+            )}
+          </div>
+
           {loading ? (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4">
               <Skeleton /><Skeleton /><Skeleton />
             </div>
-          ) : rooms.length === 0 ? (
+          ) : filteredRooms.length === 0 ? (
             <div className="border border-dashed border-gray-200 rounded-xl py-12 sm:py-16 text-center px-6">
               <div className="w-12 h-12 rounded-xl bg-gray-50 border border-gray-100 flex items-center justify-center mx-auto mb-4">
                 <Radio className="w-5 h-5 text-gray-300" />
               </div>
-              <p className="text-sm font-medium text-gray-700 mb-1">No active rooms right now</p>
+              <p className="text-sm font-medium text-gray-700 mb-1">
+                {catFilter === 'All' ? 'No active rooms right now' : `No active ${catFilter} rooms`}
+              </p>
               <p className="text-xs text-gray-400 mb-5 max-w-xs mx-auto">
                 Start a discussion and share the code with your batch.
               </p>
@@ -302,10 +388,22 @@ export default function LandingPage() {
           ) : (
             <>
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4">
-                {rooms.map(r => (
+                {displayedRooms.map(r => (
                   <RoomCard key={r.id} room={r} user={user} onJoin={handleJoin} onDelete={handleDelete} />
                 ))}
               </div>
+
+              {/* Load more */}
+              {hasMore && (
+                <div className="mt-5 text-center">
+                  <button
+                    onClick={() => setVisibleCount(p => p + PAGE_SIZE)}
+                    className="btn-secondary text-xs py-2 px-6"
+                  >
+                    Load more · {filteredRooms.length - visibleCount} remaining
+                  </button>
+                </div>
+              )}
 
               {!user && (
                 <div className="mt-4 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 bg-brand-50 border border-brand-100 rounded-xl px-4 sm:px-5 py-4">

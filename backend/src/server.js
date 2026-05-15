@@ -69,6 +69,8 @@ async function start() {
     await pool.query(`ALTER TABLE rooms ADD COLUMN IF NOT EXISTS created_by UUID REFERENCES users(id)`);
     await pool.query(`ALTER TABLE rooms ADD COLUMN IF NOT EXISTS admin_username VARCHAR(100)`);
     await pool.query(`ALTER TABLE rooms ADD COLUMN IF NOT EXISTS description TEXT`);
+    await pool.query(`ALTER TABLE rooms ADD COLUMN IF NOT EXISTS category VARCHAR(50) DEFAULT 'GD'`);
+    await pool.query(`ALTER TABLE rooms ADD COLUMN IF NOT EXISTS subcategory VARCHAR(50)`);
 
     app.listen(PORT, () => console.log(`SSBCircle backend running on port ${PORT}`));
   } catch (err) {
