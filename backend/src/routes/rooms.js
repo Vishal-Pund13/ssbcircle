@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const jwt = require('jsonwebtoken');
+const { AccessToken } = require('livekit-server-sdk');
 const { createRoom, getRoomByCode, getActiveRooms, closeRoom } = require('../models/Room');
 const authMiddleware = require('../middleware/auth');
 
@@ -34,7 +34,32 @@ router.get('/active', async (req, res) => {
   }
 });
 
-// JaaS JWT for a room — requires auth
+// Kick participant (host only) — calls LiveKit server API
+router.post('/:code/kick', authMiddleware, async (req, res) => {
+  try {
+    const { code } = req.params;
+    const { identity } = req.body;
+    if (!identity) return res.status(400).json({ error: 'identity required' });
+
+    const room = await getRoomByCode(code);
+    if (!room) return res.status(404).json({ error: 'Room not found' });
+    if (room.created_by !== req.userId) return res.status(403).json({ error: 'Only the host can remove participants' });
+
+    const { RoomServiceClient } = require('livekit-server-sdk');
+    const svc = new RoomServiceClient(
+      process.env.LIVEKIT_URL,
+      process.env.LIVEKIT_API_KEY,
+      process.env.LIVEKIT_API_SECRET
+    );
+    await svc.removeParticipant(room.room_code, identity);
+    res.json({ success: true });
+  } catch (err) {
+    console.error('Kick error:', err);
+    res.status(500).json({ error: 'Failed to remove participant' });
+  }
+});
+
+// LiveKit token for a room — requires auth
 router.get('/:code/token', authMiddleware, async (req, res) => {
   try {
     const { code } = req.params;
@@ -42,51 +67,38 @@ router.get('/:code/token', authMiddleware, async (req, res) => {
       return res.status(400).json({ error: 'Invalid room code format' });
     }
 
-    const appId = process.env.JAAS_APP_ID;
-    const keyId = process.env.JAAS_KEY_ID;
-    const privateKeyB64 = process.env.JAAS_PRIVATE_KEY_BASE64;
+    const apiKey    = process.env.LIVEKIT_API_KEY;
+    const apiSecret = process.env.LIVEKIT_API_SECRET;
+    const url       = process.env.LIVEKIT_URL;
 
-    if (!appId || !keyId || !privateKeyB64) {
-      return res.status(503).json({ error: 'JaaS not configured on server' });
+    if (!apiKey || !apiSecret || !url) {
+      return res.status(503).json({ error: 'LiveKit not configured on server' });
     }
-
-    const privateKey = Buffer.from(privateKeyB64, 'base64').toString('utf8');
 
     const room = await getRoomByCode(code);
     if (!room) return res.status(404).json({ error: 'Room not found or no longer active' });
 
     const isModerator = room.created_by === req.userId;
 
-    const payload = {
-      iss: 'chat',
-      aud: 'jitsi',
-      sub: appId,
-      room: '*',
-      context: {
-        user: {
-          id: String(req.userId),
-          name: req.displayName,
-          moderator: isModerator,
-        },
-        features: {
-          livestreaming: false,
-          recording: false,
-          transcription: false,
-          'outbound-call': false,
-        },
-      },
-    };
-
-    const token = jwt.sign(payload, privateKey, {
-      algorithm: 'RS256',
-      expiresIn: '6h',
-      keyid: `${appId}/${keyId}`,
-      notBefore: '-5s',
+    const at = new AccessToken(apiKey, apiSecret, {
+      identity: String(req.userId),
+      name:     req.displayName,
+      ttl:      '6h',
     });
 
-    res.json({ token, appId });
+    at.addGrant({
+      room:           room.room_code,
+      roomJoin:       true,
+      canPublish:     true,
+      canSubscribe:   true,
+      canPublishData: true,
+      roomAdmin:      isModerator,
+    });
+
+    const token = await at.toJwt();
+    res.json({ token, url });
   } catch (err) {
-    console.error('JaaS token error:', err);
+    console.error('LiveKit token error:', err);
     res.status(500).json({ error: 'Failed to generate meeting token' });
   }
 });

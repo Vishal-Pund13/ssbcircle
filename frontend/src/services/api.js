@@ -65,7 +65,12 @@ export const closeRoom = async (code) => {
   return data;
 };
 
-export const getJaasToken = async (code) => {
+export const getRoomToken = async (code) => {
   const { data } = await api.get(`/api/rooms/${code}/token`);
-  return data; // { token, appId }
+  return data; // { token, url }
+};
+
+export const kickParticipant = async (code, identity) => {
+  const { data } = await api.post(`/api/rooms/${code}/kick`, { identity });
+  return data;
 };

@@ -2,12 +2,12 @@ import { useEffect, useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { getActiveRooms, closeRoom } from '../services/api';
 import { useAuth } from '../context/AuthContext';
-import { Mic, Timer, FileText, CheckSquare, Lock, Radio } from 'lucide-react';
+import { Mic, Timer, FileText, CheckSquare, Lock, Radio, ArrowRight, Trash2 } from 'lucide-react';
 
 function Logo() {
   return (
-    <div className="flex items-center gap-2.5">
-      <svg viewBox="0 0 48 48" fill="none" className="w-7 h-7">
+    <div className="flex items-center gap-2">
+      <svg viewBox="0 0 48 48" fill="none" className="w-7 h-7 shrink-0">
         <circle cx="24" cy="24" r="22" stroke="#1e3a5f" strokeWidth="3" />
         <circle cx="14" cy="20" r="3.5" fill="#1e3a5f" />
         <circle cx="24" cy="14" r="3.5" fill="#1e3a5f" />
@@ -25,7 +25,7 @@ function Avatar({ name, avatarUrl }) {
   const initials = name?.split(' ').map(w => w[0]).join('').toUpperCase().slice(0, 2) || '?';
   if (avatarUrl) return <img src={avatarUrl} alt={name} className="w-7 h-7 rounded-full object-cover" />;
   return (
-    <div className="w-7 h-7 rounded-full bg-brand-600 flex items-center justify-center text-[10px] font-semibold text-white">
+    <div className="w-7 h-7 rounded-full bg-brand-600 flex items-center justify-center text-[10px] font-bold text-white shrink-0">
       {initials}
     </div>
   );
@@ -51,43 +51,47 @@ function RoomCard({ room, user, onJoin, onDelete }) {
   }
 
   return (
-    <div className="bg-white border border-gray-200 rounded-xl p-5 flex flex-col gap-3 hover:border-gray-300 hover:shadow-sm transition-all">
-      <div className="flex items-center justify-between">
-        <div className="flex items-center gap-2">
-          <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
-          <span className="text-[11px] font-mono font-medium text-gray-400 tracking-widest">{room.room_code}</span>
+    <div className="bg-white border border-gray-200 rounded-xl overflow-hidden hover:border-brand-600/30 hover:shadow-md transition-all duration-200 flex flex-col">
+      <div className="h-0.5 bg-brand-600" />
+      <div className="p-4 flex flex-col gap-3 flex-1">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <span className="relative flex h-2 w-2">
+              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75" />
+              <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500" />
+            </span>
+            <span className="text-[11px] font-mono font-semibold text-gray-400 tracking-widest">{room.room_code}</span>
+          </div>
+          <div className="flex items-center gap-1.5">
+            <span className="text-[11px] text-gray-300">{timeAgo(room.created_at)}</span>
+            {isCreator && (
+              <button onClick={handleDelete} disabled={deleting}
+                className="p-1 text-gray-300 hover:text-red-500 transition-colors cursor-pointer disabled:opacity-40">
+                <Trash2 className="w-3.5 h-3.5" />
+              </button>
+            )}
+          </div>
         </div>
-        <span className="text-xs text-gray-300">{timeAgo(room.created_at)}</span>
-      </div>
 
-      <p className="text-sm font-medium text-gray-800 leading-snug line-clamp-2">
-        {room.topic}
-      </p>
-
-      {room.admin_display_name && (
-        <p className="text-xs text-gray-400">
-          {isCreator
-            ? <span className="text-brand-600 font-medium">You · Host</span>
-            : <>by <span className="text-gray-600">{room.admin_display_name}</span></>}
+        <p className="text-sm font-semibold text-gray-800 leading-snug line-clamp-2 flex-1">
+          {room.topic}
         </p>
-      )}
 
-      <div className="flex gap-2 pt-1">
+        {room.admin_display_name && (
+          <p className="text-xs text-gray-400">
+            {isCreator
+              ? <span className="text-brand-600 font-medium">You · Host</span>
+              : <>by <span className="text-gray-600 font-medium">{room.admin_display_name}</span></>}
+          </p>
+        )}
+
         <button
           onClick={() => onJoin(room.room_code)}
-          className="btn-primary flex-1 py-2 text-xs"
+          className="w-full flex items-center justify-center gap-1.5 bg-brand-600 hover:bg-brand-700 text-white text-xs font-semibold py-2.5 rounded-lg transition-colors cursor-pointer"
         >
-          Join Room
+          <Mic className="w-3.5 h-3.5" />
+          {user ? 'Join Room' : 'Sign in to Join'}
         </button>
-        {isCreator && (
-          <button
-            onClick={handleDelete}
-            disabled={deleting}
-            className="px-3 text-gray-300 hover:text-red-400 border border-gray-200 rounded-lg hover:border-red-200 transition-colors cursor-pointer disabled:opacity-40 text-sm"
-          >
-            ×
-          </button>
-        )}
       </div>
     </div>
   );
@@ -95,11 +99,14 @@ function RoomCard({ room, user, onJoin, onDelete }) {
 
 function Skeleton() {
   return (
-    <div className="border border-gray-100 rounded-xl p-5 animate-pulse">
-      <div className="h-3 bg-gray-100 rounded w-16 mb-3" />
-      <div className="h-4 bg-gray-100 rounded w-3/4 mb-2" />
-      <div className="h-3 bg-gray-100 rounded w-1/3 mb-4" />
-      <div className="h-8 bg-gray-100 rounded-lg" />
+    <div className="border border-gray-100 rounded-xl overflow-hidden animate-pulse">
+      <div className="h-0.5 bg-gray-100" />
+      <div className="p-4 space-y-3">
+        <div className="h-3 bg-gray-100 rounded w-16" />
+        <div className="h-4 bg-gray-100 rounded w-full" />
+        <div className="h-4 bg-gray-100 rounded w-2/3" />
+        <div className="h-9 bg-gray-100 rounded-lg" />
+      </div>
     </div>
   );
 }
@@ -137,169 +144,210 @@ export default function LandingPage() {
   return (
     <div className="min-h-screen bg-white">
 
-      {/* Nav */}
-      <nav className="border-b border-gray-100 sticky top-0 z-50 bg-white/90 backdrop-blur-md">
-        <div className="max-w-5xl mx-auto px-5 h-14 flex items-center justify-between">
+      {/* ── Navbar ── */}
+      <header className="border-b border-gray-100 sticky top-0 z-50 bg-white/90 backdrop-blur-md">
+        <div className="max-w-5xl mx-auto px-4 sm:px-6 h-14 flex items-center justify-between gap-3">
           <Link to="/"><Logo /></Link>
-          <div className="flex items-center gap-2">
+
+          <nav className="flex items-center gap-1.5 sm:gap-2">
             {user ? (
               <>
-                <Link to="/profile" className="flex items-center gap-2 px-2.5 py-1.5 rounded-lg hover:bg-gray-50 transition-colors text-sm text-gray-600">
+                <Link to="/profile" className="flex items-center gap-1.5 px-2 py-1.5 rounded-lg hover:bg-gray-50 transition-colors">
                   <Avatar name={user.display_name} avatarUrl={user.avatar_url} />
-                  <span className="hidden sm:block font-medium">{user.display_name}</span>
+                  <span className="hidden sm:block text-sm text-gray-600 font-medium">{user.display_name}</span>
                 </Link>
-                <button onClick={() => navigate('/join')} className="btn-secondary py-2 px-3.5 text-xs">Join</button>
-                <button onClick={() => navigate('/create')} className="btn-primary py-2 px-3.5 text-xs">Create Room</button>
-                <button onClick={logout} className="text-xs text-gray-400 hover:text-gray-600 px-2 cursor-pointer transition-colors">Sign out</button>
+                <button onClick={() => navigate('/join')}
+                  className="hidden sm:flex btn-secondary py-1.5 px-3 text-xs">
+                  Join
+                </button>
+                <button onClick={() => navigate('/create')}
+                  className="btn-primary py-1.5 px-3 text-xs sm:px-4 sm:text-sm">
+                  Create Room
+                </button>
+                <button onClick={logout}
+                  className="text-xs text-gray-400 hover:text-gray-600 px-2 cursor-pointer transition-colors hidden sm:block">
+                  Sign out
+                </button>
               </>
             ) : (
               <>
-                <Link to="/login" className="text-sm text-gray-500 hover:text-gray-900 px-3 py-2 transition-colors font-medium">Sign in</Link>
-                <Link to="/register" className="btn-primary py-2 px-4 text-sm">Get started</Link>
+                <Link to="/login" className="text-sm text-gray-500 hover:text-gray-900 px-3 py-2 font-medium hidden sm:block">
+                  Sign in
+                </Link>
+                <Link to="/login" className="text-sm text-gray-500 hover:text-gray-900 px-2 py-2 font-medium sm:hidden">
+                  Sign in
+                </Link>
+                <Link to="/register" className="btn-primary py-1.5 px-3 text-xs sm:px-4 sm:text-sm">
+                  Get started
+                </Link>
               </>
             )}
-          </div>
+          </nav>
         </div>
-      </nav>
+      </header>
 
-      {/* Hero */}
-      <section className="max-w-5xl mx-auto px-5 pt-20 pb-16">
-        <div className="max-w-2xl">
-          <div className="inline-flex items-center gap-2 bg-brand-50 text-brand-600 text-xs font-semibold px-3 py-1.5 rounded-full mb-6">
-            <span className="w-1.5 h-1.5 rounded-full bg-brand-600" />
-            Free · Voice only · No downloads
-          </div>
-          <h1 className="text-5xl sm:text-6xl font-bold text-gray-900 leading-[1.08] tracking-tight mb-5">
-            Practice GD with<br />
-            <span className="text-brand-600">real aspirants.</span>
-          </h1>
-          <p className="text-gray-500 text-lg leading-relaxed mb-8 max-w-lg">
-            Create a voice room, share the code, and practice SSB group discussions — with a live timer, transcript and self-evaluation tools.
-          </p>
-          <div className="flex gap-3">
-            <button
-              onClick={() => navigate(user ? '/create' : '/register')}
-              className="btn-primary text-sm px-5 py-3"
-            >
-              {user ? 'Create a Room' : 'Get started free'}
-            </button>
-            <button
-              onClick={() => navigate(user ? '/join' : '/login')}
-              className="btn-secondary text-sm px-5 py-3"
-            >
-              Join a Room
-            </button>
-          </div>
-        </div>
-      </section>
+      <main>
 
-      {/* Feature pills */}
-      <section className="border-y border-gray-100 bg-gray-50">
-        <div className="max-w-5xl mx-auto px-5 py-5 flex flex-wrap gap-4">
-          {[
-            { icon: Mic,          text: 'Real-time voice rooms' },
-            { icon: Timer,        text: 'Built-in GD timer' },
-            { icon: FileText,     text: 'Live transcript' },
-            { icon: CheckSquare,  text: 'SSB self-evaluation checklist' },
-            { icon: Lock,         text: 'Private room codes' },
-          ].map(({ icon: Icon, text }) => (
-            <div key={text} className="flex items-center gap-2 text-sm text-gray-600 font-medium">
-              <Icon className="w-4 h-4 text-brand-600 shrink-0" />
-              <span>{text}</span>
-            </div>
-          ))}
-        </div>
-      </section>
-
-      {/* Live Rooms */}
-      <section className="max-w-5xl mx-auto px-5 py-12">
-        <div className="flex items-center justify-between mb-6">
-          <div>
-            <h2 className="text-xl font-semibold text-gray-900">Live rooms</h2>
-            <p className="text-sm text-gray-400 mt-0.5">Jump into an active discussion right now</p>
-          </div>
-          <div className="flex items-center gap-3">
-            {!loading && rooms.length > 0 && (
-              <span className="text-xs font-medium text-emerald-600 bg-emerald-50 px-2.5 py-1 rounded-full border border-emerald-100">
-                {rooms.length} active
+        {/* ── Hero ── */}
+        <section className="max-w-5xl mx-auto px-4 sm:px-6 pt-10 sm:pt-16 pb-10 sm:pb-14">
+          <div className="max-w-2xl">
+            <div className="inline-flex items-center gap-2 bg-emerald-50 text-emerald-700 text-xs font-semibold px-3 py-1.5 rounded-full mb-5 border border-emerald-100">
+              <span className="relative flex h-2 w-2">
+                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75" />
+                <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500" />
               </span>
-            )}
-            <button
-              onClick={() => { setLoading(true); fetchRooms(); }}
-              className="text-xs text-gray-400 hover:text-gray-600 cursor-pointer transition-colors font-medium"
-            >
-              Refresh
-            </button>
-          </div>
-        </div>
-
-        {loading ? (
-          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
-            <Skeleton /><Skeleton /><Skeleton />
-          </div>
-        ) : rooms.length === 0 ? (
-          <div className="border border-dashed border-gray-200 rounded-xl py-16 text-center">
-            <Radio className="w-8 h-8 text-gray-300 mx-auto mb-3" />
-            <p className="text-sm font-medium text-gray-700 mb-1">No active rooms</p>
-            <p className="text-xs text-gray-400 mb-5">Start a discussion and invite your peers with a room code.</p>
-            <button
-              onClick={() => navigate(user ? '/create' : '/register')}
-              className="btn-primary text-xs py-2 px-4"
-            >
-              Create a Room
-            </button>
-          </div>
-        ) : (
-          <>
-            <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
-              {rooms.map(r => (
-                <RoomCard key={r.id} room={r} user={user} onJoin={handleJoin} onDelete={handleDelete} />
-              ))}
+              {!loading && rooms.length > 0
+                ? `${rooms.length} discussion${rooms.length > 1 ? 's' : ''} happening right now`
+                : 'Live voice rooms · Join any time'}
             </div>
-            <div className="mt-5 flex items-center justify-between bg-brand-50 border border-brand-100 rounded-xl px-5 py-3.5">
-              <p className="text-sm text-brand-600 font-medium">
-                {user ? 'Start your own discussion?' : 'Sign in to join or create a room.'}
-              </p>
-              <button
-                onClick={() => navigate(user ? '/create' : '/register')}
-                className="btn-primary text-xs py-2 px-4"
-              >
+
+            <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold text-gray-900 leading-[1.1] tracking-tight mb-4 sm:mb-5">
+              Practice GD with<br />
+              <span className="text-brand-600">real aspirants.</span>
+            </h1>
+            <p className="text-gray-500 text-base sm:text-lg leading-relaxed mb-6 sm:mb-8 max-w-lg">
+              Create a voice room, share a 6-letter code, and practice SSB group discussions — with a live timer, transcript and self-evaluation tools.
+            </p>
+            <div className="flex flex-col xs:flex-row gap-3">
+              <button onClick={() => navigate(user ? '/create' : '/register')}
+                className="btn-primary text-sm px-5 py-3 w-full xs:w-auto flex items-center justify-center gap-2">
                 {user ? 'Create a Room' : 'Get started free'}
+                <ArrowRight className="w-4 h-4" />
+              </button>
+              <button onClick={() => navigate(user ? '/join' : '/login')}
+                className="btn-secondary text-sm px-5 py-3 w-full xs:w-auto">
+                Join a Room
               </button>
             </div>
-          </>
-        )}
-      </section>
 
-      {/* How it works */}
-      <section className="border-t border-gray-100 bg-gray-50 py-14 px-5">
-        <div className="max-w-5xl mx-auto">
-          <h2 className="text-xl font-semibold text-gray-900 mb-8">How it works</h2>
-          <div className="grid sm:grid-cols-3 gap-6">
+            {/* Social proof */}
+            <div className="flex items-center gap-3 mt-6">
+              <div className="flex -space-x-2">
+                {['A','V','R','S','P'].map((l, i) => (
+                  <div key={i} className="w-7 h-7 rounded-full bg-brand-600 border-2 border-white flex items-center justify-center text-[9px] font-bold text-white" style={{ opacity: 1 - i * 0.12 }}>{l}</div>
+                ))}
+              </div>
+              <p className="text-xs text-gray-500">
+                <span className="font-semibold text-gray-700">500+</span> aspirants joined · <span className="font-semibold text-gray-700">Free</span> forever
+              </p>
+            </div>
+          </div>
+        </section>
+
+        {/* ── Feature strip ── */}
+        <section className="border-y border-gray-100 bg-gray-50">
+          <div className="max-w-5xl mx-auto px-4 sm:px-6 py-4 flex flex-wrap gap-x-5 gap-y-2.5">
             {[
-              { n: '1', title: 'Create a free account', desc: 'Sign up in under 30 seconds. No credit card, no email verification.' },
-              { n: '2', title: 'Open or join a room', desc: 'Enter a GD topic to host, or enter a 6-letter code to join someone\'s room.' },
-              { n: '3', title: 'Discuss and evaluate', desc: 'Use the timer, live transcript, and SSB checklist to improve every session.' },
-            ].map(({ n, title, desc }) => (
-              <div key={n} className="flex gap-4">
-                <div className="shrink-0 w-7 h-7 rounded-lg bg-brand-600 text-white text-sm font-bold flex items-center justify-center">
-                  {n}
-                </div>
-                <div>
-                  <h3 className="text-sm font-semibold text-gray-900 mb-1">{title}</h3>
-                  <p className="text-sm text-gray-400 leading-relaxed">{desc}</p>
-                </div>
+              { icon: Mic,         text: 'Real-time voice' },
+              { icon: Timer,       text: 'GD timer' },
+              { icon: FileText,    text: 'Live transcript' },
+              { icon: CheckSquare, text: 'SSB checklist' },
+              { icon: Lock,        text: 'Private codes' },
+            ].map(({ icon: Icon, text }) => (
+              <div key={text} className="flex items-center gap-1.5 text-sm text-gray-500 font-medium">
+                <Icon className="w-3.5 h-3.5 text-brand-600 shrink-0" />
+                {text}
               </div>
             ))}
           </div>
-        </div>
-      </section>
+        </section>
 
-      {/* Footer */}
-      <footer className="border-t border-gray-100 py-6 px-5">
+        {/* ── Live Rooms ── */}
+        <section className="max-w-5xl mx-auto px-4 sm:px-6 py-8 sm:py-12">
+          <div className="flex items-center justify-between mb-5">
+            <div>
+              <div className="flex items-center gap-2 mb-0.5">
+                <h2 className="text-lg sm:text-xl font-semibold text-gray-900">Live rooms</h2>
+                {!loading && rooms.length > 0 && (
+                  <span className="text-xs font-medium text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-100">
+                    {rooms.length} active
+                  </span>
+                )}
+              </div>
+              <p className="text-xs sm:text-sm text-gray-400">Open to all — sign in to join</p>
+            </div>
+            <button onClick={() => { setLoading(true); fetchRooms(); }}
+              className="flex items-center gap-1 text-xs text-gray-400 hover:text-gray-600 cursor-pointer font-medium px-2 py-1.5">
+              <Radio className="w-3.5 h-3.5" /> Refresh
+            </button>
+          </div>
+
+          {loading ? (
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4">
+              <Skeleton /><Skeleton /><Skeleton />
+            </div>
+          ) : rooms.length === 0 ? (
+            <div className="border border-dashed border-gray-200 rounded-xl py-12 sm:py-16 text-center px-6">
+              <div className="w-12 h-12 rounded-xl bg-gray-50 border border-gray-100 flex items-center justify-center mx-auto mb-4">
+                <Radio className="w-5 h-5 text-gray-300" />
+              </div>
+              <p className="text-sm font-medium text-gray-700 mb-1">No active rooms right now</p>
+              <p className="text-xs text-gray-400 mb-5 max-w-xs mx-auto">
+                Start a discussion and share the code with your batch.
+              </p>
+              <button onClick={() => navigate(user ? '/create' : '/register')}
+                className="btn-primary text-xs py-2 px-5">
+                {user ? 'Create a Room' : 'Get started free'}
+              </button>
+            </div>
+          ) : (
+            <>
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4">
+                {rooms.map(r => (
+                  <RoomCard key={r.id} room={r} user={user} onJoin={handleJoin} onDelete={handleDelete} />
+                ))}
+              </div>
+
+              {!user && (
+                <div className="mt-4 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 bg-brand-50 border border-brand-100 rounded-xl px-4 sm:px-5 py-4">
+                  <p className="text-sm text-brand-700 font-medium">Sign in to join or create a room</p>
+                  <Link to="/register" className="btn-primary text-xs py-2 px-4 shrink-0 w-full sm:w-auto text-center">
+                    Join free
+                  </Link>
+                </div>
+              )}
+              {user && (
+                <div className="mt-4 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 bg-gray-50 border border-gray-100 rounded-xl px-4 sm:px-5 py-3.5">
+                  <p className="text-sm text-gray-600 font-medium">Want to start your own discussion?</p>
+                  <button onClick={() => navigate('/create')} className="btn-primary text-xs py-2 px-4 shrink-0 w-full sm:w-auto">
+                    Create a Room
+                  </button>
+                </div>
+              )}
+            </>
+          )}
+        </section>
+
+        {/* ── How it works ── */}
+        <section className="border-t border-gray-100 bg-gray-50 py-10 sm:py-14 px-4 sm:px-6">
+          <div className="max-w-5xl mx-auto">
+            <h2 className="text-lg sm:text-xl font-semibold text-gray-900 mb-6 sm:mb-8">How it works</h2>
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-5 sm:gap-8">
+              {[
+                { n: '1', title: 'Create a free account', desc: 'Sign up in under 30 seconds. No credit card, no verification required.' },
+                { n: '2', title: 'Open or join a room', desc: 'Enter a GD topic to host, or enter a 6-letter code to join someone\'s room.' },
+                { n: '3', title: 'Discuss and evaluate', desc: 'Use the timer, live transcript, and SSB checklist to improve every session.' },
+              ].map(({ n, title, desc }) => (
+                <div key={n} className="flex gap-4">
+                  <div className="shrink-0 w-7 h-7 rounded-lg bg-brand-600 text-white text-sm font-bold flex items-center justify-center mt-0.5">
+                    {n}
+                  </div>
+                  <div>
+                    <h3 className="text-sm font-semibold text-gray-900 mb-1.5">{title}</h3>
+                    <p className="text-sm text-gray-400 leading-relaxed">{desc}</p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </section>
+
+      </main>
+
+      <footer className="border-t border-gray-100 py-5 px-4 sm:px-6">
         <div className="max-w-5xl mx-auto flex items-center justify-between">
           <Logo />
-          <p className="text-xs text-gray-300">© {new Date().getFullYear()} SSBCircle · Built for SSB aspirants</p>
+          <p className="text-xs text-gray-300">© {new Date().getFullYear()} SSBCircle</p>
         </div>
       </footer>
     </div>

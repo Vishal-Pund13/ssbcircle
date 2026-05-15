@@ -10,6 +10,7 @@ module.exports = function authMiddleware(req, res, next) {
     req.userId = payload.userId;
     req.username = payload.username;
     req.displayName = payload.displayName;
+    req.email = payload.email || '';
     next();
   } catch {
     res.status(401).json({ error: 'Invalid or expired token' });

@@ -1,333 +1,311 @@
 import { useState, useEffect, useRef } from 'react';
+import { Mic, MicOff, FileText, CheckSquare, Download, Trash2, X, Plus, MessageSquare, Send } from 'lucide-react';
 
-// ─── Transcript Tab ───────────────────────────────────────────────────────────
-
+// ─── Transcript ───────────────────────────────────────────────────────────────
 function TranscriptTab() {
-  const [supported] = useState(
-    () => !!(window.SpeechRecognition || window.webkitSpeechRecognition)
-  );
+  const [supported] = useState(() => !!(window.SpeechRecognition || window.webkitSpeechRecognition));
   const [listening, setListening] = useState(false);
-  const [entries, setEntries] = useState([]);
-  const [interim, setInterim] = useState('');
+  const [entries,   setEntries]   = useState([]);
+  const [interim,   setInterim]   = useState('');
   const recognitionRef = useRef(null);
-  const bottomRef = useRef(null);
+  const listeningRef   = useRef(false);
+  const bottomRef      = useRef(null);
 
-  useEffect(() => {
-    bottomRef.current?.scrollIntoView({ behavior: 'smooth' });
-  }, [entries, interim]);
-
-  useEffect(() => {
-    return () => recognitionRef.current?.stop();
-  }, []);
+  useEffect(() => { bottomRef.current?.scrollIntoView({ behavior: 'smooth' }); }, [entries, interim]);
+  useEffect(() => () => { listeningRef.current = false; recognitionRef.current?.stop(); }, []);
 
   function startListening() {
     const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
     const rec = new SR();
-    rec.continuous = true;
-    rec.interimResults = true;
-    rec.lang = 'en-IN';
-
+    rec.continuous = true; rec.interimResults = true; rec.lang = 'en-IN';
     rec.onresult = (e) => {
       let interimText = '';
       for (let i = e.resultIndex; i < e.results.length; i++) {
-        const transcript = e.results[i][0].transcript;
+        const t = e.results[i][0].transcript;
         if (e.results[i].isFinal) {
-          const timestamp = new Date().toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
-          setEntries((prev) => [...prev, { timestamp, text: transcript.trim() }]);
+          const ts = new Date().toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' });
+          setEntries(prev => [...prev, { ts, text: t.trim() }]);
           setInterim('');
-        } else {
-          interimText += transcript;
-        }
+        } else interimText += t;
       }
       setInterim(interimText);
     };
-
-    rec.onerror = (e) => {
-      if (e.error !== 'no-speech') {
-        setListening(false);
-      }
-    };
-
-    rec.onend = () => {
-      // Auto-restart if still listening (handles Chrome's 60s limit)
-      if (recognitionRef.current && listening) {
-        try { recognitionRef.current.start(); } catch {}
-      }
-    };
-
-    recognitionRef.current = rec;
-    rec.start();
-    setListening(true);
+    rec.onerror = (e) => { if (e.error !== 'no-speech') { listeningRef.current = false; setListening(false); } };
+    rec.onend   = () => { if (recognitionRef.current && listeningRef.current) try { recognitionRef.current.start(); } catch {} };
+    recognitionRef.current = rec; listeningRef.current = true; rec.start(); setListening(true);
   }
 
   function stopListening() {
-    recognitionRef.current?.stop();
-    recognitionRef.current = null;
-    setListening(false);
-    setInterim('');
+    listeningRef.current = false; recognitionRef.current?.stop(); recognitionRef.current = null;
+    setListening(false); setInterim('');
   }
 
-  function downloadTranscript() {
-    if (entries.length === 0) return;
-    const text = entries.map((e) => `[${e.timestamp}] ${e.text}`).join('\n');
+  function download() {
+    if (!entries.length) return;
+    const text = entries.map(e => `[${e.ts}] ${e.text}`).join('\n');
     const blob = new Blob([`SSBCircle – GD Transcript\n${'─'.repeat(40)}\n\n${text}`], { type: 'text/plain' });
     const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = `GD_Transcript_${new Date().toISOString().slice(0, 10)}.txt`;
-    a.click();
+    Object.assign(document.createElement('a'), { href: url, download: `GD_Transcript_${new Date().toISOString().slice(0,10)}.txt` }).click();
     URL.revokeObjectURL(url);
   }
 
-  function clearTranscript() {
-    setEntries([]);
-    setInterim('');
-  }
-
-  if (!supported) {
-    return (
-      <div className="flex flex-col items-center justify-center h-full px-4 text-center">
-        <svg className="w-10 h-10 text-slate-600 mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-        </svg>
-        <p className="text-slate-400 text-sm">Transcript requires Chrome or Edge browser.</p>
-      </div>
-    );
-  }
+  if (!supported) return (
+    <div className="flex flex-col items-center justify-center h-full text-center px-6">
+      <MicOff className="w-8 h-8 text-gray-300 mb-3"/>
+      <p className="text-sm text-gray-600 font-medium">Transcript unavailable</p>
+      <p className="text-xs text-gray-400 mt-1">Use Chrome or Edge for live transcription.</p>
+    </div>
+  );
 
   return (
     <div className="flex flex-col h-full">
-      {/* Controls */}
-      <div className="flex items-center gap-2 p-3 border-b border-slate-700">
-        <button
-          onClick={listening ? stopListening : startListening}
-          className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition-colors ${
+      <div className="flex items-center gap-2 px-4 py-3 border-b border-gray-100">
+        <button onClick={listening ? stopListening : startListening}
+          className={`flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-semibold transition-all cursor-pointer border ${
             listening
-              ? 'bg-red-500/20 text-red-400 hover:bg-red-500/30'
-              : 'bg-primary-600 text-white hover:bg-primary-700'
-          }`}
-        >
-          <span className={`w-2 h-2 rounded-full ${listening ? 'bg-red-400 animate-pulse' : 'bg-white'}`} />
-          {listening ? 'Stop' : 'Start'}
+              ? 'bg-red-50 text-red-600 border-red-200'
+              : 'bg-brand-50 text-brand-600 border-brand-100 hover:bg-brand-100'
+          }`}>
+          {listening
+            ? <><span className="w-1.5 h-1.5 rounded-full bg-red-500 animate-pulse"/> Recording</>
+            : <><Mic className="w-3.5 h-3.5"/> Start</>}
         </button>
-        <button
-          onClick={downloadTranscript}
-          disabled={entries.length === 0}
-          className="px-3 py-1.5 rounded-lg text-xs font-semibold bg-slate-700 text-slate-300 hover:bg-slate-600 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
-        >
-          Download
+        <div className="flex-1"/>
+        <button onClick={() => { setEntries([]); setInterim(''); }} disabled={!entries.length}
+          className="p-1.5 rounded-lg text-gray-400 hover:text-gray-600 hover:bg-gray-100 transition-colors cursor-pointer disabled:opacity-30 disabled:cursor-not-allowed">
+          <Trash2 className="w-3.5 h-3.5"/>
         </button>
-        <button
-          onClick={clearTranscript}
-          disabled={entries.length === 0}
-          className="px-3 py-1.5 rounded-lg text-xs font-semibold bg-slate-700 text-slate-400 hover:bg-slate-600 disabled:opacity-40 disabled:cursor-not-allowed transition-colors ml-auto"
-        >
-          Clear
+        <button onClick={download} disabled={!entries.length}
+          className="p-1.5 rounded-lg text-gray-400 hover:text-gray-600 hover:bg-gray-100 transition-colors cursor-pointer disabled:opacity-30 disabled:cursor-not-allowed">
+          <Download className="w-3.5 h-3.5"/>
         </button>
       </div>
-
-      <p className="text-[10px] text-slate-500 px-3 pt-2 pb-1">
-        Captures <span className="text-slate-400 font-medium">your speech</span> only · en-IN
-      </p>
-
-      {/* Transcript area */}
-      <div className="flex-1 overflow-y-auto px-3 pb-3 space-y-2">
-        {entries.length === 0 && !interim && (
-          <p className="text-slate-600 text-xs text-center mt-8">
-            {listening ? 'Listening… start speaking.' : 'Press Start to begin transcription.'}
-          </p>
+      <p className="text-[10px] text-gray-400 px-4 pt-2.5 pb-1">Captures <span className="font-medium text-gray-600">your mic</span> · en-IN</p>
+      <div className="flex-1 overflow-y-auto px-4 pb-4 space-y-3">
+        {!entries.length && !interim && (
+          <div className="flex flex-col items-center justify-center h-32 text-center">
+            {listening
+              ? <><div className="flex gap-0.5 mb-3">{[1,2,3,4,5].map(i => (
+                  <div key={i} className="w-0.5 bg-brand-600 rounded-full animate-bounce"
+                    style={{ height: `${8+i*4}px`, animationDelay: `${i*0.1}s` }}/>
+                ))}</div><p className="text-xs text-gray-500">Listening…</p></>
+              : <p className="text-xs text-gray-400">Press Start to begin</p>}
+          </div>
         )}
         {entries.map((entry, i) => (
-          <div key={i} className="text-sm">
-            <span className="text-[10px] text-slate-500 font-mono">{entry.timestamp}</span>
-            <p className="text-slate-200 leading-snug mt-0.5">{entry.text}</p>
+          <div key={i}>
+            <span className="text-[10px] text-gray-400 font-mono">{entry.ts}</span>
+            <p className="text-sm text-gray-800 leading-relaxed mt-0.5">{entry.text}</p>
           </div>
         ))}
-        {interim && (
-          <p className="text-slate-500 text-sm italic">{interim}</p>
-        )}
-        <div ref={bottomRef} />
+        {interim && <p className="text-sm text-gray-400 italic">{interim}<span className="animate-pulse">_</span></p>}
+        <div ref={bottomRef}/>
       </div>
     </div>
   );
 }
 
-// ─── Notes Tab ────────────────────────────────────────────────────────────────
+// ─── Notes ────────────────────────────────────────────────────────────────────
+const NOTE_PROMPTS = ['Key points raised:', 'My contributions:', 'What I missed:', 'Improvement areas:'];
 
 function NotesTab() {
   const [notes, setNotes] = useState('');
 
-  function downloadNotes() {
+  function download() {
     if (!notes.trim()) return;
     const blob = new Blob([`SSBCircle – GD Notes\n${'─'.repeat(40)}\n\n${notes}`], { type: 'text/plain' });
     const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = `GD_Notes_${new Date().toISOString().slice(0, 10)}.txt`;
-    a.click();
+    Object.assign(document.createElement('a'), { href: url, download: `GD_Notes_${new Date().toISOString().slice(0,10)}.txt` }).click();
     URL.revokeObjectURL(url);
   }
 
-  const PROMPTS = [
-    'Key points raised:',
-    'My contributions:',
-    'What I missed:',
-    'Improvement areas:',
-  ];
-
   return (
     <div className="flex flex-col h-full">
-      <div className="flex items-center gap-2 p-3 border-b border-slate-700">
-        <span className="text-xs text-slate-400 flex-1">Quick notes during GD</span>
-        <button
-          onClick={downloadNotes}
-          disabled={!notes.trim()}
-          className="px-3 py-1.5 rounded-lg text-xs font-semibold bg-slate-700 text-slate-300 hover:bg-slate-600 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
-        >
-          Download
+      <div className="flex items-center gap-2 px-4 py-3 border-b border-gray-100">
+        <span className="text-xs text-gray-500 flex-1 font-medium">Quick notes</span>
+        <button onClick={() => setNotes('')} disabled={!notes}
+          className="p-1.5 rounded-lg text-gray-400 hover:text-gray-600 hover:bg-gray-100 transition-colors cursor-pointer disabled:opacity-30 disabled:cursor-not-allowed">
+          <Trash2 className="w-3.5 h-3.5"/>
+        </button>
+        <button onClick={download} disabled={!notes.trim()}
+          className="p-1.5 rounded-lg text-gray-400 hover:text-gray-600 hover:bg-gray-100 transition-colors cursor-pointer disabled:opacity-30 disabled:cursor-not-allowed">
+          <Download className="w-3.5 h-3.5"/>
         </button>
       </div>
-
-      {/* Prompt chips */}
-      <div className="flex flex-wrap gap-1.5 p-3 border-b border-slate-700/50">
-        {PROMPTS.map((p) => (
-          <button
-            key={p}
-            onClick={() => setNotes((n) => n + (n ? '\n\n' : '') + p + '\n')}
-            className="text-[10px] bg-slate-700 text-slate-400 hover:bg-slate-600 hover:text-slate-200 px-2 py-1 rounded-md transition-colors"
-          >
-            + {p}
+      <div className="flex flex-wrap gap-1.5 px-4 py-2.5 border-b border-gray-100">
+        {NOTE_PROMPTS.map(p => (
+          <button key={p}
+            onClick={() => setNotes(n => n + (n && !n.endsWith('\n') ? '\n\n' : '') + p + '\n')}
+            className="flex items-center gap-1 text-[10px] text-gray-500 hover:text-brand-600 bg-gray-50 hover:bg-brand-50 px-2 py-1 rounded-md transition-colors cursor-pointer border border-gray-200 hover:border-brand-200">
+            <Plus className="w-2.5 h-2.5"/> {p}
           </button>
         ))}
       </div>
-
       <textarea
-        className="flex-1 bg-transparent text-slate-200 text-sm p-3 resize-none outline-none placeholder-slate-600 leading-relaxed"
-        placeholder="Jot down key points, your arguments, and observations here…"
+        className="flex-1 bg-transparent text-sm text-gray-800 px-4 py-3 resize-none outline-none placeholder-gray-300 leading-relaxed font-sans"
+        placeholder="Jot down key points, arguments, counter-arguments…"
         value={notes}
-        onChange={(e) => setNotes(e.target.value)}
+        onChange={e => setNotes(e.target.value)}
         spellCheck={false}
       />
-      <div className="px-3 pb-2 text-right">
-        <span className="text-[10px] text-slate-600">{notes.length} chars</span>
+      <div className="px-4 py-2 border-t border-gray-100 flex justify-end">
+        <span className="text-[10px] text-gray-300">{notes.length} chars</span>
       </div>
     </div>
   );
 }
 
-// ─── Checklist Tab ────────────────────────────────────────────────────────────
-
-const CHECKLIST_ITEMS = [
-  { id: 'initiate', label: 'Initiated / entered early' },
-  { id: 'listen', label: 'Listened actively' },
-  { id: 'build', label: 'Built on others\' points' },
-  { id: 'factual', label: 'Used facts/examples' },
-  { id: 'clear', label: 'Was clear & concise' },
+// ─── Checklist ────────────────────────────────────────────────────────────────
+const CHECKLIST = [
+  { id: 'initiate',  label: 'Initiated or entered early' },
+  { id: 'listen',    label: 'Listened actively' },
+  { id: 'build',     label: "Built on others' points" },
+  { id: 'factual',   label: 'Used facts or examples' },
+  { id: 'clear',     label: 'Was clear and concise' },
   { id: 'interrupt', label: 'Avoided interrupting' },
-  { id: 'summarize', label: 'Summarized / concluded' },
-  { id: 'calm', label: 'Stayed calm & composed' },
+  { id: 'summarize', label: 'Summarized or concluded' },
+  { id: 'calm',      label: 'Stayed calm and composed' },
 ];
 
 function ChecklistTab() {
   const [checked, setChecked] = useState({});
-
-  function toggle(id) {
-    setChecked((c) => ({ ...c, [id]: !c[id] }));
-  }
-
+  const toggle = id => setChecked(c => ({ ...c, [id]: !c[id] }));
   const score = Object.values(checked).filter(Boolean).length;
+  const pct   = Math.round((score / CHECKLIST.length) * 100);
+  const scoreColor = pct >= 75 ? 'text-emerald-600' : pct >= 50 ? 'text-amber-600' : 'text-red-500';
+  const barColor   = pct >= 75 ? 'bg-emerald-500'   : pct >= 50 ? 'bg-amber-400'   : 'bg-red-400';
 
   return (
     <div className="flex flex-col h-full">
-      <div className="flex items-center justify-between p-3 border-b border-slate-700">
-        <span className="text-xs text-slate-400">Self-evaluation checklist</span>
-        <span className="text-xs font-bold text-primary-400">{score}/{CHECKLIST_ITEMS.length}</span>
+      <div className="px-4 py-3 border-b border-gray-100">
+        <div className="flex items-center justify-between mb-2">
+          <span className="text-xs text-gray-500 font-medium">Self-evaluation</span>
+          <span className={`text-2xl font-bold tabular-nums ${scoreColor}`}>{pct}<span className="text-sm font-medium">%</span></span>
+        </div>
+        <div className="h-1.5 bg-gray-100 rounded-full overflow-hidden">
+          <div className={`h-full rounded-full transition-all duration-500 ${barColor}`} style={{ width: `${pct}%` }}/>
+        </div>
+        <p className="text-[10px] text-gray-400 mt-1.5">{score} of {CHECKLIST.length} criteria met</p>
       </div>
-      <div className="flex-1 overflow-y-auto p-3 space-y-2">
-        {CHECKLIST_ITEMS.map(({ id, label }) => (
-          <label key={id} className="flex items-center gap-3 cursor-pointer group">
-            <div
-              onClick={() => toggle(id)}
-              className={`w-5 h-5 rounded-md border-2 flex items-center justify-center shrink-0 transition-colors ${
-                checked[id]
-                  ? 'bg-primary-600 border-primary-600'
-                  : 'border-slate-600 group-hover:border-slate-500'
-              }`}
-            >
+      <div className="flex-1 overflow-y-auto px-3 py-3 space-y-1">
+        {CHECKLIST.map(({ id, label }) => (
+          <button key={id} onClick={() => toggle(id)}
+            className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-left transition-all cursor-pointer ${
+              checked[id] ? 'bg-brand-50' : 'hover:bg-gray-50'
+            }`}>
+            <div className={`flex items-center justify-center shrink-0 rounded-md border-2 transition-all ${
+              checked[id] ? 'bg-brand-600 border-brand-600' : 'border-gray-300'
+            }`} style={{ width: 18, height: 18 }}>
               {checked[id] && (
-                <svg className="w-3 h-3 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
+                <svg className="w-2.5 h-2.5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7"/>
                 </svg>
               )}
             </div>
-            <span
-              onClick={() => toggle(id)}
-              className={`text-sm transition-colors ${checked[id] ? 'text-slate-400 line-through' : 'text-slate-200'}`}
-            >
+            <span className={`text-sm transition-colors ${checked[id] ? 'text-gray-400 line-through' : 'text-gray-700'}`}>
               {label}
             </span>
-          </label>
+          </button>
         ))}
-      </div>
-      {/* Score bar */}
-      <div className="p-3 border-t border-slate-700">
-        <div className="flex justify-between text-xs text-slate-500 mb-1">
-          <span>Performance</span>
-          <span>{Math.round((score / CHECKLIST_ITEMS.length) * 100)}%</span>
-        </div>
-        <div className="h-1.5 bg-slate-700 rounded-full overflow-hidden">
-          <div
-            className="h-full bg-primary-500 rounded-full transition-all duration-300"
-            style={{ width: `${(score / CHECKLIST_ITEMS.length) * 100}%` }}
-          />
-        </div>
       </div>
     </div>
   );
 }
 
-// ─── Panel wrapper ────────────────────────────────────────────────────────────
+// ─── Chat ─────────────────────────────────────────────────────────────────────
+function ChatTab({ messages, onSend }) {
+  const [text, setText] = useState('');
+  const bottomRef = useRef(null);
+  useEffect(() => { bottomRef.current?.scrollIntoView({ behavior: 'smooth' }); }, [messages]);
 
-const TABS = [
-  { id: 'transcript', label: 'Transcript' },
-  { id: 'notes', label: 'Notes' },
-  { id: 'checklist', label: 'Checklist' },
-];
-
-export default function GDPanel({ onClose }) {
-  const [activeTab, setActiveTab] = useState('transcript');
+  function handleSend(e) {
+    e.preventDefault();
+    const t = text.trim(); if (!t) return;
+    onSend(t); setText('');
+  }
 
   return (
-    <div className="absolute top-12 right-0 bottom-0 z-20 w-72 bg-slate-800 border-l border-slate-700 flex flex-col shadow-2xl">
-      {/* Panel header */}
-      <div className="flex items-center justify-between px-3 py-2 border-b border-slate-700 shrink-0">
-        <div className="flex gap-1">
-          {TABS.map((tab) => (
-            <button
-              key={tab.id}
-              onClick={() => setActiveTab(tab.id)}
-              className={`px-2.5 py-1 rounded-lg text-xs font-semibold transition-colors ${
-                activeTab === tab.id
-                  ? 'bg-primary-600 text-white'
-                  : 'text-slate-400 hover:text-slate-200'
-              }`}
-            >
-              {tab.label}
-            </button>
-          ))}
-        </div>
-        <button onClick={onClose} className="text-slate-500 hover:text-slate-300 transition-colors ml-1">
-          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-          </svg>
+    <div className="flex flex-col h-full">
+      <div className="flex-1 overflow-y-auto px-4 py-3 space-y-3">
+        {messages.length === 0 && (
+          <div className="flex flex-col items-center justify-center h-32 text-center">
+            <MessageSquare className="w-7 h-7 text-gray-200 mb-2"/>
+            <p className="text-xs text-gray-400">No messages yet</p>
+            <p className="text-[11px] text-gray-300 mt-0.5">Start the conversation</p>
+          </div>
+        )}
+        {messages.map(msg => (
+          <div key={msg.id} className={`flex flex-col ${msg.isMe ? 'items-end' : 'items-start'}`}>
+            {!msg.isMe && <span className="text-[10px] text-gray-400 font-medium mb-0.5 px-1">{msg.sender}</span>}
+            <div className={`max-w-[85%] px-3 py-2 rounded-xl text-sm leading-snug ${
+              msg.isMe
+                ? 'bg-brand-600 text-white rounded-br-sm'
+                : 'bg-gray-100 text-gray-800 rounded-bl-sm'
+            }`}>
+              {msg.text}
+            </div>
+            <span className="text-[10px] text-gray-300 mt-0.5 px-1">{msg.ts}</span>
+          </div>
+        ))}
+        <div ref={bottomRef}/>
+      </div>
+      <form onSubmit={handleSend} className="flex items-center gap-2 px-3 py-3 border-t border-gray-100">
+        <input
+          type="text" value={text} onChange={e => setText(e.target.value)}
+          placeholder="Type a message…"
+          className="flex-1 bg-gray-50 border border-gray-200 rounded-lg px-3 py-2 text-sm text-gray-800 placeholder-gray-400 outline-none focus:border-brand-600 focus:ring-2 focus:ring-brand-100 transition-colors"
+        />
+        <button type="submit" disabled={!text.trim()}
+          className="p-2 rounded-lg bg-brand-600 hover:bg-brand-700 text-white transition-colors cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed">
+          <Send className="w-4 h-4"/>
+        </button>
+      </form>
+    </div>
+  );
+}
+
+// ─── Panel ────────────────────────────────────────────────────────────────────
+const TABS = [
+  { id: 'chat',       label: 'Chat',       Icon: MessageSquare },
+  { id: 'transcript', label: 'Transcript', Icon: Mic },
+  { id: 'notes',      label: 'Notes',      Icon: FileText },
+  { id: 'checklist',  label: 'Checklist',  Icon: CheckSquare },
+];
+
+export default function GDPanel({ onClose, chatMessages = [], onSendMessage, activeTab, onTabChange }) {
+  const [active, setActive] = useState(activeTab ?? 'chat');
+
+  useEffect(() => { if (activeTab) setActive(activeTab); }, [activeTab]);
+
+  function handleTab(id) { setActive(id); onTabChange?.(id); }
+
+  return (
+    <div className="fixed inset-0 z-50 bg-white flex flex-col sm:relative sm:inset-auto sm:z-20 sm:w-80 sm:shrink-0 sm:border-l sm:border-gray-200 sm:shadow-none shadow-2xl">
+      {/* Tab bar */}
+      <div className="flex items-center border-b border-gray-200 shrink-0">
+        {TABS.map(({ id, label, Icon }) => (
+          <button key={id} onClick={() => handleTab(id)}
+            className={`flex-1 flex flex-col items-center gap-0.5 py-2.5 text-[10px] font-semibold tracking-wide uppercase transition-all cursor-pointer border-b-2 ${
+              active === id
+                ? 'text-brand-600 border-brand-600'
+                : 'text-gray-400 border-transparent hover:text-gray-600'
+            }`}>
+            <Icon className="w-3.5 h-3.5"/>
+            {label}
+          </button>
+        ))}
+        <button onClick={onClose}
+          className="px-2.5 py-2.5 text-gray-400 hover:text-gray-600 transition-colors cursor-pointer border-b-2 border-transparent shrink-0">
+          <X className="w-4 h-4"/>
         </button>
       </div>
 
-      {/* Tab content */}
-      <div className="flex-1 overflow-hidden">
-        {activeTab === 'transcript' && <TranscriptTab />}
-        {activeTab === 'notes' && <NotesTab />}
-        {activeTab === 'checklist' && <ChecklistTab />}
+      {/* All tabs mounted — CSS controls visibility so state is never lost */}
+      <div className="flex-1 overflow-hidden relative">
+        <div className={`absolute inset-0 flex flex-col ${active === 'chat'       ? '' : 'hidden'}`}><ChatTab messages={chatMessages} onSend={onSendMessage}/></div>
+        <div className={`absolute inset-0 flex flex-col ${active === 'transcript' ? '' : 'hidden'}`}><TranscriptTab/></div>
+        <div className={`absolute inset-0 flex flex-col ${active === 'notes'      ? '' : 'hidden'}`}><NotesTab/></div>
+        <div className={`absolute inset-0 flex flex-col ${active === 'checklist'  ? '' : 'hidden'}`}><ChecklistTab/></div>
       </div>
     </div>
   );

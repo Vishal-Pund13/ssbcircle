@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
+import { Play, Pause, RotateCcw, X, GripHorizontal } from 'lucide-react';
 
 const PRESETS = [
   { label: '15m', value: 15 * 60 },
@@ -7,28 +8,33 @@ const PRESETS = [
   { label: '30m', value: 30 * 60 },
 ];
 
-function pad(n) {
-  return String(n).padStart(2, '0');
-}
+function pad(n) { return String(n).padStart(2, '0'); }
 
 export default function GDTimer({ onClose }) {
-  const [total, setTotal] = useState(20 * 60);
+  const [total, setTotal]       = useState(20 * 60);
   const [remaining, setRemaining] = useState(20 * 60);
-  const [running, setRunning] = useState(false);
-  const [started, setStarted] = useState(false);
-  const [done, setDone] = useState(false);
+  const [running, setRunning]   = useState(false);
+  const [started, setStarted]   = useState(false);
+  const [done, setDone]         = useState(false);
   const intervalRef = useRef(null);
-  const audioRef = useRef(null);
 
+  // Drag state — default: bottom center
+  const [pos, setPos] = useState(null); // null = use CSS default
+  const dragging   = useRef(false);
+  const dragOrigin = useRef({ mx: 0, my: 0, px: 0, py: 0 });
+
+  // ── Timer logic ──────────────────────────────────────────────────────────
   useEffect(() => {
     if (running) {
       intervalRef.current = setInterval(() => {
-        setRemaining((r) => {
+        setRemaining(r => {
           if (r <= 1) {
             clearInterval(intervalRef.current);
             setRunning(false);
             setDone(true);
-            playAlert();
+            if (Notification.permission === 'granted') {
+              new Notification('SSBCircle', { body: 'GD time is up!' });
+            }
             return 0;
           }
           return r - 1;
@@ -40,143 +46,155 @@ export default function GDTimer({ onClose }) {
     return () => clearInterval(intervalRef.current);
   }, [running]);
 
-  function playAlert() {
-    // Browser notification
-    if (Notification.permission === 'granted') {
-      new Notification('SSBCircle', { body: 'GD time is up!' });
-    } else if (Notification.permission !== 'denied') {
-      Notification.requestPermission();
-    }
-  }
-
   function handlePreset(val) {
     clearInterval(intervalRef.current);
-    setTotal(val);
-    setRemaining(val);
-    setRunning(false);
-    setStarted(false);
-    setDone(false);
+    setTotal(val); setRemaining(val);
+    setRunning(false); setStarted(false); setDone(false);
   }
 
   function handleStart() {
-    setStarted(true);
-    setDone(false);
-    setRunning(true);
-    if (Notification.permission !== 'granted') {
-      Notification.requestPermission();
-    }
+    setStarted(true); setDone(false); setRunning(true);
+    if (Notification.permission !== 'granted') Notification.requestPermission();
   }
 
-  function handlePause() { setRunning(false); }
   function handleReset() {
     clearInterval(intervalRef.current);
-    setRunning(false);
-    setStarted(false);
-    setDone(false);
-    setRemaining(total);
+    setRunning(false); setStarted(false); setDone(false); setRemaining(total);
   }
 
+  // ── Drag logic ───────────────────────────────────────────────────────────
+  function onDragStart(e) {
+    e.preventDefault();
+    const touch = e.touches?.[0] ?? e;
+    const current = pos ?? {
+      x: window.innerWidth / 2,
+      y: window.innerHeight - 90,
+    };
+    dragging.current = true;
+    dragOrigin.current = { mx: touch.clientX, my: touch.clientY, px: current.x, py: current.y };
+  }
+
+  useEffect(() => {
+    function onMove(e) {
+      if (!dragging.current) return;
+      const touch = e.touches?.[0] ?? e;
+      const dx = touch.clientX - dragOrigin.current.mx;
+      const dy = touch.clientY - dragOrigin.current.my;
+      setPos({ x: dragOrigin.current.px + dx, y: dragOrigin.current.py + dy });
+    }
+    function onUp() { dragging.current = false; }
+
+    window.addEventListener('mousemove', onMove);
+    window.addEventListener('mouseup', onUp);
+    window.addEventListener('touchmove', onMove, { passive: false });
+    window.addEventListener('touchend', onUp);
+    return () => {
+      window.removeEventListener('mousemove', onMove);
+      window.removeEventListener('mouseup', onUp);
+      window.removeEventListener('touchmove', onMove);
+      window.removeEventListener('touchend', onUp);
+    };
+  }, []);
+
+  // ── Derived ──────────────────────────────────────────────────────────────
   const minutes = Math.floor(remaining / 60);
   const seconds = remaining % 60;
   const progress = remaining / total;
-  const circumference = 2 * Math.PI * 40;
+  const circumference = 2 * Math.PI * 16;
   const dashOffset = circumference * (1 - progress);
 
-  const timeColor = done
-    ? 'text-red-400'
-    : remaining <= 60
-    ? 'text-red-400'
-    : remaining <= 300
-    ? 'text-yellow-400'
-    : 'text-white';
+  const isUrgent  = remaining <= 60 && !done;
+  const isWarning = remaining <= 300 && remaining > 60;
+  const ringColor = done || isUrgent ? '#f87171' : isWarning ? '#fbbf24' : '#3b82f6';
+  const timeColor = done || isUrgent ? 'text-red-500' : isWarning ? 'text-amber-500' : 'text-gray-900';
 
-  const ringColor = done
-    ? '#f87171'
-    : remaining <= 60
-    ? '#f87171'
-    : remaining <= 300
-    ? '#facc15'
-    : '#2563eb';
+  // Position style: fixed when dragged, otherwise default bottom-center
+  const posStyle = pos
+    ? { position: 'fixed', left: pos.x, top: pos.y, transform: 'translate(-50%, -50%)', zIndex: 50 }
+    : { position: 'absolute', bottom: 24, left: '50%', transform: 'translateX(-50%)', zIndex: 30 };
 
   return (
-    <div className="absolute top-14 left-1/2 -translate-x-1/2 z-30 bg-slate-800/95 backdrop-blur-sm border border-slate-700 rounded-2xl shadow-2xl p-5 w-72">
-      {/* Header */}
-      <div className="flex items-center justify-between mb-4">
-        <span className="text-sm font-semibold text-slate-300">GD Timer</span>
-        <button onClick={onClose} className="text-slate-500 hover:text-slate-300 transition-colors">
-          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-          </svg>
-        </button>
-      </div>
+    <div style={posStyle} className="flex flex-col items-center gap-2 select-none">
 
-      {/* Presets */}
+      {/* Preset bar */}
       {!started && (
-        <div className="flex gap-2 mb-4">
+        <div className="flex items-center gap-1.5 bg-white border border-gray-200 rounded-full px-3 py-1.5 shadow-lg">
+          <span className="text-[10px] text-gray-400 font-medium mr-1">Duration</span>
           {PRESETS.map(({ label, value }) => (
-            <button
-              key={value}
-              onClick={() => handlePreset(value)}
-              className={`flex-1 py-1.5 rounded-lg text-xs font-semibold transition-colors ${
-                total === value
-                  ? 'bg-primary-600 text-white'
-                  : 'bg-slate-700 text-slate-400 hover:bg-slate-600 hover:text-white'
-              }`}
-            >
+            <button key={value} onClick={() => handlePreset(value)}
+              className={`px-2.5 py-1 rounded-full text-[11px] font-semibold transition-all cursor-pointer ${
+                total === value ? 'bg-brand-600 text-white' : 'text-gray-500 hover:text-gray-800 hover:bg-gray-100'
+              }`}>
               {label}
             </button>
           ))}
         </div>
       )}
 
-      {/* Circle countdown */}
-      <div className="flex justify-center mb-4">
-        <div className="relative w-24 h-24 flex items-center justify-center">
-          <svg className="absolute inset-0 w-full h-full -rotate-90" viewBox="0 0 100 100">
-            <circle cx="50" cy="50" r="40" fill="none" stroke="#334155" strokeWidth="6" />
-            <circle
-              cx="50" cy="50" r="40"
-              fill="none"
-              stroke={ringColor}
-              strokeWidth="6"
-              strokeLinecap="round"
-              strokeDasharray={circumference}
-              strokeDashoffset={dashOffset}
-              style={{ transition: 'stroke-dashoffset 0.8s linear, stroke 0.5s' }}
-            />
-          </svg>
-          <span className={`text-2xl font-bold font-mono tabular-nums ${timeColor}`}>
-            {pad(minutes)}:{pad(seconds)}
-          </span>
+      {/* Main pill */}
+      <div className={`flex items-center gap-3 bg-white border rounded-full pl-2 pr-4 py-2.5 shadow-lg transition-all ${
+        done ? 'border-red-300' : isUrgent ? 'border-red-200' : 'border-gray-200'
+      }`}>
+
+        {/* Drag handle */}
+        <div
+          onMouseDown={onDragStart}
+          onTouchStart={onDragStart}
+          className="flex items-center px-1.5 cursor-grab active:cursor-grabbing text-gray-300 hover:text-gray-500 transition-colors"
+          title="Drag to move"
+        >
+          <GripHorizontal className="w-4 h-4"/>
         </div>
-      </div>
 
-      {done && (
-        <p className="text-center text-red-400 text-sm font-semibold mb-3 animate-pulse">
-          Time&apos;s up!
-        </p>
-      )}
+        {/* Mini ring */}
+        <div className="relative w-9 h-9 flex items-center justify-center shrink-0">
+          <svg className="absolute inset-0 w-full h-full -rotate-90" viewBox="0 0 40 40">
+            <circle cx="20" cy="20" r="16" fill="none" stroke="#f3f4f6" strokeWidth="3"/>
+            <circle cx="20" cy="20" r="16" fill="none" stroke={ringColor} strokeWidth="3"
+              strokeLinecap="round" strokeDasharray={circumference} strokeDashoffset={dashOffset}
+              style={{ transition: 'stroke-dashoffset 0.8s linear, stroke 0.4s' }}/>
+          </svg>
+          <span className="text-[10px] font-bold text-gray-500 tabular-nums">{pad(minutes)}</span>
+        </div>
 
-      {/* Controls */}
-      <div className="flex gap-2">
-        {!started ? (
-          <button onClick={handleStart} className="flex-1 bg-primary-600 hover:bg-primary-700 text-white text-sm font-semibold py-2 rounded-xl transition-colors">
-            Start
+        {/* Time */}
+        <span className={`text-xl font-bold font-mono tabular-nums tracking-tight ${timeColor}`}>
+          {pad(minutes)}:{pad(seconds)}
+        </span>
+
+        {done && <span className="text-xs font-bold text-red-500 uppercase tracking-widest">Time's up</span>}
+
+        {/* Controls */}
+        <div className="flex items-center gap-1">
+          {!started ? (
+            <button onClick={handleStart}
+              className="flex items-center gap-1.5 bg-brand-600 hover:bg-brand-700 text-white text-xs font-semibold px-3 py-1.5 rounded-full transition-colors cursor-pointer">
+              <Play className="w-3 h-3"/> Start
+            </button>
+          ) : running ? (
+            <button onClick={() => setRunning(false)}
+              className="p-1.5 rounded-full text-gray-500 hover:text-gray-800 hover:bg-gray-100 transition-colors cursor-pointer">
+              <Pause className="w-4 h-4"/>
+            </button>
+          ) : (
+            <button onClick={() => setRunning(true)}
+              className="p-1.5 rounded-full text-brand-600 hover:bg-brand-50 transition-colors cursor-pointer">
+              <Play className="w-4 h-4"/>
+            </button>
+          )}
+
+          {started && (
+            <button onClick={handleReset}
+              className="p-1.5 rounded-full text-gray-400 hover:text-gray-700 hover:bg-gray-100 transition-colors cursor-pointer">
+              <RotateCcw className="w-3.5 h-3.5"/>
+            </button>
+          )}
+
+          <button onClick={onClose}
+            className="p-1.5 rounded-full text-gray-300 hover:text-gray-600 hover:bg-gray-100 transition-colors cursor-pointer">
+            <X className="w-3.5 h-3.5"/>
           </button>
-        ) : running ? (
-          <button onClick={handlePause} className="flex-1 bg-yellow-500 hover:bg-yellow-600 text-white text-sm font-semibold py-2 rounded-xl transition-colors">
-            Pause
-          </button>
-        ) : (
-          <button onClick={handleStart} className="flex-1 bg-primary-600 hover:bg-primary-700 text-white text-sm font-semibold py-2 rounded-xl transition-colors">
-            Resume
-          </button>
-        )}
-        {started && (
-          <button onClick={handleReset} className="px-4 bg-slate-700 hover:bg-slate-600 text-slate-300 text-sm font-semibold py-2 rounded-xl transition-colors">
-            Reset
-          </button>
-        )}
+        </div>
       </div>
     </div>
   );

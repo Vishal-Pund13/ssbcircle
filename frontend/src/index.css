@@ -2,6 +2,9 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Prevent horizontal scroll globally */
+html, body { overflow-x: hidden; }
+
 @layer base {
   body {
     @apply bg-white text-gray-900 antialiased;
