@@ -317,28 +317,62 @@ function VoiceRoomUI({ room, isAdmin, roomCode, showTimer, setShowTimer, showPan
         {/* ── Main content area ── */}
         <div className="flex-1 flex overflow-hidden bg-gray-50">
 
+          {/* ── MOBILE: always show normal grid + banner when screen sharing ── */}
+          <div className="flex sm:hidden flex-1 flex-col overflow-hidden">
+            {activeScreen && (
+              <div className="shrink-0 flex items-start gap-2.5 bg-blue-50 border-b border-blue-100 px-4 py-3">
+                <ScreenShare className="w-4 h-4 text-blue-600 shrink-0 mt-0.5" />
+                <div className="flex-1 min-w-0">
+                  <p className="text-xs font-semibold text-blue-800">
+                    {activeScreen.participant.isLocal ? 'You are' : `${activeScreen.participant.name || activeScreen.participant.identity} is`} sharing screen
+                  </p>
+                  <p className="text-[11px] text-blue-600 mt-0.5">
+                    Screen sharing is best viewed on a desktop or laptop.
+                  </p>
+                </div>
+              </div>
+            )}
+            <div className="flex-1 overflow-auto p-3 flex items-center justify-center">
+              {participants.length === 0 ? (
+                <div className="text-center">
+                  <div className="w-16 h-16 rounded-xl bg-white border border-gray-200 flex items-center justify-center mx-auto mb-4 shadow-sm">
+                    <Mic className="w-7 h-7 text-gray-300"/>
+                  </div>
+                  <p className="text-gray-600 font-semibold text-sm">Waiting for others to join…</p>
+                  <p className="text-gray-400 text-xs mt-1">Share code <span className="font-mono font-semibold text-brand-600 bg-brand-50 px-1.5 py-0.5 rounded">{room.room_code}</span></p>
+                </div>
+              ) : (
+                <div className={`grid gap-2 w-full max-w-4xl mx-auto ${
+                  participants.length === 1 ? 'grid-cols-1 max-w-xs' :
+                  participants.length === 2 ? 'grid-cols-2 max-w-lg' :
+                  'grid-cols-2'
+                }`}>
+                  {participants.map(p => (
+                    <ParticipantTile key={p.identity} participant={p} handRaised={raisedHands.has(p.identity)} isAdmin={isAdmin} roomCode={roomCode} onMute={muteParticipant} />
+                  ))}
+                </div>
+              )}
+            </div>
+          </div>
+
+          {/* ── DESKTOP: GMeet layout — video+strip or grid ── */}
           {activeScreen ? (
-            /* ── Screen share: video left + participant strip right ── */
-            <>
-              {/* Screen video */}
+            /* Screen share: video left + participant strip right */
+            <div className="hidden sm:flex flex-1 overflow-hidden">
               <div className="flex-1 bg-gray-900 relative overflow-hidden flex items-center justify-center">
                 <VideoTrack trackRef={activeScreen} className="max-w-full max-h-full object-contain" />
                 <div className="absolute top-3 left-3 flex items-center gap-1.5 bg-black/60 text-white text-xs px-2.5 py-1.5 rounded-full backdrop-blur-sm">
                   <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
-                  {activeScreen.participant.isLocal
-                    ? 'You are'
-                    : `${activeScreen.participant.name || activeScreen.participant.identity} is`} sharing screen
+                  {activeScreen.participant.isLocal ? 'You are' : `${activeScreen.participant.name || activeScreen.participant.identity} is`} sharing screen
                 </div>
               </div>
-
-              {/* Participant strip — right on desktop, bottom on mobile */}
-              <div className="flex sm:flex-col gap-2 p-2 bg-white border-t sm:border-t-0 sm:border-l border-gray-200 overflow-x-auto sm:overflow-y-auto sm:overflow-x-hidden sm:w-44 shrink-0">
+              <div className="flex flex-col gap-2 p-2 bg-white border-l border-gray-200 overflow-y-auto w-44 shrink-0">
                 {participants.map(p => <MiniTile key={p.identity} p={p} />)}
               </div>
-            </>
+            </div>
           ) : (
-            /* ── Normal participant grid — centered in available space ── */
-            <div className="flex-1 overflow-auto p-3 sm:p-6 flex items-center justify-center">
+            /* Normal participant grid */
+            <div className="hidden sm:flex flex-1 overflow-auto p-6 items-center justify-center">
               {participants.length === 0 ? (
                 <div className="text-center">
                   <div className="w-16 h-16 rounded-xl bg-white border border-gray-200 flex items-center justify-center mx-auto mb-4 shadow-sm">
@@ -346,29 +380,19 @@ function VoiceRoomUI({ room, isAdmin, roomCode, showTimer, setShowTimer, showPan
                   </div>
                   <p className="text-gray-600 font-semibold text-sm">Waiting for others to join…</p>
                   <p className="text-gray-400 text-xs mt-1">
-                    Share the code{' '}
-                    <span className="font-mono font-semibold text-brand-600 bg-brand-50 px-1.5 py-0.5 rounded">
-                      {room.room_code}
-                    </span>
+                    Share the code <span className="font-mono font-semibold text-brand-600 bg-brand-50 px-1.5 py-0.5 rounded">{room.room_code}</span>
                   </p>
                 </div>
               ) : (
-                <div className={`grid gap-2 sm:gap-4 w-full max-w-4xl mx-auto ${
+                <div className={`grid gap-4 w-full max-w-4xl mx-auto ${
                   participants.length === 1 ? 'grid-cols-1 max-w-xs' :
                   participants.length === 2 ? 'grid-cols-2 max-w-lg' :
                   participants.length <= 4  ? 'grid-cols-2' :
-                  participants.length <= 6  ? 'grid-cols-2 sm:grid-cols-3' :
-                  'grid-cols-2 sm:grid-cols-3 lg:grid-cols-4'
+                  participants.length <= 6  ? 'grid-cols-3' :
+                  'grid-cols-3 lg:grid-cols-4'
                 }`}>
                   {participants.map(p => (
-                    <ParticipantTile
-                      key={p.identity}
-                      participant={p}
-                      handRaised={raisedHands.has(p.identity)}
-                      isAdmin={isAdmin}
-                      roomCode={roomCode}
-                      onMute={muteParticipant}
-                    />
+                    <ParticipantTile key={p.identity} participant={p} handRaised={raisedHands.has(p.identity)} isAdmin={isAdmin} roomCode={roomCode} onMute={muteParticipant} />
                   ))}
                 </div>
               )}
@@ -389,10 +413,11 @@ function VoiceRoomUI({ room, isAdmin, roomCode, showTimer, setShowTimer, showPan
       </div>
 
       {/* ── Bottom bar — GMeet 3-group layout ── */}
-      <div className="shrink-0 bg-white border-t border-gray-200 py-2.5 sm:py-3 px-3 sm:px-5">
+      <div className="shrink-0 bg-white border-t border-gray-200 pt-2.5 sm:py-3 px-3 sm:px-5"
+        style={{ paddingBottom: 'max(env(safe-area-inset-bottom, 0px) + 10px, 14px)' }}>
 
         {/* Mobile: single centered scrollable row */}
-        <div className="flex sm:hidden items-center justify-center gap-2 overflow-x-auto">
+        <div className="flex sm:hidden items-center justify-center gap-2 overflow-x-auto pb-1">
           <button onClick={() => localParticipant.setMicrophoneEnabled(isMuted)}
             className={`shrink-0 flex items-center gap-1.5 px-4 py-2 rounded-lg text-sm font-semibold transition-all cursor-pointer border ${isMuted ? 'bg-red-50 text-red-600 border-red-200' : 'bg-white text-gray-700 border-gray-200'}`}>
             {isMuted ? <MicOff className="w-4 h-4"/> : <Mic className="w-4 h-4"/>}

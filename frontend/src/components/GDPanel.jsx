@@ -294,8 +294,9 @@ export default function GDPanel({ onClose, chatMessages = [], onSendMessage, act
             {label}
           </button>
         ))}
+        {/* X only on desktop — mobile has Done button at bottom */}
         <button onClick={onClose}
-          className="px-2.5 py-2.5 text-gray-400 hover:text-gray-600 transition-colors cursor-pointer border-b-2 border-transparent shrink-0">
+          className="hidden sm:block px-2.5 py-2.5 text-gray-400 hover:text-gray-600 transition-colors cursor-pointer border-b-2 border-transparent shrink-0">
           <X className="w-4 h-4"/>
         </button>
       </div>
@@ -306,6 +307,14 @@ export default function GDPanel({ onClose, chatMessages = [], onSendMessage, act
         <div className={`absolute inset-0 flex flex-col ${active === 'transcript' ? '' : 'hidden'}`}><TranscriptTab/></div>
         <div className={`absolute inset-0 flex flex-col ${active === 'notes'      ? '' : 'hidden'}`}><NotesTab/></div>
         <div className={`absolute inset-0 flex flex-col ${active === 'checklist'  ? '' : 'hidden'}`}><ChecklistTab/></div>
+      </div>
+
+      {/* Mobile-only close button at the bottom — easy thumb reach */}
+      <div className="sm:hidden shrink-0 px-4 py-3 border-t border-gray-200">
+        <button onClick={onClose}
+          className="w-full py-2.5 text-sm font-semibold text-gray-600 bg-gray-50 hover:bg-gray-100 rounded-xl border border-gray-200 transition-colors cursor-pointer">
+          Close
+        </button>
       </div>
     </div>
   );
