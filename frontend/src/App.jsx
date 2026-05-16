@@ -8,6 +8,9 @@ import ProfilePage from './components/ProfilePage';
 import CreateRoom from './components/CreateRoom';
 import JoinRoom from './components/JoinRoom';
 import RoomView from './components/RoomView';
+import SuperAdminLogin from './components/SuperAdminLogin';
+import SuperAdminDashboard from './components/SuperAdminDashboard';
+import AnimationPreview from './components/AnimationPreview';
 
 export default function App() {
   return (
@@ -26,6 +29,10 @@ export default function App() {
           <Route path="/room/:code" element={
             <ProtectedRoute><RoomView /></ProtectedRoute>
           } />
+          <Route path="/preview" element={<AnimationPreview />} />
+          {/* Hidden admin routes — not linked from anywhere in the public UI */}
+          <Route path="/sa" element={<SuperAdminLogin />} />
+          <Route path="/sa/dashboard" element={<SuperAdminDashboard />} />
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
       </BrowserRouter>

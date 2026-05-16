@@ -2,9 +2,10 @@ import { useState, useEffect, useRef } from 'react';
 import { Mic, MicOff, FileText, CheckSquare, Download, Trash2, X, Plus, MessageSquare, Send } from 'lucide-react';
 
 // ─── Transcript ───────────────────────────────────────────────────────────────
-function TranscriptTab() {
+function TranscriptTab({ onStateChange }) {
   const [supported] = useState(() => !!(window.SpeechRecognition || window.webkitSpeechRecognition));
   const [listening, setListening] = useState(false);
+  const [paused,    setPaused]    = useState(false);
   const [entries,   setEntries]   = useState([]);
   const [interim,   setInterim]   = useState('');
   const recognitionRef = useRef(null);
@@ -12,9 +13,31 @@ function TranscriptTab() {
   const bottomRef      = useRef(null);
 
   useEffect(() => { bottomRef.current?.scrollIntoView({ behavior: 'smooth' }); }, [entries, interim]);
-  useEffect(() => () => { listeningRef.current = false; recognitionRef.current?.stop(); }, []);
 
-  function startListening() {
+  useEffect(() => () => {
+    listeningRef.current = false;
+    recognitionRef.current?.stop();
+    recognitionRef.current = null;
+  }, []);
+
+  // Auto-restart when tab becomes visible again (browser kills speech rec in background)
+  useEffect(() => {
+    function handleVisibility() {
+      if (document.visibilityState === 'visible' && listeningRef.current) {
+        setPaused(false);
+        // Force restart — Chrome may have killed it while hidden
+        try { recognitionRef.current?.stop(); } catch {}
+        // onend will fire and restart automatically
+      }
+      if (document.visibilityState === 'hidden' && listeningRef.current) {
+        setPaused(true);
+      }
+    }
+    document.addEventListener('visibilitychange', handleVisibility);
+    return () => document.removeEventListener('visibilitychange', handleVisibility);
+  }, []);
+
+  function buildRec() {
     const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
     const rec = new SR();
     rec.continuous = true; rec.interimResults = true; rec.lang = 'en-IN';
@@ -30,14 +53,42 @@ function TranscriptTab() {
       }
       setInterim(interimText);
     };
-    rec.onerror = (e) => { if (e.error !== 'no-speech') { listeningRef.current = false; setListening(false); } };
-    rec.onend   = () => { if (recognitionRef.current && listeningRef.current) try { recognitionRef.current.start(); } catch {} };
-    recognitionRef.current = rec; listeningRef.current = true; rec.start(); setListening(true);
+    rec.onerror = (e) => {
+      if (e.error !== 'no-speech' && e.error !== 'aborted') {
+        listeningRef.current = false;
+        setListening(false);
+        onStateChange?.(false);
+      }
+    };
+    rec.onend = () => {
+      if (listeningRef.current) {
+        // Rebuild instance on each restart (some browsers require it)
+        const next = buildRec();
+        recognitionRef.current = next;
+        try { next.start(); } catch {}
+      }
+    };
+    return rec;
+  }
+
+  function startListening() {
+    const rec = buildRec();
+    recognitionRef.current = rec;
+    listeningRef.current = true;
+    rec.start();
+    setListening(true);
+    setPaused(false);
+    onStateChange?.(true);
   }
 
   function stopListening() {
-    listeningRef.current = false; recognitionRef.current?.stop(); recognitionRef.current = null;
-    setListening(false); setInterim('');
+    listeningRef.current = false;
+    recognitionRef.current?.stop();
+    recognitionRef.current = null;
+    setListening(false);
+    setPaused(false);
+    setInterim('');
+    onStateChange?.(false);
   }
 
   function download() {
@@ -63,11 +114,13 @@ function TranscriptTab() {
         <button onClick={listening ? stopListening : startListening}
           className={`flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-semibold transition-all cursor-pointer border ${
             listening
-              ? 'bg-red-50 text-red-600 border-red-200'
+              ? paused ? 'bg-amber-50 text-amber-600 border-amber-200' : 'bg-red-50 text-red-600 border-red-200'
               : 'bg-brand-50 text-brand-600 border-brand-100 hover:bg-brand-100'
           }`}>
           {listening
-            ? <><span className="w-1.5 h-1.5 rounded-full bg-red-500 animate-pulse"/> Recording</>
+            ? paused
+              ? <><span className="w-1.5 h-1.5 rounded-full bg-amber-500 animate-pulse"/> Paused (tab hidden)</>
+              : <><span className="w-1.5 h-1.5 rounded-full bg-red-500 animate-pulse"/> Recording</>
             : <><Mic className="w-3.5 h-3.5"/> Start</>}
         </button>
         <div className="flex-1"/>
@@ -272,7 +325,7 @@ const TABS = [
   { id: 'checklist',  label: 'Checklist',  Icon: CheckSquare },
 ];
 
-export default function GDPanel({ onClose, chatMessages = [], onSendMessage, activeTab, onTabChange }) {
+export default function GDPanel({ show, onClose, chatMessages = [], onSendMessage, activeTab, onTabChange, onTranscriptStateChange }) {
   const [active, setActive] = useState(activeTab ?? 'chat');
 
   useEffect(() => { if (activeTab) setActive(activeTab); }, [activeTab]);
@@ -280,7 +333,7 @@ export default function GDPanel({ onClose, chatMessages = [], onSendMessage, act
   function handleTab(id) { setActive(id); onTabChange?.(id); }
 
   return (
-    <div className="fixed inset-0 z-50 bg-white flex flex-col sm:relative sm:inset-auto sm:z-20 sm:w-80 sm:shrink-0 sm:border-l sm:border-gray-200 sm:shadow-none shadow-2xl">
+    <div className={`${show ? '' : 'hidden'} fixed inset-0 z-50 bg-white flex flex-col sm:relative sm:inset-auto sm:z-20 sm:w-80 sm:shrink-0 sm:border-l sm:border-gray-200 sm:shadow-none shadow-2xl`}>
       {/* Tab bar */}
       <div className="flex items-center border-b border-gray-200 shrink-0">
         {TABS.map(({ id, label, Icon }) => (
@@ -304,7 +357,7 @@ export default function GDPanel({ onClose, chatMessages = [], onSendMessage, act
       {/* All tabs mounted — CSS controls visibility so state is never lost */}
       <div className="flex-1 overflow-hidden relative">
         <div className={`absolute inset-0 flex flex-col ${active === 'chat'       ? '' : 'hidden'}`}><ChatTab messages={chatMessages} onSend={onSendMessage}/></div>
-        <div className={`absolute inset-0 flex flex-col ${active === 'transcript' ? '' : 'hidden'}`}><TranscriptTab/></div>
+        <div className={`absolute inset-0 flex flex-col ${active === 'transcript' ? '' : 'hidden'}`}><TranscriptTab onStateChange={onTranscriptStateChange}/></div>
         <div className={`absolute inset-0 flex flex-col ${active === 'notes'      ? '' : 'hidden'}`}><NotesTab/></div>
         <div className={`absolute inset-0 flex flex-col ${active === 'checklist'  ? '' : 'hidden'}`}><ChecklistTab/></div>
       </div>

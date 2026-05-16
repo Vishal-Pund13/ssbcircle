@@ -118,7 +118,7 @@ function RoomCard({ room, user, onJoin, onDelete }) {
 
         <button
           onClick={() => onJoin(room.room_code)}
-          className="w-full flex items-center justify-center gap-1.5 bg-brand-600 hover:bg-brand-700 text-white text-xs font-semibold py-2.5 rounded-lg transition-colors cursor-pointer"
+          className="w-full flex items-center justify-center gap-1.5 bg-white hover:bg-brand-50 text-brand-600 border border-brand-600 text-xs font-semibold py-2.5 rounded-lg transition-colors cursor-pointer"
         >
           <Mic className="w-3.5 h-3.5" />
           {user ? 'Join Room' : 'Sign in to Join'}

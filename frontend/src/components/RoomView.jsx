@@ -35,7 +35,7 @@ function Logo() {
 }
 
 // ── Participant tile ─────────────────────────────────────────────────────────
-function ParticipantTile({ participant, handRaised, isAdmin, roomCode, onMute }) {
+function ParticipantTile({ participant, handRaised, isAdmin, roomCode, onMute, hostId }) {
   const isSpeaking = useIsSpeaking(participant);
   const [showMenu, setShowMenu] = useState(false);
   const menuRef = useRef(null);
@@ -65,9 +65,16 @@ function ParticipantTile({ participant, handRaised, isAdmin, roomCode, onMute })
         : 'border-gray-200 bg-white hover:border-gray-300 hover:shadow-sm'
     }`}>
 
+      {/* Host badge */}
+      {hostId && participant.identity === hostId && (
+        <div className="absolute top-2 left-2 bg-brand-600 text-white text-[10px] font-bold px-1.5 py-0.5 rounded-full">
+          HOST
+        </div>
+      )}
+
       {/* Raised hand */}
       {handRaised && (
-        <div className="absolute top-2 left-2 bg-amber-50 border border-amber-200 text-amber-600 text-[10px] font-semibold px-1.5 py-0.5 rounded-full flex items-center gap-1">
+        <div className={`absolute text-amber-600 text-[10px] font-semibold px-1.5 py-0.5 rounded-full flex items-center gap-1 bg-amber-50 border border-amber-200 ${hostId && participant.identity === hostId ? 'top-2 left-14' : 'top-2 left-2'}`}>
           <Hand className="w-2.5 h-2.5"/> Hand
         </div>
       )}
@@ -194,7 +201,7 @@ function AdminPanel({ participants, roomCode, onMuteAll, onEndRoom, onMutePartic
 }
 
 // ── Voice room UI ────────────────────────────────────────────────────────────
-function VoiceRoomUI({ room, isAdmin, roomCode, showTimer, setShowTimer, showPanel, setShowPanel, onLeave }) {
+function VoiceRoomUI({ room, isAdmin, roomCode, showTimer, setShowTimer, showPanel, setShowPanel, onLeave, setIsTranscribing }) {
   const lkRoom = useRoomContext();
   const participants = useParticipants();
   const { localParticipant } = useLocalParticipant();
@@ -204,12 +211,13 @@ function VoiceRoomUI({ room, isAdmin, roomCode, showTimer, setShowTimer, showPan
   const activeScreen    = screenTracks[0] ?? null;
   const isScreenSharing = screenTracks.some(t => t.participant.isLocal);
 
-  const [myHandRaised, setMyHandRaised] = useState(false);
-  const [raisedHands,  setRaisedHands]  = useState(new Set());
-  const [chatMessages, setChatMessages] = useState([]);
-  const [unreadChat,   setUnreadChat]   = useState(0);
-  const [panelTab,     setPanelTab]     = useState('chat');
-  const [showAdmin,    setShowAdmin]    = useState(false);
+  const [myHandRaised,   setMyHandRaised]   = useState(false);
+  const [raisedHands,    setRaisedHands]    = useState(new Set());
+  const [chatMessages,   setChatMessages]   = useState([]);
+  const [unreadChat,     setUnreadChat]     = useState(0);
+  const [panelTab,       setPanelTab]       = useState('chat');
+  const [showAdmin,      setShowAdmin]      = useState(false);
+  const [timerSyncEvent, setTimerSyncEvent] = useState(null);
 
   const encoder = new TextEncoder();
   const decoder = new TextDecoder();
@@ -229,6 +237,11 @@ function VoiceRoomUI({ room, isAdmin, roomCode, showTimer, setShowTimer, showPan
         if (msg.type === 'MUTE_ALL' && !isAdmin) localParticipant.setMicrophoneEnabled(false);
         if (msg.type === 'MUTE_PARTICIPANT' && msg.identity === localParticipant.identity) localParticipant.setMicrophoneEnabled(false);
         if (msg.type === 'END_ROOM') onLeave();
+        if (['TIMER_START','TIMER_PAUSE','TIMER_RESUME','TIMER_RESET'].includes(msg.type)) {
+          setTimerSyncEvent(msg);
+          if (msg.type === 'TIMER_START') setShowTimer(true);
+        }
+        if (msg.type === 'TIMER_CLOSE') setShowTimer(false);
       } catch { /* ignore */ }
     }
     lkRoom.on(RoomEvent.DataReceived, handleData);
@@ -364,7 +377,7 @@ function VoiceRoomUI({ room, isAdmin, roomCode, showTimer, setShowTimer, showPan
                   'grid-cols-2 sm:grid-cols-3 lg:grid-cols-4'
                 }`}>
                   {participants.map(p => (
-                    <ParticipantTile key={p.identity} participant={p} handRaised={raisedHands.has(p.identity)} isAdmin={isAdmin} roomCode={roomCode} onMute={muteParticipant} />
+                    <ParticipantTile key={p.identity} participant={p} handRaised={raisedHands.has(p.identity)} isAdmin={isAdmin} roomCode={roomCode} onMute={muteParticipant} hostId={room.created_by ? String(room.created_by) : null} />
                   ))}
                 </div>
               )}
@@ -373,15 +386,15 @@ function VoiceRoomUI({ room, isAdmin, roomCode, showTimer, setShowTimer, showPan
         </div>
 
         {/* Notes / chat panel — right sidebar */}
-        {showPanel && (
-          <GDPanel
-            onClose={() => setShowPanel(false)}
-            chatMessages={chatMessages}
-            onSendMessage={sendChat}
-            activeTab={panelTab}
-            onTabChange={setPanelTab}
-          />
-        )}
+        <GDPanel
+          show={showPanel}
+          onClose={() => setShowPanel(false)}
+          chatMessages={chatMessages}
+          onSendMessage={sendChat}
+          activeTab={panelTab}
+          onTabChange={setPanelTab}
+          onTranscriptStateChange={v => setIsTranscribing?.(v)}
+        />
       </div>
 
       {/* ── Bottom bar — GMeet 3-group layout ── */}
@@ -426,15 +439,12 @@ function VoiceRoomUI({ room, isAdmin, roomCode, showTimer, setShowTimer, showPan
         {/* Desktop: 3-column GMeet layout */}
         <div className="hidden sm:grid grid-cols-3 items-center">
 
-          {/* Left — room info */}
+          {/* Left — participant count */}
           <div className="flex items-center gap-3">
             <div className="flex items-center gap-1.5 px-3 py-2 bg-gray-50 border border-gray-200 rounded-lg text-xs text-gray-500 font-medium">
               <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse shrink-0"/>
               {participants.length} in room
             </div>
-            <span className="text-xs font-mono text-gray-400 px-2.5 py-2 border border-gray-200 rounded-lg bg-gray-50">
-              {room.room_code}
-            </span>
           </div>
 
           {/* Center — primary controls */}
@@ -482,7 +492,14 @@ function VoiceRoomUI({ room, isAdmin, roomCode, showTimer, setShowTimer, showPan
         </div>
       </div>
 
-      {showTimer && <GDTimer onClose={() => setShowTimer(false)} />}
+      {showTimer && (
+        <GDTimer
+          onClose={() => setShowTimer(false)}
+          isAdmin={isAdmin}
+          onBroadcast={publish}
+          syncEvent={timerSyncEvent}
+        />
+      )}
     </>
   );
 }
@@ -493,15 +510,22 @@ export default function RoomView() {
   const navigate  = useNavigate();
   const { user }  = useAuth();
 
-  const [room,        setRoom]        = useState(null);
-  const [token,       setToken]       = useState('');
-  const [livekitUrl,  setLivekitUrl]  = useState('');
-  const [fetchStatus, setFetchStatus] = useState('loading');
-  const [error,       setError]       = useState('');
-  const [showTimer,   setShowTimer]   = useState(false);
-  const [showPanel,   setShowPanel]   = useState(false);
+  const [room,          setRoom]          = useState(null);
+  const [token,         setToken]         = useState('');
+  const [livekitUrl,    setLivekitUrl]    = useState('');
+  const [fetchStatus,   setFetchStatus]   = useState('loading');
+  const [error,         setError]         = useState('');
+  const [showTimer,     setShowTimer]     = useState(false);
+  const [showPanel,     setShowPanel]     = useState(false);
+  const [isTranscribing, setIsTranscribing] = useState(false);
 
   const isAdmin = room && user && room.created_by === user.id;
+
+  // Show transcription status in browser tab title when minimized
+  useEffect(() => {
+    document.title = isTranscribing ? '● Transcribing | SSBCircle' : 'SSBCircle';
+    return () => { document.title = 'SSBCircle'; };
+  }, [isTranscribing]);
 
   useEffect(() => {
     let cancelled = false;
@@ -541,42 +565,42 @@ export default function RoomView() {
   return (
     <div className="flex flex-col h-screen bg-white overflow-hidden">
 
-      {/* Header — matches homepage nav exactly */}
+      {/* Header */}
       <header className="flex items-center justify-between px-5 py-3 bg-white border-b border-gray-200 shrink-0 z-10 shadow-sm">
         <div className="flex items-center gap-3 min-w-0">
           <Logo/>
-          {room && (
-            <div className="flex items-center gap-2 min-w-0">
-              <span className="w-px h-4 bg-gray-200 shrink-0"/>
-              <div className="min-w-0">
-                <span className="text-gray-700 text-xs font-semibold truncate block max-w-[140px] sm:max-w-xs">
-                  {room.topic}
-                </span>
-                {room.description && (
-                  <span className="text-gray-400 text-[10px] truncate block max-w-[140px] sm:max-w-xs">
-                    {room.description}
-                  </span>
-                )}
-              </div>
-              {isAdmin && (
-                <span className="shrink-0 text-[10px] font-semibold px-2 py-0.5 rounded-full bg-brand-50 text-brand-600 border border-brand-100">
-                  HOST
-                </span>
-              )}
-            </div>
+          {isAdmin && (
+            <span className="shrink-0 text-[10px] font-semibold px-2 py-0.5 rounded-full bg-brand-50 text-brand-600 border border-brand-100">
+              HOST
+            </span>
           )}
         </div>
 
         <div className="flex items-center gap-2 shrink-0">
-          <button onClick={() => setShowTimer(v => !v)}
-            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition-all cursor-pointer border ${
-              showTimer
-                ? 'bg-brand-600 text-white border-brand-600'
-                : 'bg-white text-gray-500 border-gray-200 hover:bg-gray-50 hover:text-gray-700'
-            }`}>
-            <Timer className="w-3.5 h-3.5"/>
-            <span className="hidden sm:inline">Timer</span>
-          </button>
+          {/* Live transcription indicator */}
+          {isTranscribing && (
+            <div className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-full bg-red-50 border border-red-100">
+              <div className="flex items-end gap-[2px]">
+                {[3, 6, 10, 6, 3].map((h, i) => (
+                  <div key={i} className="w-[2px] bg-red-500 rounded-full animate-bounce"
+                    style={{ height: h + 'px', animationDelay: `${i * 0.1}s`, animationDuration: '0.7s' }} />
+                ))}
+              </div>
+              <span className="text-[10px] font-bold text-red-600 tracking-widest uppercase hidden xs:inline">Live</span>
+            </div>
+          )}
+
+          {isAdmin && (
+            <button onClick={() => setShowTimer(v => !v)}
+              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition-all cursor-pointer border ${
+                showTimer
+                  ? 'bg-brand-600 text-white border-brand-600'
+                  : 'bg-white text-gray-500 border-gray-200 hover:bg-gray-50 hover:text-gray-700'
+              }`}>
+              <Timer className="w-3.5 h-3.5"/>
+              <span className="hidden sm:inline">Timer</span>
+            </button>
+          )}
 
           {room && (
             <span className="hidden sm:inline-flex items-center gap-1.5 text-gray-400 text-[11px] px-2.5 py-1.5 rounded-lg font-mono border border-gray-200 bg-gray-50">
@@ -586,6 +610,37 @@ export default function RoomView() {
           )}
         </div>
       </header>
+
+      {/* Topic banner — always visible, keeps participants focused */}
+      {room && (
+        <div className="shrink-0 bg-brand-600 px-4 sm:px-6 py-2.5 flex items-center gap-3">
+          <div className="flex-1 min-w-0">
+            <h2 className="text-sm sm:text-base font-bold text-white leading-snug truncate">
+              {room.topic}
+            </h2>
+            <div className="flex items-center gap-2 mt-0.5 flex-wrap">
+              {room.admin_display_name && (
+                <span className="text-[11px] text-white/60">
+                  Hosted by <span className="text-white/90 font-semibold">{room.admin_display_name}</span>
+                </span>
+              )}
+              {room.description && (
+                <span className="text-[11px] text-white/50 hidden sm:inline truncate max-w-xs">· {room.description}</span>
+              )}
+            </div>
+          </div>
+          <div className="flex items-center gap-2 shrink-0">
+            {room.category && (
+              <span className="text-[10px] font-semibold px-2.5 py-1 rounded-full bg-white/15 text-white border border-white/20">
+                {room.category}{room.subcategory ? ` · ${room.subcategory}` : ''}
+              </span>
+            )}
+            <span className="hidden sm:inline text-[10px] font-mono text-white/50 px-2 py-1 border border-white/20 rounded-lg">
+              {room.room_code}
+            </span>
+          </div>
+        </div>
+      )}
 
       {/* Loading */}
       {fetchStatus === 'loading' && (
@@ -616,6 +671,7 @@ export default function RoomView() {
             showPanel={showPanel}
             setShowPanel={setShowPanel}
             onLeave={handleLeave}
+            setIsTranscribing={setIsTranscribing}
           />
         </LiveKitRoom>
       )}
