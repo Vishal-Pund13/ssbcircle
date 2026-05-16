@@ -3,12 +3,13 @@ const router = express.Router();
 const { AccessToken } = require('livekit-server-sdk');
 const { createRoom, getRoomByCode, getActiveRooms, closeRoom } = require('../models/Room');
 const authMiddleware = require('../middleware/auth');
+const { createRoomLimiter } = require('../middleware/rateLimit');
 
 const VALID_CATEGORIES = ['GD', 'PPDT', 'Lecturette', 'IO Practice'];
 const GD_SUBCATEGORIES = ['Defence', 'International Relations', 'Society', 'Economy', 'Science & Tech', 'Environment', 'Sports & Awards'];
 
-// Create room — requires auth
-router.post('/', authMiddleware, async (req, res) => {
+// Create room — requires auth + per-user room-creation rate limit
+router.post('/', authMiddleware, createRoomLimiter, async (req, res) => {
   try {
     const { title, description, category, subcategory } = req.body;
 
