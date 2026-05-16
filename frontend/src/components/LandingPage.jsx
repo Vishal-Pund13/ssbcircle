@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { getActiveRooms, closeRoom } from '../services/api';
 import { useAuth } from '../context/AuthContext';
-import { Mic, Timer, FileText, CheckSquare, Lock, Radio, ArrowRight, Trash2 } from 'lucide-react';
+import { Mic, Timer, FileText, CheckSquare, Lock, Radio, ArrowRight, Trash2, Target, Headphones, RefreshCw, Zap, Users, Presentation } from 'lucide-react';
 import HeroMapAnimation from './HeroMapAnimation';
 
 const CATEGORIES = ['All', 'GD', 'PPDT', 'Lecturette', 'IO Practice'];
@@ -433,27 +433,83 @@ export default function LandingPage() {
           )}
         </section>
 
-        {/* ── How it works ── */}
-        <section className="border-t border-gray-100 bg-gray-50 py-10 sm:py-14 px-4 sm:px-6">
+        {/* ── How to use ── */}
+        <section className="border-t border-gray-100 bg-white py-12 sm:py-16 px-4 sm:px-6">
           <div className="max-w-5xl mx-auto">
-            <h2 className="text-lg sm:text-xl font-semibold text-gray-900 mb-6 sm:mb-8">How it works</h2>
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-5 sm:gap-8">
+
+            {/* Header */}
+            <div className="mb-10 sm:mb-14">
+              <span className="inline-block text-[11px] font-bold text-brand-600 uppercase tracking-widest mb-3">Platform Guide</span>
+              <h2 className="text-2xl sm:text-3xl font-bold text-gray-900 leading-tight">
+                How to get the most out of SSBCircle
+              </h2>
+              <p className="text-gray-400 text-sm mt-2">For GD, PPDT, Lecturette, and mock interviews — everything the SSB tests you on.</p>
+            </div>
+
+            {/* Steps with connected dots — map-style */}
+            <div className="relative mb-12 sm:mb-16">
+              {/* Dashed connector line — desktop */}
+              <div className="hidden sm:block absolute top-[15px] left-[3rem] right-[3rem]"
+                style={{ height: '1px', background: 'repeating-linear-gradient(to right,#bfdbfe 0,#bfdbfe 6px,transparent 6px,transparent 14px)' }} />
+
+              <div className="grid grid-cols-1 sm:grid-cols-4 gap-8 sm:gap-6">
+                {[
+                  { n: '01', title: 'Create a free account',  desc: 'Sign up in 30 seconds — no credit card. Google login works too.' },
+                  { n: '02', title: 'Create or join a room',  desc: 'Host picks a topic and shares the 6-letter code. Participants enter it to join instantly.' },
+                  { n: '03', title: 'Run the GD',             desc: 'Start the timer. Enable transcript. Listen actively and build on what others say — group flow is what GTO assesses.' },
+                  { n: '04', title: 'Review & improve',       desc: 'Read your transcript, fill the SSB checklist, and note what to fix next session.' },
+                ].map(({ n, title, desc }) => (
+                  <div key={n} className="flex sm:flex-col gap-4 sm:gap-0">
+                    <div className="relative shrink-0 z-10">
+                      <div className="w-8 h-8 rounded-full bg-brand-600 border-4 border-white ring-2 ring-blue-100 flex items-center justify-center shadow-sm">
+                        <span className="text-[9px] font-bold text-white">{n}</span>
+                      </div>
+                    </div>
+                    <div className="sm:mt-5">
+                      <h3 className="text-sm font-bold text-gray-900 mb-1.5">{title}</h3>
+                      <p className="text-xs text-gray-400 leading-relaxed">{desc}</p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* Tips grid */}
+            <h3 className="text-sm font-bold text-gray-800 mb-4 uppercase tracking-wide">Tips for your best session</h3>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 mb-6">
               {[
-                { n: '1', title: 'Create a free account', desc: 'Sign up in under 30 seconds. No credit card, no verification required.' },
-                { n: '2', title: 'Open or join a room', desc: 'Enter a GD topic to host, or enter a 6-letter code to join someone\'s room.' },
-                { n: '3', title: 'Discuss and evaluate', desc: 'Use the timer, live transcript, and SSB checklist to improve every session.' },
-              ].map(({ n, title, desc }) => (
-                <div key={n} className="flex gap-4">
-                  <div className="shrink-0 w-7 h-7 rounded-lg bg-brand-600 text-white text-sm font-bold flex items-center justify-center mt-0.5">
-                    {n}
+                { Icon: Target,      tip: 'Set leads like the real SSB',   desc: 'The assessor gives 3 leads — host from a laptop, share your screen so everyone sees them. Let the group pick one, then highlight the selected lead.' },
+                { Icon: Timer,       tip: 'Time it like the real thing',   desc: 'SSB GDs run 15–20 min. Use the built-in timer and stop exactly on time — discipline is noticed.' },
+                { Icon: Mic,         tip: 'Speak, don\'t dominate',        desc: 'Aim for 3–4 quality contributions. Frequency without value hurts your assessment.' },
+                { Icon: Headphones,  tip: 'Listen actively, then add',     desc: 'Let a point complete, then build on it or bring a new angle. Group flow matters more than jumping in.' },
+                { Icon: Presentation, tip: 'PPDT & Lecturette rooms',       desc: 'Create a PPDT room, host shares screen to show the picture, group describes then discusses. For Lecturette, each person gets 3 min on a topic — use the timer.' },
+                { Icon: Users,       tip: '1-on-1 mock interviews',        desc: 'Recommended students or ex-servicemen officers can create a private 2-person room for structured Personal Interview practice. Share the code with just one person.' },
+              ].map(({ Icon, tip, desc }) => (
+                <div key={tip} className="bg-gray-50 border border-gray-100 rounded-xl p-4 flex gap-3 hover:border-blue-100 hover:bg-blue-50/30 transition-colors">
+                  <div className="shrink-0 mt-0.5 w-7 h-7 rounded-lg bg-white border border-gray-200 flex items-center justify-center shadow-sm">
+                    <Icon className="w-3.5 h-3.5 text-brand-600" />
                   </div>
                   <div>
-                    <h3 className="text-sm font-semibold text-gray-900 mb-1.5">{title}</h3>
-                    <p className="text-sm text-gray-400 leading-relaxed">{desc}</p>
+                    <p className="text-xs font-bold text-gray-800 mb-1">{tip}</p>
+                    <p className="text-xs text-gray-400 leading-relaxed">{desc}</p>
                   </div>
                 </div>
               ))}
             </div>
+
+            {/* Host responsibility */}
+            <div className="bg-amber-50 border border-amber-100 rounded-xl p-4 sm:p-5 flex gap-4 items-start">
+              <div className="shrink-0 w-8 h-8 rounded-full bg-amber-100 flex items-center justify-center">
+                <Zap className="w-4 h-4 text-amber-600" />
+              </div>
+              <div>
+                <p className="text-sm font-bold text-amber-800 mb-1">Host's responsibility</p>
+                <p className="text-sm text-amber-700 leading-relaxed">
+                  When your session is over, <strong>end the room</strong> from the Controls panel inside the room. Every active room occupies a live server slot — closing it promptly helps keep SSBCircle free for all aspirants.
+                </p>
+              </div>
+            </div>
+
           </div>
         </section>
 
