@@ -7,6 +7,7 @@ const { authLimiter, createRoomLimiter, generalLimiter } = require('./middleware
 const roomsRouter = require('./routes/rooms');
 const authRouter  = require('./routes/auth');
 const adminRouter = require('./routes/admin');
+const { startCleanup } = require('./cleanup');
 
 const app  = express();
 const PORT = process.env.PORT || 4000;
@@ -72,6 +73,8 @@ async function start() {
     const server = app.listen(PORT, () =>
       console.log(`SSBCircle backend running on port ${PORT}`)
     );
+
+    startCleanup();
 
     // ── Graceful shutdown (PM2 / Docker send SIGTERM on restart/deploy) ───────
     function shutdown(signal) {

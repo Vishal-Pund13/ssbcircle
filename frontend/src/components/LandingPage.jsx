@@ -3,6 +3,7 @@ import { useNavigate, Link } from 'react-router-dom';
 import { getActiveRooms, closeRoom } from '../services/api';
 import { useAuth } from '../context/AuthContext';
 import { Mic, Timer, FileText, CheckSquare, Lock, Radio, ArrowRight, Trash2 } from 'lucide-react';
+import HeroMapAnimation from './HeroMapAnimation';
 
 const CATEGORIES = ['All', 'GD', 'PPDT', 'Lecturette', 'IO Practice'];
 const GD_SUBCATEGORIES = ['Defence', 'International Relations', 'Society', 'Economy', 'Science & Tech', 'Environment', 'Sports & Awards'];
@@ -243,8 +244,9 @@ export default function LandingPage() {
 
         {/* ── Hero ── */}
         <section className="border-b border-gray-100 py-12 sm:py-20 px-4 sm:px-6">
-          <div className="max-w-5xl mx-auto">
-            <div className="max-w-2xl">
+          <div className="max-w-5xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-10 items-center">
+            <div>
+
               <div className="inline-flex items-center gap-2 bg-emerald-50 text-emerald-700 text-xs font-semibold px-3 py-1.5 rounded-full mb-6 border border-emerald-100">
                 <span className="relative flex h-2 w-2">
                   <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75" />
@@ -260,7 +262,7 @@ export default function LandingPage() {
                 <span className="text-brand-600">real aspirants.</span>
               </h1>
               <p className="text-gray-500 text-base sm:text-lg leading-relaxed mb-8">
-                Create a voice room, share a 6-letter code, and practice SSB group discussions — with a live timer, transcript and self-evaluation tools.
+                Connecting defence aspirants from every corner of India — practice Group Discussions together, build confidence, and walk into your SSB interview ready. Free, always.
               </p>
 
               <div className="flex flex-col sm:flex-row gap-3 mb-8">
@@ -286,6 +288,12 @@ export default function LandingPage() {
                 </p>
               </div>
             </div>
+
+            {/* Map — desktop only */}
+            <div className="hidden lg:flex justify-center items-center">
+              <HeroMapAnimation />
+            </div>
+
           </div>
         </section>
 

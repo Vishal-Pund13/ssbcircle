@@ -55,6 +55,7 @@ async function migrate() {
     `ALTER TABLE rooms ADD COLUMN IF NOT EXISTS description TEXT`,
     `ALTER TABLE rooms ADD COLUMN IF NOT EXISTS category VARCHAR(50) DEFAULT 'GD'`,
     `ALTER TABLE rooms ADD COLUMN IF NOT EXISTS subcategory VARCHAR(50)`,
+    `ALTER TABLE rooms ADD COLUMN IF NOT EXISTS emptied_at TIMESTAMP`,
   ];
   for (const sql of roomCols) {
     await pool.query(sql).catch(() => {});
