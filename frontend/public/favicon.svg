@@ -1,5 +1,5 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" role="img" aria-label="SSBCircle logo">
-  <rect width="48" height="48" rx="12" fill="none" />
+  <rect width="48" height="48" rx="12" fill="#ffffff" />
   <circle cx="24" cy="24" r="22" fill="none" stroke="#1e3a5f" stroke-width="3" />
   <circle cx="14" cy="20" r="3.5" fill="#1e3a5f" />
   <circle cx="24" cy="14" r="3.5" fill="#1e3a5f" />
