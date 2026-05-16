@@ -34,10 +34,58 @@ function Logo() {
   );
 }
 
+// ── Confirm dialog ────────────────────────────────────────────────────────────
+function ConfirmDialog({ open, title, message, confirmLabel = 'Confirm', onConfirm, onCancel }) {
+  if (!open) return null;
+  return (
+    <div className="fixed inset-0 z-[200] flex items-center justify-center p-4 bg-black/40 backdrop-blur-sm" onClick={onCancel}>
+      <div className="bg-white rounded-2xl shadow-xl w-full max-w-sm p-6" onClick={e => e.stopPropagation()}>
+        <h3 className="text-base font-semibold text-gray-900 mb-1">{title}</h3>
+        <p className="text-sm text-gray-500 mb-5">{message}</p>
+        <div className="flex gap-2 justify-end">
+          <button onClick={onCancel}
+            className="px-4 py-2 rounded-lg text-sm font-medium text-gray-700 bg-gray-100 hover:bg-gray-200 transition-colors cursor-pointer">
+            Cancel
+          </button>
+          <button onClick={onConfirm}
+            className="px-4 py-2 rounded-lg text-sm font-medium bg-red-500 hover:bg-red-600 text-white transition-colors cursor-pointer">
+            {confirmLabel}
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ── Hint-aware button wrapper ─────────────────────────────────────────────────
+function HintButton({ hint, children, ...props }) {
+  const [show, setShow] = useState(false);
+  const timer = useRef(null);
+
+  function onTouchStart() { timer.current = setTimeout(() => setShow(true), 500); }
+  function onTouchEnd() { clearTimeout(timer.current); if (show) setTimeout(() => setShow(false), 1500); }
+
+  return (
+    <div className="relative shrink-0">
+      {show && (
+        <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-max max-w-[180px] bg-gray-800 text-white text-[11px] leading-snug rounded-lg px-3 py-1.5 text-center z-50 pointer-events-none shadow-lg">
+          {hint}
+          <span className="absolute top-full left-1/2 -translate-x-1/2 border-[5px] border-transparent border-t-gray-800"/>
+        </div>
+      )}
+      <button {...props} onMouseEnter={() => setShow(true)} onMouseLeave={() => setShow(false)}
+        onTouchStart={onTouchStart} onTouchEnd={onTouchEnd} onTouchMove={() => clearTimeout(timer.current)}>
+        {children}
+      </button>
+    </div>
+  );
+}
+
 // ── Participant tile ─────────────────────────────────────────────────────────
 function ParticipantTile({ participant, handRaised, isAdmin, roomCode, onMute, hostId }) {
   const isSpeaking = useIsSpeaking(participant);
   const [showMenu, setShowMenu] = useState(false);
+  const [showKickConfirm, setShowKickConfirm] = useState(false);
   const menuRef = useRef(null);
   const name     = participant.name || participant.identity || 'Participant';
   const initials = name.split(' ').map(w => w[0]).join('').toUpperCase().slice(0, 2);
@@ -53,7 +101,11 @@ function ParticipantTile({ participant, handRaised, isAdmin, roomCode, onMute, h
 
   async function handleKick() {
     setShowMenu(false);
-    if (!window.confirm(`Remove ${name} from the room?`)) return;
+    setShowKickConfirm(true);
+  }
+
+  async function confirmKick() {
+    setShowKickConfirm(false);
     try { await kickParticipant(roomCode, participant.identity); }
     catch (e) { alert(e.message); }
   }
@@ -133,12 +185,24 @@ function ParticipantTile({ participant, handRaised, isAdmin, roomCode, onMute, h
           <span className="text-[10px] text-gray-400">{isMuted ? 'Muted' : 'Listening'}</span>
         </div>
       )}
+      <ConfirmDialog open={showKickConfirm} title="Remove participant?"
+        message={`Remove ${name} from the room? They won't be able to rejoin unless invited again.`}
+        confirmLabel="Remove" onConfirm={confirmKick} onCancel={() => setShowKickConfirm(false)}/>
     </div>
   );
 }
 
 // ── Admin panel ──────────────────────────────────────────────────────────────
 function AdminPanel({ participants, roomCode, onMuteAll, onEndRoom, onMuteParticipant, onClose }) {
+  const [pendingKick, setPendingKick] = useState(null);
+
+  async function confirmKick() {
+    if (!pendingKick) return;
+    setPendingKick(null);
+    try { await kickParticipant(roomCode, pendingKick.identity); }
+    catch (e) { alert(e.message); }
+  }
+
   return (
     <div className="fixed inset-0 z-50 bg-white flex flex-col sm:relative sm:inset-auto sm:z-20 sm:w-64 sm:shrink-0 sm:border-r sm:border-gray-200 shadow-lg">
       <div className="flex items-center justify-between px-4 py-3.5 border-b border-gray-100">
@@ -181,11 +245,7 @@ function AdminPanel({ participants, roomCode, onMuteAll, onEndRoom, onMutePartic
                       className="p-1 rounded text-gray-400 hover:text-amber-600 hover:bg-amber-50 transition-colors cursor-pointer">
                       <MicOff className="w-3 h-3"/>
                     </button>
-                    <button onClick={async () => {
-                      if (!window.confirm(`Remove ${name}?`)) return;
-                      try { await kickParticipant(roomCode, p.identity); }
-                      catch (e) { alert(e.message); }
-                    }}
+                    <button onClick={() => setPendingKick({ identity: p.identity, name })}
                       className="p-1 rounded text-gray-400 hover:text-red-500 hover:bg-red-50 transition-colors cursor-pointer">
                       <UserX className="w-3 h-3"/>
                     </button>
@@ -196,6 +256,9 @@ function AdminPanel({ participants, roomCode, onMuteAll, onEndRoom, onMutePartic
           })}
         </div>
       </div>
+      <ConfirmDialog open={!!pendingKick} title="Remove participant?"
+        message={`Remove ${pendingKick?.name} from the room? They won't be able to rejoin unless invited again.`}
+        confirmLabel="Remove" onConfirm={confirmKick} onCancel={() => setPendingKick(null)}/>
     </div>
   );
 }
@@ -217,6 +280,8 @@ function VoiceRoomUI({ room, isAdmin, roomCode, showTimer, setShowTimer, showPan
   const [unreadChat,     setUnreadChat]     = useState(0);
   const [panelTab,       setPanelTab]       = useState('chat');
   const [showAdmin,      setShowAdmin]      = useState(false);
+  const [isMicToggling,  setIsMicToggling]  = useState(false);
+  const [showLeaveConfirm, setShowLeaveConfirm] = useState(false);
   const [timerSyncEvent, setTimerSyncEvent] = useState(null);
 
   const encoder = new TextEncoder();
@@ -261,6 +326,13 @@ function VoiceRoomUI({ room, isAdmin, roomCode, showTimer, setShowTimer, showPan
     };
     setChatMessages(prev => [...prev, { ...msg, id: Date.now(), isMe: true }]);
     publish(msg);
+  }
+
+  async function toggleMic() {
+    if (isMicToggling) return;
+    setIsMicToggling(true);
+    try { await localParticipant.setMicrophoneEnabled(isMuted); } catch {}
+    finally { setIsMicToggling(false); }
   }
 
   function toggleHand() {
@@ -401,39 +473,39 @@ function VoiceRoomUI({ room, isAdmin, roomCode, showTimer, setShowTimer, showPan
       <div className="shrink-0 bg-white border-t border-gray-200 pt-2.5 sm:py-3 px-3 sm:px-5"
         style={{ paddingBottom: 'max(env(safe-area-inset-bottom, 0px) + 10px, 14px)' }}>
 
-        {/* Mobile: single centered scrollable row */}
+        {/* Mobile: single centered scrollable row — Mic in center */}
         <div className="flex sm:hidden items-center justify-center gap-2 overflow-x-auto pb-1">
-          <button onClick={() => localParticipant.setMicrophoneEnabled(isMuted)}
-            className={`shrink-0 flex items-center gap-1.5 px-4 py-2 rounded-lg text-sm font-semibold transition-all cursor-pointer border ${isMuted ? 'bg-red-50 text-red-600 border-red-200' : 'bg-white text-gray-700 border-gray-200'}`}>
-            {isMuted ? <MicOff className="w-4 h-4"/> : <Mic className="w-4 h-4"/>}
-          </button>
-          <button onClick={toggleHand}
-            className={`shrink-0 flex items-center gap-1.5 px-4 py-2 rounded-lg text-sm font-semibold transition-all cursor-pointer border ${myHandRaised ? 'bg-amber-50 text-amber-600 border-amber-200' : 'bg-white text-gray-600 border-gray-200'}`}>
+          <HintButton hint="Signal you want to speak without interrupting — like in a GTO group task" onClick={toggleHand}
+            className={`flex items-center gap-1.5 px-3 py-2 rounded-lg text-sm font-semibold transition-all cursor-pointer border ${myHandRaised ? 'bg-amber-50 text-amber-600 border-amber-200' : 'bg-white text-gray-600 border-gray-200'}`}>
             <Hand className="w-4 h-4"/>
-          </button>
-          <button onClick={toggleScreenShare}
-            className={`shrink-0 flex items-center gap-1.5 px-3 py-2 rounded-lg text-sm font-semibold transition-all cursor-pointer border ${isScreenSharing ? 'bg-emerald-50 text-emerald-600 border-emerald-200' : 'bg-white text-gray-600 border-gray-200'}`}>
+          </HintButton>
+          <HintButton hint="Share your screen — useful in mock presentations & interviews" onClick={toggleScreenShare}
+            className={`flex items-center gap-1.5 px-3 py-2 rounded-lg text-sm font-semibold transition-all cursor-pointer border ${isScreenSharing ? 'bg-emerald-50 text-emerald-600 border-emerald-200' : 'bg-white text-gray-600 border-gray-200'}`}>
             {isScreenSharing ? <ScreenShareOff className="w-4 h-4"/> : <ScreenShare className="w-4 h-4"/>}
-          </button>
-          <button onClick={openChat}
-            className="shrink-0 relative flex items-center gap-1.5 px-3 py-2 rounded-lg text-sm font-semibold bg-white text-gray-600 border border-gray-200 cursor-pointer">
+          </HintButton>
+          <HintButton hint="Mute yourself when others speak — practice active listening like in a GD" onClick={toggleMic} disabled={isMicToggling}
+            className={`flex items-center gap-1.5 px-4 py-2 rounded-lg text-sm font-semibold transition-all cursor-pointer border ${isMicToggling ? 'opacity-60 cursor-wait' : ''} ${isMuted ? 'bg-red-50 text-red-600 border-red-200' : 'bg-white text-gray-700 border-gray-200'}`}>
+            {isMuted ? <MicOff className="w-4 h-4"/> : <Mic className="w-4 h-4"/>}
+          </HintButton>
+          <HintButton hint="Send text to the group without interrupting the discussion" onClick={openChat}
+            className="relative flex items-center gap-1.5 px-3 py-2 rounded-lg text-sm font-semibold bg-white text-gray-600 border border-gray-200 cursor-pointer">
             <MessageSquare className="w-4 h-4"/>
             {unreadChat > 0 && <span className="absolute -top-1.5 -right-1.5 w-5 h-5 bg-brand-600 text-white text-[9px] font-bold rounded-full flex items-center justify-center">{unreadChat > 9 ? '9+' : unreadChat}</span>}
-          </button>
-          <button onClick={() => { setPanelTab('transcript'); setShowPanel(v => !v); }}
-            className={`shrink-0 flex items-center gap-1.5 px-3 py-2 rounded-lg text-sm font-semibold transition-all cursor-pointer border ${showPanel && panelTab !== 'chat' ? 'bg-brand-600 text-white border-brand-600' : 'bg-white text-gray-600 border-gray-200'}`}>
+          </HintButton>
+          <HintButton hint="Auto-captures spoken words — review your GD performance after the session" onClick={() => { setPanelTab('transcript'); setShowPanel(v => !v); }}
+            className={`flex items-center gap-1.5 px-3 py-2 rounded-lg text-sm font-semibold transition-all cursor-pointer border ${showPanel && panelTab !== 'chat' ? 'bg-brand-600 text-white border-brand-600' : 'bg-white text-gray-600 border-gray-200'}`}>
             <FileText className="w-4 h-4"/>
-          </button>
+          </HintButton>
           {isAdmin && (
-            <button onClick={() => setShowAdmin(v => !v)}
-              className={`shrink-0 flex items-center gap-1.5 px-3 py-2 rounded-lg text-sm font-semibold transition-all cursor-pointer border ${showAdmin ? 'bg-brand-600 text-white border-brand-600' : 'bg-white text-gray-600 border-gray-200'}`}>
+            <HintButton hint="Manage participants — mute, remove, or end the room" onClick={() => setShowAdmin(v => !v)}
+              className={`flex items-center gap-1.5 px-3 py-2 rounded-lg text-sm font-semibold transition-all cursor-pointer border ${showAdmin ? 'bg-brand-600 text-white border-brand-600' : 'bg-white text-gray-600 border-gray-200'}`}>
               <Settings className="w-4 h-4"/>
-            </button>
+            </HintButton>
           )}
-          <button onClick={onLeave}
-            className="shrink-0 flex items-center gap-1.5 px-3 py-2 rounded-lg text-sm font-semibold bg-red-500 hover:bg-red-600 text-white transition-colors cursor-pointer">
+          <HintButton hint="Exit the voice room" onClick={() => setShowLeaveConfirm(true)}
+            className="flex items-center gap-1.5 px-3 py-2 rounded-lg text-sm font-semibold bg-red-500 hover:bg-red-600 text-white transition-colors cursor-pointer">
             <LogOut className="w-4 h-4"/>
-          </button>
+          </HintButton>
         </div>
 
         {/* Desktop: 3-column GMeet layout */}
@@ -449,43 +521,43 @@ function VoiceRoomUI({ room, isAdmin, roomCode, showTimer, setShowTimer, showPan
 
           {/* Center — primary controls */}
           <div className="flex items-center justify-center gap-2">
-            <button onClick={() => localParticipant.setMicrophoneEnabled(isMuted)}
-              className={`flex items-center gap-1.5 px-4 py-2 rounded-lg text-sm font-semibold transition-all cursor-pointer border ${isMuted ? 'bg-red-50 text-red-600 border-red-200 hover:bg-red-100' : 'bg-white text-gray-700 border-gray-200 hover:bg-gray-50'}`}>
+            <HintButton hint="Mute yourself when others speak — practice active listening like in a GD" onClick={toggleMic} disabled={isMicToggling}
+              className={`flex items-center gap-1.5 px-4 py-2 rounded-lg text-sm font-semibold transition-all cursor-pointer border ${isMicToggling ? 'opacity-60 cursor-wait' : ''} ${isMuted ? 'bg-red-50 text-red-600 border-red-200 hover:bg-red-100' : 'bg-white text-gray-700 border-gray-200 hover:bg-gray-50'}`}>
               {isMuted ? <MicOff className="w-4 h-4"/> : <Mic className="w-4 h-4"/>}
               {isMuted ? 'Unmute' : 'Mute'}
-            </button>
-            <button onClick={toggleHand}
+            </HintButton>
+            <HintButton hint="Signal you want to speak without interrupting — like in a GTO group task" onClick={toggleHand}
               className={`flex items-center gap-1.5 px-4 py-2 rounded-lg text-sm font-semibold transition-all cursor-pointer border ${myHandRaised ? 'bg-amber-50 text-amber-600 border-amber-200' : 'bg-white text-gray-600 border-gray-200 hover:bg-gray-50'}`}>
               <Hand className="w-4 h-4"/>
               {myHandRaised ? 'Lower Hand' : 'Raise Hand'}
-            </button>
-            <button onClick={toggleScreenShare}
+            </HintButton>
+            <HintButton hint="Share your screen — useful in mock presentations & interviews" onClick={toggleScreenShare}
               className={`flex items-center gap-1.5 px-3 py-2 rounded-lg text-sm font-semibold transition-all cursor-pointer border ${isScreenSharing ? 'bg-emerald-50 text-emerald-600 border-emerald-200 hover:bg-emerald-100' : 'bg-white text-gray-600 border-gray-200 hover:bg-gray-50'}`}>
               {isScreenSharing ? <ScreenShareOff className="w-4 h-4"/> : <ScreenShare className="w-4 h-4"/>}
               {isScreenSharing ? 'Stop Share' : 'Share Screen'}
-            </button>
-            <button onClick={onLeave}
+            </HintButton>
+            <HintButton hint="Exit the voice room" onClick={() => setShowLeaveConfirm(true)}
               className="flex items-center gap-1.5 px-4 py-2 rounded-lg text-sm font-semibold bg-red-500 hover:bg-red-600 text-white transition-colors cursor-pointer">
               <LogOut className="w-4 h-4"/> Leave
-            </button>
+            </HintButton>
           </div>
 
           {/* Right — secondary controls */}
           <div className="flex items-center justify-end gap-2">
-            <button onClick={openChat}
+            <HintButton hint="Send text to the group without interrupting the discussion" onClick={openChat}
               className="relative flex items-center gap-1.5 px-3 py-2 rounded-lg text-sm font-semibold bg-white text-gray-600 border border-gray-200 hover:bg-gray-50 transition-all cursor-pointer">
               <MessageSquare className="w-4 h-4"/> Chat
               {unreadChat > 0 && <span className="absolute -top-1.5 -right-1.5 w-5 h-5 bg-brand-600 text-white text-[9px] font-bold rounded-full flex items-center justify-center">{unreadChat > 9 ? '9+' : unreadChat}</span>}
-            </button>
-            <button onClick={() => { setPanelTab('transcript'); setShowPanel(v => !v); }}
+            </HintButton>
+            <HintButton hint="Auto-captures spoken words — review your GD performance after the session" onClick={() => { setPanelTab('transcript'); setShowPanel(v => !v); }}
               className={`flex items-center gap-1.5 px-3 py-2 rounded-lg text-sm font-semibold transition-all cursor-pointer border ${showPanel && panelTab !== 'chat' ? 'bg-brand-600 text-white border-brand-600' : 'bg-white text-gray-600 border-gray-200 hover:bg-gray-50'}`}>
               <FileText className="w-4 h-4"/> Notes
-            </button>
+            </HintButton>
             {isAdmin && (
-              <button onClick={() => setShowAdmin(v => !v)}
+              <HintButton hint="Manage participants — mute, remove, or end the room" onClick={() => setShowAdmin(v => !v)}
                 className={`flex items-center gap-1.5 px-3 py-2 rounded-lg text-sm font-semibold transition-all cursor-pointer border ${showAdmin ? 'bg-brand-600 text-white border-brand-600' : 'bg-white text-gray-600 border-gray-200 hover:bg-gray-50'}`}>
                 <Settings className="w-4 h-4"/> Controls
-              </button>
+              </HintButton>
             )}
           </div>
 
@@ -500,6 +572,10 @@ function VoiceRoomUI({ room, isAdmin, roomCode, showTimer, setShowTimer, showPan
           syncEvent={timerSyncEvent}
         />
       )}
+
+      <ConfirmDialog open={showLeaveConfirm} title="Leave the room?"
+        message="Are you sure you want to leave? You can rejoin using the same room code."
+        confirmLabel="Leave" onConfirm={onLeave} onCancel={() => setShowLeaveConfirm(false)}/>
     </>
   );
 }
