@@ -1,0 +1,13 @@
+User-agent: *
+Allow: /
+Disallow: /sa
+Disallow: /sa/dashboard
+Disallow: /room/
+
+User-agent: facebookexternalhit
+Allow: /
+
+User-agent: Twitterbot
+Allow: /
+
+Sitemap: https://www.ssbcircle.com/sitemap.xml
