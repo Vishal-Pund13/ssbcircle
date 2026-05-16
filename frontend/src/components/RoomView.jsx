@@ -519,7 +519,7 @@ function VoiceRoomUI({ room, isAdmin, roomCode, showTimer, setShowTimer, showPan
             </div>
           </div>
 
-          {/* Center — primary controls */}
+          {/* Center — all controls */}
           <div className="flex items-center justify-center gap-2">
             <HintButton hint="Mute yourself when others speak — practice active listening like in a GD" onClick={toggleMic} disabled={isMicToggling}
               className={`flex items-center gap-1.5 px-4 py-2 rounded-lg text-sm font-semibold transition-all cursor-pointer border ${isMicToggling ? 'opacity-60 cursor-wait' : ''} ${isMuted ? 'bg-red-50 text-red-600 border-red-200 hover:bg-red-100' : 'bg-white text-gray-700 border-gray-200 hover:bg-gray-50'}`}>
@@ -530,6 +530,15 @@ function VoiceRoomUI({ room, isAdmin, roomCode, showTimer, setShowTimer, showPan
               className={`flex items-center gap-1.5 px-4 py-2 rounded-lg text-sm font-semibold transition-all cursor-pointer border ${myHandRaised ? 'bg-amber-50 text-amber-600 border-amber-200' : 'bg-white text-gray-600 border-gray-200 hover:bg-gray-50'}`}>
               <Hand className="w-4 h-4"/>
               {myHandRaised ? 'Lower Hand' : 'Raise Hand'}
+            </HintButton>
+            <HintButton hint="Send text to the group without interrupting the discussion" onClick={openChat}
+              className="relative flex items-center gap-1.5 px-3 py-2 rounded-lg text-sm font-semibold bg-white text-gray-600 border border-gray-200 hover:bg-gray-50 transition-all cursor-pointer">
+              <MessageSquare className="w-4 h-4"/> Chat
+              {unreadChat > 0 && <span className="absolute -top-1.5 -right-1.5 w-5 h-5 bg-brand-600 text-white text-[9px] font-bold rounded-full flex items-center justify-center">{unreadChat > 9 ? '9+' : unreadChat}</span>}
+            </HintButton>
+            <HintButton hint="Auto-captures spoken words — review your GD performance after the session" onClick={() => { setPanelTab('transcript'); setShowPanel(v => !v); }}
+              className={`flex items-center gap-1.5 px-3 py-2 rounded-lg text-sm font-semibold transition-all cursor-pointer border ${showPanel && panelTab !== 'chat' ? 'bg-brand-600 text-white border-brand-600' : 'bg-white text-gray-600 border-gray-200 hover:bg-gray-50'}`}>
+              <FileText className="w-4 h-4"/> Notes
             </HintButton>
             <HintButton hint="Share your screen — useful in mock presentations & interviews" onClick={toggleScreenShare}
               className={`flex items-center gap-1.5 px-3 py-2 rounded-lg text-sm font-semibold transition-all cursor-pointer border ${isScreenSharing ? 'bg-emerald-50 text-emerald-600 border-emerald-200 hover:bg-emerald-100' : 'bg-white text-gray-600 border-gray-200 hover:bg-gray-50'}`}>
@@ -542,17 +551,8 @@ function VoiceRoomUI({ room, isAdmin, roomCode, showTimer, setShowTimer, showPan
             </HintButton>
           </div>
 
-          {/* Right — secondary controls */}
+          {/* Right — admin only */}
           <div className="flex items-center justify-end gap-2">
-            <HintButton hint="Send text to the group without interrupting the discussion" onClick={openChat}
-              className="relative flex items-center gap-1.5 px-3 py-2 rounded-lg text-sm font-semibold bg-white text-gray-600 border border-gray-200 hover:bg-gray-50 transition-all cursor-pointer">
-              <MessageSquare className="w-4 h-4"/> Chat
-              {unreadChat > 0 && <span className="absolute -top-1.5 -right-1.5 w-5 h-5 bg-brand-600 text-white text-[9px] font-bold rounded-full flex items-center justify-center">{unreadChat > 9 ? '9+' : unreadChat}</span>}
-            </HintButton>
-            <HintButton hint="Auto-captures spoken words — review your GD performance after the session" onClick={() => { setPanelTab('transcript'); setShowPanel(v => !v); }}
-              className={`flex items-center gap-1.5 px-3 py-2 rounded-lg text-sm font-semibold transition-all cursor-pointer border ${showPanel && panelTab !== 'chat' ? 'bg-brand-600 text-white border-brand-600' : 'bg-white text-gray-600 border-gray-200 hover:bg-gray-50'}`}>
-              <FileText className="w-4 h-4"/> Notes
-            </HintButton>
             {isAdmin && (
               <HintButton hint="Manage participants — mute, remove, or end the room" onClick={() => setShowAdmin(v => !v)}
                 className={`flex items-center gap-1.5 px-3 py-2 rounded-lg text-sm font-semibold transition-all cursor-pointer border ${showAdmin ? 'bg-brand-600 text-white border-brand-600' : 'bg-white text-gray-600 border-gray-200 hover:bg-gray-50'}`}>
