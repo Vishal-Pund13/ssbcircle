@@ -12,7 +12,7 @@ import {
 import { RoomEvent, Track } from 'livekit-client';
 import {
   Mic, MicOff, Timer, FileText, MessageSquare, LogOut,
-  AlertCircle, Hand, VolumeX, UserX, PhoneOff, Settings,
+  AlertCircle, Hand, VolumeX, Volume2, UserX, PhoneOff, Settings,
   ScreenShare, ScreenShareOff,
 } from 'lucide-react';
 
@@ -84,24 +84,17 @@ function HintButton({ hint, children, ...props }) {
 // ── Participant tile ─────────────────────────────────────────────────────────
 function ParticipantTile({ participant, handRaised, isAdmin, roomCode, onMute, hostId }) {
   const isSpeaking = useIsSpeaking(participant);
-  const [showMenu, setShowMenu] = useState(false);
   const [showKickConfirm, setShowKickConfirm] = useState(false);
-  const menuRef = useRef(null);
+  const [locallyMuted, setLocallyMuted] = useState(false);
   const name     = participant.name || participant.identity || 'Participant';
   const initials = name.split(' ').map(w => w[0]).join('').toUpperCase().slice(0, 2);
   const isMuted  = !participant.isMicrophoneEnabled;
   const isLocal  = participant.isLocal;
 
-  useEffect(() => {
-    if (!showMenu) return;
-    function h(e) { if (menuRef.current && !menuRef.current.contains(e.target)) setShowMenu(false); }
-    document.addEventListener('mousedown', h);
-    return () => document.removeEventListener('mousedown', h);
-  }, [showMenu]);
-
-  async function handleKick() {
-    setShowMenu(false);
-    setShowKickConfirm(true);
+  function toggleLocalMute() {
+    const next = !locallyMuted;
+    setLocallyMuted(next);
+    try { participant.setVolume(next ? 0 : 1); } catch {}
   }
 
   async function confirmKick() {
@@ -131,26 +124,30 @@ function ParticipantTile({ participant, handRaised, isAdmin, roomCode, onMute, h
         </div>
       )}
 
-      {/* Admin gear */}
-      {isAdmin && !isLocal && (
-        <div className="absolute top-2 right-2">
-          <button
-            onClick={() => setShowMenu(v => !v)}
-            className="w-6 h-6 rounded-full bg-gray-100 hover:bg-gray-200 text-gray-400 hover:text-gray-600 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all cursor-pointer"
-          >
-            <Settings className="w-3 h-3"/>
+      {/* Hover action buttons — visible on hover for non-local participants */}
+      {!isLocal && (
+        <div className="absolute top-2 right-2 flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-all">
+          {/* Speaker toggle — everyone can locally mute a participant */}
+          <button onClick={toggleLocalMute}
+            title={locallyMuted ? 'Unmute for you' : 'Mute for you'}
+            className={`w-6 h-6 rounded-full flex items-center justify-center transition-all cursor-pointer ${locallyMuted ? 'bg-red-100 text-red-500' : 'bg-gray-100 hover:bg-gray-200 text-gray-500 hover:text-gray-700'}`}>
+            {locallyMuted ? <VolumeX className="w-3 h-3"/> : <Volume2 className="w-3 h-3"/>}
           </button>
-          {showMenu && (
-            <div ref={menuRef} className="absolute top-8 right-0 bg-white border border-gray-200 rounded-xl shadow-lg py-1 z-50 min-w-[150px]">
-              <button onClick={() => { setShowMenu(false); onMute(participant.identity); }}
-                className="w-full flex items-center gap-2 px-3 py-2 text-xs text-gray-600 hover:bg-gray-50 hover:text-gray-900 transition-colors cursor-pointer text-left">
-                <MicOff className="w-3.5 h-3.5 shrink-0"/> Request mute
-              </button>
-              <button onClick={handleKick}
-                className="w-full flex items-center gap-2 px-3 py-2 text-xs text-red-500 hover:bg-red-50 transition-colors cursor-pointer text-left">
-                <UserX className="w-3.5 h-3.5 shrink-0"/> Remove from room
-              </button>
-            </div>
+          {/* Mute mic — admin only */}
+          {isAdmin && (
+            <button onClick={() => onMute(participant.identity)}
+              title="Request mute"
+              className="w-6 h-6 rounded-full bg-gray-100 hover:bg-amber-100 text-gray-500 hover:text-amber-600 flex items-center justify-center transition-all cursor-pointer">
+              <MicOff className="w-3 h-3"/>
+            </button>
+          )}
+          {/* Kick — admin only */}
+          {isAdmin && (
+            <button onClick={() => setShowKickConfirm(true)}
+              title="Remove from room"
+              className="w-6 h-6 rounded-full bg-gray-100 hover:bg-red-100 text-gray-500 hover:text-red-500 flex items-center justify-center transition-all cursor-pointer">
+              <UserX className="w-3 h-3"/>
+            </button>
           )}
         </div>
       )}
@@ -519,13 +516,8 @@ function VoiceRoomUI({ room, isAdmin, roomCode, showTimer, setShowTimer, showPan
             </div>
           </div>
 
-          {/* Center — all controls */}
+          {/* Center — all controls, Mic in middle */}
           <div className="flex items-center justify-center gap-2">
-            <HintButton hint="Mute yourself when others speak — practice active listening like in a GD" onClick={toggleMic} disabled={isMicToggling}
-              className={`flex items-center gap-1.5 px-4 py-2 rounded-lg text-sm font-semibold transition-all cursor-pointer border ${isMicToggling ? 'opacity-60 cursor-wait' : ''} ${isMuted ? 'bg-red-50 text-red-600 border-red-200 hover:bg-red-100' : 'bg-white text-gray-700 border-gray-200 hover:bg-gray-50'}`}>
-              {isMuted ? <MicOff className="w-4 h-4"/> : <Mic className="w-4 h-4"/>}
-              {isMuted ? 'Unmute' : 'Mute'}
-            </HintButton>
             <HintButton hint="Signal you want to speak without interrupting — like in a GTO group task" onClick={toggleHand}
               className={`flex items-center gap-1.5 px-4 py-2 rounded-lg text-sm font-semibold transition-all cursor-pointer border ${myHandRaised ? 'bg-amber-50 text-amber-600 border-amber-200' : 'bg-white text-gray-600 border-gray-200 hover:bg-gray-50'}`}>
               <Hand className="w-4 h-4"/>
@@ -535,6 +527,11 @@ function VoiceRoomUI({ room, isAdmin, roomCode, showTimer, setShowTimer, showPan
               className="relative flex items-center gap-1.5 px-3 py-2 rounded-lg text-sm font-semibold bg-white text-gray-600 border border-gray-200 hover:bg-gray-50 transition-all cursor-pointer">
               <MessageSquare className="w-4 h-4"/> Chat
               {unreadChat > 0 && <span className="absolute -top-1.5 -right-1.5 w-5 h-5 bg-brand-600 text-white text-[9px] font-bold rounded-full flex items-center justify-center">{unreadChat > 9 ? '9+' : unreadChat}</span>}
+            </HintButton>
+            <HintButton hint="Mute yourself when others speak — practice active listening like in a GD" onClick={toggleMic} disabled={isMicToggling}
+              className={`flex items-center gap-1.5 px-4 py-2 rounded-lg text-sm font-semibold transition-all cursor-pointer border ${isMicToggling ? 'opacity-60 cursor-wait' : ''} ${isMuted ? 'bg-red-50 text-red-600 border-red-200 hover:bg-red-100' : 'bg-white text-gray-700 border-gray-200 hover:bg-gray-50'}`}>
+              {isMuted ? <MicOff className="w-4 h-4"/> : <Mic className="w-4 h-4"/>}
+              {isMuted ? 'Unmute' : 'Mute'}
             </HintButton>
             <HintButton hint="Auto-captures spoken words — review your GD performance after the session" onClick={() => { setPanelTab('transcript'); setShowPanel(v => !v); }}
               className={`flex items-center gap-1.5 px-3 py-2 rounded-lg text-sm font-semibold transition-all cursor-pointer border ${showPanel && panelTab !== 'chat' ? 'bg-brand-600 text-white border-brand-600' : 'bg-white text-gray-600 border-gray-200 hover:bg-gray-50'}`}>
