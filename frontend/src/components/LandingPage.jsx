@@ -282,7 +282,7 @@ export default function LandingPage() {
                   ))}
                 </div>
                 <p className="text-xs text-gray-500">
-                  <span className="font-semibold text-gray-700">500+</span> aspirants joined · <span className="font-semibold text-gray-700">Free</span> forever
+                  <span className="font-semibold text-gray-700">100+</span> aspirants joined · <span className="font-semibold text-gray-700">Free</span>
                 </p>
               </div>
             </div>
