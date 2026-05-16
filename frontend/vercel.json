@@ -1,5 +1,10 @@
 {
-  "rewrites": [{ "source": "/(.*)", "destination": "/" }],
+  "rewrites": [
+    {
+      "source": "/((?!.*\\.(?:xml|txt|png|svg|ico|json|webp|jpg|jpeg|gif|css|js|woff|woff2|ttf)$).*)",
+      "destination": "/"
+    }
+  ],
   "headers": [
     {
       "source": "/og-image.png",
