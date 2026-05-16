@@ -67,8 +67,12 @@ app.use((err, _req, res, _next) => {
 // ── Start ─────────────────────────────────────────────────────────────────────
 async function start() {
   try {
-    await pool.query('SELECT 1'); // verify DB connectivity — migrations run separately
+    await pool.query('SELECT 1'); // verify DB connectivity
     console.log('✓ Database connected');
+
+    // Auto-migrate: safe to run on every boot
+    await pool.query(`ALTER TABLE rooms ADD COLUMN IF NOT EXISTS emptied_at TIMESTAMP`);
+    console.log('✓ Schema up to date');
 
     const server = app.listen(PORT, () =>
       console.log(`SSBCircle backend running on port ${PORT}`)
