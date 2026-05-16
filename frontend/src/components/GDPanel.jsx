@@ -15,6 +15,7 @@ function TranscriptTab({ onStateChange }) {
   const recognitionRef = useRef(null);
   const listeningRef   = useRef(false);
   const retryTimer     = useRef(null);
+  const retryCount     = useRef(0);
   const bottomRef      = useRef(null);
 
   useEffect(() => { bottomRef.current?.scrollIntoView({ behavior: 'smooth' }); }, [entries, interim]);
@@ -41,6 +42,15 @@ function TranscriptTab({ onStateChange }) {
 
   function scheduleRestart() {
     if (!listeningRef.current) return;
+    if (retryCount.current >= 10) {
+      listeningRef.current = false;
+      setListening(false);
+      setRetrying(false);
+      setError('Transcription stopped after repeated failures. Tap the mic to try again.');
+      onStateChange?.(false);
+      return;
+    }
+    retryCount.current += 1;
     setRetrying(true);
     setInterim('');
     clearTimeout(retryTimer.current);
@@ -51,8 +61,9 @@ function TranscriptTab({ onStateChange }) {
       try {
         next.start();
         setRetrying(false);
+        retryCount.current = 0;
       } catch {
-        scheduleRestart(); // keep trying
+        scheduleRestart();
       }
     }, 500);
   }
@@ -104,6 +115,7 @@ function TranscriptTab({ onStateChange }) {
   function startListening() {
     setError('');
     setRetrying(false);
+    retryCount.current = 0;
     listeningRef.current = true;
     const rec = buildRec();
     recognitionRef.current = rec;

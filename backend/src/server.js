@@ -37,7 +37,8 @@ app.use('/api/auth', authLimiter, authRouter);
 // createRoomLimiter is applied inside rooms.js on POST / only
 app.use('/api/rooms', generalLimiter, roomsRouter);
 
-// Admin: general guard
+// Admin: strict limit on login endpoint, general on everything else
+app.use('/api/admin/login', authLimiter);
 app.use('/api/admin', generalLimiter, adminRouter);
 
 // ── Health check ─────────────────────────────────────────────────────────────
