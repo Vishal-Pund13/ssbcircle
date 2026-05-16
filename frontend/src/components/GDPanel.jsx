@@ -2,46 +2,69 @@ import { useState, useEffect, useRef } from 'react';
 import { Mic, MicOff, FileText, CheckSquare, Download, Trash2, X, Plus, MessageSquare, Send } from 'lucide-react';
 
 // ─── Transcript ───────────────────────────────────────────────────────────────
+// continuous=true is unreliable on Android Chrome — detect and use single-shot mode
+const IS_MOBILE = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
+
 function TranscriptTab({ onStateChange }) {
   const [supported] = useState(() => !!(window.SpeechRecognition || window.webkitSpeechRecognition));
-  const [listening, setListening] = useState(false);
-  const [paused,    setPaused]    = useState(false);
-  const [entries,   setEntries]   = useState([]);
-  const [interim,   setInterim]   = useState('');
-  const [error,     setError]     = useState('');
+  const [listening,  setListening]  = useState(false);
+  const [retrying,   setRetrying]   = useState(false);
+  const [entries,    setEntries]    = useState([]);
+  const [interim,    setInterim]    = useState('');
+  const [error,      setError]      = useState('');
   const recognitionRef = useRef(null);
   const listeningRef   = useRef(false);
+  const retryTimer     = useRef(null);
   const bottomRef      = useRef(null);
 
   useEffect(() => { bottomRef.current?.scrollIntoView({ behavior: 'smooth' }); }, [entries, interim]);
 
+  // Cleanup on unmount
   useEffect(() => () => {
     listeningRef.current = false;
-    recognitionRef.current?.stop();
+    clearTimeout(retryTimer.current);
+    try { recognitionRef.current?.stop(); } catch {}
     recognitionRef.current = null;
   }, []);
 
-  // Auto-restart when tab becomes visible again (browser kills speech rec in background)
+  // When tab becomes visible again, nudge the recognition to restart
   useEffect(() => {
-    function handleVisibility() {
+    function onVisibility() {
       if (document.visibilityState === 'visible' && listeningRef.current) {
-        setPaused(false);
-        // Force restart — Chrome may have killed it while hidden
         try { recognitionRef.current?.stop(); } catch {}
-        // onend will fire and restart automatically
-      }
-      if (document.visibilityState === 'hidden' && listeningRef.current) {
-        setPaused(true);
+        // onend fires → scheduleRestart handles it
       }
     }
-    document.addEventListener('visibilitychange', handleVisibility);
-    return () => document.removeEventListener('visibilitychange', handleVisibility);
+    document.addEventListener('visibilitychange', onVisibility);
+    return () => document.removeEventListener('visibilitychange', onVisibility);
   }, []);
+
+  function scheduleRestart() {
+    if (!listeningRef.current) return;
+    setRetrying(true);
+    setInterim('');
+    clearTimeout(retryTimer.current);
+    retryTimer.current = setTimeout(() => {
+      if (!listeningRef.current) return;
+      const next = buildRec();
+      recognitionRef.current = next;
+      try {
+        next.start();
+        setRetrying(false);
+      } catch {
+        scheduleRestart(); // keep trying
+      }
+    }, 500);
+  }
 
   function buildRec() {
     const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
     const rec = new SR();
-    rec.continuous = true; rec.interimResults = true; rec.lang = 'en-IN';
+    // continuous=true breaks on many Android Chrome versions — use false + auto-restart
+    rec.continuous     = !IS_MOBILE;
+    rec.interimResults = true;
+    rec.lang           = 'en-IN';
+
     rec.onresult = (e) => {
       let interimText = '';
       for (let i = e.resultIndex; i < e.results.length; i++) {
@@ -50,47 +73,57 @@ function TranscriptTab({ onStateChange }) {
           const ts = new Date().toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' });
           setEntries(prev => [...prev, { ts, text: t.trim() }]);
           setInterim('');
-        } else interimText += t;
+        } else {
+          interimText += t;
+        }
       }
-      setInterim(interimText);
+      if (interimText) setInterim(interimText);
     };
+
     rec.onerror = (e) => {
-      const name = e.error || 'speech recognition error';
-      if (name !== 'no-speech' && name !== 'aborted') {
+      const name = e.error;
+      // Only hard-stop on permission errors — everything else auto-restarts via onend
+      if (name === 'not-allowed' || name === 'service-not-allowed') {
         listeningRef.current = false;
+        clearTimeout(retryTimer.current);
         setListening(false);
-        setError(`Transcript error: ${name}`);
+        setRetrying(false);
+        setError('Microphone access denied. Please allow mic access and try again.');
         onStateChange?.(false);
       }
+      // network / no-speech / aborted / audio-capture → let onend fire and restart
     };
+
     rec.onend = () => {
-      if (listeningRef.current) {
-        // Rebuild instance on each restart (some browsers require it)
-        const next = buildRec();
-        recognitionRef.current = next;
-        try { next.start(); } catch {}
-      }
+      if (listeningRef.current) scheduleRestart();
     };
+
     return rec;
   }
 
   function startListening() {
     setError('');
+    setRetrying(false);
+    listeningRef.current = true;
     const rec = buildRec();
     recognitionRef.current = rec;
-    listeningRef.current = true;
-    rec.start();
-    setListening(true);
-    setPaused(false);
-    onStateChange?.(true);
+    try {
+      rec.start();
+      setListening(true);
+      onStateChange?.(true);
+    } catch {
+      listeningRef.current = false;
+      setError('Could not start recording. Reload the page and try again.');
+    }
   }
 
   function stopListening() {
     listeningRef.current = false;
-    recognitionRef.current?.stop();
+    clearTimeout(retryTimer.current);
+    try { recognitionRef.current?.stop(); } catch {}
     recognitionRef.current = null;
     setListening(false);
-    setPaused(false);
+    setRetrying(false);
     setInterim('');
     onStateChange?.(false);
   }
@@ -105,25 +138,33 @@ function TranscriptTab({ onStateChange }) {
   }
 
   if (!supported) return (
-    <div className="flex flex-col items-center justify-center h-full text-center px-6">
-      <MicOff className="w-8 h-8 text-gray-300 mb-3"/>
-      <p className="text-sm text-gray-600 font-medium">Transcript unavailable</p>
-      <p className="text-xs text-gray-400 mt-1">Use Chrome or Edge for live transcription.</p>
+    <div className="flex flex-col items-center justify-center h-full text-center px-6 gap-3">
+      <MicOff className="w-8 h-8 text-gray-300"/>
+      <div>
+        <p className="text-sm text-gray-600 font-medium">Transcript not available</p>
+        <p className="text-xs text-gray-400 mt-1">
+          Open this page in <span className="font-semibold">Chrome</span> on Android or desktop.
+        </p>
+        <p className="text-xs text-gray-300 mt-0.5">Safari / iOS does not support live transcription.</p>
+      </div>
     </div>
   );
 
   return (
     <div className="flex flex-col h-full">
+      {/* Toolbar */}
       <div className="flex items-center gap-2 px-4 py-3 border-b border-gray-100">
         <button onClick={listening ? stopListening : startListening}
           className={`flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-semibold transition-all cursor-pointer border ${
             listening
-              ? paused ? 'bg-amber-50 text-amber-600 border-amber-200' : 'bg-red-50 text-red-600 border-red-200'
+              ? retrying
+                ? 'bg-amber-50 text-amber-600 border-amber-200'
+                : 'bg-red-50 text-red-600 border-red-200'
               : 'bg-brand-50 text-brand-600 border-brand-100 hover:bg-brand-100'
           }`}>
           {listening
-            ? paused
-              ? <><span className="w-1.5 h-1.5 rounded-full bg-amber-500 animate-pulse"/> Paused (tab hidden)</>
+            ? retrying
+              ? <><span className="w-1.5 h-1.5 rounded-full bg-amber-500 animate-pulse"/> Reconnecting…</>
               : <><span className="w-1.5 h-1.5 rounded-full bg-red-500 animate-pulse"/> Recording</>
             : <><Mic className="w-3.5 h-3.5"/> Start</>}
         </button>
@@ -137,21 +178,30 @@ function TranscriptTab({ onStateChange }) {
           <Download className="w-3.5 h-3.5"/>
         </button>
       </div>
-      <p className="text-[10px] text-gray-400 px-4 pt-2.5 pb-1">Captures <span className="font-medium text-gray-600">your mic</span> · en-IN</p>
+
+      <p className="text-[10px] text-gray-400 px-4 pt-2.5 pb-1">
+        Captures <span className="font-medium text-gray-600">your mic</span> · en-IN
+        {IS_MOBILE && <span className="ml-1 text-gray-300">· mobile mode</span>}
+      </p>
+
       {error && (
-        <div className="px-4 pb-2 text-sm text-red-600 bg-red-50 rounded-xl mx-4 mb-2">
+        <div className="mx-4 mb-2 px-3 py-2 text-xs text-red-600 bg-red-50 rounded-lg border border-red-100 leading-snug">
           {error}
         </div>
       )}
+
+      {/* Entries */}
       <div className="flex-1 overflow-y-auto px-4 pb-4 space-y-3">
         {!entries.length && !interim && (
           <div className="flex flex-col items-center justify-center h-32 text-center">
-            {listening
+            {listening && !retrying
               ? <><div className="flex gap-0.5 mb-3">{[1,2,3,4,5].map(i => (
                   <div key={i} className="w-0.5 bg-brand-600 rounded-full animate-bounce"
                     style={{ height: `${8+i*4}px`, animationDelay: `${i*0.1}s` }}/>
                 ))}</div><p className="text-xs text-gray-500">Listening…</p></>
-              : <p className="text-xs text-gray-400">Press Start to begin</p>}
+              : retrying
+                ? <p className="text-xs text-amber-500 animate-pulse">Reconnecting to speech service…</p>
+                : <p className="text-xs text-gray-400">Press Start to begin</p>}
           </div>
         )}
         {entries.map((entry, i) => (
@@ -160,7 +210,9 @@ function TranscriptTab({ onStateChange }) {
             <p className="text-sm text-gray-800 leading-relaxed mt-0.5">{entry.text}</p>
           </div>
         ))}
-        {interim && <p className="text-sm text-gray-400 italic">{interim}<span className="animate-pulse">_</span></p>}
+        {interim && (
+          <p className="text-sm text-gray-400 italic">{interim}<span className="animate-pulse">_</span></p>
+        )}
         <div ref={bottomRef}/>
       </div>
     </div>
