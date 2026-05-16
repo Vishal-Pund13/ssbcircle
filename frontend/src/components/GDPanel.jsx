@@ -8,6 +8,7 @@ function TranscriptTab({ onStateChange }) {
   const [paused,    setPaused]    = useState(false);
   const [entries,   setEntries]   = useState([]);
   const [interim,   setInterim]   = useState('');
+  const [error,     setError]     = useState('');
   const recognitionRef = useRef(null);
   const listeningRef   = useRef(false);
   const bottomRef      = useRef(null);
@@ -54,9 +55,11 @@ function TranscriptTab({ onStateChange }) {
       setInterim(interimText);
     };
     rec.onerror = (e) => {
-      if (e.error !== 'no-speech' && e.error !== 'aborted') {
+      const name = e.error || 'speech recognition error';
+      if (name !== 'no-speech' && name !== 'aborted') {
         listeningRef.current = false;
         setListening(false);
+        setError(`Transcript error: ${name}`);
         onStateChange?.(false);
       }
     };
@@ -72,6 +75,7 @@ function TranscriptTab({ onStateChange }) {
   }
 
   function startListening() {
+    setError('');
     const rec = buildRec();
     recognitionRef.current = rec;
     listeningRef.current = true;
@@ -134,6 +138,11 @@ function TranscriptTab({ onStateChange }) {
         </button>
       </div>
       <p className="text-[10px] text-gray-400 px-4 pt-2.5 pb-1">Captures <span className="font-medium text-gray-600">your mic</span> · en-IN</p>
+      {error && (
+        <div className="px-4 pb-2 text-sm text-red-600 bg-red-50 rounded-xl mx-4 mb-2">
+          {error}
+        </div>
+      )}
       <div className="flex-1 overflow-y-auto px-4 pb-4 space-y-3">
         {!entries.length && !interim && (
           <div className="flex flex-col items-center justify-center h-32 text-center">

@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" role="img" aria-label="SSBCircle logo">
+  <rect width="48" height="48" rx="12" fill="#ffffff" />
+  <circle cx="24" cy="24" r="22" fill="#0f172a" />
+  <circle cx="14" cy="20" r="3.5" fill="#f8fafc" />
+  <circle cx="24" cy="14" r="3.5" fill="#f8fafc" />
+  <circle cx="34" cy="20" r="3.5" fill="#f8fafc" />
+  <circle cx="30" cy="31" r="3.5" fill="#f8fafc" />
+  <circle cx="18" cy="31" r="3.5" fill="#f8fafc" />
+  <path d="M14 20 L24 14 L34 20 L30 31 L18 31 Z" stroke="#f8fafc" stroke-width="1.5" fill="none" />
+</svg>
