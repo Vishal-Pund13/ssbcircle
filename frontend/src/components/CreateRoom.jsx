@@ -2,16 +2,45 @@ import { useState } from 'react';
 import { useNavigate, useLocation, Link } from 'react-router-dom';
 import { createRoom } from '../services/api';
 import { useAuth } from '../context/AuthContext';
-import { Copy, Check, ArrowRight, AlertCircle, Info } from 'lucide-react';
+import { Copy, Check, ArrowRight, AlertCircle, Info, Lightbulb, ChevronDown, ChevronUp } from 'lucide-react';
 
 const CATEGORIES = ['GD', 'PPDT', 'Lecturette', 'IO Practice'];
 const GD_SUBCATEGORIES = ['Defence', 'International Relations', 'Society', 'Economy', 'Science & Tech', 'Environment', 'Sports & Awards'];
+
+const CATEGORY_TIPS = {
+  'GD': [
+    'Host from a laptop — share your screen so all participants see the 3 leads the assessor gives',
+    'Let the group pick one lead, then highlight the selected lead on your shared screen',
+    'Set the timer to 15–20 min — mirrors actual SSB GD duration',
+    'Listen actively and build on what others say — group flow is what GTO assesses, not who talks most',
+    'End the room when done — it frees up server resources for other aspirants',
+  ],
+  'PPDT': [
+    'Host from a laptop — share your screen to show the picture to all participants',
+    'Give 1 min for individual story writing, then let each person narrate their version (1 min each)',
+    'Discuss as a group to arrive at a common story with a common hero',
+    'Use the timer for each phase to keep it structured and realistic',
+  ],
+  'Lecturette': [
+    'Host from a laptop — share your screen with the topic visible throughout the session',
+    'Each participant gets 3 min strictly on the timer — no interruptions during the lecture',
+    'Others use the Notes tab to jot feedback, share it after the speaker finishes',
+    'Rotate speakers so everyone gets equal practice — log who spoke in the chat',
+  ],
+  'IO Practice': [
+    'Best for 1-on-1 sessions — one person plays the IO, the other is the candidate',
+    'Share the room code with just one other person to keep it private',
+    'The IO can use the chat to send written questions if mic is not available',
+    'Recommended: ex-servicemen, recommended students, or experienced aspirants take the IO role',
+    'Use the transcript to review how answers were framed after the session',
+  ],
+};
 
 const CATEGORY_META = {
   'GD':          { label: 'Group Discussion',                  desc: 'Topic-based group discussion' },
   'PPDT':        { label: 'PPDT',                              desc: 'Picture Perception & Discussion' },
   'Lecturette':  { label: 'Lecturette',                        desc: 'Individual talk on a topic' },
-  'IO Practice': { label: 'IO Practice',                       desc: 'Individual Obstacles practice' },
+  'IO Practice': { label: 'IO Practice',                       desc: 'Interview Officer mock interview' },
 };
 
 export default function CreateRoom() {
@@ -163,6 +192,22 @@ export default function CreateRoom() {
                   <AlertCircle className="w-3 h-3 shrink-0" /> {errors.category}
                 </p>
               )}
+            </div>
+
+            {/* Session tips — updates live with category */}
+            <div className="bg-blue-50 border border-blue-100 rounded-xl p-4">
+              <p className="text-xs font-bold text-brand-700 mb-2.5 flex items-center gap-1.5">
+                <Lightbulb className="w-3.5 h-3.5 shrink-0" />
+                How to run a great {CATEGORY_META[category].label} session
+              </p>
+              <ul className="space-y-1.5">
+                {CATEGORY_TIPS[category].map(tip => (
+                  <li key={tip} className="text-xs text-brand-700/75 flex items-start gap-2 leading-relaxed">
+                    <span className="shrink-0 mt-1.5 w-1 h-1 rounded-full bg-brand-400" />
+                    {tip}
+                  </li>
+                ))}
+              </ul>
             </div>
 
             {/* GD Subcategory */}

@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { getActiveRooms, closeRoom } from '../services/api';
 import { useAuth } from '../context/AuthContext';
-import { Mic, Timer, FileText, CheckSquare, Lock, Radio, ArrowRight, Trash2, Target, Headphones, RefreshCw, Zap, Users, Presentation } from 'lucide-react';
+import { Mic, Timer, FileText, CheckSquare, Radio, ArrowRight, Trash2, Zap } from 'lucide-react';
 import HeroMapAnimation from './HeroMapAnimation';
 
 const CATEGORIES = ['All', 'GD', 'PPDT', 'Lecturette', 'IO Practice'];
@@ -202,7 +202,6 @@ export default function LandingPage() {
       <header className="border-b border-gray-100 sticky top-0 z-50 bg-white/90 backdrop-blur-md">
         <div className="max-w-5xl mx-auto px-4 sm:px-6 h-14 flex items-center justify-between gap-3">
           <Link to="/"><Logo /></Link>
-
           <nav className="flex items-center gap-1.5 sm:gap-2">
             {user ? (
               <>
@@ -210,30 +209,15 @@ export default function LandingPage() {
                   <Avatar name={user.display_name} avatarUrl={user.avatar_url} />
                   <span className="hidden sm:block text-sm text-gray-600 font-medium">{user.display_name}</span>
                 </Link>
-                <button onClick={() => navigate('/join')}
-                  className="hidden sm:flex btn-secondary py-1.5 px-3 text-xs">
-                  Join
-                </button>
-                <button onClick={() => navigate('/create')}
-                  className="btn-primary py-1.5 px-3 text-xs sm:px-4 sm:text-sm">
-                  Create Room
-                </button>
-                <button onClick={logout}
-                  className="text-xs text-gray-400 hover:text-gray-600 px-2 cursor-pointer transition-colors hidden sm:block">
-                  Sign out
-                </button>
+                <button onClick={() => navigate('/join')} className="hidden sm:flex btn-secondary py-1.5 px-3 text-xs">Join</button>
+                <button onClick={() => navigate('/create')} className="btn-primary py-1.5 px-3 text-xs sm:px-4 sm:text-sm">Create Room</button>
+                <button onClick={logout} className="text-xs text-gray-400 hover:text-gray-600 px-2 cursor-pointer transition-colors hidden sm:block">Sign out</button>
               </>
             ) : (
               <>
-                <Link to="/login" className="text-sm text-gray-500 hover:text-gray-900 px-3 py-2 font-medium hidden sm:block">
-                  Sign in
-                </Link>
-                <Link to="/login" className="text-sm text-gray-500 hover:text-gray-900 px-2 py-2 font-medium sm:hidden">
-                  Sign in
-                </Link>
-                <Link to="/register" className="btn-primary py-1.5 px-3 text-xs sm:px-4 sm:text-sm">
-                  Get started
-                </Link>
+                <Link to="/login" className="text-sm text-gray-500 hover:text-gray-900 px-3 py-2 font-medium hidden sm:block">Sign in</Link>
+                <Link to="/login" className="text-sm text-gray-500 hover:text-gray-900 px-2 py-2 font-medium sm:hidden">Sign in</Link>
+                <Link to="/register" className="btn-primary py-1.5 px-3 text-xs sm:px-4 sm:text-sm">Get started</Link>
               </>
             )}
           </nav>
@@ -246,7 +230,6 @@ export default function LandingPage() {
         <section className="border-b border-gray-100 py-12 sm:py-20 px-4 sm:px-6">
           <div className="max-w-5xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-10 items-center">
             <div>
-
               <div className="inline-flex items-center gap-2 bg-emerald-50 text-emerald-700 text-xs font-semibold px-3 py-1.5 rounded-full mb-6 border border-emerald-100">
                 <span className="relative flex h-2 w-2">
                   <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75" />
@@ -262,7 +245,7 @@ export default function LandingPage() {
                 <span className="text-brand-600">real aspirants.</span>
               </h1>
               <p className="text-gray-500 text-base sm:text-lg leading-relaxed mb-8">
-                Connecting defence aspirants from every corner of India — practice Group Discussions together, build confidence, and walk into your SSB interview ready. Free, always.
+                Connecting defence aspirants from across India. Practice GD, PPDT, Lecturette and mock interviews — free, together.
               </p>
 
               <div className="flex flex-col sm:flex-row gap-3 mb-8">
@@ -289,29 +272,9 @@ export default function LandingPage() {
               </div>
             </div>
 
-            {/* Map — desktop only */}
             <div className="hidden lg:flex justify-center items-center">
               <HeroMapAnimation />
             </div>
-
-          </div>
-        </section>
-
-        {/* ── Feature strip ── */}
-        <section className="border-y border-gray-100 bg-gray-50">
-          <div className="max-w-5xl mx-auto px-4 sm:px-6 py-4 flex flex-wrap gap-x-5 gap-y-2.5">
-            {[
-              { icon: Mic,         text: 'Real-time voice' },
-              { icon: Timer,       text: 'GD timer' },
-              { icon: FileText,    text: 'Live transcript' },
-              { icon: CheckSquare, text: 'SSB checklist' },
-              { icon: Lock,        text: 'Private codes' },
-            ].map(({ icon: Icon, text }) => (
-              <div key={text} className="flex items-center gap-1.5 text-sm text-gray-500 font-medium">
-                <Icon className="w-3.5 h-3.5 text-brand-600 shrink-0" />
-                {text}
-              </div>
-            ))}
           </div>
         </section>
 
@@ -320,9 +283,10 @@ export default function LandingPage() {
           <div className="flex items-center justify-between mb-5">
             <div>
               <div className="flex items-center gap-2 mb-0.5">
-                <h2 className="text-lg sm:text-xl font-semibold text-gray-900">Live rooms</h2>
+                <h2 className="text-xl sm:text-2xl font-bold text-gray-900">Live rooms</h2>
                 {!loading && rooms.length > 0 && (
-                  <span className="text-xs font-medium text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-100">
+                  <span className="text-xs font-semibold text-emerald-600 bg-emerald-50 px-2.5 py-1 rounded-full border border-emerald-100 flex items-center gap-1.5">
+                    <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
                     {rooms.length} active
                   </span>
                 )}
@@ -335,37 +299,25 @@ export default function LandingPage() {
             </button>
           </div>
 
-          {/* ── Category filter tabs ── */}
+          {/* Category filter tabs */}
           <div className="mb-4">
             <div className="flex gap-2 overflow-x-auto pb-1 scrollbar-hide">
               {CATEGORIES.map(cat => (
-                <button
-                  key={cat}
-                  onClick={() => handleCatFilter(cat)}
+                <button key={cat} onClick={() => handleCatFilter(cat)}
                   className={`shrink-0 px-3.5 py-1.5 rounded-full text-xs font-semibold border transition-all cursor-pointer ${
-                    catFilter === cat
-                      ? 'bg-brand-600 text-white border-brand-600'
-                      : 'bg-white text-gray-500 border-gray-200 hover:border-gray-300 hover:bg-gray-50'
-                  }`}
-                >
+                    catFilter === cat ? 'bg-brand-600 text-white border-brand-600' : 'bg-white text-gray-500 border-gray-200 hover:border-gray-300 hover:bg-gray-50'
+                  }`}>
                   {cat}
                 </button>
               ))}
             </div>
-
-            {/* GD subtopic chips */}
             {catFilter === 'GD' && (
               <div className="flex gap-1.5 flex-wrap mt-2.5">
                 {GD_SUBCATEGORIES.map(sub => (
-                  <button
-                    key={sub}
-                    onClick={() => handleSubFilter(sub)}
+                  <button key={sub} onClick={() => handleSubFilter(sub)}
                     className={`px-2.5 py-1 rounded-full border text-[11px] font-medium transition-all cursor-pointer ${
-                      subFilter === sub
-                        ? 'bg-blue-600 text-white border-blue-600'
-                        : 'bg-white text-gray-400 border-gray-200 hover:border-gray-300'
-                    }`}
-                  >
+                      subFilter === sub ? 'bg-blue-600 text-white border-blue-600' : 'bg-white text-gray-400 border-gray-200 hover:border-gray-300'
+                    }`}>
                     {sub}
                   </button>
                 ))}
@@ -385,11 +337,8 @@ export default function LandingPage() {
               <p className="text-sm font-medium text-gray-700 mb-1">
                 {catFilter === 'All' ? 'No active rooms right now' : `No active ${catFilter} rooms`}
               </p>
-              <p className="text-xs text-gray-400 mb-5 max-w-xs mx-auto">
-                Start a discussion and share the code with your batch.
-              </p>
-              <button onClick={() => navigate(user ? '/create' : '/register')}
-                className="btn-primary text-xs py-2 px-5">
+              <p className="text-xs text-gray-400 mb-5 max-w-xs mx-auto">Start a discussion and share the code with your batch.</p>
+              <button onClick={() => navigate(user ? '/create' : '/register')} className="btn-primary text-xs py-2 px-5">
                 {user ? 'Create a Room' : 'Get started free'}
               </button>
             </div>
@@ -400,116 +349,77 @@ export default function LandingPage() {
                   <RoomCard key={r.id} room={r} user={user} onJoin={handleJoin} onDelete={handleDelete} />
                 ))}
               </div>
-
-              {/* Load more */}
               {hasMore && (
                 <div className="mt-5 text-center">
-                  <button
-                    onClick={() => setVisibleCount(p => p + PAGE_SIZE)}
-                    className="btn-secondary text-xs py-2 px-6"
-                  >
+                  <button onClick={() => setVisibleCount(p => p + PAGE_SIZE)} className="btn-secondary text-xs py-2 px-6">
                     Load more · {filteredRooms.length - visibleCount} remaining
                   </button>
                 </div>
               )}
-
               {!user && (
                 <div className="mt-4 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 bg-brand-50 border border-brand-100 rounded-xl px-4 sm:px-5 py-4">
                   <p className="text-sm text-brand-700 font-medium">Sign in to join or create a room</p>
-                  <Link to="/register" className="btn-primary text-xs py-2 px-4 shrink-0 w-full sm:w-auto text-center">
-                    Join free
-                  </Link>
+                  <Link to="/register" className="btn-primary text-xs py-2 px-4 shrink-0 w-full sm:w-auto text-center">Join free</Link>
                 </div>
               )}
               {user && (
                 <div className="mt-4 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 bg-gray-50 border border-gray-100 rounded-xl px-4 sm:px-5 py-3.5">
                   <p className="text-sm text-gray-600 font-medium">Want to start your own discussion?</p>
-                  <button onClick={() => navigate('/create')} className="btn-primary text-xs py-2 px-4 shrink-0 w-full sm:w-auto">
-                    Create a Room
-                  </button>
+                  <button onClick={() => navigate('/create')} className="btn-primary text-xs py-2 px-4 shrink-0 w-full sm:w-auto">Create a Room</button>
                 </div>
               )}
             </>
           )}
         </section>
 
-        {/* ── How to use ── */}
-        <section className="border-t border-gray-100 bg-white py-12 sm:py-16 px-4 sm:px-6">
+        {/* ── What SSBCircle gives you ── */}
+        <section className="border-t border-gray-100 bg-gray-50 py-10 sm:py-14 px-4 sm:px-6">
           <div className="max-w-5xl mx-auto">
-
-            {/* Header */}
-            <div className="mb-10 sm:mb-14">
-              <span className="inline-block text-[11px] font-bold text-brand-600 uppercase tracking-widest mb-3">Platform Guide</span>
-              <h2 className="text-2xl sm:text-3xl font-bold text-gray-900 leading-tight">
-                How to get the most out of SSBCircle
-              </h2>
-              <p className="text-gray-400 text-sm mt-2">For GD, PPDT, Lecturette, and mock interviews — everything the SSB tests you on.</p>
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
+              {[
+                { Icon: Mic,         title: 'Real voice rooms',       desc: 'Live audio with everyone in the session. No bots, no recordings — just real practice with real aspirants.' },
+                { Icon: Timer,       title: 'GD timer + transcript',  desc: 'Built-in timer mirrors actual SSB duration. Live transcript captures every word so you can review your performance.' },
+                { Icon: CheckSquare, title: 'SSB self-evaluation',    desc: 'Post-session checklist covering initiation, group harmony and summarisation — the same parameters the board assesses.' },
+              ].map(({ Icon, title, desc }) => (
+                <div key={title} className="flex gap-4">
+                  <div className="shrink-0 w-9 h-9 rounded-xl bg-white border border-gray-200 flex items-center justify-center shadow-sm mt-0.5">
+                    <Icon className="w-4 h-4 text-brand-600" />
+                  </div>
+                  <div>
+                    <h3 className="text-sm font-bold text-gray-900 mb-1">{title}</h3>
+                    <p className="text-xs text-gray-400 leading-relaxed">{desc}</p>
+                  </div>
+                </div>
+              ))}
             </div>
+          </div>
+        </section>
 
-            {/* Steps with connected dots — map-style */}
-            <div className="relative mb-12 sm:mb-16">
-              {/* Dashed connector line — desktop */}
+        {/* ── 3 steps ── */}
+        <section className="border-t border-gray-100 bg-white py-10 sm:py-14 px-4 sm:px-6">
+          <div className="max-w-5xl mx-auto">
+            <h2 className="text-lg font-bold text-gray-900 mb-8">How it works</h2>
+            <div className="relative">
               <div className="hidden sm:block absolute top-[15px] left-[3rem] right-[3rem]"
                 style={{ height: '1px', background: 'repeating-linear-gradient(to right,#bfdbfe 0,#bfdbfe 6px,transparent 6px,transparent 14px)' }} />
-
-              <div className="grid grid-cols-1 sm:grid-cols-4 gap-8 sm:gap-6">
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-8 sm:gap-6">
                 {[
-                  { n: '01', title: 'Create a free account',  desc: 'Sign up in 30 seconds — no credit card. Google login works too.' },
-                  { n: '02', title: 'Create or join a room',  desc: 'Host picks a topic and shares the 6-letter code. Participants enter it to join instantly.' },
-                  { n: '03', title: 'Run the GD',             desc: 'Start the timer. Enable transcript. Listen actively and build on what others say — group flow is what GTO assesses.' },
-                  { n: '04', title: 'Review & improve',       desc: 'Read your transcript, fill the SSB checklist, and note what to fix next session.' },
+                  { n: '01', title: 'Create a free account', desc: 'Sign up in 30 seconds. No credit card required.' },
+                  { n: '02', title: 'Open or join a room',   desc: 'Host a session with a topic, or enter a 6-letter code to join one.' },
+                  { n: '03', title: 'Practice and improve',  desc: 'Use the timer, transcript and checklist every session to track your growth.' },
                 ].map(({ n, title, desc }) => (
                   <div key={n} className="flex sm:flex-col gap-4 sm:gap-0">
-                    <div className="relative shrink-0 z-10">
-                      <div className="w-8 h-8 rounded-full bg-brand-600 border-4 border-white ring-2 ring-blue-100 flex items-center justify-center shadow-sm">
-                        <span className="text-[9px] font-bold text-white">{n}</span>
-                      </div>
+                    <div className="shrink-0 z-10 w-8 h-8 rounded-full bg-brand-600 border-4 border-white ring-2 ring-blue-100 flex items-center justify-center shadow-sm">
+                      <span className="text-[9px] font-bold text-white">{n}</span>
                     </div>
                     <div className="sm:mt-5">
-                      <h3 className="text-sm font-bold text-gray-900 mb-1.5">{title}</h3>
+                      <h3 className="text-sm font-bold text-gray-900 mb-1">{title}</h3>
                       <p className="text-xs text-gray-400 leading-relaxed">{desc}</p>
                     </div>
                   </div>
                 ))}
               </div>
             </div>
-
-            {/* Tips grid */}
-            <h3 className="text-sm font-bold text-gray-800 mb-4 uppercase tracking-wide">Tips for your best session</h3>
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 mb-6">
-              {[
-                { Icon: Target,      tip: 'Set leads like the real SSB',   desc: 'The assessor gives 3 leads — host from a laptop, share your screen so everyone sees them. Let the group pick one, then highlight the selected lead.' },
-                { Icon: Timer,       tip: 'Time it like the real thing',   desc: 'SSB GDs run 15–20 min. Use the built-in timer and stop exactly on time — discipline is noticed.' },
-                { Icon: Mic,         tip: 'Speak, don\'t dominate',        desc: 'Aim for 3–4 quality contributions. Frequency without value hurts your assessment.' },
-                { Icon: Headphones,  tip: 'Listen actively, then add',     desc: 'Let a point complete, then build on it or bring a new angle. Group flow matters more than jumping in.' },
-                { Icon: Presentation, tip: 'PPDT & Lecturette rooms',       desc: 'Create a PPDT room, host shares screen to show the picture, group describes then discusses. For Lecturette, each person gets 3 min on a topic — use the timer.' },
-                { Icon: Users,       tip: '1-on-1 mock interviews',        desc: 'Recommended students or ex-servicemen officers can create a private 2-person room for structured Personal Interview practice. Share the code with just one person.' },
-              ].map(({ Icon, tip, desc }) => (
-                <div key={tip} className="bg-gray-50 border border-gray-100 rounded-xl p-4 flex gap-3 hover:border-blue-100 hover:bg-blue-50/30 transition-colors">
-                  <div className="shrink-0 mt-0.5 w-7 h-7 rounded-lg bg-white border border-gray-200 flex items-center justify-center shadow-sm">
-                    <Icon className="w-3.5 h-3.5 text-brand-600" />
-                  </div>
-                  <div>
-                    <p className="text-xs font-bold text-gray-800 mb-1">{tip}</p>
-                    <p className="text-xs text-gray-400 leading-relaxed">{desc}</p>
-                  </div>
-                </div>
-              ))}
-            </div>
-
-            {/* Host responsibility */}
-            <div className="bg-amber-50 border border-amber-100 rounded-xl p-4 sm:p-5 flex gap-4 items-start">
-              <div className="shrink-0 w-8 h-8 rounded-full bg-amber-100 flex items-center justify-center">
-                <Zap className="w-4 h-4 text-amber-600" />
-              </div>
-              <div>
-                <p className="text-sm font-bold text-amber-800 mb-1">Host's responsibility</p>
-                <p className="text-sm text-amber-700 leading-relaxed">
-                  When your session is over, <strong>end the room</strong> from the Controls panel inside the room. Every active room occupies a live server slot — closing it promptly helps keep SSBCircle free for all aspirants.
-                </p>
-              </div>
-            </div>
-
           </div>
         </section>
 

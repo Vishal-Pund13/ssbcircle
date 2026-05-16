@@ -13,7 +13,7 @@ import { RoomEvent, Track } from 'livekit-client';
 import {
   Mic, MicOff, Timer, FileText, MessageSquare, LogOut,
   AlertCircle, Hand, VolumeX, Volume2, UserX, PhoneOff, Settings,
-  ScreenShare, ScreenShareOff,
+  ScreenShare, ScreenShareOff, Monitor,
 } from 'lucide-react';
 
 // ── Logo (navy, for light header) ───────────────────────────────────────────
@@ -279,6 +279,7 @@ function VoiceRoomUI({ room, isAdmin, roomCode, showTimer, setShowTimer, showPan
   const [showAdmin,      setShowAdmin]      = useState(false);
   const [isMicToggling,  setIsMicToggling]  = useState(false);
   const [showLeaveConfirm, setShowLeaveConfirm] = useState(false);
+  const [hostTipDismissed, setHostTipDismissed] = useState(false);
   const [timerSyncEvent, setTimerSyncEvent] = useState(null);
 
   const encoder = new TextEncoder();
@@ -406,7 +407,21 @@ function VoiceRoomUI({ room, isAdmin, roomCode, showTimer, setShowTimer, showPan
         )}
 
         {/* ── Main content area ── */}
-        <div className="flex-1 flex overflow-hidden bg-gray-50">
+        <div className="flex-1 flex flex-col overflow-hidden bg-gray-50">
+
+          {/* Host-only screen share tip — dismissible */}
+          {isAdmin && !hostTipDismissed && !isScreenSharing && (
+            <div className="shrink-0 flex items-start gap-3 bg-brand-50 border-b border-brand-100 px-4 py-2.5">
+              <Monitor className="w-4 h-4 text-brand-600 shrink-0 mt-0.5" />
+              <p className="text-xs text-brand-700 leading-relaxed flex-1">
+                <span className="font-semibold">Host tip:</span> Share your screen to show the PPDT image, GD leads or topic — helps newcomers follow along and keeps the group channelized.
+              </p>
+              <button onClick={() => setHostTipDismissed(true)}
+                className="shrink-0 text-brand-400 hover:text-brand-600 transition-colors cursor-pointer text-lg leading-none">
+                ×
+              </button>
+            </div>
+          )}
 
           {activeScreen ? (
             /* ── Screen share active — video top/left, participants strip bottom/right ── */
