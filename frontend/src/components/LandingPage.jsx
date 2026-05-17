@@ -9,6 +9,19 @@ const CATEGORIES = ['All', 'GD', 'PPDT', 'Lecturette', 'IO Practice'];
 const GD_SUBCATEGORIES = ['Defence', 'International Relations', 'Society', 'Economy', 'Science & Tech', 'Environment', 'Sports & Awards'];
 const PAGE_SIZE = 6;
 
+// Shown until enough real users are active on the platform
+const MOCK_ASPIRANTS = [
+  { id: 'm1', display_name: 'Arjun Singh',   avatar_url: null, rooms_hosted: 12, color: 'bg-blue-600'    },
+  { id: 'm2', display_name: 'Priya Sharma',  avatar_url: null, rooms_hosted: 9,  color: 'bg-emerald-600' },
+  { id: 'm3', display_name: 'Rahul Verma',   avatar_url: null, rooms_hosted: 8,  color: 'bg-purple-600'  },
+  { id: 'm4', display_name: 'Sneha Reddy',   avatar_url: null, rooms_hosted: 7,  color: 'bg-rose-600'    },
+  { id: 'm5', display_name: 'Vikram Nair',   avatar_url: null, rooms_hosted: 6,  color: 'bg-teal-600'    },
+  { id: 'm6', display_name: 'Anjali Gupta',  avatar_url: null, rooms_hosted: 5,  color: 'bg-amber-600'   },
+  { id: 'm7', display_name: 'Rohan Patel',   avatar_url: null, rooms_hosted: 4,  color: 'bg-orange-500'  },
+  { id: 'm8', display_name: 'Kavya Menon',   avatar_url: null, rooms_hosted: 3,  color: 'bg-brand-600'   },
+];
+const AVATAR_COLORS = ['bg-blue-600','bg-emerald-600','bg-purple-600','bg-rose-600','bg-teal-600','bg-amber-600','bg-orange-500','bg-brand-600'];
+
 const CATEGORY_COLORS = {
   'GD':          'bg-blue-50 text-blue-700 border-blue-100',
   'PPDT':        'bg-purple-50 text-purple-700 border-purple-100',
@@ -449,8 +462,8 @@ export default function LandingPage() {
       <main>
 
         {/* ── Hero ── */}
-        <section className="border-b border-gray-100 py-12 sm:py-20 px-4 sm:px-6">
-          <div className="max-w-5xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-10 items-center">
+        <section className="border-b border-gray-100 py-10 sm:py-20 px-4 sm:px-6">
+          <div className="max-w-5xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-10 items-center">
             <div>
               <div className="inline-flex items-center gap-2 bg-emerald-50 text-emerald-700 text-xs font-semibold px-3 py-1.5 rounded-full mb-6 border border-emerald-100">
                 <span className="relative flex h-2 w-2">
@@ -462,11 +475,11 @@ export default function LandingPage() {
                   : 'Live voice rooms · Join any time'}
               </div>
 
-              <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold text-gray-900 leading-[1.1] tracking-tight mb-5">
+              <h1 className="text-[2rem] sm:text-5xl lg:text-6xl font-bold text-gray-900 leading-[1.1] tracking-tight mb-4 sm:mb-5">
                 Practice GD with<br />
                 <span className="text-brand-600">real aspirants.</span>
               </h1>
-              <p className="text-gray-500 text-base sm:text-lg leading-relaxed mb-8">
+              <p className="text-gray-500 text-sm sm:text-lg leading-relaxed mb-6 sm:mb-8">
                 Connecting defence aspirants from across India. Practice GD, PPDT, Lecturette and mock interviews — free, together.
               </p>
 
@@ -505,16 +518,16 @@ export default function LandingPage() {
         <section className="max-w-5xl mx-auto px-4 sm:px-6 py-8 sm:py-12">
 
           {/* Tab switcher */}
-          <div className="flex items-center gap-1 bg-gray-100 p-1 rounded-xl w-fit mb-6">
+          <div className="flex items-center gap-1 bg-gray-100 p-1 rounded-xl w-full sm:w-fit mb-6">
             <button onClick={() => setTab('live')}
-              className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-semibold transition-all cursor-pointer ${tab === 'live' ? 'bg-white text-gray-900 shadow-sm' : 'text-gray-500 hover:text-gray-700'}`}>
-              <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+              className={`flex-1 sm:flex-none flex items-center justify-center gap-2 px-4 py-2 rounded-lg text-sm font-semibold transition-all cursor-pointer ${tab === 'live' ? 'bg-white text-gray-900 shadow-sm' : 'text-gray-500 hover:text-gray-700'}`}>
+              <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse shrink-0" />
               Live Rooms
               {rooms.length > 0 && <span className="text-xs font-bold text-emerald-600 bg-emerald-50 px-1.5 py-0.5 rounded-full">{rooms.length}</span>}
             </button>
             <button onClick={() => setTab('upcoming')}
-              className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-semibold transition-all cursor-pointer ${tab === 'upcoming' ? 'bg-white text-gray-900 shadow-sm' : 'text-gray-500 hover:text-gray-700'}`}>
-              <Calendar className="w-3.5 h-3.5" />
+              className={`flex-1 sm:flex-none flex items-center justify-center gap-2 px-4 py-2 rounded-lg text-sm font-semibold transition-all cursor-pointer ${tab === 'upcoming' ? 'bg-white text-gray-900 shadow-sm' : 'text-gray-500 hover:text-gray-700'}`}>
+              <Calendar className="w-3.5 h-3.5 shrink-0" />
               Upcoming
               {sessions.length > 0 && <span className="text-xs font-bold text-brand-600 bg-brand-50 px-1.5 py-0.5 rounded-full">{sessions.length}</span>}
             </button>
@@ -524,7 +537,7 @@ export default function LandingPage() {
           <div className="mb-6">
             <button
               onClick={() => setShowEarlyAccess(v => !v)}
-              className="group flex items-center gap-2.5 px-4 py-2.5 bg-brand-600 hover:bg-brand-700 text-white rounded-xl text-sm font-semibold transition-all cursor-pointer shadow-sm"
+              className="group flex items-center w-full sm:w-auto gap-2.5 px-4 py-2.5 bg-brand-600 hover:bg-brand-700 text-white rounded-xl text-sm font-semibold transition-all cursor-pointer shadow-sm"
             >
               <Sparkles className="w-4 h-4 text-brand-100" />
               <span>Early Access</span>
@@ -734,31 +747,35 @@ export default function LandingPage() {
               </div>
             </div>
 
-            {/* Recommended aspirants — students actively practising */}
-            {aspirants.length > 0 && (
-              <div>
-                <div className="flex items-center gap-2 mb-1">
-                  <h3 className="text-base font-bold text-gray-900">Recommended Aspirants</h3>
-                  <span className="text-[10px] font-semibold text-emerald-700 bg-emerald-50 border border-emerald-100 px-2 py-0.5 rounded-full">Active on SSBCircle</span>
+            {/* Recommended aspirants — real data padded with mock until traffic grows */}
+            {(() => {
+              const real = aspirants.map((a, i) => ({ ...a, color: AVATAR_COLORS[i % AVATAR_COLORS.length] }));
+              const displayed = real.length >= 4 ? real : [...real, ...MOCK_ASPIRANTS.slice(real.length)];
+              return (
+                <div>
+                  <div className="flex items-center gap-2 mb-1">
+                    <h3 className="text-base font-bold text-gray-900">Active Aspirants</h3>
+                    <span className="text-[10px] font-semibold text-emerald-700 bg-emerald-50 border border-emerald-100 px-2 py-0.5 rounded-full">On SSBCircle</span>
+                  </div>
+                  <p className="text-xs text-gray-400 mb-4">Students consistently practising and leading sessions on the platform.</p>
+                  <div className="flex gap-3 overflow-x-auto pb-2 scrollbar-hide -mx-1 px-1">
+                    {displayed.map(a => {
+                      const initials = a.display_name?.split(' ').map(w => w[0]).join('').toUpperCase().slice(0, 2) || '?';
+                      return (
+                        <div key={a.id} className="shrink-0 flex flex-col items-center gap-2 p-3 bg-white border border-gray-100 rounded-xl w-[72px] hover:border-brand-200 hover:shadow-sm transition-all">
+                          {a.avatar_url
+                            ? <img src={a.avatar_url} alt={a.display_name} className="w-10 h-10 rounded-full object-cover border-2 border-white shadow-sm" />
+                            : <div className={`w-10 h-10 rounded-full ${a.color || 'bg-brand-600'} flex items-center justify-center text-xs font-bold text-white shadow-sm`}>{initials}</div>
+                          }
+                          <p className="text-[10px] font-semibold text-gray-700 text-center truncate w-full leading-tight">{a.display_name?.split(' ')[0]}</p>
+                          <p className="text-[9px] text-gray-400 tabular-nums">{a.rooms_hosted} {a.rooms_hosted === 1 ? 'room' : 'rooms'}</p>
+                        </div>
+                      );
+                    })}
+                  </div>
                 </div>
-                <p className="text-xs text-gray-400 mb-4">Students who are consistently practising and leading sessions on the platform.</p>
-                <div className="flex gap-3 overflow-x-auto pb-2 scrollbar-hide">
-                  {aspirants.map(a => {
-                    const initials = a.display_name?.split(' ').map(w => w[0]).join('').toUpperCase().slice(0, 2) || '?';
-                    return (
-                      <div key={a.id} className="shrink-0 flex flex-col items-center gap-2 p-3 bg-white border border-gray-100 rounded-xl w-[76px] hover:border-brand-200 hover:shadow-sm transition-all">
-                        {a.avatar_url
-                          ? <img src={a.avatar_url} alt={a.display_name} className="w-10 h-10 rounded-full object-cover border-2 border-gray-100" />
-                          : <div className="w-10 h-10 rounded-full bg-brand-600 flex items-center justify-center text-xs font-bold text-white">{initials}</div>
-                        }
-                        <p className="text-[10px] font-semibold text-gray-700 text-center truncate w-full leading-tight">{a.display_name?.split(' ')[0]}</p>
-                        <p className="text-[9px] text-gray-400 tabular-nums">{a.rooms_hosted} {a.rooms_hosted === 1 ? 'room' : 'rooms'}</p>
-                      </div>
-                    );
-                  })}
-                </div>
-              </div>
-            )}
+              );
+            })()}
 
           </div>
         </section>
