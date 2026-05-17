@@ -7,7 +7,7 @@ const { authLimiter, createRoomLimiter, generalLimiter } = require('./middleware
 const roomsRouter = require('./routes/rooms');
 const authRouter  = require('./routes/auth');
 const adminRouter = require('./routes/admin');
-const { startCleanup } = require('./cleanup');
+const { startCleanup, runCleanup } = require('./cleanup');
 
 const app  = express();
 const PORT = process.env.PORT || 4000;
@@ -46,6 +46,8 @@ app.use('/api/admin', generalLimiter, adminRouter);
 app.get('/health', async (_req, res) => {
   try {
     const { rows } = await pool.query('SELECT NOW() AS db_time');
+    // Run cleanup on every health ping — keeps it working even if server was sleeping
+    runCleanup().catch(() => {});
     res.json({
       status: 'ok',
       db: 'connected',

@@ -7,7 +7,7 @@ const lkService = new RoomServiceClient(
   process.env.LIVEKIT_API_SECRET
 );
 
-const EMPTY_TIMEOUT_MS = 30 * 60 * 1000; // 30 minutes
+const EMPTY_TIMEOUT_MS = 60 * 60 * 1000; // 60 minutes
 const INTERVAL_MS      =  2 * 60 * 1000; // check every 2 minutes
 
 async function runCleanup() {
@@ -66,4 +66,4 @@ function startCleanup() {
   setInterval(runCleanup, INTERVAL_MS);
 }
 
-module.exports = { startCleanup };
+module.exports = { startCleanup, runCleanup };
