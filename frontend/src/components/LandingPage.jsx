@@ -523,8 +523,17 @@ export default function LandingPage() {
                   Intentionally limited. Uncompromisingly focused.
                 </p>
                 <p className="text-xs text-brand-100 mt-1.5 leading-relaxed">
-                  SSBCircle runs a maximum of 8 live rooms and 4 upcoming sessions to keep every discussion meaningful and distraction-free. Once your practice is done, please leave the room — someone else is waiting for their turn.
+                  SSBCircle runs a maximum of 8 live rooms and 4 upcoming sessions to keep every discussion focused and high-quality.
                 </p>
+
+                {/* Highlighted host reminder */}
+                <div className="mt-2.5 flex items-start gap-2 bg-white/10 border border-white/20 rounded-lg px-3 py-2">
+                  <span className="mt-0.5 shrink-0 text-base">⚠️</span>
+                  <p className="text-xs text-white font-medium leading-relaxed">
+                    <span className="font-bold">Hosts — once your session is done, please delete your room</span> so others can create new ones. Use the <span className="font-bold">"End & Delete Room"</span> button inside the room.
+                  </p>
+                </div>
+
                 <div className="mt-2.5 flex flex-col gap-1">
                   <p className="text-[11px] text-brand-50/70 flex items-center gap-1.5">
                     <span className="w-1 h-1 rounded-full bg-brand-100/50 shrink-0"/>

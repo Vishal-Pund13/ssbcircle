@@ -12,7 +12,7 @@ import {
 import { RoomEvent, Track } from 'livekit-client';
 import {
   Mic, MicOff, Timer, FileText, MessageSquare, LogOut,
-  AlertCircle, Hand, VolumeX, Volume2, UserX, PhoneOff, Settings,
+  AlertCircle, Hand, VolumeX, Volume2, UserX, PhoneOff, Settings, Trash2,
   ScreenShare, ScreenShareOff, Monitor,
 } from 'lucide-react';
 
@@ -514,10 +514,18 @@ function VoiceRoomUI({ room, isAdmin, roomCode, showTimer, setShowTimer, showPan
               <Settings className="w-4 h-4"/>
             </HintButton>
           )}
-          <HintButton hint="Exit the voice room" onClick={() => setShowLeaveConfirm(true)}
-            className="flex items-center gap-1.5 px-3 py-2 rounded-lg text-sm font-semibold bg-red-500 hover:bg-red-600 text-white transition-colors cursor-pointer">
-            <LogOut className="w-4 h-4"/>
-          </HintButton>
+          {isAdmin && (
+            <HintButton hint="End session and delete room for everyone" onClick={endRoomForAll}
+              className="flex items-center gap-1.5 px-3 py-2 rounded-lg text-sm font-semibold bg-red-600 hover:bg-red-700 text-white transition-colors cursor-pointer">
+              <Trash2 className="w-4 h-4"/>
+            </HintButton>
+          )}
+          {!isAdmin && (
+            <HintButton hint="Exit the voice room" onClick={() => setShowLeaveConfirm(true)}
+              className="flex items-center gap-1.5 px-3 py-2 rounded-lg text-sm font-semibold bg-red-500 hover:bg-red-600 text-white transition-colors cursor-pointer">
+              <LogOut className="w-4 h-4"/>
+            </HintButton>
+          )}
         </div>
 
         {/* Desktop: 3-column GMeet layout */}
@@ -563,12 +571,18 @@ function VoiceRoomUI({ room, isAdmin, roomCode, showTimer, setShowTimer, showPan
             </HintButton>
           </div>
 
-          {/* Right — admin only */}
+          {/* Right — admin controls */}
           <div className="flex items-center justify-end gap-2">
             {isAdmin && (
-              <HintButton hint="Manage participants — mute, remove, or end the room" onClick={() => setShowAdmin(v => !v)}
+              <HintButton hint="Manage participants — mute, remove" onClick={() => setShowAdmin(v => !v)}
                 className={`flex items-center gap-1.5 px-3 py-2 rounded-lg text-sm font-semibold transition-all cursor-pointer border ${showAdmin ? 'bg-brand-600 text-white border-brand-600' : 'bg-white text-gray-600 border-gray-200 hover:bg-gray-50'}`}>
                 <Settings className="w-4 h-4"/> Controls
+              </HintButton>
+            )}
+            {isAdmin && (
+              <HintButton hint="Session done? Delete the room so others can create new ones" onClick={endRoomForAll}
+                className="flex items-center gap-1.5 px-3 py-2 rounded-lg text-sm font-semibold bg-red-600 hover:bg-red-700 text-white transition-colors cursor-pointer">
+                <Trash2 className="w-4 h-4"/> End & Delete Room
               </HintButton>
             )}
           </div>
