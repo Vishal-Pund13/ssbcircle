@@ -34,16 +34,6 @@ api.interceptors.response.use(
 );
 
 // Auth
-export const loginUser = async (username, password) => {
-  const { data } = await api.post('/api/auth/login', { username, password });
-  return data;
-};
-
-export const registerUser = async (username, displayName, password) => {
-  const { data } = await api.post('/api/auth/register', { username, displayName, password });
-  return data;
-};
-
 export const googleAuth = async (credential) => {
   const { data } = await api.post('/api/auth/google', { credential });
   return data;
@@ -109,4 +99,9 @@ export const cancelSession = async (id) => {
 export const startSession = async (id) => {
   const { data } = await api.post(`/api/sessions/${id}/start`);
   return data.room;
+};
+
+export const getFeatured = async () => {
+  const { data } = await api.get('/api/featured');
+  return data;
 };

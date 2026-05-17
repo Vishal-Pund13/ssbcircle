@@ -1,8 +1,8 @@
 import { useEffect, useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
-import { getActiveRooms, closeRoom, getSessions, toggleInterest, cancelSession, startSession } from '../services/api';
+import { getActiveRooms, closeRoom, getSessions, toggleInterest, cancelSession, startSession, getFeatured } from '../services/api';
 import { useAuth } from '../context/AuthContext';
-import { Mic, Timer, FileText, CheckSquare, Radio, ArrowRight, Trash2, Zap, Lightbulb, Users, Presentation, Target, Headphones, RefreshCw, X, Calendar, Heart, PlayCircle, Share2, Check } from 'lucide-react';
+import { Mic, Timer, FileText, CheckSquare, Radio, ArrowRight, Trash2, Zap, Lightbulb, Users, Presentation, Target, Headphones, RefreshCw, X, Calendar, Heart, PlayCircle, Share2, Check, Sparkles, ChevronDown, Shield, Star, Lock } from 'lucide-react';
 import HeroMapAnimation from './HeroMapAnimation';
 
 const CATEGORIES = ['All', 'GD', 'PPDT', 'Lecturette', 'IO Practice'];
@@ -347,6 +347,7 @@ export default function LandingPage() {
   const navigate = useNavigate();
   const { user, logout } = useAuth();
   const [showTips,        setShowTips]        = useState(false);
+  const [showEarlyAccess, setShowEarlyAccess] = useState(false);
   const [rooms,           setRooms]           = useState([]);
   const [loading,         setLoading]         = useState(true);
   const [catFilter,       setCatFilter]       = useState('All');
@@ -355,6 +356,7 @@ export default function LandingPage() {
   const [tab,             setTab]             = useState('live');
   const [sessions,        setSessions]        = useState([]);
   const [sessionsLoading, setSessionsLoading] = useState(false);
+  const [aspirants,       setAspirants]       = useState([]);
 
   async function fetchRooms(showSkeleton = false) {
     if (showSkeleton) setLoading(true);
@@ -374,6 +376,9 @@ export default function LandingPage() {
     // First load — show skeletons
     fetchRooms(true);
     fetchSessions(true);
+
+    // Featured aspirants — load once
+    getFeatured().then(d => setAspirants(d.aspirants || [])).catch(() => {});
 
     // Background refresh — silent (no skeleton flash)
     const roomTimer    = setInterval(() => fetchRooms(false), 20_000);
@@ -515,59 +520,40 @@ export default function LandingPage() {
             </button>
           </div>
 
-          {/* ── Platform capacity banner ── */}
-          <div className="mb-6 rounded-2xl overflow-hidden bg-brand-600 text-white">
-            <div className="px-5 py-4 flex flex-col sm:flex-row sm:items-center gap-4">
+          {/* ── Early Access toggle ── */}
+          <div className="mb-6">
+            <button
+              onClick={() => setShowEarlyAccess(v => !v)}
+              className="group flex items-center gap-2.5 px-4 py-2.5 bg-brand-600 hover:bg-brand-700 text-white rounded-xl text-sm font-semibold transition-all cursor-pointer shadow-sm"
+            >
+              <Sparkles className="w-4 h-4 text-brand-100" />
+              <span>Early Access</span>
+              <span className="text-brand-100 text-xs font-normal hidden sm:inline">— see what's building behind the scenes</span>
+              <ChevronDown className={`w-4 h-4 text-brand-100 transition-transform duration-200 ${showEarlyAccess ? 'rotate-180' : ''}`} />
+            </button>
 
-              {/* Left: copy */}
-              <div className="flex-1 min-w-0">
-                <div className="flex items-center gap-2 mb-1.5">
-                  <span className="text-[10px] font-bold tracking-widest uppercase text-brand-100 bg-white/10 border border-white/15 px-2.5 py-0.5 rounded-full">Early Access</span>
-                </div>
-                <p className="text-sm font-semibold leading-snug">
-                  Intentionally limited. Uncompromisingly focused.
-                </p>
-                <p className="text-xs text-brand-100 mt-1.5 leading-relaxed">
-                  SSBCircle runs a maximum of 8 live rooms and 4 upcoming sessions to keep every discussion focused and high-quality.
-                </p>
-
-                {/* Highlighted host reminder */}
-                <div className="mt-2.5 flex items-start gap-2 bg-white/10 border border-white/20 rounded-lg px-3 py-2">
-                  <span className="mt-0.5 shrink-0 text-base">⚠️</span>
-                  <p className="text-xs text-white font-medium leading-relaxed">
-                    <span className="font-bold">Hosts — once your session is done, please delete your room</span> so others can create new ones. Use the <span className="font-bold">"End & Delete Room"</span> button inside the room.
-                  </p>
-                </div>
-
-                <div className="mt-2.5 flex flex-col gap-1">
-                  <p className="text-[11px] text-brand-50/70 flex items-center gap-1.5">
-                    <span className="w-1 h-1 rounded-full bg-brand-100/50 shrink-0"/>
-                    As aspirants grow, so does SSBCircle — shaped entirely by you.
-                  </p>
-                  <p className="text-[11px] text-brand-50/70 flex items-center gap-1.5">
-                    <span className="w-1 h-1 rounded-full bg-brand-100/50 shrink-0"/>
-                    <span><span className="text-brand-100 font-semibold">Coming soon —</span> live sessions with ex-servicemen & veterans.</span>
-                  </p>
+            {showEarlyAccess && (
+              <div className="mt-3 rounded-2xl bg-brand-600 text-white overflow-hidden">
+                <div className="px-5 py-4 flex flex-col sm:flex-row sm:items-start gap-4">
+                  <div className="flex-1 min-w-0">
+                    <p className="text-sm font-semibold leading-snug mb-1.5">Intentionally limited. Uncompromisingly focused.</p>
+                    <p className="text-xs text-brand-100 leading-relaxed">
+                      SSBCircle runs a maximum of 8 live rooms and 4 upcoming sessions to keep every discussion meaningful and distraction-free. As aspirants grow, so does SSBCircle — shaped entirely by you.
+                    </p>
+                  </div>
+                  <div className="flex sm:flex-col gap-3 sm:gap-2 shrink-0">
+                    <div className="flex-1 sm:flex-none bg-white/8 border border-white/10 rounded-xl px-4 py-2.5 text-center">
+                      <p className="text-xl font-bold tabular-nums leading-none">{loading ? '—' : rooms.length}<span className="text-brand-100 text-sm font-medium">/8</span></p>
+                      <p className="text-[10px] text-brand-100 uppercase tracking-widest mt-0.5">Live Rooms</p>
+                    </div>
+                    <div className="flex-1 sm:flex-none bg-white/8 border border-white/10 rounded-xl px-4 py-2.5 text-center">
+                      <p className="text-xl font-bold tabular-nums leading-none">{sessionsLoading ? '—' : sessions.length}<span className="text-brand-100 text-sm font-medium">/4</span></p>
+                      <p className="text-[10px] text-brand-100 uppercase tracking-widest mt-0.5">Scheduled</p>
+                    </div>
+                  </div>
                 </div>
               </div>
-
-              {/* Right: live counters */}
-              <div className="flex sm:flex-col gap-3 sm:gap-2 shrink-0">
-                <div className="flex-1 sm:flex-none bg-white/8 border border-white/10 rounded-xl px-4 py-2.5 text-center">
-                  <p className="text-xl font-bold tabular-nums leading-none">
-                    {loading ? '—' : rooms.length}<span className="text-brand-100 font-medium text-sm">/8</span>
-                  </p>
-                  <p className="text-[10px] text-brand-100 uppercase tracking-widest mt-0.5">Live Rooms</p>
-                </div>
-                <div className="flex-1 sm:flex-none bg-white/8 border border-white/10 rounded-xl px-4 py-2.5 text-center">
-                  <p className="text-xl font-bold tabular-nums leading-none">
-                    {sessionsLoading ? '—' : sessions.length}<span className="text-brand-100 font-medium text-sm">/4</span>
-                  </p>
-                  <p className="text-[10px] text-brand-100 uppercase tracking-widest mt-0.5">Scheduled</p>
-                </div>
-              </div>
-
-            </div>
+            )}
           </div>
 
           {/* ── UPCOMING tab ── */}
@@ -689,11 +675,93 @@ export default function LandingPage() {
           </>)}
         </section>
 
+        {/* ── Host caution notice ── */}
+        <div className="max-w-5xl mx-auto px-4 sm:px-6 pb-4">
+          <div className="flex items-start gap-2.5 bg-amber-50 border border-amber-200 rounded-xl px-4 py-3">
+            <span className="shrink-0 text-base mt-0.5">⚠️</span>
+            <p className="text-xs text-amber-800 leading-relaxed">
+              <span className="font-bold">Hosts — once your session is over, please delete your room</span> using the <span className="font-semibold">"End & Delete Room"</span> button inside the room. This keeps the platform open for others to practise.
+            </p>
+          </div>
+        </div>
+
         {/* ── India map — mobile only, below live rooms ── */}
         <div className="lg:hidden border-t border-gray-100 py-6 flex flex-col items-center gap-3 bg-white">
           <p className="text-xs text-gray-400 font-medium text-center px-4">Connecting aspirants to learn and practice communication skills</p>
           <HeroMapAnimation />
         </div>
+
+        {/* ── What's Ahead ── */}
+        <section className="border-t border-gray-100 bg-white py-10 sm:py-14 px-4 sm:px-6">
+          <div className="max-w-5xl mx-auto">
+
+            <div className="mb-8">
+              <div className="flex items-center gap-2 mb-1">
+                <Lock className="w-4 h-4 text-brand-600" />
+                <span className="text-xs font-bold uppercase tracking-widest text-brand-600">What's Ahead</span>
+              </div>
+              <h2 className="text-xl sm:text-2xl font-bold text-gray-900">Coming to SSBCircle</h2>
+              <p className="text-sm text-gray-400 mt-1">Built in the open — you shape what we build next.</p>
+            </div>
+
+            {/* Coming soon cards */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-10">
+
+              {/* Veterans sessions */}
+              <div className="relative rounded-2xl border border-brand-100 bg-brand-50 p-5 overflow-hidden">
+                <div className="absolute top-3 right-3 text-[10px] font-bold uppercase tracking-widest text-brand-600 bg-brand-100 px-2.5 py-0.5 rounded-full">Coming Soon</div>
+                <div className="w-10 h-10 rounded-xl bg-brand-600 flex items-center justify-center mb-3">
+                  <Shield className="w-5 h-5 text-white" />
+                </div>
+                <h3 className="text-sm font-bold text-gray-900 mb-1">Sessions with Veterans & Ex-Servicemen</h3>
+                <p className="text-xs text-gray-500 leading-relaxed">
+                  Live guided sessions hosted by SSB-recommended aspirants and ex-servicemen. Get real feedback on your GD performance, body language, and communication style from those who have cleared the board themselves.
+                </p>
+                <p className="text-[11px] text-brand-600 font-semibold mt-3">Invite-only · Limited seats per session</p>
+              </div>
+
+              {/* Peer assessment */}
+              <div className="relative rounded-2xl border border-gray-200 bg-gray-50 p-5 overflow-hidden">
+                <div className="absolute top-3 right-3 text-[10px] font-bold uppercase tracking-widest text-gray-400 bg-gray-100 px-2.5 py-0.5 rounded-full">Planned</div>
+                <div className="w-10 h-10 rounded-xl bg-gray-200 flex items-center justify-center mb-3">
+                  <Star className="w-5 h-5 text-gray-500" />
+                </div>
+                <h3 className="text-sm font-bold text-gray-900 mb-1">Peer Assessment & Ratings</h3>
+                <p className="text-xs text-gray-500 leading-relaxed">
+                  After each session, rate your peers on communication, leadership, and participation. Build a performance profile that speaks louder than words on your SSB prep journey.
+                </p>
+                <p className="text-[11px] text-gray-400 font-semibold mt-3">Anonymous · Merit-based</p>
+              </div>
+            </div>
+
+            {/* Recommended aspirants — students actively practising */}
+            {aspirants.length > 0 && (
+              <div>
+                <div className="flex items-center gap-2 mb-1">
+                  <h3 className="text-base font-bold text-gray-900">Recommended Aspirants</h3>
+                  <span className="text-[10px] font-semibold text-emerald-700 bg-emerald-50 border border-emerald-100 px-2 py-0.5 rounded-full">Active on SSBCircle</span>
+                </div>
+                <p className="text-xs text-gray-400 mb-4">Students who are consistently practising and leading sessions on the platform.</p>
+                <div className="flex gap-3 overflow-x-auto pb-2 scrollbar-hide">
+                  {aspirants.map(a => {
+                    const initials = a.display_name?.split(' ').map(w => w[0]).join('').toUpperCase().slice(0, 2) || '?';
+                    return (
+                      <div key={a.id} className="shrink-0 flex flex-col items-center gap-2 p-3 bg-white border border-gray-100 rounded-xl w-[76px] hover:border-brand-200 hover:shadow-sm transition-all">
+                        {a.avatar_url
+                          ? <img src={a.avatar_url} alt={a.display_name} className="w-10 h-10 rounded-full object-cover border-2 border-gray-100" />
+                          : <div className="w-10 h-10 rounded-full bg-brand-600 flex items-center justify-center text-xs font-bold text-white">{initials}</div>
+                        }
+                        <p className="text-[10px] font-semibold text-gray-700 text-center truncate w-full leading-tight">{a.display_name?.split(' ')[0]}</p>
+                        <p className="text-[9px] text-gray-400 tabular-nums">{a.rooms_hosted} {a.rooms_hosted === 1 ? 'room' : 'rooms'}</p>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+            )}
+
+          </div>
+        </section>
 
         {/* ── What SSBCircle gives you ── */}
         <section className="border-t border-gray-100 bg-gray-50 py-10 sm:py-14 px-4 sm:px-6">

@@ -51,6 +51,26 @@ app.use('/api/admin', generalLimiter, adminRouter);
 // Sessions
 app.use('/api/sessions', generalLimiter, sessionsRouter);
 
+// Featured aspirants — public, lightweight
+app.get('/api/featured', generalLimiter, async (_req, res) => {
+  try {
+    const { rows } = await pool.query(`
+      SELECT u.id, u.display_name, u.avatar_url,
+             COUNT(r.id)::int AS rooms_hosted
+      FROM users u
+      JOIN rooms r ON r.created_by = u.id
+      WHERE u.is_banned = false
+      GROUP BY u.id
+      HAVING COUNT(r.id) > 0
+      ORDER BY COUNT(r.id) DESC, u.created_at DESC
+      LIMIT 8
+    `);
+    res.json({ aspirants: rows });
+  } catch {
+    res.json({ aspirants: [] });
+  }
+});
+
 // ── Health check ─────────────────────────────────────────────────────────────
 app.get('/health', async (_req, res) => {
   try {
