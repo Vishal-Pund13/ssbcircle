@@ -417,8 +417,9 @@ export default function LandingPage() {
               </div>
             </div>
 
-            <div className="hidden lg:flex justify-center items-center">
+            <div className="hidden lg:flex flex-col justify-center items-center gap-3">
               <HeroMapAnimation />
+              <p className="text-xs text-gray-400 font-medium text-center">Connecting aspirants to learn and practice communication skills</p>
             </div>
           </div>
         </section>
@@ -562,7 +563,8 @@ export default function LandingPage() {
         </section>
 
         {/* ── India map — mobile only, below live rooms ── */}
-        <div className="lg:hidden border-t border-gray-100 py-6 flex justify-center bg-white">
+        <div className="lg:hidden border-t border-gray-100 py-6 flex flex-col items-center gap-3 bg-white">
+          <p className="text-xs text-gray-400 font-medium text-center px-4">Connecting aspirants to learn and practice communication skills</p>
           <HeroMapAnimation />
         </div>
 
