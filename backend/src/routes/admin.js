@@ -77,7 +77,7 @@ router.get('/rooms', adminGuard, async (_req, res) => {
 router.get('/users', adminGuard, async (_req, res) => {
   try {
     const { rows } = await pool.query(`
-      SELECT id, display_name, email, avatar_url, created_at
+      SELECT id, display_name, email, avatar_url, is_banned, created_at
       FROM users
       ORDER BY created_at DESC
       LIMIT 200
@@ -86,6 +86,40 @@ router.get('/users', adminGuard, async (_req, res) => {
   } catch (err) {
     console.error('Admin users error:', err);
     res.status(500).json({ error: 'Failed to fetch users' });
+  }
+});
+
+// Ban user
+router.post('/users/:id/ban', adminGuard, async (req, res) => {
+  try {
+    await pool.query('UPDATE users SET is_banned=true WHERE id=$1', [req.params.id]);
+    // Close all their active rooms immediately
+    const { rows } = await pool.query(
+      'UPDATE rooms SET is_active=false WHERE created_by=$1 AND is_active=true RETURNING room_code',
+      [req.params.id]
+    );
+    if (rows.length) {
+      const codes = rows.map(r => r.room_code);
+      await pool.query(
+        `UPDATE scheduled_sessions SET room_code=NULL, is_active=false WHERE room_code = ANY($1)`,
+        [codes]
+      );
+    }
+    res.json({ message: 'User banned and rooms closed' });
+  } catch (err) {
+    console.error('Admin ban error:', err);
+    res.status(500).json({ error: 'Failed to ban user' });
+  }
+});
+
+// Unban user
+router.post('/users/:id/unban', adminGuard, async (req, res) => {
+  try {
+    await pool.query('UPDATE users SET is_banned=false WHERE id=$1', [req.params.id]);
+    res.json({ message: 'User unbanned' });
+  } catch (err) {
+    console.error('Admin unban error:', err);
+    res.status(500).json({ error: 'Failed to unban user' });
   }
 });
 

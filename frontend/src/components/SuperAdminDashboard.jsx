@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Users, Radio, FolderOpen, CalendarDays, Trash2, LogOut, RefreshCw, Calendar, Bell, BellOff, PlayCircle } from 'lucide-react';
+import { Users, Radio, FolderOpen, CalendarDays, Trash2, LogOut, RefreshCw, Calendar, Bell, PlayCircle, Ban, ShieldCheck } from 'lucide-react';
 
 const API = import.meta.env.VITE_API_URL || 'http://localhost:4000';
 
@@ -88,6 +88,14 @@ export default function SuperAdminDashboard() {
     if (!window.confirm(`Cancel session "${topic}"?`)) return;
     await fetch(`${API}/api/admin/sessions/${id}`, { method: 'DELETE', headers: authHeaders() });
     setSessions(p => p.map(s => s.id === id ? { ...s, is_active: false } : s));
+  }
+
+  async function handleBan(id, name, banned) {
+    const action = banned ? 'unban' : 'ban';
+    if (!window.confirm(`${banned ? 'Unban' : 'Ban'} ${name}?`)) return;
+    await fetch(`${API}/api/admin/users/${id}/${action}`, { method: 'POST', headers: authHeaders() });
+    setUsers(p => p.map(u => u.id === id ? { ...u, is_banned: !banned } : u));
+    if (!banned) setRooms(p => p.map(r => r.created_by === id ? { ...r, is_active: false } : r));
   }
 
   function handleLogout() {
@@ -334,6 +342,8 @@ export default function SuperAdminDashboard() {
                     <th className="px-4 py-3 text-[11px] font-semibold text-gray-500 uppercase tracking-wide">User</th>
                     <th className="px-4 py-3 text-[11px] font-semibold text-gray-500 uppercase tracking-wide hidden sm:table-cell">Email</th>
                     <th className="px-4 py-3 text-[11px] font-semibold text-gray-500 uppercase tracking-wide hidden sm:table-cell">Joined</th>
+                    <th className="px-4 py-3 text-[11px] font-semibold text-gray-500 uppercase tracking-wide">Status</th>
+                    <th className="px-4 py-3"/>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-gray-50">
@@ -343,10 +353,12 @@ export default function SuperAdminDashboard() {
                         <td className="px-4 py-3"><div className="h-4 bg-gray-100 rounded w-32"/></td>
                         <td className="px-4 py-3 hidden sm:table-cell"><div className="h-4 bg-gray-100 rounded w-40"/></td>
                         <td className="px-4 py-3 hidden sm:table-cell"><div className="h-4 bg-gray-100 rounded w-16"/></td>
+                        <td className="px-4 py-3"><div className="h-4 bg-gray-100 rounded w-14"/></td>
+                        <td className="px-4 py-3"/>
                       </tr>
                     ))
                   ) : users.map(u => (
-                    <tr key={u.id} className="hover:bg-gray-50 transition-colors">
+                    <tr key={u.id} className={`hover:bg-gray-50 transition-colors ${u.is_banned ? 'opacity-60' : ''}`}>
                       <td className="px-4 py-3">
                         <div className="flex items-center gap-2.5">
                           {u.avatar_url ? (
@@ -364,6 +376,19 @@ export default function SuperAdminDashboard() {
                       </td>
                       <td className="px-4 py-3 hidden sm:table-cell text-xs text-gray-500">{u.email || '—'}</td>
                       <td className="px-4 py-3 hidden sm:table-cell text-xs text-gray-400">{timeAgo(u.created_at)}</td>
+                      <td className="px-4 py-3">
+                        {u.is_banned
+                          ? <span className="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-red-50 text-red-500">Banned</span>
+                          : <span className="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-700">Active</span>
+                        }
+                      </td>
+                      <td className="px-4 py-3 text-right">
+                        <button onClick={() => handleBan(u.id, u.display_name, u.is_banned)}
+                          className={`p-1.5 rounded-lg transition-colors cursor-pointer ${u.is_banned ? 'text-gray-300 hover:text-emerald-600 hover:bg-emerald-50' : 'text-gray-300 hover:text-red-500 hover:bg-red-50'}`}
+                          title={u.is_banned ? 'Unban user' : 'Ban user'}>
+                          {u.is_banned ? <ShieldCheck className="w-3.5 h-3.5"/> : <Ban className="w-3.5 h-3.5"/>}
+                        </button>
+                      </td>
                     </tr>
                   ))}
                 </tbody>

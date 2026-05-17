@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { useNavigate, useLocation, Link } from 'react-router-dom';
 import { createRoom, createSession } from '../services/api';
 import { useAuth } from '../context/AuthContext';
-import { Copy, Check, ArrowRight, AlertCircle, Info, Lightbulb, Calendar, Zap } from 'lucide-react';
+import { Copy, Check, ArrowRight, AlertCircle, Info, Lightbulb, Calendar, Zap, Radio } from 'lucide-react';
 
 const CATEGORIES = ['GD', 'PPDT', 'Lecturette', 'IO Practice'];
 const GD_SUBCATEGORIES = ['Defence', 'International Relations', 'Society', 'Economy', 'Science & Tech', 'Environment', 'Sports & Awards'];
@@ -48,17 +48,21 @@ export default function CreateRoom() {
   const location  = useLocation();
   const { user }  = useAuth();
 
-  const [title,        setTitle]        = useState('');
-  const [description,  setDescription]  = useState('');
-  const [category,     setCategory]     = useState('GD');
-  const [subcategory,  setSubcategory]  = useState('');
-  const [loading,      setLoading]      = useState(false);
-  const [room,         setRoom]         = useState(null);
-  const [mode,         setMode]         = useState('now'); // 'now' | 'schedule'
-  const [scheduledAt,  setScheduledAt]  = useState('');
-  const [scheduled,    setScheduled]    = useState(null); // scheduled session result
-  const [copied,      setCopied]      = useState(false);
-  const [errors,      setErrors]      = useState({});
+  const [title,           setTitle]           = useState('');
+  const [description,     setDescription]     = useState('');
+  const [category,        setCategory]        = useState('GD');
+  const [subcategory,     setSubcategory]     = useState('');
+  const [maxParticipants, setMaxParticipants] = useState(8);
+  const [platformLimit,   setPlatformLimit]   = useState(false);
+  const [sessionLimit,    setSessionLimit]    = useState(false);
+  const [loading,         setLoading]         = useState(false);
+  const [room,            setRoom]            = useState(null);
+  const [mode,            setMode]            = useState('now'); // 'now' | 'schedule'
+  const [scheduledAt,     setScheduledAt]     = useState('');
+  const [scheduled,       setScheduled]       = useState(null);
+  const [copied,          setCopied]          = useState(false);
+  const [errors,          setErrors]          = useState({});
+  const [existingRoom,    setExistingRoom]    = useState(null); // for 409 conflict
 
   const shareUrl = room ? `${window.location.origin}/join/${room.room_code}` : '';
 
@@ -101,10 +105,13 @@ export default function CreateRoom() {
         });
         setScheduled(sess);
       } else {
-        const created = await createRoom(title.trim(), description.trim(), category, subcategory || null);
+        const created = await createRoom(title.trim(), description.trim(), category, subcategory || null, maxParticipants);
         setRoom(created);
       }
     } catch (err) {
+      if (err.existing_room) { setExistingRoom(err.existing_room); return; }
+      if (err.platform_limit) { setPlatformLimit(true); return; }
+      if (err.session_limit)  { setSessionLimit(true);  return; }
       setErrors({ general: err.message });
     } finally {
       setLoading(false);
@@ -117,6 +124,70 @@ export default function CreateRoom() {
       setCopied(true);
       setTimeout(() => setCopied(false), 2000);
     } catch {}
+  }
+
+  // ── Platform room limit reached ───────────────────────────────────────────
+  if (platformLimit) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center px-4 py-8">
+        <div className="w-full max-w-md bg-white border border-orange-200 rounded-xl shadow-sm p-8 text-center">
+          <div className="w-12 h-12 bg-orange-50 rounded-full flex items-center justify-center mx-auto mb-4">
+            <Radio className="w-6 h-6 text-orange-500" />
+          </div>
+          <h2 className="text-xl font-bold text-gray-900 mb-2">All 8 rooms are active</h2>
+          <p className="text-gray-500 text-sm mb-6">The platform limit of 8 simultaneous rooms has been reached. Join an existing room or wait for one to close before creating a new one.</p>
+          <div className="flex flex-col gap-3">
+            <button onClick={() => navigate('/')} className="btn-primary w-full py-2.5">Browse active rooms</button>
+            <button onClick={() => setPlatformLimit(false)} className="w-full py-2.5 text-sm text-gray-500 hover:text-gray-700 transition-colors cursor-pointer">Try again</button>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // ── Session schedule limit reached ────────────────────────────────────────
+  if (sessionLimit) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center px-4 py-8">
+        <div className="w-full max-w-md bg-white border border-orange-200 rounded-xl shadow-sm p-8 text-center">
+          <div className="w-12 h-12 bg-orange-50 rounded-full flex items-center justify-center mx-auto mb-4">
+            <Calendar className="w-6 h-6 text-orange-500" />
+          </div>
+          <h2 className="text-xl font-bold text-gray-900 mb-2">4 sessions already scheduled</h2>
+          <p className="text-gray-500 text-sm mb-6">The platform allows a maximum of 4 upcoming sessions at a time. Wait for an existing session to start or be cancelled, then schedule yours.</p>
+          <div className="flex flex-col gap-3">
+            <button onClick={() => navigate('/')} className="btn-primary w-full py-2.5">View upcoming sessions</button>
+            <button onClick={() => setSessionLimit(false)} className="w-full py-2.5 text-sm text-gray-500 hover:text-gray-700 transition-colors cursor-pointer">Go back</button>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // ── Existing active room conflict ─────────────────────────────────────────
+  if (existingRoom) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center px-4 py-8">
+        <div className="w-full max-w-md bg-white border border-orange-200 rounded-xl shadow-sm p-8 text-center">
+          <div className="w-12 h-12 bg-orange-50 rounded-full flex items-center justify-center mx-auto mb-4">
+            <Radio className="w-6 h-6 text-orange-500" />
+          </div>
+          <h2 className="text-xl font-bold text-gray-900 mb-2">You already have an active room</h2>
+          <p className="text-gray-500 text-sm mb-1">Close your current room before creating a new one.</p>
+          <p className="font-semibold text-gray-800 mt-3 mb-6">"{existingRoom.topic}"</p>
+          <div className="flex flex-col gap-3">
+            <button onClick={() => navigate(`/room/${existingRoom.room_code}`)}
+              className="btn-primary w-full py-2.5">
+              Go to my active room
+            </button>
+            <button onClick={() => setExistingRoom(null)}
+              className="w-full py-2.5 text-sm text-gray-500 hover:text-gray-700 transition-colors cursor-pointer">
+              Go back
+            </button>
+          </div>
+        </div>
+      </div>
+    );
   }
 
   // ── Scheduled success state ───────────────────────────────────────────────
@@ -350,6 +421,25 @@ export default function CreateRoom() {
                 </p>
               )}
             </div>
+
+            {/* Max participants — only for Start Now */}
+            {mode === 'now' && (
+              <div>
+                <label className="text-xs font-semibold text-gray-600 block mb-2">
+                  Max participants: <span className="text-brand-600">{maxParticipants}</span>
+                </label>
+                <div className="flex gap-2">
+                  {[4,5,6,7,8].map(n => (
+                    <button key={n} type="button"
+                      onClick={() => setMaxParticipants(n)}
+                      className={`w-9 h-9 rounded-lg text-sm font-semibold border transition-all cursor-pointer ${maxParticipants === n ? 'bg-brand-600 text-white border-brand-600' : 'bg-white text-gray-600 border-gray-200 hover:border-brand-300'}`}>
+                      {n}
+                    </button>
+                  ))}
+                </div>
+                <p className="text-[11px] text-gray-400 mt-1.5">SSB GD panels typically have 5–8 participants</p>
+              </div>
+            )}
 
             {/* Mode toggle */}
             <div className="grid grid-cols-2 gap-2">

@@ -24,7 +24,12 @@ api.interceptors.response.use(
     const message =
       err.response?.data?.error ||
       (err.code === 'ECONNABORTED' ? 'Request timed out' : 'Network error. Please try again.');
-    return Promise.reject(new Error(message));
+    const error = new Error(message);
+    if (err.response?.data?.existing_room) error.existing_room = err.response.data.existing_room;
+    if (err.response?.data?.full) error.full = true;
+    if (err.response?.data?.platform_limit) error.platform_limit = true;
+    if (err.response?.data?.session_limit) error.session_limit = true;
+    return Promise.reject(error);
   }
 );
 
@@ -50,8 +55,8 @@ export const fetchMe = async () => {
 };
 
 // Rooms
-export const createRoom = async (title, description, category, subcategory) => {
-  const { data } = await api.post('/api/rooms', { title, description, category, subcategory });
+export const createRoom = async (title, description, category, subcategory, max_participants) => {
+  const { data } = await api.post('/api/rooms', { title, description, category, subcategory, max_participants });
   return data.room;
 };
 

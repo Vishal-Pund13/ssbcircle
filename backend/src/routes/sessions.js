@@ -48,6 +48,17 @@ router.post('/', auth, async (req, res) => {
     if (isNaN(scheduledDate) || scheduledDate <= new Date())
       return res.status(400).json({ error: 'Scheduled time must be in the future' });
 
+    // Platform-wide limit: max 4 upcoming active sessions
+    const { rows: countRows } = await pool.query(
+      "SELECT COUNT(*) FROM scheduled_sessions WHERE is_active=true AND scheduled_at > NOW()"
+    );
+    if (parseInt(countRows[0].count) >= 4) {
+      return res.status(429).json({
+        error: 'There are already 4 upcoming sessions scheduled — the maximum allowed. Please wait for one to start or be cancelled before scheduling a new one.',
+        session_limit: true,
+      });
+    }
+
     const { rows } = await pool.query(`
       INSERT INTO scheduled_sessions
         (topic, description, category, subcategory, scheduled_at, created_by, admin_username)

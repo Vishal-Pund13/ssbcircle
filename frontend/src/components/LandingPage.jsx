@@ -77,6 +77,9 @@ function RoomCard({ room, user, onJoin, onDelete }) {
   const [deleting, setDeleting] = useState(false);
   const isCreator = user && room.created_by === user.id;
   const colorClass = CATEGORY_COLORS[room.category] || 'bg-gray-100 text-gray-500 border-gray-200';
+  const maxP = room.max_participants || 8;
+  const count = room.participant_count ?? 0;
+  const isFull = count >= maxP;
 
   async function handleDelete(e) {
     e.stopPropagation();
@@ -92,14 +95,17 @@ function RoomCard({ room, user, onJoin, onDelete }) {
       <div className="p-4 flex flex-col gap-3 flex-1">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <span className="relative flex h-2 w-2">
+            <span className="relative flex h-2 w-2 shrink-0">
               <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75" />
               <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500" />
             </span>
             <span className="text-[11px] font-mono font-semibold text-gray-400 tracking-widest">{room.room_code}</span>
+            <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full border ${isFull ? 'bg-red-50 text-red-500 border-red-200' : 'bg-gray-50 text-gray-500 border-gray-200'}`}>
+              {isFull ? 'Full' : `${count}/${maxP}`}
+            </span>
           </div>
           <div className="flex items-center gap-1.5">
-            <span className="text-[11px] text-gray-300">{timeAgo(room.created_at)}</span>
+            <span className="text-[11px] text-gray-300 hidden sm:inline">{timeAgo(room.created_at)}</span>
             <ShareButton
               title={room.topic}
               text={`Join "${room.topic}" on SSBCircle — use code ${room.room_code}`}
@@ -146,11 +152,12 @@ function RoomCard({ room, user, onJoin, onDelete }) {
         )}
 
         <button
-          onClick={() => onJoin(room.room_code)}
-          className="w-full flex items-center justify-center gap-1.5 bg-white hover:bg-brand-50 text-brand-600 border border-brand-600 text-xs font-semibold py-2.5 rounded-lg transition-colors cursor-pointer"
+          onClick={() => !isFull && onJoin(room.room_code)}
+          disabled={isFull}
+          className={`w-full flex items-center justify-center gap-1.5 border text-xs font-semibold py-2.5 rounded-lg transition-colors ${isFull ? 'bg-gray-50 text-gray-400 border-gray-200 cursor-not-allowed' : 'bg-white hover:bg-brand-50 text-brand-600 border-brand-600 cursor-pointer'}`}
         >
           <Mic className="w-3.5 h-3.5" />
-          {user ? 'Join Room' : 'Sign in to Join'}
+          {isFull ? 'Room Full' : user ? 'Join Room' : 'Sign in to Join'}
         </button>
       </div>
     </div>

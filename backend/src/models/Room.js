@@ -1,5 +1,12 @@
 const { randomBytes } = require('crypto');
+const { RoomServiceClient } = require('livekit-server-sdk');
 const pool = require('../db');
+
+const lkService = new RoomServiceClient(
+  process.env.LIVEKIT_URL,
+  process.env.LIVEKIT_API_KEY,
+  process.env.LIVEKIT_API_SECRET
+);
 
 function generateRoomCode() {
   const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
@@ -11,7 +18,7 @@ function generateRoomCode() {
   return code;
 }
 
-async function createRoom(title, description, category, subcategory, userId, displayName) {
+async function createRoom(title, description, category, subcategory, userId, displayName, maxParticipants = 8) {
   let roomCode;
   for (let attempts = 0; attempts < 10; attempts++) {
     const candidate = generateRoomCode();
@@ -21,10 +28,11 @@ async function createRoom(title, description, category, subcategory, userId, dis
   if (!roomCode) throw new Error('Could not generate unique room code');
 
   const jitsiRoomName = `SSBCircle_${roomCode}`;
+  const max = Math.min(8, Math.max(2, parseInt(maxParticipants) || 8));
   const { rows } = await pool.query(
-    `INSERT INTO rooms (topic, description, category, subcategory, room_code, jitsi_room_name, created_by, admin_username)
-     VALUES ($1, $2, $3, $4, $5, $6, $7, $8) RETURNING *`,
-    [title, description || null, category || 'GD', subcategory || null, roomCode, jitsiRoomName, userId || null, displayName || null]
+    `INSERT INTO rooms (topic, description, category, subcategory, room_code, jitsi_room_name, created_by, admin_username, max_participants)
+     VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9) RETURNING *`,
+    [title, description || null, category || 'GD', subcategory || null, roomCode, jitsiRoomName, userId || null, displayName || null, max]
   );
   return rows[0];
 }
@@ -48,7 +56,19 @@ async function getActiveRooms() {
      WHERE r.is_active = true
      ORDER BY r.created_at DESC`
   );
-  return rows;
+
+  // Merge with LiveKit participant counts (single API call)
+  try {
+    const lkRooms = await lkService.listRooms();
+    const countMap = {};
+    for (const r of lkRooms) {
+      const code = r.name.replace('SSBCircle_', '');
+      countMap[code] = r.numParticipants;
+    }
+    return rows.map(r => ({ ...r, participant_count: countMap[r.room_code] ?? 0 }));
+  } catch {
+    return rows.map(r => ({ ...r, participant_count: null }));
+  }
 }
 
 async function closeRoom(code) {

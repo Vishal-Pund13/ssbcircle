@@ -124,9 +124,9 @@ function ParticipantTile({ participant, handRaised, isAdmin, roomCode, onMute, h
         </div>
       )}
 
-      {/* Hover action buttons — visible on hover for non-local participants */}
+      {/* Action buttons — always visible on mobile, hover-only on desktop */}
       {!isLocal && (
-        <div className="absolute top-2 right-2 flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-all">
+        <div className="absolute top-2 right-2 flex items-center gap-1 opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition-all">
           {/* Speaker toggle — everyone can locally mute a participant */}
           <button onClick={toggleLocalMute}
             title={locallyMuted ? 'Unmute for you' : 'Mute for you'}
@@ -166,8 +166,8 @@ function ParticipantTile({ participant, handRaised, isAdmin, roomCode, onMute, h
         )}
       </div>
 
-      <p className="text-xs font-semibold text-gray-700 text-center truncate w-full px-1 mb-1">
-        {name}{isLocal && <span className="text-gray-400 font-normal"> (you)</span>}
+      <p className="text-xs font-semibold text-gray-700 text-center truncate w-full px-1 mb-1" title={name}>
+        {isLocal ? 'You' : name}
       </p>
 
       {isSpeaking ? (
