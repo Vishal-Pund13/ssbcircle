@@ -2,11 +2,15 @@ import { useState, useEffect, useRef } from 'react';
 import { Mic, MicOff, FileText, CheckSquare, Download, Trash2, X, Plus, MessageSquare, Send } from 'lucide-react';
 
 // ─── Transcript ───────────────────────────────────────────────────────────────
-// continuous=true is unreliable on Android Chrome — detect and use single-shot mode
+const IS_IOS    = /iPhone|iPad|iPod/i.test(navigator.userAgent);
 const IS_MOBILE = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
 
 function TranscriptTab({ onStateChange }) {
-  const [supported] = useState(() => !!(window.SpeechRecognition || window.webkitSpeechRecognition));
+  // iOS webkitSpeechRecognition exists in the API but fails silently or immediately —
+  // block it early and show a clear message instead of a confusing retry loop
+  const [supported] = useState(() =>
+    !IS_IOS && !!(window.SpeechRecognition || window.webkitSpeechRecognition)
+  );
   const [listening,  setListening]  = useState(false);
   const [retrying,   setRetrying]   = useState(false);
   const [entries,    setEntries]    = useState([]);
@@ -93,16 +97,20 @@ function TranscriptTab({ onStateChange }) {
 
     rec.onerror = (e) => {
       const name = e.error;
-      // Only hard-stop on permission errors — everything else auto-restarts via onend
-      if (name === 'not-allowed' || name === 'service-not-allowed') {
+      const HARD_STOP = {
+        'not-allowed':         'Microphone access denied. Please allow mic permission and try again.',
+        'service-not-allowed': 'Microphone access denied. Please allow mic permission and try again.',
+        'audio-capture':       'Could not access the microphone — it may be in use by the voice room. Try muting yourself first, then start the transcript.',
+      };
+      if (HARD_STOP[name]) {
         listeningRef.current = false;
         clearTimeout(retryTimer.current);
         setListening(false);
         setRetrying(false);
-        setError('Microphone access denied. Please allow mic access and try again.');
+        setError(HARD_STOP[name]);
         onStateChange?.(false);
       }
-      // network / no-speech / aborted / audio-capture → let onend fire and restart
+      // network / no-speech / aborted → let onend fire and auto-restart
     };
 
     rec.onend = () => {
@@ -153,11 +161,23 @@ function TranscriptTab({ onStateChange }) {
     <div className="flex flex-col items-center justify-center h-full text-center px-6 gap-3">
       <MicOff className="w-8 h-8 text-gray-300"/>
       <div>
-        <p className="text-sm text-gray-600 font-medium">Transcript not available</p>
-        <p className="text-xs text-gray-400 mt-1">
-          Open this page in <span className="font-semibold">Chrome</span> on Android or desktop.
+        <p className="text-sm text-gray-700 font-semibold mb-1">
+          {IS_IOS ? 'Not supported on iPhone / iPad' : 'Transcript not available'}
         </p>
-        <p className="text-xs text-gray-300 mt-0.5">Safari / iOS does not support live transcription.</p>
+        {IS_IOS ? (
+          <>
+            <p className="text-xs text-gray-400 leading-relaxed">
+              Safari on iOS does not support live speech transcription.
+            </p>
+            <p className="text-xs text-gray-400 mt-1.5">
+              Use <span className="font-semibold text-gray-600">Chrome on Android</span> or join from a <span className="font-semibold text-gray-600">desktop/laptop</span> to use this feature.
+            </p>
+          </>
+        ) : (
+          <p className="text-xs text-gray-400 mt-1">
+            Open this page in <span className="font-semibold">Chrome</span> on Android or desktop for live transcription.
+          </p>
+        )}
       </div>
     </div>
   );
