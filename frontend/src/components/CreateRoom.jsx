@@ -380,7 +380,7 @@ export default function CreateRoom() {
                   type="datetime-local"
                   className={`input-base ${errors.scheduledAt ? 'border-red-300' : ''}`}
                   value={scheduledAt}
-                  min={new Date(Date.now() + 5 * 60000).toISOString().slice(0, 16)}
+                  min={(() => { const d = new Date(Date.now() + 5 * 60000); return new Date(d.getTime() - d.getTimezoneOffset() * 60000).toISOString().slice(0, 16); })()}
                   onChange={e => { setScheduledAt(e.target.value); setErrors(p => ({ ...p, scheduledAt: '' })); }}
                   disabled={loading}
                 />
