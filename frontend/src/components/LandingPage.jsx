@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { getActiveRooms, closeRoom, getSessions, toggleInterest, cancelSession, startSession } from '../services/api';
 import { useAuth } from '../context/AuthContext';
-import { Mic, Timer, FileText, CheckSquare, Radio, ArrowRight, Trash2, Zap, Lightbulb, Users, Presentation, Target, Headphones, RefreshCw, X, Calendar, Heart, PlayCircle } from 'lucide-react';
+import { Mic, Timer, FileText, CheckSquare, Radio, ArrowRight, Trash2, Zap, Lightbulb, Users, Presentation, Target, Headphones, RefreshCw, X, Calendar, Heart, PlayCircle, Share2, Check } from 'lucide-react';
 import HeroMapAnimation from './HeroMapAnimation';
 
 const CATEGORIES = ['All', 'GD', 'PPDT', 'Lecturette', 'IO Practice'];
@@ -43,6 +43,29 @@ function Avatar({ name, avatarUrl }) {
   );
 }
 
+async function share({ title, text, url }) {
+  if (navigator.share) {
+    try { await navigator.share({ title, text, url }); return true; } catch {}
+  }
+  try { await navigator.clipboard.writeText(url); return 'copied'; } catch {}
+  return false;
+}
+
+function ShareButton({ title, text, url }) {
+  const [done, setDone] = useState(false);
+  async function handleShare() {
+    const result = await share({ title, text, url });
+    if (result) { setDone(true); setTimeout(() => setDone(false), 2000); }
+  }
+  return (
+    <button onClick={handleShare}
+      className="p-1.5 rounded-lg text-gray-300 hover:text-brand-600 hover:bg-brand-50 transition-colors cursor-pointer"
+      title={done ? 'Link copied!' : 'Share'}>
+      {done ? <Check className="w-3.5 h-3.5 text-emerald-500" /> : <Share2 className="w-3.5 h-3.5" />}
+    </button>
+  );
+}
+
 function timeAgo(dateStr) {
   const diff = Math.floor((Date.now() - new Date(dateStr)) / 1000);
   if (diff < 60) return `${diff}s ago`;
@@ -77,6 +100,11 @@ function RoomCard({ room, user, onJoin, onDelete }) {
           </div>
           <div className="flex items-center gap-1.5">
             <span className="text-[11px] text-gray-300">{timeAgo(room.created_at)}</span>
+            <ShareButton
+              title={room.topic}
+              text={`Join "${room.topic}" on SSBCircle — use code ${room.room_code}`}
+              url={`${window.location.origin}/room/${room.room_code}`}
+            />
             {isCreator && (
               <button onClick={handleDelete} disabled={deleting}
                 className="p-1 text-gray-300 hover:text-red-500 transition-colors cursor-pointer disabled:opacity-40">
@@ -207,17 +235,24 @@ function UpcomingTab({ sessions, loading, user, onRefresh, navigate, onInterest,
                     <span className={`text-[10px] font-semibold px-2 py-0.5 rounded-full border ${COLORS[s.category] || 'bg-gray-50 text-gray-500 border-gray-100'}`}>
                       {s.category}
                     </span>
-                    {isLive ? (
-                      <span className="flex items-center gap-1 text-[11px] font-semibold text-emerald-600">
-                        <span className="relative flex h-1.5 w-1.5">
-                          <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75" />
-                          <span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-emerald-500" />
+                    <div className="flex items-center gap-1.5">
+                      {isLive ? (
+                        <span className="flex items-center gap-1 text-[11px] font-semibold text-emerald-600">
+                          <span className="relative flex h-1.5 w-1.5">
+                            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75" />
+                            <span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-emerald-500" />
+                          </span>
+                          Live Now
                         </span>
-                        Live Now
-                      </span>
-                    ) : (
-                      <span className="text-[11px] font-semibold text-brand-600">{countdown(s.scheduled_at)}</span>
-                    )}
+                      ) : (
+                        <span className="text-[11px] font-semibold text-brand-600">{countdown(s.scheduled_at)}</span>
+                      )}
+                      <ShareButton
+                        title={s.topic}
+                        text={`Join "${s.topic}" (${s.category}) on SSBCircle — ${dt.toLocaleDateString('en-IN', { day:'numeric', month:'short' })} at ${dt.toLocaleTimeString('en-IN', { hour:'2-digit', minute:'2-digit' })}`}
+                        url={isLive ? `${window.location.origin}/room/${s.room_code}` : window.location.origin}
+                      />
+                    </div>
                   </div>
                   <p className="text-sm font-semibold text-gray-800 leading-snug flex-1">{s.topic}</p>
                   <div className="text-xs text-gray-400">
