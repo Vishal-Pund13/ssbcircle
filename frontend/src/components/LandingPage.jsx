@@ -372,6 +372,11 @@ export default function LandingPage() {
           )}
         </section>
 
+        {/* ── India map — mobile only, below live rooms ── */}
+        <div className="lg:hidden border-t border-gray-100 py-6 flex justify-center bg-white">
+          <HeroMapAnimation />
+        </div>
+
         {/* ── What SSBCircle gives you ── */}
         <section className="border-t border-gray-100 bg-gray-50 py-10 sm:py-14 px-4 sm:px-6">
           <div className="max-w-5xl mx-auto">
