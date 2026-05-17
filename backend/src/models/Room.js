@@ -59,7 +59,7 @@ async function closeRoom(code) {
   );
   if (rows[0]) {
     await pool.query(
-      'UPDATE scheduled_sessions SET room_code = NULL WHERE room_code = $1',
+      'UPDATE scheduled_sessions SET room_code = NULL, is_active = false WHERE room_code = $1',
       [upper]
     );
   }

@@ -42,9 +42,9 @@ async function runCleanup() {
             'UPDATE rooms SET is_active = false WHERE room_code = $1',
             [room.room_code]
           );
-          // Clear room_code on any scheduled session pointing here so the card stops showing "Live Now"
+          // Mark linked scheduled session as completed so it disappears from upcoming tab
           await pool.query(
-            'UPDATE scheduled_sessions SET room_code = NULL WHERE room_code = $1',
+            'UPDATE scheduled_sessions SET room_code = NULL, is_active = false WHERE room_code = $1',
             [room.room_code]
           );
           // Also delete from LiveKit (best-effort)
