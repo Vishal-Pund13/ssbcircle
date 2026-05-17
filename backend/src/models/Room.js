@@ -52,10 +52,17 @@ async function getActiveRooms() {
 }
 
 async function closeRoom(code) {
+  const upper = code.toUpperCase();
   const { rows } = await pool.query(
     'UPDATE rooms SET is_active = false WHERE room_code = $1 RETURNING *',
-    [code.toUpperCase()]
+    [upper]
   );
+  if (rows[0]) {
+    await pool.query(
+      'UPDATE scheduled_sessions SET room_code = NULL WHERE room_code = $1',
+      [upper]
+    );
+  }
   return rows[0] || null;
 }
 

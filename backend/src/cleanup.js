@@ -37,14 +37,19 @@ async function runCleanup() {
             [room.room_code]
           );
         } else if (Date.now() - new Date(room.emptied_at).getTime() >= EMPTY_TIMEOUT_MS) {
-          // Empty for 30+ minutes — close it
+          // Empty for 60+ minutes — close it
           await pool.query(
             'UPDATE rooms SET is_active = false WHERE room_code = $1',
             [room.room_code]
           );
+          // Clear room_code on any scheduled session pointing here so the card stops showing "Live Now"
+          await pool.query(
+            'UPDATE scheduled_sessions SET room_code = NULL WHERE room_code = $1',
+            [room.room_code]
+          );
           // Also delete from LiveKit (best-effort)
           await lkService.deleteRoom(room.jitsi_room_name).catch(() => {});
-          console.log(`[cleanup] Closed empty room ${room.room_code} (empty for 30+ min)`);
+          console.log(`[cleanup] Closed empty room ${room.room_code} (empty for 60+ min)`);
         }
       } catch {
         // LiveKit throws if the room doesn't exist there — treat as empty
