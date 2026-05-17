@@ -57,17 +57,34 @@ async function getActiveRooms() {
      ORDER BY r.created_at DESC`
   );
 
-  // Merge with LiveKit participant counts (single API call)
+  // Fetch participant counts + avatars from LiveKit in parallel
   try {
     const lkRooms = await lkService.listRooms();
     const countMap = {};
-    for (const r of lkRooms) {
-      const code = r.name.replace('SSBCircle_', '');
-      countMap[code] = r.numParticipants;
-    }
-    return rows.map(r => ({ ...r, participant_count: countMap[r.room_code] ?? 0 }));
+    const participantMap = {};
+
+    await Promise.all(lkRooms.map(async lkRoom => {
+      const code = lkRoom.name.replace('SSBCircle_', '');
+      countMap[code] = lkRoom.numParticipants;
+      try {
+        const ps = await lkService.listParticipants(lkRoom.name);
+        participantMap[code] = ps.slice(0, 4).map(p => {
+          let avatar_url = null;
+          try { avatar_url = JSON.parse(p.metadata || '{}').avatar_url; } catch {}
+          return { name: p.name || p.identity, avatar_url };
+        });
+      } catch {
+        participantMap[code] = [];
+      }
+    }));
+
+    return rows.map(r => ({
+      ...r,
+      participant_count: countMap[r.room_code] ?? 0,
+      participants:      participantMap[r.room_code] ?? [],
+    }));
   } catch {
-    return rows.map(r => ({ ...r, participant_count: null }));
+    return rows.map(r => ({ ...r, participant_count: 0, participants: [] }));
   }
 }
 

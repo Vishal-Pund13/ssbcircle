@@ -137,10 +137,15 @@ router.get('/:code/token', authMiddleware, async (req, res) => {
       }
     }
 
+    // Fetch avatar to embed in participant metadata (used by room card previews)
+    const { rows: uRows } = await pool.query('SELECT avatar_url FROM users WHERE id=$1', [req.userId]);
+    const avatarUrl = uRows[0]?.avatar_url || null;
+
     const at = new AccessToken(apiKey, apiSecret, {
       identity: String(req.userId),
       name:     req.displayName,
       ttl:      '6h',
+      metadata: JSON.stringify({ avatar_url: avatarUrl }),
     });
 
     at.addGrant({

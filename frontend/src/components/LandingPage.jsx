@@ -143,12 +143,37 @@ function RoomCard({ room, user, onJoin, onDelete }) {
           )}
         </div>
 
-        {room.admin_display_name && (
-          <p className="text-xs text-gray-400">
-            {isCreator
-              ? <span className="text-brand-600 font-medium">You · Host</span>
-              : <>by <span className="text-gray-600 font-medium">{room.admin_display_name}</span></>}
-          </p>
+        {/* Participant avatars */}
+        {room.participants?.length > 0 ? (
+          <div className="flex items-center gap-2">
+            <div className="flex -space-x-2">
+              {room.participants.map((p, i) => (
+                p.avatar_url
+                  ? <img key={i} src={p.avatar_url} alt={p.name}
+                      className="w-7 h-7 rounded-full border-2 border-white object-cover"
+                      title={p.name} />
+                  : <div key={i}
+                      className="w-7 h-7 rounded-full bg-brand-600 border-2 border-white flex items-center justify-center text-[10px] font-bold text-white shrink-0"
+                      title={p.name}>
+                      {p.name?.split(' ').map(w => w[0]).join('').toUpperCase().slice(0, 2) || '?'}
+                    </div>
+              ))}
+            </div>
+            <p className="text-xs text-gray-400 truncate">
+              {isCreator
+                ? <span className="text-brand-600 font-medium">You · Host</span>
+                : <span className="font-medium text-gray-600">{room.admin_display_name}</span>}
+              {count > 0 && <span className="text-gray-400"> · {count} in room</span>}
+            </p>
+          </div>
+        ) : (
+          room.admin_display_name && (
+            <p className="text-xs text-gray-400">
+              {isCreator
+                ? <span className="text-brand-600 font-medium">You · Host</span>
+                : <>by <span className="text-gray-600 font-medium">{room.admin_display_name}</span></>}
+            </p>
+          )
         )}
 
         <button
