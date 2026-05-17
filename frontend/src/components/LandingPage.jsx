@@ -510,6 +510,52 @@ export default function LandingPage() {
             </button>
           </div>
 
+          {/* ── Platform capacity banner ── */}
+          <div className="mb-6 rounded-2xl overflow-hidden bg-brand-600 text-white">
+            <div className="px-5 py-4 flex flex-col sm:flex-row sm:items-center gap-4">
+
+              {/* Left: copy */}
+              <div className="flex-1 min-w-0">
+                <div className="flex items-center gap-2 mb-1.5">
+                  <span className="text-[10px] font-bold tracking-widest uppercase text-brand-100 bg-white/10 border border-white/15 px-2.5 py-0.5 rounded-full">Early Access</span>
+                </div>
+                <p className="text-sm font-semibold leading-snug">
+                  Intentionally limited. Uncompromisingly focused.
+                </p>
+                <p className="text-xs text-brand-100 mt-1.5 leading-relaxed">
+                  SSBCircle runs a maximum of 8 live rooms and 4 upcoming sessions to keep every discussion meaningful and distraction-free. Once your practice is done, please leave the room — someone else is waiting for their turn.
+                </p>
+                <div className="mt-2.5 flex flex-col gap-1">
+                  <p className="text-[11px] text-brand-50/70 flex items-center gap-1.5">
+                    <span className="w-1 h-1 rounded-full bg-brand-100/50 shrink-0"/>
+                    As aspirants grow, so does SSBCircle — shaped entirely by you.
+                  </p>
+                  <p className="text-[11px] text-brand-50/70 flex items-center gap-1.5">
+                    <span className="w-1 h-1 rounded-full bg-brand-100/50 shrink-0"/>
+                    <span><span className="text-brand-100 font-semibold">Coming soon —</span> live sessions with ex-servicemen & veterans.</span>
+                  </p>
+                </div>
+              </div>
+
+              {/* Right: live counters */}
+              <div className="flex sm:flex-col gap-3 sm:gap-2 shrink-0">
+                <div className="flex-1 sm:flex-none bg-white/8 border border-white/10 rounded-xl px-4 py-2.5 text-center">
+                  <p className="text-xl font-bold tabular-nums leading-none">
+                    {loading ? '—' : rooms.length}<span className="text-brand-100 font-medium text-sm">/8</span>
+                  </p>
+                  <p className="text-[10px] text-brand-100 uppercase tracking-widest mt-0.5">Live Rooms</p>
+                </div>
+                <div className="flex-1 sm:flex-none bg-white/8 border border-white/10 rounded-xl px-4 py-2.5 text-center">
+                  <p className="text-xl font-bold tabular-nums leading-none">
+                    {sessionsLoading ? '—' : sessions.length}<span className="text-brand-100 font-medium text-sm">/4</span>
+                  </p>
+                  <p className="text-[10px] text-brand-100 uppercase tracking-widest mt-0.5">Scheduled</p>
+                </div>
+              </div>
+
+            </div>
+          </div>
+
           {/* ── UPCOMING tab ── */}
           {tab === 'upcoming' && (
             <UpcomingTab sessions={sessions} loading={sessionsLoading} user={user}
