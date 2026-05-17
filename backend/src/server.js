@@ -9,7 +9,7 @@ const authRouter     = require('./routes/auth');
 const adminRouter    = require('./routes/admin');
 const sessionsRouter = require('./routes/sessions');
 const { startCleanup, runCleanup } = require('./cleanup');
-const { sendReminder } = require('./email');
+const { sendReminder, sendHostStartReminder } = require('./email');
 
 const app  = express();
 const PORT = process.env.PORT || 4000;
@@ -102,6 +102,29 @@ async function sendSessionReminders() {
       await pool.query('UPDATE scheduled_sessions SET reminder_sent=true WHERE id=$1', [session.id]);
       console.log(`[reminders] Sent reminders for session: ${session.topic}`);
     }
+
+    // Host start reminder — sent at the scheduled time (±5 min window)
+    const { rows: starting } = await pool.query(`
+      SELECT s.id, s.topic, s.category, s.scheduled_at, s.created_by,
+             u.email, u.display_name
+      FROM scheduled_sessions s
+      JOIN users u ON u.id = s.created_by
+      WHERE s.is_active = true
+        AND s.room_code IS NULL
+        AND s.host_reminder_sent = false
+        AND s.scheduled_at BETWEEN NOW() - INTERVAL '5 minutes' AND NOW() + INTERVAL '5 minutes'
+    `);
+    for (const session of starting) {
+      if (session.email) {
+        await sendHostStartReminder({
+          to: session.email, name: session.display_name,
+          topic: session.topic, category: session.category,
+          scheduled_at: session.scheduled_at,
+        }).catch(() => {});
+      }
+      await pool.query('UPDATE scheduled_sessions SET host_reminder_sent=true WHERE id=$1', [session.id]);
+      console.log(`[reminders] Sent host start reminder: ${session.topic}`);
+    }
   } catch (err) {
     console.error('[reminders] Error:', err.message);
   }
@@ -115,6 +138,7 @@ async function start() {
     // Auto-migrate: safe to run on every boot
     await pool.query(`ALTER TABLE rooms ADD COLUMN IF NOT EXISTS emptied_at TIMESTAMP`);
     await pool.query(`ALTER TABLE scheduled_sessions ADD COLUMN IF NOT EXISTS reminder_sent BOOLEAN DEFAULT false`);
+    await pool.query(`ALTER TABLE scheduled_sessions ADD COLUMN IF NOT EXISTS host_reminder_sent BOOLEAN DEFAULT false`);
     await pool.query(`
       CREATE TABLE IF NOT EXISTS scheduled_sessions (
         id UUID PRIMARY KEY DEFAULT gen_random_uuid(),

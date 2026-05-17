@@ -32,17 +32,21 @@ router.post('/login', (req, res) => {
 // Stats
 router.get('/stats', adminGuard, async (_req, res) => {
   try {
-    const [users, activeRooms, totalRooms, todayRooms] = await Promise.all([
+    const [users, activeRooms, totalRooms, todayRooms, upcomingSessions, totalSessions] = await Promise.all([
       pool.query('SELECT COUNT(*) FROM users'),
       pool.query('SELECT COUNT(*) FROM rooms WHERE is_active = true'),
       pool.query('SELECT COUNT(*) FROM rooms'),
       pool.query("SELECT COUNT(*) FROM rooms WHERE created_at >= NOW() - INTERVAL '24 hours'"),
+      pool.query("SELECT COUNT(*) FROM scheduled_sessions WHERE is_active = true AND scheduled_at > NOW()"),
+      pool.query('SELECT COUNT(*) FROM scheduled_sessions'),
     ]);
     res.json({
-      totalUsers:  parseInt(users.rows[0].count),
-      activeRooms: parseInt(activeRooms.rows[0].count),
-      totalRooms:  parseInt(totalRooms.rows[0].count),
-      todayRooms:  parseInt(todayRooms.rows[0].count),
+      totalUsers:        parseInt(users.rows[0].count),
+      activeRooms:       parseInt(activeRooms.rows[0].count),
+      totalRooms:        parseInt(totalRooms.rows[0].count),
+      todayRooms:        parseInt(todayRooms.rows[0].count),
+      upcomingSessions:  parseInt(upcomingSessions.rows[0].count),
+      totalSessions:     parseInt(totalSessions.rows[0].count),
     });
   } catch (err) {
     console.error('Admin stats error:', err);
@@ -73,8 +77,7 @@ router.get('/rooms', adminGuard, async (_req, res) => {
 router.get('/users', adminGuard, async (_req, res) => {
   try {
     const { rows } = await pool.query(`
-      SELECT id, username, display_name, email, created_at,
-             google_id IS NOT NULL AS is_google
+      SELECT id, display_name, email, avatar_url, created_at
       FROM users
       ORDER BY created_at DESC
       LIMIT 200
@@ -83,6 +86,43 @@ router.get('/users', adminGuard, async (_req, res) => {
   } catch (err) {
     console.error('Admin users error:', err);
     res.status(500).json({ error: 'Failed to fetch users' });
+  }
+});
+
+// All scheduled sessions
+router.get('/sessions', adminGuard, async (_req, res) => {
+  try {
+    const { rows } = await pool.query(`
+      SELECT s.id, s.topic, s.category, s.subcategory, s.scheduled_at,
+             s.is_active, s.room_code, s.reminder_sent, s.created_at,
+             u.display_name AS host_display_name, u.email AS host_email,
+             COUNT(DISTINCT si.user_id)::int AS interest_count
+      FROM scheduled_sessions s
+      LEFT JOIN users u ON s.created_by = u.id
+      LEFT JOIN session_interests si ON s.id = si.session_id
+      GROUP BY s.id, u.display_name, u.email
+      ORDER BY s.scheduled_at DESC
+      LIMIT 100
+    `);
+    res.json({ sessions: rows });
+  } catch (err) {
+    console.error('Admin sessions error:', err);
+    res.status(500).json({ error: 'Failed to fetch sessions' });
+  }
+});
+
+// Cancel any session
+router.delete('/sessions/:id', adminGuard, async (req, res) => {
+  try {
+    const { rows } = await pool.query(
+      'UPDATE scheduled_sessions SET is_active=false WHERE id=$1 RETURNING id',
+      [req.params.id]
+    );
+    if (!rows.length) return res.status(404).json({ error: 'Session not found' });
+    res.json({ message: 'Session cancelled' });
+  } catch (err) {
+    console.error('Admin cancel session error:', err);
+    res.status(500).json({ error: 'Failed to cancel session' });
   }
 });
 

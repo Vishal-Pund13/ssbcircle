@@ -191,4 +191,24 @@ async function sendRoomLive({ to, name, topic, category, room_code }) {
   return resend.emails.send({ from: FROM, to, subject: `Live now: ${topic}`, html: baseTemplate({ label: 'Room is Live', body }) });
 }
 
-module.exports = { sendInterestConfirmation, sendReminder, sendRoomLive };
+// 4. Host start reminder (sent at scheduled time)
+async function sendHostStartReminder({ to, name, topic, category, scheduled_at }) {
+  const { date, time } = formatDt(scheduled_at);
+  const body = `
+    <p style="font-size:20px;font-weight:700;color:#111827;margin:0 0 8px;">${topic}</p>
+    <span style="display:inline-block;background:#e0e7ff;color:#1e3a5f;font-size:11px;font-weight:700;padding:3px 12px;border-radius:999px;margin-bottom:20px;">${category}</span>
+    <table cellpadding="0" cellspacing="0" border="0" width="100%" style="margin-bottom:24px;">
+      ${infoRow('Date', date)}
+      ${infoRow('Time', time)}
+    </table>
+    <p style="font-size:14px;color:#374151;line-height:1.7;margin:0;">
+      Hi ${name || 'Host'},<br/><br/>
+      Your session is scheduled to start <strong>right now</strong>. Participants are waiting for you.<br/><br/>
+      Head to SSBCircle and click <strong>"Start Room"</strong> on your session card to open the room and let everyone in.
+    </p>
+    ${ctaButton('Start Your Session Now', BASE)}
+  `;
+  return resend.emails.send({ from: FROM, to, subject: `Start now: ${topic}`, html: baseTemplate({ label: 'Time to Start', body }) });
+}
+
+module.exports = { sendInterestConfirmation, sendReminder, sendRoomLive, sendHostStartReminder };
