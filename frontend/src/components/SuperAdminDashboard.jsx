@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Users, Radio, FolderOpen, CalendarDays, Trash2, LogOut, RefreshCw, Calendar, Bell, PlayCircle, Ban, ShieldCheck } from 'lucide-react';
+import { Users, Radio, FolderOpen, CalendarDays, Trash2, LogOut, RefreshCw, Calendar, Bell, PlayCircle, Ban, ShieldCheck, Flag, CheckCircle } from 'lucide-react';
 
 const API = import.meta.env.VITE_API_URL || 'http://localhost:4000';
 
@@ -45,7 +45,8 @@ export default function SuperAdminDashboard() {
   const [rooms,    setRooms]    = useState([]);
   const [users,    setUsers]    = useState([]);
   const [sessions, setSessions] = useState([]);
-  const [tab,      setTab]      = useState('rooms');
+  const [reports,  setReports]  = useState([]);
+  const [tab,      setTab]      = useState('reports');
   const [loading,  setLoading]  = useState(true);
   const [error,    setError]    = useState('');
 
@@ -61,11 +62,13 @@ export default function SuperAdminDashboard() {
       if (sRes.status === 401 || sRes.status === 403) {
         sessionStorage.removeItem('sa_token'); navigate('/sa'); return;
       }
-      const [s, r, u, ss] = await Promise.all([sRes.json(), rRes.json(), uRes.json(), ssRes.json()]);
+      const repRes = await fetch(`${API}/api/admin/reports`, { headers: authHeaders() });
+      const [s, r, u, ss, rep] = await Promise.all([sRes.json(), rRes.json(), uRes.json(), ssRes.json(), repRes.json()]);
       setStats(s);
       setRooms(r.rooms || []);
       setUsers(u.users || []);
       setSessions(ss.sessions || []);
+      setReports(rep.reports || []);
     } catch {
       setError('Failed to load data. Check your connection.');
     } finally {
@@ -90,6 +93,11 @@ export default function SuperAdminDashboard() {
     setSessions(p => p.map(s => s.id === id ? { ...s, is_active: false } : s));
   }
 
+  async function handleResolve(id) {
+    await fetch(`${API}/api/admin/reports/${id}`, { method: 'PATCH', headers: authHeaders(), body: JSON.stringify({ status: 'resolved' }) });
+    setReports(p => p.map(r => r.id === id ? { ...r, status: 'resolved' } : r));
+  }
+
   async function handleBan(id, name, banned) {
     const action = banned ? 'unban' : 'ban';
     if (!window.confirm(`${banned ? 'Unban' : 'Ban'} ${name}?`)) return;
@@ -103,7 +111,9 @@ export default function SuperAdminDashboard() {
     navigate('/sa');
   }
 
+  const pendingReports = reports.filter(r => r.status === 'pending').length;
   const TABS = [
+    { id: 'reports',  label: 'Reports',  count: pendingReports, alert: pendingReports > 0 },
     { id: 'rooms',    label: 'Rooms',    count: rooms.length },
     { id: 'sessions', label: 'Sessions', count: sessions.length },
     { id: 'users',    label: 'Users',    count: users.length },
@@ -167,14 +177,103 @@ export default function SuperAdminDashboard() {
         <div className="flex gap-1 mb-4 border-b border-gray-200">
           {TABS.map(t => (
             <button key={t.id} onClick={() => setTab(t.id)}
-              className={`px-4 py-2 text-sm font-semibold border-b-2 transition-all cursor-pointer -mb-px ${
+              className={`flex items-center gap-1.5 px-4 py-2 text-sm font-semibold border-b-2 transition-all cursor-pointer -mb-px ${
                 tab === t.id ? 'text-brand-600 border-brand-600' : 'text-gray-400 border-transparent hover:text-gray-600'
               }`}>
+              {t.id === 'reports' && <Flag className="w-3.5 h-3.5" />}
               {t.label}
-              <span className="ml-1.5 text-[10px] font-medium text-gray-400">{t.count}</span>
+              {t.alert
+                ? <span className="ml-0.5 text-[10px] font-bold text-white bg-red-500 px-1.5 py-0.5 rounded-full">{t.count}</span>
+                : <span className="ml-0.5 text-[10px] font-medium text-gray-400">{t.count}</span>
+              }
             </button>
           ))}
         </div>
+
+        {/* ── Reports ── */}
+        {tab === 'reports' && (
+          <div className="bg-white border border-gray-200 rounded-xl overflow-hidden">
+            <div className="overflow-x-auto">
+              <table className="w-full text-sm">
+                <thead>
+                  <tr className="border-b border-gray-100 bg-gray-50 text-left">
+                    <th className="px-4 py-3 text-[11px] font-semibold text-gray-500 uppercase tracking-wide">Reported User</th>
+                    <th className="px-4 py-3 text-[11px] font-semibold text-gray-500 uppercase tracking-wide">Reason</th>
+                    <th className="px-4 py-3 text-[11px] font-semibold text-gray-500 uppercase tracking-wide hidden sm:table-cell">Reporter</th>
+                    <th className="px-4 py-3 text-[11px] font-semibold text-gray-500 uppercase tracking-wide hidden sm:table-cell">Room</th>
+                    <th className="px-4 py-3 text-[11px] font-semibold text-gray-500 uppercase tracking-wide">Status</th>
+                    <th className="px-4 py-3 text-[11px] font-semibold text-gray-500 uppercase tracking-wide hidden sm:table-cell">Time</th>
+                    <th className="px-4 py-3"/>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-gray-50">
+                  {loading ? (
+                    Array.from({ length: 4 }).map((_, i) => (
+                      <tr key={i} className="animate-pulse">
+                        <td className="px-4 py-3"><div className="h-4 bg-gray-100 rounded w-28"/></td>
+                        <td className="px-4 py-3"><div className="h-4 bg-gray-100 rounded w-32"/></td>
+                        <td className="px-4 py-3 hidden sm:table-cell"><div className="h-4 bg-gray-100 rounded w-24"/></td>
+                        <td className="px-4 py-3 hidden sm:table-cell"><div className="h-4 bg-gray-100 rounded w-16"/></td>
+                        <td className="px-4 py-3"><div className="h-4 bg-gray-100 rounded w-16"/></td>
+                        <td className="px-4 py-3 hidden sm:table-cell"><div className="h-4 bg-gray-100 rounded w-16"/></td>
+                        <td className="px-4 py-3"/>
+                      </tr>
+                    ))
+                  ) : reports.length === 0 ? (
+                    <tr><td colSpan={7} className="px-4 py-10 text-center text-sm text-gray-400">No reports yet</td></tr>
+                  ) : reports.map(r => (
+                    <tr key={r.id} className={`hover:bg-gray-50 transition-colors ${r.status === 'resolved' ? 'opacity-50' : ''}`}>
+                      <td className="px-4 py-3">
+                        <div className="flex items-center gap-2">
+                          {r.reported_avatar
+                            ? <img src={r.reported_avatar} className="w-6 h-6 rounded-full object-cover shrink-0" alt=""/>
+                            : <div className="w-6 h-6 rounded-full bg-brand-600 flex items-center justify-center text-[9px] font-bold text-white shrink-0">
+                                {r.reported_name?.split(' ').map(w=>w[0]).join('').slice(0,2).toUpperCase()||'?'}
+                              </div>
+                          }
+                          <div>
+                            <p className="text-xs font-semibold text-gray-900">{r.reported_name || '—'}</p>
+                            {r.reported_is_banned && <span className="text-[9px] text-red-500 font-semibold">Banned</span>}
+                          </div>
+                        </div>
+                      </td>
+                      <td className="px-4 py-3">
+                        <p className="text-xs font-medium text-gray-700">{r.reason}</p>
+                        {r.description && <p className="text-[11px] text-gray-400 truncate max-w-[180px]">{r.description}</p>}
+                      </td>
+                      <td className="px-4 py-3 hidden sm:table-cell text-xs text-gray-500">{r.reporter_name || 'Anonymous'}</td>
+                      <td className="px-4 py-3 hidden sm:table-cell text-[11px] font-mono text-gray-400">{r.room_code || '—'}</td>
+                      <td className="px-4 py-3">
+                        <span className={`text-[10px] font-semibold px-2 py-0.5 rounded-full ${
+                          r.status === 'resolved' ? 'bg-gray-100 text-gray-400'
+                          : r.status === 'reviewed' ? 'bg-blue-50 text-blue-600'
+                          : 'bg-red-50 text-red-600'
+                        }`}>{r.status}</span>
+                      </td>
+                      <td className="px-4 py-3 hidden sm:table-cell text-xs text-gray-400">{timeAgo(r.created_at)}</td>
+                      <td className="px-4 py-3">
+                        <div className="flex items-center gap-1 justify-end">
+                          {!r.reported_is_banned && r.reported_user_id && (
+                            <button onClick={() => handleBan(r.reported_user_id, r.reported_name, false)}
+                              className="p-1.5 rounded-lg text-gray-300 hover:text-red-500 hover:bg-red-50 transition-colors cursor-pointer" title="Ban user">
+                              <Ban className="w-3.5 h-3.5"/>
+                            </button>
+                          )}
+                          {r.status !== 'resolved' && (
+                            <button onClick={() => handleResolve(r.id)}
+                              className="p-1.5 rounded-lg text-gray-300 hover:text-emerald-600 hover:bg-emerald-50 transition-colors cursor-pointer" title="Mark resolved">
+                              <CheckCircle className="w-3.5 h-3.5"/>
+                            </button>
+                          )}
+                        </div>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        )}
 
         {/* ── Rooms ── */}
         {tab === 'rooms' && (

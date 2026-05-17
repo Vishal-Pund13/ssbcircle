@@ -51,6 +51,27 @@ app.use('/api/admin', generalLimiter, adminRouter);
 // Sessions
 app.use('/api/sessions', generalLimiter, sessionsRouter);
 
+// Report a user (any signed-in user)
+const authMw = require('./middleware/auth');
+app.post('/api/reports', generalLimiter, authMw, async (req, res) => {
+  try {
+    const { reported_user_id, room_code, reason, description } = req.body;
+    if (!reported_user_id || !reason)
+      return res.status(400).json({ error: 'reported_user_id and reason are required' });
+    if (reported_user_id === req.userId)
+      return res.status(400).json({ error: 'You cannot report yourself' });
+    await pool.query(
+      `INSERT INTO user_reports (reporter_id, reported_user_id, room_code, reason, description)
+       VALUES ($1,$2,$3,$4,$5)`,
+      [req.userId, reported_user_id, room_code || null, reason.slice(0, 100), (description || '').slice(0, 500)]
+    );
+    res.json({ message: 'Report submitted. Our team will review it.' });
+  } catch (err) {
+    console.error('Report error:', err);
+    res.status(500).json({ error: 'Failed to submit report' });
+  }
+});
+
 // Featured aspirants — public, lightweight
 app.get('/api/featured', generalLimiter, async (_req, res) => {
   try {
@@ -165,6 +186,19 @@ async function start() {
     await pool.query(`ALTER TABLE users ADD COLUMN IF NOT EXISTS is_banned BOOLEAN DEFAULT false`);
     await pool.query(`ALTER TABLE scheduled_sessions ADD COLUMN IF NOT EXISTS reminder_sent BOOLEAN DEFAULT false`);
     await pool.query(`ALTER TABLE scheduled_sessions ADD COLUMN IF NOT EXISTS host_reminder_sent BOOLEAN DEFAULT false`);
+
+    await pool.query(`
+      CREATE TABLE IF NOT EXISTS user_reports (
+        id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+        reporter_id UUID REFERENCES users(id) ON DELETE SET NULL,
+        reported_user_id UUID REFERENCES users(id) ON DELETE CASCADE,
+        room_code VARCHAR(10),
+        reason VARCHAR(100) NOT NULL,
+        description TEXT,
+        status VARCHAR(20) DEFAULT 'pending',
+        created_at TIMESTAMP DEFAULT NOW()
+      )
+    `);
 
     // Performance indexes — safe to run repeatedly
     await pool.query(`CREATE INDEX IF NOT EXISTS idx_rooms_active      ON rooms(created_at DESC) WHERE is_active = true`);

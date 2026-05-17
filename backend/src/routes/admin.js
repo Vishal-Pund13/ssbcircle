@@ -123,6 +123,40 @@ router.post('/users/:id/unban', adminGuard, async (req, res) => {
   }
 });
 
+// All reports
+router.get('/reports', adminGuard, async (_req, res) => {
+  try {
+    const { rows } = await pool.query(`
+      SELECT r.id, r.reason, r.description, r.status, r.room_code, r.created_at,
+             reporter.display_name AS reporter_name,
+             reported.id           AS reported_user_id,
+             reported.display_name AS reported_name,
+             reported.avatar_url   AS reported_avatar,
+             reported.is_banned    AS reported_is_banned
+      FROM user_reports r
+      LEFT JOIN users reporter ON reporter.id = r.reporter_id
+      LEFT JOIN users reported ON reported.id = r.reported_user_id
+      ORDER BY r.created_at DESC
+      LIMIT 100
+    `);
+    res.json({ reports: rows });
+  } catch (err) {
+    console.error('Admin reports error:', err);
+    res.status(500).json({ error: 'Failed to fetch reports' });
+  }
+});
+
+// Resolve / dismiss a report
+router.patch('/reports/:id', adminGuard, async (req, res) => {
+  try {
+    const { status } = req.body; // 'reviewed' | 'resolved'
+    await pool.query('UPDATE user_reports SET status=$1 WHERE id=$2', [status, req.params.id]);
+    res.json({ message: 'Report updated' });
+  } catch (err) {
+    res.status(500).json({ error: 'Failed to update report' });
+  }
+});
+
 // All scheduled sessions
 router.get('/sessions', adminGuard, async (_req, res) => {
   try {

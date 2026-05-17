@@ -105,3 +105,8 @@ export const getFeatured = async () => {
   const { data } = await api.get('/api/featured');
   return data;
 };
+
+export const reportUser = async (payload) => {
+  const { data } = await api.post('/api/reports', payload);
+  return data;
+};

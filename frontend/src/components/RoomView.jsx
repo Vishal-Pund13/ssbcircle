@@ -1,6 +1,6 @@
 import { useEffect, useState, useRef } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
-import { getRoom, getRoomToken, closeRoom, kickParticipant } from '../services/api';
+import { getRoom, getRoomToken, closeRoom, kickParticipant, reportUser } from '../services/api';
 import { useAuth } from '../context/AuthContext';
 import GDTimer from './GDTimer';
 import GDPanel from './GDPanel';
@@ -12,7 +12,7 @@ import {
 import { RoomEvent, Track } from 'livekit-client';
 import {
   Mic, MicOff, Timer, FileText, MessageSquare, LogOut,
-  AlertCircle, Hand, VolumeX, Volume2, UserX, PhoneOff, Settings, Trash2,
+  AlertCircle, Hand, VolumeX, Volume2, UserX, PhoneOff, Settings, Trash2, Flag,
   ScreenShare, ScreenShareOff, Monitor,
 } from 'lucide-react';
 
@@ -30,6 +30,77 @@ function Logo() {
         <path d="M14 20 L24 14 L34 20 L30 31 L18 31 Z" stroke="#1e3a5f" strokeWidth="1.5" fill="none"/>
       </svg>
       <span className="font-bold text-gray-900 text-[15px] tracking-tight">SSBCircle</span>
+    </div>
+  );
+}
+
+const REPORT_REASONS = [
+  'Inappropriate language',
+  'Harassment or bullying',
+  'Spam / off-topic',
+  'Impersonation',
+  'Other',
+];
+
+// ── Report modal ──────────────────────────────────────────────────────────────
+function ReportModal({ participant, roomCode, onClose }) {
+  const [reason,      setReason]      = useState('');
+  const [description, setDescription] = useState('');
+  const [submitting,  setSubmitting]  = useState(false);
+  const [done,        setDone]        = useState(false);
+
+  async function submit() {
+    if (!reason) return;
+    setSubmitting(true);
+    try {
+      await reportUser({ reported_user_id: participant.identity, room_code: roomCode, reason, description });
+      setDone(true);
+    } catch { /* non-critical */ }
+    finally { setSubmitting(false); }
+  }
+
+  return (
+    <div className="fixed inset-0 z-[200] flex items-center justify-center p-4 bg-black/40 backdrop-blur-sm" onClick={onClose}>
+      <div className="bg-white rounded-2xl shadow-xl w-full max-w-sm p-6" onClick={e => e.stopPropagation()}>
+        {done ? (
+          <>
+            <div className="w-10 h-10 bg-emerald-50 rounded-full flex items-center justify-center mx-auto mb-3">
+              <Flag className="w-5 h-5 text-emerald-600" />
+            </div>
+            <h3 className="text-base font-semibold text-gray-900 text-center mb-1">Report submitted</h3>
+            <p className="text-sm text-gray-500 text-center mb-4">Our team will review it and take action if needed.</p>
+            <button onClick={onClose} className="w-full py-2 rounded-lg text-sm font-medium bg-gray-100 hover:bg-gray-200 transition-colors cursor-pointer">Close</button>
+          </>
+        ) : (
+          <>
+            <h3 className="text-base font-semibold text-gray-900 mb-1">Report {participant.name || 'participant'}</h3>
+            <p className="text-xs text-gray-400 mb-4">Help us keep SSBCircle safe. False reports may result in action against your account.</p>
+            <div className="flex flex-col gap-2 mb-4">
+              {REPORT_REASONS.map(r => (
+                <button key={r} onClick={() => setReason(r)}
+                  className={`px-3 py-2 rounded-lg text-sm text-left border transition-all cursor-pointer ${reason === r ? 'bg-brand-50 border-brand-300 text-brand-700 font-semibold' : 'border-gray-200 text-gray-600 hover:bg-gray-50'}`}>
+                  {r}
+                </button>
+              ))}
+            </div>
+            <textarea
+              placeholder="Additional details (optional)"
+              value={description}
+              onChange={e => setDescription(e.target.value)}
+              rows={2}
+              maxLength={500}
+              className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm text-gray-700 resize-none focus:outline-none focus:border-brand-400 mb-4"
+            />
+            <div className="flex gap-2">
+              <button onClick={onClose} className="flex-1 py-2 rounded-lg text-sm font-medium bg-gray-100 hover:bg-gray-200 transition-colors cursor-pointer">Cancel</button>
+              <button onClick={submit} disabled={!reason || submitting}
+                className="flex-1 py-2 rounded-lg text-sm font-semibold bg-red-500 hover:bg-red-600 text-white transition-colors cursor-pointer disabled:opacity-50">
+                {submitting ? 'Submitting…' : 'Submit Report'}
+              </button>
+            </div>
+          </>
+        )}
+      </div>
     </div>
   );
 }
@@ -84,7 +155,8 @@ function HintButton({ hint, children, ...props }) {
 // ── Participant tile ─────────────────────────────────────────────────────────
 function ParticipantTile({ participant, handRaised, isAdmin, roomCode, onMute, hostId }) {
   const isSpeaking = useIsSpeaking(participant);
-  const [showKickConfirm, setShowKickConfirm] = useState(false);
+  const [showKickConfirm,   setShowKickConfirm]   = useState(false);
+  const [showReportModal,   setShowReportModal]    = useState(false);
   const [locallyMuted, setLocallyMuted] = useState(false);
   const name     = participant.name || participant.identity || 'Participant';
   const initials = name.split(' ').map(w => w[0]).join('').toUpperCase().slice(0, 2);
@@ -149,7 +221,16 @@ function ParticipantTile({ participant, handRaised, isAdmin, roomCode, onMute, h
               <UserX className="w-3 h-3"/>
             </button>
           )}
+          {/* Report — available to everyone */}
+          <button onClick={() => setShowReportModal(true)}
+            title="Report this participant"
+            className="w-6 h-6 rounded-full bg-gray-100 hover:bg-orange-100 text-gray-400 hover:text-orange-500 flex items-center justify-center transition-all cursor-pointer">
+            <Flag className="w-3 h-3"/>
+          </button>
         </div>
+      )}
+      {showReportModal && (
+        <ReportModal participant={participant} roomCode={roomCode} onClose={() => setShowReportModal(false)} />
       )}
 
       {/* Avatar */}
