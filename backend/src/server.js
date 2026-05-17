@@ -1,8 +1,9 @@
 require('dotenv').config();
-const express = require('express');
-const helmet  = require('helmet');
-const cors    = require('cors');
-const pool    = require('./db');
+const express     = require('express');
+const helmet      = require('helmet');
+const cors        = require('cors');
+const compression = require('compression');
+const pool        = require('./db');
 const { authLimiter, createRoomLimiter, generalLimiter } = require('./middleware/rateLimit');
 const roomsRouter    = require('./routes/rooms');
 const authRouter     = require('./routes/auth');
@@ -17,6 +18,9 @@ const PORT = process.env.PORT || 4000;
 // ── Trust proxy (Render / Railway / Heroku sit behind one) ───────────────────
 // Needed so rate-limiter reads the real client IP, not the proxy IP
 app.set('trust proxy', 1);
+
+// ── Compression (gzip) ───────────────────────────────────────────────────────
+app.use(compression());
 
 // ── Security headers ─────────────────────────────────────────────────────────
 app.use(helmet({
@@ -141,6 +145,14 @@ async function start() {
     await pool.query(`ALTER TABLE users ADD COLUMN IF NOT EXISTS is_banned BOOLEAN DEFAULT false`);
     await pool.query(`ALTER TABLE scheduled_sessions ADD COLUMN IF NOT EXISTS reminder_sent BOOLEAN DEFAULT false`);
     await pool.query(`ALTER TABLE scheduled_sessions ADD COLUMN IF NOT EXISTS host_reminder_sent BOOLEAN DEFAULT false`);
+
+    // Performance indexes — safe to run repeatedly
+    await pool.query(`CREATE INDEX IF NOT EXISTS idx_rooms_active      ON rooms(created_at DESC) WHERE is_active = true`);
+    await pool.query(`CREATE INDEX IF NOT EXISTS idx_rooms_created_by  ON rooms(created_by)      WHERE is_active = true`);
+    await pool.query(`CREATE INDEX IF NOT EXISTS idx_sessions_active   ON scheduled_sessions(scheduled_at ASC) WHERE is_active = true`);
+    await pool.query(`CREATE INDEX IF NOT EXISTS idx_interests_session ON session_interests(session_id)`);
+    await pool.query(`CREATE INDEX IF NOT EXISTS idx_users_google      ON users(google_id)`);
+    await pool.query(`CREATE INDEX IF NOT EXISTS idx_users_email       ON users(email)`);
     await pool.query(`
       CREATE TABLE IF NOT EXISTS scheduled_sessions (
         id UUID PRIMARY KEY DEFAULT gen_random_uuid(),

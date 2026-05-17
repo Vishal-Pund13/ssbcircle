@@ -356,24 +356,29 @@ export default function LandingPage() {
   const [sessions,        setSessions]        = useState([]);
   const [sessionsLoading, setSessionsLoading] = useState(false);
 
-  async function fetchRooms() {
+  async function fetchRooms(showSkeleton = false) {
+    if (showSkeleton) setLoading(true);
     try { setRooms(await getActiveRooms()); }
     catch { /* non-critical */ }
     finally { setLoading(false); }
   }
 
-  async function fetchSessions() {
-    setSessionsLoading(true);
+  async function fetchSessions(showSkeleton = false) {
+    if (showSkeleton) setSessionsLoading(true);
     try { setSessions(await getSessions()); }
     catch { /* non-critical */ }
     finally { setSessionsLoading(false); }
   }
 
   useEffect(() => {
-    fetchRooms();
-    fetchSessions();
-    const t = setInterval(fetchRooms, 15000);
-    return () => clearInterval(t);
+    // First load — show skeletons
+    fetchRooms(true);
+    fetchSessions(true);
+
+    // Background refresh — silent (no skeleton flash)
+    const roomTimer    = setInterval(() => fetchRooms(false), 20_000);
+    const sessionTimer = setInterval(() => fetchSessions(false), 45_000);
+    return () => { clearInterval(roomTimer); clearInterval(sessionTimer); };
   }, []);
 
   // Reset visible count when filter changes
@@ -604,7 +609,7 @@ export default function LandingPage() {
               </div>
               <p className="text-xs sm:text-sm text-gray-400">Open to all — sign in to join</p>
             </div>
-            <button onClick={() => { setLoading(true); fetchRooms(); }}
+            <button onClick={() => fetchRooms(false)}
               className="flex items-center gap-1 text-xs text-gray-400 hover:text-gray-600 cursor-pointer font-medium px-2 py-1.5">
               <Radio className="w-3.5 h-3.5" /> Refresh
             </button>
