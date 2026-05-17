@@ -197,16 +197,27 @@ function UpcomingTab({ sessions, loading, user, onRefresh, navigate, onInterest,
           {sessions.map(s => {
             const dt = new Date(s.scheduled_at);
             const isHost = user?.id === s.created_by;
-            const canStart = isHost && (Date.now() >= dt.getTime() - 10 * 60000);
+            const isLive = !!s.room_code;
+            const canStart = !isLive && isHost && (Date.now() >= dt.getTime() - 10 * 60000);
             return (
-              <div key={s.id} className="bg-white border border-gray-200 rounded-xl overflow-hidden hover:border-brand-600/30 hover:shadow-md transition-all flex flex-col">
-                <div className="h-0.5 bg-brand-600" />
+              <div key={s.id} className={`bg-white border rounded-xl overflow-hidden hover:shadow-md transition-all flex flex-col ${isLive ? 'border-emerald-300 hover:border-emerald-400' : 'border-gray-200 hover:border-brand-600/30'}`}>
+                <div className={`h-0.5 ${isLive ? 'bg-emerald-500' : 'bg-brand-600'}`} />
                 <div className="p-4 flex flex-col gap-3 flex-1">
                   <div className="flex items-center justify-between">
                     <span className={`text-[10px] font-semibold px-2 py-0.5 rounded-full border ${COLORS[s.category] || 'bg-gray-50 text-gray-500 border-gray-100'}`}>
                       {s.category}
                     </span>
-                    <span className="text-[11px] font-semibold text-brand-600">{countdown(s.scheduled_at)}</span>
+                    {isLive ? (
+                      <span className="flex items-center gap-1 text-[11px] font-semibold text-emerald-600">
+                        <span className="relative flex h-1.5 w-1.5">
+                          <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75" />
+                          <span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-emerald-500" />
+                        </span>
+                        Live Now
+                      </span>
+                    ) : (
+                      <span className="text-[11px] font-semibold text-brand-600">{countdown(s.scheduled_at)}</span>
+                    )}
                   </div>
                   <p className="text-sm font-semibold text-gray-800 leading-snug flex-1">{s.topic}</p>
                   <div className="text-xs text-gray-400">
@@ -214,7 +225,11 @@ function UpcomingTab({ sessions, loading, user, onRefresh, navigate, onInterest,
                     {s.host_display_name && <p className="mt-0.5">by {isHost ? <span className="text-brand-600 font-medium">You</span> : s.host_display_name}</p>}
                   </div>
                   <div className="flex items-center gap-2">
-                    {canStart ? (
+                    {isLive ? (
+                      <button onClick={() => navigate(`/room/${s.room_code}`)} className="flex-1 flex items-center justify-center gap-1.5 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-semibold py-2.5 rounded-lg transition-colors cursor-pointer">
+                        <PlayCircle className="w-3.5 h-3.5" /> Join Now
+                      </button>
+                    ) : canStart ? (
                       <button onClick={() => onStart(s.id)} className="flex-1 flex items-center justify-center gap-1.5 bg-brand-600 hover:bg-brand-700 text-white text-xs font-semibold py-2.5 rounded-lg transition-colors cursor-pointer">
                         <PlayCircle className="w-3.5 h-3.5" /> Start Room
                       </button>
@@ -227,7 +242,7 @@ function UpcomingTab({ sessions, loading, user, onRefresh, navigate, onInterest,
                         {s.is_interested ? 'Notification On' : 'Get Notification'}
                       </button>
                     )}
-                    {isHost && !canStart && (
+                    {isHost && !canStart && !isLive && (
                       <button
                         onClick={() => {
                           if (window.confirm('Cancel this session? This cannot be undone and all registered aspirants will lose their slot.')) {
