@@ -780,28 +780,6 @@ export default function LandingPage() {
           </div>
         </section>
 
-        {/* ── What SSBCircle gives you ── */}
-        <section className="border-t border-gray-100 bg-gray-50 py-10 sm:py-14 px-4 sm:px-6">
-          <div className="max-w-5xl mx-auto">
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
-              {[
-                { Icon: Mic,         title: 'Real voice rooms',       desc: 'Live audio with everyone in the session. No bots, no recordings — just real practice with real aspirants.' },
-                { Icon: Timer,       title: 'GD timer + transcript',  desc: 'Built-in timer mirrors actual SSB duration. Live transcript captures every word so you can review your performance.' },
-                { Icon: CheckSquare, title: 'SSB self-evaluation',    desc: 'Post-session checklist covering initiation, group harmony and summarisation — the same parameters the board assesses.' },
-              ].map(({ Icon, title, desc }) => (
-                <div key={title} className="flex gap-4">
-                  <div className="shrink-0 w-9 h-9 rounded-xl bg-white border border-gray-200 flex items-center justify-center shadow-sm mt-0.5">
-                    <Icon className="w-4 h-4 text-brand-600" />
-                  </div>
-                  <div>
-                    <h3 className="text-sm font-bold text-gray-900 mb-1">{title}</h3>
-                    <p className="text-xs text-gray-400 leading-relaxed">{desc}</p>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-        </section>
 
         {/* ── 3 steps ── */}
         <section className="border-t border-gray-100 bg-white py-10 sm:py-14 px-4 sm:px-6">
