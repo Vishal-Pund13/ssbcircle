@@ -62,6 +62,34 @@ async function migrate() {
   }
   console.log('✓ rooms columns');
 
+  await pool.query(`
+    CREATE TABLE IF NOT EXISTS scheduled_sessions (
+      id           UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+      topic        VARCHAR(255) NOT NULL,
+      description  TEXT,
+      category     VARCHAR(50) DEFAULT 'GD',
+      subcategory  VARCHAR(50),
+      scheduled_at TIMESTAMP NOT NULL,
+      created_by   UUID REFERENCES users(id),
+      admin_username VARCHAR(100),
+      room_code    VARCHAR(10),
+      is_active    BOOLEAN DEFAULT true,
+      created_at   TIMESTAMP DEFAULT NOW()
+    )
+  `);
+  console.log('✓ scheduled_sessions table');
+
+  await pool.query(`
+    CREATE TABLE IF NOT EXISTS session_interests (
+      id         UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+      session_id UUID REFERENCES scheduled_sessions(id) ON DELETE CASCADE,
+      user_id    UUID REFERENCES users(id) ON DELETE CASCADE,
+      created_at TIMESTAMP DEFAULT NOW(),
+      UNIQUE(session_id, user_id)
+    )
+  `);
+  console.log('✓ session_interests table');
+
   console.log('\nAll migrations complete.');
   await pool.end();
 }

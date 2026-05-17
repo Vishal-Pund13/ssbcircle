@@ -79,3 +79,29 @@ export const kickParticipant = async (code, identity) => {
   const { data } = await api.post(`/api/rooms/${code}/kick`, { identity });
   return data;
 };
+
+// Sessions
+export const getSessions = async () => {
+  const { data } = await api.get('/api/sessions');
+  return data.sessions;
+};
+
+export const createSession = async (payload) => {
+  const { data } = await api.post('/api/sessions', payload);
+  return data.session;
+};
+
+export const toggleInterest = async (id) => {
+  const { data } = await api.post(`/api/sessions/${id}/interest`);
+  return data;
+};
+
+export const cancelSession = async (id) => {
+  const { data } = await api.delete(`/api/sessions/${id}`);
+  return data;
+};
+
+export const startSession = async (id) => {
+  const { data } = await api.post(`/api/sessions/${id}/start`);
+  return data.room;
+};

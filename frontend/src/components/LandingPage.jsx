@@ -1,8 +1,8 @@
 import { useEffect, useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
-import { getActiveRooms, closeRoom } from '../services/api';
+import { getActiveRooms, closeRoom, getSessions, toggleInterest, cancelSession, startSession } from '../services/api';
 import { useAuth } from '../context/AuthContext';
-import { Mic, Timer, FileText, CheckSquare, Radio, ArrowRight, Trash2, Zap } from 'lucide-react';
+import { Mic, Timer, FileText, CheckSquare, Radio, ArrowRight, Trash2, Zap, Lightbulb, Users, Presentation, Target, Headphones, RefreshCw, X, Calendar, Heart, PlayCircle } from 'lucide-react';
 import HeroMapAnimation from './HeroMapAnimation';
 
 const CATEGORIES = ['All', 'GD', 'PPDT', 'Lecturette', 'IO Practice'];
@@ -143,14 +143,136 @@ function Skeleton() {
   );
 }
 
+function countdown(dateStr) {
+  const diff = new Date(dateStr) - Date.now();
+  if (diff <= 0) return 'Starting soon';
+  const h = Math.floor(diff / 3600000);
+  const m = Math.floor((diff % 3600000) / 60000);
+  if (h > 0) return `in ${h}h ${m}m`;
+  return `in ${m}m`;
+}
+
+function UpcomingTab({ sessions, loading, user, onRefresh, navigate, onInterest, onCancel, onStart }) {
+  const COLORS = {
+    'GD':          'bg-blue-50 text-blue-700 border-blue-100',
+    'PPDT':        'bg-purple-50 text-purple-700 border-purple-100',
+    'Lecturette':  'bg-orange-50 text-orange-700 border-orange-100',
+    'IO Practice': 'bg-emerald-50 text-emerald-700 border-emerald-100',
+  };
+
+  return (
+    <div>
+      <div className="flex items-center justify-between mb-5">
+        <div>
+          <h2 className="text-xl sm:text-2xl font-bold text-gray-900">Upcoming Sessions</h2>
+          <p className="text-xs sm:text-sm text-gray-400">Scheduled by aspirants — mark interest to stay reminded</p>
+        </div>
+        <div className="flex items-center gap-2">
+          <button onClick={onRefresh} className="flex items-center gap-1 text-xs text-gray-400 hover:text-gray-600 cursor-pointer font-medium px-2 py-1.5">
+            <Radio className="w-3.5 h-3.5" /> Refresh
+          </button>
+          <button onClick={() => navigate('/create')} className="btn-primary text-xs py-2 px-4 flex items-center gap-1.5">
+            <Calendar className="w-3.5 h-3.5" /> Schedule
+          </button>
+        </div>
+      </div>
+
+      {loading ? (
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4">
+          {[1,2,3].map(i => <div key={i} className="border border-gray-100 rounded-xl p-4 space-y-3 animate-pulse"><div className="h-3 bg-gray-100 rounded w-16"/><div className="h-4 bg-gray-100 rounded w-full"/><div className="h-9 bg-gray-100 rounded-lg"/></div>)}
+        </div>
+      ) : sessions.length === 0 ? (
+        <div className="border border-dashed border-gray-200 rounded-xl py-12 text-center px-6">
+          <div className="w-12 h-12 rounded-xl bg-gray-50 border border-gray-100 flex items-center justify-center mx-auto mb-4">
+            <Calendar className="w-5 h-5 text-gray-300" />
+          </div>
+          <p className="text-sm font-medium text-gray-700 mb-1">No upcoming sessions</p>
+          <p className="text-xs text-gray-400 mb-5">Schedule one and invite your batch to join.</p>
+          <button onClick={() => navigate(user ? '/create' : '/register')} className="btn-primary text-xs py-2 px-5">
+            {user ? 'Schedule a Session' : 'Get started free'}
+          </button>
+        </div>
+      ) : (
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4">
+          {sessions.map(s => {
+            const dt = new Date(s.scheduled_at);
+            const isHost = user?.id === s.created_by;
+            const canStart = isHost && (Date.now() >= dt.getTime() - 10 * 60000);
+            return (
+              <div key={s.id} className="bg-white border border-gray-200 rounded-xl overflow-hidden hover:border-brand-600/30 hover:shadow-md transition-all flex flex-col">
+                <div className="h-0.5 bg-brand-600" />
+                <div className="p-4 flex flex-col gap-3 flex-1">
+                  <div className="flex items-center justify-between">
+                    <span className={`text-[10px] font-semibold px-2 py-0.5 rounded-full border ${COLORS[s.category] || 'bg-gray-50 text-gray-500 border-gray-100'}`}>
+                      {s.category}
+                    </span>
+                    <span className="text-[11px] font-semibold text-brand-600">{countdown(s.scheduled_at)}</span>
+                  </div>
+                  <p className="text-sm font-semibold text-gray-800 leading-snug flex-1">{s.topic}</p>
+                  <div className="text-xs text-gray-400">
+                    <p className="font-medium text-gray-600">{dt.toLocaleDateString('en-IN', { weekday:'short', day:'numeric', month:'short' })} · {dt.toLocaleTimeString('en-IN', { hour:'2-digit', minute:'2-digit' })}</p>
+                    {s.host_display_name && <p className="mt-0.5">by {isHost ? <span className="text-brand-600 font-medium">You</span> : s.host_display_name}</p>}
+                  </div>
+                  <div className="flex items-center gap-2">
+                    {canStart ? (
+                      <button onClick={() => onStart(s.id)} className="flex-1 flex items-center justify-center gap-1.5 bg-brand-600 hover:bg-brand-700 text-white text-xs font-semibold py-2.5 rounded-lg transition-colors cursor-pointer">
+                        <PlayCircle className="w-3.5 h-3.5" /> Start Room
+                      </button>
+                    ) : (
+                      <button
+                        onClick={() => !s.is_interested && onInterest(s.id)}
+                        disabled={s.is_interested}
+                        className={`flex-1 flex items-center justify-center gap-1.5 text-xs font-semibold py-2.5 rounded-lg border transition-all ${s.is_interested ? 'bg-emerald-50 text-emerald-700 border-emerald-200 cursor-not-allowed' : 'bg-white text-gray-600 border-gray-200 hover:bg-brand-50 hover:text-brand-600 hover:border-brand-200 cursor-pointer'}`}>
+                        <Heart className={`w-3.5 h-3.5 ${s.is_interested ? 'fill-emerald-600' : ''}`} />
+                        {s.is_interested ? 'Notification On' : 'Get Notification'}
+                      </button>
+                    )}
+                    {isHost && !canStart && (
+                      <button
+                        onClick={() => {
+                          if (window.confirm('Cancel this session? This cannot be undone and all registered aspirants will lose their slot.')) {
+                            onCancel(s.id);
+                          }
+                        }}
+                        className="px-3 py-2.5 text-xs text-gray-400 hover:text-red-500 border border-gray-200 hover:border-red-200 rounded-lg transition-colors cursor-pointer">
+                        Cancel
+                      </button>
+                    )}
+                  </div>
+                  <div className="flex items-center justify-center gap-1.5 mt-1">
+                    <div className="flex -space-x-1">
+                      {[...Array(Math.min(s.interest_count, 4))].map((_, i) => (
+                        <div key={i} className="w-4 h-4 rounded-full bg-brand-600 border border-white" style={{ opacity: 1 - i * 0.15 }} />
+                      ))}
+                    </div>
+                    <p className="text-[11px] text-gray-400">
+                      {s.interest_count === 0
+                        ? 'No notifications yet — be the first'
+                        : `${s.interest_count} aspirant${s.interest_count > 1 ? 's' : ''} getting notified`}
+                    </p>
+                  </div>
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      )}
+    </div>
+  );
+}
+
 export default function LandingPage() {
   const navigate = useNavigate();
   const { user, logout } = useAuth();
-  const [rooms,       setRooms]       = useState([]);
-  const [loading,     setLoading]     = useState(true);
-  const [catFilter,   setCatFilter]   = useState('All');
-  const [subFilter,   setSubFilter]   = useState('');
-  const [visibleCount, setVisibleCount] = useState(PAGE_SIZE);
+  const [showTips,        setShowTips]        = useState(false);
+  const [rooms,           setRooms]           = useState([]);
+  const [loading,         setLoading]         = useState(true);
+  const [catFilter,       setCatFilter]       = useState('All');
+  const [subFilter,       setSubFilter]       = useState('');
+  const [visibleCount,    setVisibleCount]    = useState(PAGE_SIZE);
+  const [tab,             setTab]             = useState('live');
+  const [sessions,        setSessions]        = useState([]);
+  const [sessionsLoading, setSessionsLoading] = useState(false);
 
   async function fetchRooms() {
     try { setRooms(await getActiveRooms()); }
@@ -158,8 +280,16 @@ export default function LandingPage() {
     finally { setLoading(false); }
   }
 
+  async function fetchSessions() {
+    setSessionsLoading(true);
+    try { setSessions(await getSessions()); }
+    catch { /* non-critical */ }
+    finally { setSessionsLoading(false); }
+  }
+
   useEffect(() => {
     fetchRooms();
+    fetchSessions();
     const t = setInterval(fetchRooms, 15000);
     return () => clearInterval(t);
   }, []);
@@ -278,8 +408,51 @@ export default function LandingPage() {
           </div>
         </section>
 
-        {/* ── Live Rooms ── */}
+        {/* ── Live / Upcoming tabs ── */}
         <section className="max-w-5xl mx-auto px-4 sm:px-6 py-8 sm:py-12">
+
+          {/* Tab switcher */}
+          <div className="flex items-center gap-1 bg-gray-100 p-1 rounded-xl w-fit mb-6">
+            <button onClick={() => setTab('live')}
+              className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-semibold transition-all cursor-pointer ${tab === 'live' ? 'bg-white text-gray-900 shadow-sm' : 'text-gray-500 hover:text-gray-700'}`}>
+              <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+              Live Rooms
+              {rooms.length > 0 && <span className="text-xs font-bold text-emerald-600 bg-emerald-50 px-1.5 py-0.5 rounded-full">{rooms.length}</span>}
+            </button>
+            <button onClick={() => setTab('upcoming')}
+              className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-semibold transition-all cursor-pointer ${tab === 'upcoming' ? 'bg-white text-gray-900 shadow-sm' : 'text-gray-500 hover:text-gray-700'}`}>
+              <Calendar className="w-3.5 h-3.5" />
+              Upcoming
+              {sessions.length > 0 && <span className="text-xs font-bold text-brand-600 bg-brand-50 px-1.5 py-0.5 rounded-full">{sessions.length}</span>}
+            </button>
+          </div>
+
+          {/* ── UPCOMING tab ── */}
+          {tab === 'upcoming' && (
+            <UpcomingTab sessions={sessions} loading={sessionsLoading} user={user}
+              onRefresh={fetchSessions} navigate={navigate}
+              onInterest={async (id) => {
+                if (!user) { navigate('/login'); return; }
+                const res = await toggleInterest(id).catch(() => null);
+                if (res) setSessions(prev => prev.map(s => s.id === id ? {
+                  ...s,
+                  is_interested: res.interested,
+                  interest_count: s.interest_count + (res.interested ? 1 : -1),
+                } : s));
+              }}
+              onCancel={async (id) => {
+                await cancelSession(id).catch(() => null);
+                setSessions(prev => prev.filter(s => s.id !== id));
+              }}
+              onStart={async (id) => {
+                const room = await startSession(id).catch(() => null);
+                if (room) { fetchSessions(); navigate(`/room/${room.room_code}`); }
+              }}
+            />
+          )}
+
+          {/* ── LIVE tab ── */}
+          {tab === 'live' && (<>
           <div className="flex items-center justify-between mb-5">
             <div>
               <div className="flex items-center gap-2 mb-0.5">
@@ -370,6 +543,7 @@ export default function LandingPage() {
               )}
             </>
           )}
+          </>)}
         </section>
 
         {/* ── India map — mobile only, below live rooms ── */}

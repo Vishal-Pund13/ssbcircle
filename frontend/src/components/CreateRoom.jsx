@@ -1,8 +1,8 @@
 import { useState } from 'react';
 import { useNavigate, useLocation, Link } from 'react-router-dom';
-import { createRoom } from '../services/api';
+import { createRoom, createSession } from '../services/api';
 import { useAuth } from '../context/AuthContext';
-import { Copy, Check, ArrowRight, AlertCircle, Info, Lightbulb, ChevronDown, ChevronUp } from 'lucide-react';
+import { Copy, Check, ArrowRight, AlertCircle, Info, Lightbulb, Calendar, Zap } from 'lucide-react';
 
 const CATEGORIES = ['GD', 'PPDT', 'Lecturette', 'IO Practice'];
 const GD_SUBCATEGORIES = ['Defence', 'International Relations', 'Society', 'Economy', 'Science & Tech', 'Environment', 'Sports & Awards'];
@@ -48,12 +48,15 @@ export default function CreateRoom() {
   const location  = useLocation();
   const { user }  = useAuth();
 
-  const [title,       setTitle]       = useState('');
-  const [description, setDescription] = useState('');
-  const [category,    setCategory]    = useState('GD');
-  const [subcategory, setSubcategory] = useState('');
-  const [loading,     setLoading]     = useState(false);
-  const [room,        setRoom]        = useState(null);
+  const [title,        setTitle]        = useState('');
+  const [description,  setDescription]  = useState('');
+  const [category,     setCategory]     = useState('GD');
+  const [subcategory,  setSubcategory]  = useState('');
+  const [loading,      setLoading]      = useState(false);
+  const [room,         setRoom]         = useState(null);
+  const [mode,         setMode]         = useState('now'); // 'now' | 'schedule'
+  const [scheduledAt,  setScheduledAt]  = useState('');
+  const [scheduled,    setScheduled]    = useState(null); // scheduled session result
   const [copied,      setCopied]      = useState(false);
   const [errors,      setErrors]      = useState({});
 
@@ -66,6 +69,10 @@ export default function CreateRoom() {
     if (description.trim().length < 10)    e.description = 'Description must be at least 10 characters';
     if (description.trim().length > 500)   e.description = 'Description must be under 500 characters';
     if (!CATEGORIES.includes(category))    e.category = 'Please select a category';
+    if (mode === 'schedule') {
+      if (!scheduledAt)                    e.scheduledAt = 'Please pick a date and time';
+      else if (new Date(scheduledAt) <= new Date()) e.scheduledAt = 'Scheduled time must be in the future';
+    }
     return e;
   }
 
@@ -79,8 +86,24 @@ export default function CreateRoom() {
     setLoading(true);
     setErrors({});
     try {
-      const created = await createRoom(title.trim(), description.trim(), category, subcategory || null);
-      setRoom(created);
+      if (mode === 'schedule') {
+        const sess = await createSession({
+          topic: title.trim(), description: description.trim(),
+          category, subcategory: subcategory || null,
+          scheduled_at: (() => {
+            // datetime-local gives no timezone — append local offset so UTC conversion is correct
+            const offset = -new Date().getTimezoneOffset();
+            const sign = offset >= 0 ? '+' : '-';
+            const hh = String(Math.floor(Math.abs(offset) / 60)).padStart(2, '0');
+            const mm = String(Math.abs(offset) % 60).padStart(2, '0');
+            return new Date(`${scheduledAt}:00${sign}${hh}:${mm}`).toISOString();
+          })(),
+        });
+        setScheduled(sess);
+      } else {
+        const created = await createRoom(title.trim(), description.trim(), category, subcategory || null);
+        setRoom(created);
+      }
     } catch (err) {
       setErrors({ general: err.message });
     } finally {
@@ -94,6 +117,33 @@ export default function CreateRoom() {
       setCopied(true);
       setTimeout(() => setCopied(false), 2000);
     } catch {}
+  }
+
+  // ── Scheduled success state ───────────────────────────────────────────────
+  if (scheduled) {
+    const dt = new Date(scheduled.scheduled_at);
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center px-4 py-8">
+        <div className="w-full max-w-md bg-white border border-gray-200 rounded-xl shadow-sm p-8 text-center">
+          <div className="w-12 h-12 bg-blue-50 rounded-full flex items-center justify-center mx-auto mb-4">
+            <Calendar className="w-6 h-6 text-brand-600" />
+          </div>
+          <h2 className="text-xl font-bold text-gray-900 mb-1">Session Scheduled!</h2>
+          <p className="text-gray-400 text-sm mb-1 font-medium">{scheduled.topic}</p>
+          <p className="text-brand-600 font-semibold text-sm mb-5">
+            {dt.toLocaleDateString('en-IN', { weekday:'short', day:'numeric', month:'short' })} · {dt.toLocaleTimeString('en-IN', { hour:'2-digit', minute:'2-digit' })}
+          </p>
+          <p className="text-xs text-gray-400 mb-6">Aspirants can mark interest from the Upcoming tab on the home page. Come back at the scheduled time to start the room.</p>
+          <button onClick={() => navigate('/')} className="btn-primary w-full py-2.5 mb-3 flex items-center justify-center gap-2">
+            View on Home Page <ArrowRight className="w-4 h-4" />
+          </button>
+          <button onClick={() => { setScheduled(null); setTitle(''); setDescription(''); setCategory('GD'); setSubcategory(''); setScheduledAt(''); setMode('now'); }}
+            className="text-sm text-gray-400 hover:text-gray-600 cursor-pointer transition-colors">
+            Schedule another
+          </button>
+        </div>
+      </div>
+    );
   }
 
   // ── Success state ──────────────────────────────────────────────────────────
@@ -301,6 +351,47 @@ export default function CreateRoom() {
               )}
             </div>
 
+            {/* Mode toggle */}
+            <div className="grid grid-cols-2 gap-2">
+              {[
+                { id: 'now',      Icon: Zap,      label: 'Start Now',       sub: 'Create live room' },
+                { id: 'schedule', Icon: Calendar, label: 'Schedule Later',  sub: 'Pick date & time' },
+              ].map(({ id, Icon, label, sub }) => (
+                <button key={id} type="button" onClick={() => setMode(id)}
+                  className={`flex items-center gap-3 px-3 py-2.5 rounded-lg border text-left transition-all cursor-pointer ${
+                    mode === id ? 'border-brand-600 bg-brand-600/5' : 'border-gray-200 hover:border-gray-300'
+                  }`}>
+                  <Icon className={`w-4 h-4 shrink-0 ${mode === id ? 'text-brand-600' : 'text-gray-400'}`} />
+                  <div>
+                    <p className={`text-xs font-semibold ${mode === id ? 'text-brand-600' : 'text-gray-600'}`}>{label}</p>
+                    <p className="text-[10px] text-gray-400">{sub}</p>
+                  </div>
+                </button>
+              ))}
+            </div>
+
+            {/* Datetime picker — only for schedule mode */}
+            {mode === 'schedule' && (
+              <div>
+                <label className="text-xs font-semibold text-gray-600 block mb-1.5">
+                  Date & Time <span className="text-red-400">*</span>
+                </label>
+                <input
+                  type="datetime-local"
+                  className={`input-base ${errors.scheduledAt ? 'border-red-300' : ''}`}
+                  value={scheduledAt}
+                  min={new Date(Date.now() + 5 * 60000).toISOString().slice(0, 16)}
+                  onChange={e => { setScheduledAt(e.target.value); setErrors(p => ({ ...p, scheduledAt: '' })); }}
+                  disabled={loading}
+                />
+                {errors.scheduledAt && (
+                  <p className="text-xs text-red-500 mt-1.5 flex items-center gap-1">
+                    <AlertCircle className="w-3 h-3 shrink-0" /> {errors.scheduledAt}
+                  </p>
+                )}
+              </div>
+            )}
+
             {/* Progress hints */}
             <div className="flex gap-2">
               <div className={`flex-1 h-1 rounded-full transition-all ${category ? 'bg-brand-600' : 'bg-gray-100'}`} />
@@ -319,7 +410,7 @@ export default function CreateRoom() {
                   </svg>
                   Creating…
                 </span>
-              ) : 'Create Room'}
+              ) : mode === 'schedule' ? 'Schedule Session' : 'Create Room'}
             </button>
           </form>
         </div>

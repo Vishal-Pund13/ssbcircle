@@ -4,10 +4,12 @@ const helmet  = require('helmet');
 const cors    = require('cors');
 const pool    = require('./db');
 const { authLimiter, createRoomLimiter, generalLimiter } = require('./middleware/rateLimit');
-const roomsRouter = require('./routes/rooms');
-const authRouter  = require('./routes/auth');
-const adminRouter = require('./routes/admin');
+const roomsRouter    = require('./routes/rooms');
+const authRouter     = require('./routes/auth');
+const adminRouter    = require('./routes/admin');
+const sessionsRouter = require('./routes/sessions');
 const { startCleanup, runCleanup } = require('./cleanup');
+const { sendReminder } = require('./email');
 
 const app  = express();
 const PORT = process.env.PORT || 4000;
@@ -42,12 +44,17 @@ app.use('/api/rooms', generalLimiter, roomsRouter);
 app.use('/api/admin/login', authLimiter);
 app.use('/api/admin', generalLimiter, adminRouter);
 
+// Sessions
+app.use('/api/sessions', generalLimiter, sessionsRouter);
+
 // ── Health check ─────────────────────────────────────────────────────────────
 app.get('/health', async (_req, res) => {
   try {
     const { rows } = await pool.query('SELECT NOW() AS db_time');
     // Run cleanup on every health ping — keeps it working even if server was sleeping
     runCleanup().catch(() => {});
+    // Send 30-min reminders for upcoming sessions
+    sendSessionReminders().catch(() => {});
     res.json({
       status: 'ok',
       db: 'connected',
@@ -67,6 +74,39 @@ app.use((err, _req, res, _next) => {
 });
 
 // ── Start ─────────────────────────────────────────────────────────────────────
+async function sendSessionReminders() {
+  try {
+    // Find sessions starting in 25–35 min, reminder not yet sent
+    const { rows: sessions } = await pool.query(`
+      SELECT s.id, s.topic, s.category, s.scheduled_at
+      FROM scheduled_sessions s
+      WHERE s.is_active = true
+        AND s.reminder_sent = false
+        AND s.scheduled_at BETWEEN NOW() + INTERVAL '25 minutes' AND NOW() + INTERVAL '35 minutes'
+    `);
+    console.log(`[reminders] Checked — ${sessions.length} session(s) in window`);
+    for (const session of sessions) {
+      const { rows: users } = await pool.query(`
+        SELECT u.email, u.display_name FROM session_interests si
+        JOIN users u ON u.id = si.user_id WHERE si.session_id = $1
+      `, [session.id]);
+      for (const u of users) {
+        if (u.email) {
+          await sendReminder({
+            to: u.email, name: u.display_name,
+            topic: session.topic, category: session.category,
+            scheduled_at: session.scheduled_at,
+          }).catch(() => {});
+        }
+      }
+      await pool.query('UPDATE scheduled_sessions SET reminder_sent=true WHERE id=$1', [session.id]);
+      console.log(`[reminders] Sent reminders for session: ${session.topic}`);
+    }
+  } catch (err) {
+    console.error('[reminders] Error:', err.message);
+  }
+}
+
 async function start() {
   try {
     await pool.query('SELECT 1'); // verify DB connectivity
@@ -74,6 +114,31 @@ async function start() {
 
     // Auto-migrate: safe to run on every boot
     await pool.query(`ALTER TABLE rooms ADD COLUMN IF NOT EXISTS emptied_at TIMESTAMP`);
+    await pool.query(`ALTER TABLE scheduled_sessions ADD COLUMN IF NOT EXISTS reminder_sent BOOLEAN DEFAULT false`);
+    await pool.query(`
+      CREATE TABLE IF NOT EXISTS scheduled_sessions (
+        id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+        topic VARCHAR(255) NOT NULL,
+        description TEXT,
+        category VARCHAR(50) DEFAULT 'GD',
+        subcategory VARCHAR(50),
+        scheduled_at TIMESTAMP NOT NULL,
+        created_by UUID REFERENCES users(id),
+        admin_username VARCHAR(100),
+        room_code VARCHAR(10),
+        is_active BOOLEAN DEFAULT true,
+        created_at TIMESTAMP DEFAULT NOW()
+      )
+    `);
+    await pool.query(`
+      CREATE TABLE IF NOT EXISTS session_interests (
+        id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+        session_id UUID REFERENCES scheduled_sessions(id) ON DELETE CASCADE,
+        user_id UUID REFERENCES users(id) ON DELETE CASCADE,
+        created_at TIMESTAMP DEFAULT NOW(),
+        UNIQUE(session_id, user_id)
+      )
+    `);
     console.log('✓ Schema up to date');
 
     const server = app.listen(PORT, () =>
