@@ -537,7 +537,7 @@ export default function LandingPage() {
           <div className="mb-6">
             <button
               onClick={() => setShowEarlyAccess(v => !v)}
-              className="group flex items-center w-full sm:w-auto gap-2.5 px-4 py-2.5 bg-brand-600 hover:bg-brand-700 text-white rounded-xl text-sm font-semibold transition-all cursor-pointer shadow-sm"
+              className="group flex items-center w-fit gap-2.5 px-4 py-2.5 bg-brand-600 hover:bg-brand-700 text-white rounded-xl text-sm font-semibold transition-all cursor-pointer shadow-sm"
             >
               <Sparkles className="w-4 h-4 text-brand-100" />
               <span>Early Access</span>
