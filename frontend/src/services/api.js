@@ -17,9 +17,9 @@ api.interceptors.response.use(
   (res) => res,
   (err) => {
     if (err.response?.status === 401) {
+      // Clear expired token silently — ProtectedRoute redirects protected pages,
+      // public pages should never force a redirect just for browsing
       localStorage.removeItem('token');
-      window.location.href = '/login';
-      return Promise.reject(new Error('Session expired. Please log in again.'));
     }
     const message =
       err.response?.data?.error ||
