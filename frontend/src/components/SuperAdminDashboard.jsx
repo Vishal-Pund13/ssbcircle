@@ -44,22 +44,31 @@ function RoomRow({ r, onClose, onFeature, CATEGORY_COLORS }) {
   const [draft,    setDraft]    = useState(r.summary || '');
   const [saving,   setSaving]   = useState(false);
   const [toggling, setToggling] = useState(false);
+  const [rowError, setRowError] = useState('');
 
   async function toggleFeature() {
     setToggling(true);
+    setRowError('');
     try {
       await onFeature(r.room_code, !r.is_featured, r.is_featured ? '' : draft);
-    } catch {}
-    setToggling(false);
+    } catch (err) {
+      setRowError(err.message || 'Failed — check backend');
+    } finally {
+      setToggling(false);
+    }
   }
 
   async function saveSummary() {
     setSaving(true);
+    setRowError('');
     try {
       await onFeature(r.room_code, true, draft);
       setEditing(false);
-    } catch {}
-    setSaving(false);
+    } catch (err) {
+      setRowError(err.message || 'Failed to save');
+    } finally {
+      setSaving(false);
+    }
   }
 
   return (
@@ -92,6 +101,7 @@ function RoomRow({ r, onClose, onFeature, CATEGORY_COLORS }) {
         </td>
         <td className="px-4 py-3 hidden sm:table-cell text-xs text-gray-400">{timeAgo(r.created_at)}</td>
         <td className="px-4 py-3 text-right">
+          {rowError && <p className="text-[10px] text-red-500 mb-1 text-right">{rowError}</p>}
           <div className="flex items-center gap-1 justify-end">
             {!r.is_active && (
               <>
@@ -206,10 +216,14 @@ export default function SuperAdminDashboard() {
   }
 
   async function handleFeature(code, is_featured, summary) {
-    await fetch(`${API}/api/admin/rooms/${code}/feature`, {
+    const res = await fetch(`${API}/api/admin/rooms/${code}/feature`, {
       method: 'PATCH', headers: authHeaders(),
       body: JSON.stringify({ is_featured, summary }),
     });
+    if (!res.ok) {
+      const body = await res.json().catch(() => ({}));
+      throw new Error(body.error || `HTTP ${res.status}`);
+    }
     setRooms(p => p.map(r => r.room_code === code ? { ...r, is_featured, summary } : r));
   }
 
