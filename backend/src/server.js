@@ -92,6 +92,17 @@ app.get('/api/featured', generalLimiter, async (_req, res) => {
   }
 });
 
+// ── External cron trigger — call this every 2 min from cron-job.org / UptimeRobot
+app.get('/api/cron', async (_req, res) => {
+  try {
+    await Promise.all([runCleanup(), sendSessionReminders()]);
+    res.json({ ok: true, ts: new Date().toISOString() });
+  } catch (err) {
+    console.error('[cron] Error:', err.message);
+    res.status(500).json({ ok: false, error: err.message });
+  }
+});
+
 // ── Health check ─────────────────────────────────────────────────────────────
 app.get('/health', async (_req, res) => {
   try {
@@ -141,22 +152,24 @@ async function sendSessionReminders() {
             to: u.email, name: u.display_name,
             topic: session.topic, category: session.category,
             scheduled_at: session.scheduled_at,
-          }).catch(() => {});
+          }).catch(err => console.error(`[reminders] Reminder failed for ${u.email}:`, err.message));
         }
       }
       await pool.query('UPDATE scheduled_sessions SET reminder_sent=true WHERE id=$1', [session.id]);
       console.log(`[reminders] Sent reminders for session: ${session.topic}`);
     }
 
-    // Host start reminder — sent at the scheduled time (±5 min window)
+    // Host start reminder — sent at scheduled time if room not yet active
     const { rows: starting } = await pool.query(`
       SELECT s.id, s.topic, s.category, s.scheduled_at, s.created_by,
              u.email, u.display_name
       FROM scheduled_sessions s
       JOIN users u ON u.id = s.created_by
       WHERE s.is_active = true
-        AND s.room_code IS NULL
         AND s.host_reminder_sent = false
+        AND NOT EXISTS (
+          SELECT 1 FROM rooms r WHERE r.room_code = s.room_code AND r.is_active = true
+        )
         AND s.scheduled_at BETWEEN NOW() - INTERVAL '5 minutes' AND NOW() + INTERVAL '5 minutes'
     `);
     for (const session of starting) {
@@ -165,7 +178,7 @@ async function sendSessionReminders() {
           to: session.email, name: session.display_name,
           topic: session.topic, category: session.category,
           scheduled_at: session.scheduled_at,
-        }).catch(() => {});
+        }).catch(err => console.error(`[reminders] Host reminder failed for ${session.topic}:`, err.message));
       }
       await pool.query('UPDATE scheduled_sessions SET host_reminder_sent=true WHERE id=$1', [session.id]);
       console.log(`[reminders] Sent host start reminder: ${session.topic}`);

@@ -212,6 +212,26 @@ router.patch('/rooms/:code/feature', adminGuard, async (req, res) => {
   }
 });
 
+// Test email delivery
+router.post('/test-email', adminGuard, async (req, res) => {
+  try {
+    const { Resend } = require('resend');
+    const resend = new Resend(process.env.RESEND_API_KEY);
+    const { to } = req.body;
+    if (!to) return res.status(400).json({ error: 'to email required' });
+    const result = await resend.emails.send({
+      from: 'SSBCircle <noreply@ssbcircle.com>',
+      to,
+      subject: 'SSBCircle — Email test',
+      html: '<p>Email delivery is working correctly from SSBCircle backend.</p>',
+    });
+    res.json({ ok: true, result });
+  } catch (err) {
+    console.error('[admin] Test email failed:', err.message);
+    res.status(500).json({ ok: false, error: err.message });
+  }
+});
+
 // Close any room
 router.delete('/rooms/:code', adminGuard, async (req, res) => {
   try {

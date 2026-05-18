@@ -18,56 +18,48 @@ async function runCleanup() {
     if (activeRooms.length === 0) return;
 
     for (const room of activeRooms) {
+      let participants;
       try {
-        const participants = await lkService.listParticipants(room.jitsi_room_name);
-        const isEmpty = participants.length === 0;
+        participants = await lkService.listParticipants(room.jitsi_room_name);
+      } catch (lkErr) {
+        // LiveKit unreachable or room not registered there yet — skip this cycle,
+        // do NOT mark as empty (avoids false auto-close on network blip)
+        console.warn(`[cleanup] LiveKit check failed for ${room.room_code}: ${lkErr.message} — skipping`);
+        continue;
+      }
 
-        if (!isEmpty) {
-          // Room has people — reset the empty timer
-          if (room.emptied_at) {
-            await pool.query(
-              'UPDATE rooms SET emptied_at = NULL WHERE room_code = $1',
-              [room.room_code]
-            );
-          }
-        } else if (!room.emptied_at) {
-          // Just became empty — record the time
-          await pool.query(
-            'UPDATE rooms SET emptied_at = NOW() WHERE room_code = $1',
-            [room.room_code]
-          );
-        } else if (Date.now() - new Date(room.emptied_at).getTime() >= EMPTY_TIMEOUT_MS) {
-          // Empty for 60+ minutes — close it
-          await pool.query(
-            'UPDATE rooms SET is_active = false WHERE room_code = $1',
-            [room.room_code]
-          );
-          // Mark linked scheduled session as completed so it disappears from upcoming tab
-          await pool.query(
-            'UPDATE scheduled_sessions SET room_code = NULL, is_active = false WHERE room_code = $1',
-            [room.room_code]
-          );
-          // Also delete from LiveKit (best-effort)
-          await lkService.deleteRoom(room.jitsi_room_name).catch(() => {});
-          console.log(`[cleanup] Closed empty room ${room.room_code} (empty for 60+ min)`);
+      const isEmpty = participants.length === 0;
+
+      if (!isEmpty) {
+        // Room has people — reset the empty timer
+        if (room.emptied_at) {
+          await pool.query('UPDATE rooms SET emptied_at = NULL WHERE room_code = $1', [room.room_code]);
         }
-      } catch {
-        // LiveKit throws if the room doesn't exist there — treat as empty
-        if (!room.emptied_at) {
+      } else if (!room.emptied_at) {
+        // Just became empty — record the time
+        await pool.query('UPDATE rooms SET emptied_at = NOW() WHERE room_code = $1', [room.room_code]);
+        console.log(`[cleanup] Room ${room.room_code} is now empty — starting 60-min timer`);
+      } else {
+        const emptyMs = Date.now() - new Date(room.emptied_at).getTime();
+        if (emptyMs >= EMPTY_TIMEOUT_MS) {
+          // Empty for 60+ minutes — close it
+          await pool.query('UPDATE rooms SET is_active = false WHERE room_code = $1', [room.room_code]);
           await pool.query(
-            'UPDATE rooms SET emptied_at = NOW() WHERE room_code = $1',
+            'UPDATE scheduled_sessions SET is_active = false WHERE room_code = $1',
             [room.room_code]
           );
+          await lkService.deleteRoom(room.jitsi_room_name).catch(() => {});
+          console.log(`[cleanup] Closed room ${room.room_code} — empty for ${Math.round(emptyMs / 60000)} min`);
         }
       }
     }
   } catch (err) {
-    console.error('[cleanup] Error during room cleanup:', err.message);
+    console.error('[cleanup] Error:', err.message);
   }
 }
 
 function startCleanup() {
-  console.log('✓ Room cleanup job started (checks every 2 min, closes after 30 min empty)');
+  console.log('✓ Room cleanup job started (checks every 2 min, closes after 60 min empty)');
   setInterval(runCleanup, INTERVAL_MS);
 }
 
