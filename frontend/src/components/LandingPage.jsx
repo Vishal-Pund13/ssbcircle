@@ -611,7 +611,7 @@ export default function LandingPage() {
       <main>
 
         {/* ── Hero ── */}
-        <section className="border-b border-gray-100 py-10 sm:py-20 px-4 sm:px-6">
+        <section className="border-b border-gray-100 py-6 sm:py-10 px-4 sm:px-6">
           <div className="max-w-5xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-10 items-center">
             <div>
               <div className="inline-flex items-center gap-2 bg-emerald-50 text-emerald-700 text-xs font-semibold px-3 py-1.5 rounded-full mb-6 border border-emerald-100">

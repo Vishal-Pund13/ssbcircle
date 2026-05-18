@@ -43,7 +43,7 @@ const MAP_STYLE = {
 
 export default function HeroMapAnimation() {
   return (
-    <div className="w-full max-w-[260px] sm:max-w-[340px] lg:max-w-[420px] select-none">
+    <div className="w-full max-w-[340px] sm:max-w-[420px] lg:max-w-[420px] select-none">
       <ComposableMap
         projection="geoMercator"
         projectionConfig={{ center: [82.5, 23], scale: 560 }}
