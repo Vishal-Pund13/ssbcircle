@@ -696,7 +696,7 @@ export default function LandingPage() {
       <main>
 
         {/* ── Special Event Banner ── */}
-        <SpecialEventBanner />
+        {/* <SpecialEventBanner /> */}
 
         {/* ── Hero ── */}
         <section className="border-b border-gray-100 py-6 sm:py-10 px-4 sm:px-6">
