@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
+import { useNavigate, Link, useSearchParams } from 'react-router-dom';
 import { getActiveRooms, closeRoom, getSessions, toggleInterest, cancelSession, startSession, getFeatured } from '../services/api';
 import { useAuth } from '../context/AuthContext';
 import { Mic, Timer, FileText, CheckSquare, Radio, ArrowRight, Trash2, Zap, Lightbulb, Users, Presentation, Target, Headphones, RefreshCw, X, Calendar, Heart, PlayCircle, Share2, Check, Sparkles, ChevronDown, Shield, Star, Lock } from 'lucide-react';
@@ -295,7 +295,7 @@ function UpcomingTab({ sessions, loading, user, onRefresh, navigate, onInterest,
                       <ShareButton
                         title={s.topic}
                         text={`Join "${s.topic}" (${s.category}) on SSBCircle — ${dt.toLocaleDateString('en-IN', { day:'numeric', month:'short' })} at ${dt.toLocaleTimeString('en-IN', { hour:'2-digit', minute:'2-digit' })}`}
-                        url={isLive ? `${window.location.origin}/room/${s.room_code}` : window.location.origin}
+                        url={isLive ? `${window.location.origin}/room/${s.room_code}` : `${window.location.origin}/?tab=upcoming`}
                       />
                     </div>
                   </div>
@@ -359,6 +359,7 @@ function UpcomingTab({ sessions, loading, user, onRefresh, navigate, onInterest,
 export default function LandingPage() {
   const navigate = useNavigate();
   const { user, logout } = useAuth();
+  const [searchParams] = useSearchParams();
   const [showTips,        setShowTips]        = useState(false);
   const [showEarlyAccess, setShowEarlyAccess] = useState(false);
   const [rooms,           setRooms]           = useState([]);
@@ -366,7 +367,7 @@ export default function LandingPage() {
   const [catFilter,       setCatFilter]       = useState('All');
   const [subFilter,       setSubFilter]       = useState('');
   const [visibleCount,    setVisibleCount]    = useState(PAGE_SIZE);
-  const [tab,             setTab]             = useState('live');
+  const [tab,             setTab]             = useState(() => searchParams.get('tab') === 'upcoming' ? 'upcoming' : 'live');
   const [sessions,        setSessions]        = useState([]);
   const [sessionsLoading, setSessionsLoading] = useState(false);
   const [aspirants,       setAspirants]       = useState([]);
