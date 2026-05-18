@@ -59,7 +59,7 @@ router.get('/rooms', adminGuard, async (_req, res) => {
   try {
     const { rows } = await pool.query(`
       SELECT r.id, r.topic, r.room_code, r.category, r.subcategory,
-             r.description, r.is_active, r.created_at,
+             r.description, r.is_active, r.is_featured, r.summary, r.created_at,
              u.display_name AS host, u.username AS host_username
       FROM rooms r
       LEFT JOIN users u ON r.created_by = u.id
@@ -191,6 +191,20 @@ router.delete('/sessions/:id', adminGuard, async (req, res) => {
   } catch (err) {
     console.error('Admin cancel session error:', err);
     res.status(500).json({ error: 'Failed to cancel session' });
+  }
+});
+
+// Feature a closed room (toggle) + set summary
+router.patch('/rooms/:code/feature', adminGuard, async (req, res) => {
+  try {
+    const { is_featured, summary } = req.body;
+    await pool.query(
+      'UPDATE rooms SET is_featured=$1, summary=$2 WHERE room_code=$3',
+      [!!is_featured, (summary || '').slice(0, 400), req.params.code.toUpperCase()]
+    );
+    res.json({ message: 'Updated' });
+  } catch (err) {
+    res.status(500).json({ error: 'Failed to update room' });
   }
 });
 

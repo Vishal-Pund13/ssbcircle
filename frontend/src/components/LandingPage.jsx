@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useNavigate, Link, useSearchParams } from 'react-router-dom';
-import { getActiveRooms, closeRoom, getSessions, toggleInterest, cancelSession, startSession, getFeatured } from '../services/api';
+import { getActiveRooms, closeRoom, getSessions, toggleInterest, cancelSession, startSession, getFeatured, getPastSessions } from '../services/api';
 import { useAuth } from '../context/AuthContext';
 import { Mic, Timer, FileText, CheckSquare, Radio, ArrowRight, Trash2, Zap, Lightbulb, Users, Presentation, Target, Headphones, RefreshCw, X, Calendar, Heart, PlayCircle, Share2, Check, Sparkles, ChevronDown, Shield, Star, Lock } from 'lucide-react';
 import HeroMapAnimation from './HeroMapAnimation';
@@ -371,6 +371,7 @@ export default function LandingPage() {
   const [sessions,        setSessions]        = useState([]);
   const [sessionsLoading, setSessionsLoading] = useState(false);
   const [aspirants,       setAspirants]       = useState([]);
+  const [pastSessions,    setPastSessions]    = useState([]);
 
   async function fetchRooms(showSkeleton = false) {
     if (showSkeleton) setLoading(true);
@@ -391,8 +392,9 @@ export default function LandingPage() {
     fetchRooms(true);
     fetchSessions(true);
 
-    // Featured aspirants — load once
+    // Featured aspirants + past sessions — load once
     getFeatured().then(d => setAspirants(d.aspirants || [])).catch(() => {});
+    getPastSessions().then(d => setPastSessions(d || [])).catch(() => {});
 
     // Background refresh — silent (no skeleton flash)
     const roomTimer    = setInterval(() => fetchRooms(false), 20_000);
@@ -698,6 +700,50 @@ export default function LandingPage() {
             </p>
           </div>
         </div>
+
+        {/* ── Recent Discussions ── */}
+        {pastSessions.length > 0 && (
+          <section className="border-t border-gray-100 bg-white py-10 sm:py-12 px-4 sm:px-6">
+            <div className="max-w-5xl mx-auto">
+              <div className="flex items-center justify-between mb-6">
+                <div>
+                  <h2 className="text-xl sm:text-2xl font-bold text-gray-900">Notable Sessions</h2>
+                  <p className="text-sm text-gray-400 mt-0.5">Past discussions led by veterans, recommended candidates & domain experts</p>
+                </div>
+              </div>
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4">
+                {pastSessions.map(s => {
+                  const colorClass = CATEGORY_COLORS[s.category] || 'bg-gray-100 text-gray-500 border-gray-200';
+                  const initials = s.host_name?.split(' ').map(w => w[0]).join('').toUpperCase().slice(0, 2) || '?';
+                  const dt = new Date(s.created_at);
+                  return (
+                    <div key={s.room_code} className="bg-white border border-gray-100 rounded-xl p-4 flex flex-col gap-3 hover:border-gray-200 hover:shadow-sm transition-all">
+                      <div className="flex items-center justify-between">
+                        <span className={`text-[10px] font-semibold px-2 py-0.5 rounded-full border ${colorClass}`}>
+                          {s.category}
+                        </span>
+                        <span className="text-[11px] text-gray-300">
+                          {dt.toLocaleDateString('en-IN', { day: 'numeric', month: 'short' })}
+                        </span>
+                      </div>
+                      <p className="text-sm font-semibold text-gray-800 leading-snug flex-1">{s.topic}</p>
+                      {s.summary && (
+                        <p className="text-xs text-gray-500 leading-relaxed border-t border-gray-50 pt-2">{s.summary}</p>
+                      )}
+                      <div className="flex items-center gap-2 mt-auto pt-1">
+                        {s.host_avatar
+                          ? <img src={s.host_avatar} alt={s.host_name} className="w-5 h-5 rounded-full object-cover" />
+                          : <div className="w-5 h-5 rounded-full bg-brand-600 flex items-center justify-center text-[8px] font-bold text-white shrink-0">{initials}</div>
+                        }
+                        <span className="text-[11px] text-gray-400">by {s.host_name || 'Aspirant'}</span>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+          </section>
+        )}
 
         {/* ── India map — mobile only, below live rooms ── */}
         <div className="lg:hidden border-t border-gray-100 py-6 flex flex-col items-center gap-3 bg-white">

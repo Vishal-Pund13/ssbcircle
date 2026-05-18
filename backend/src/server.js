@@ -72,6 +72,25 @@ app.post('/api/reports', generalLimiter, authMw, async (req, res) => {
   }
 });
 
+// Past sessions — public, shows recently closed rooms
+app.get('/api/rooms/past', generalLimiter, async (_req, res) => {
+  try {
+    const { rows } = await pool.query(`
+      SELECT r.room_code, r.topic, r.category, r.subcategory, r.summary, r.created_at,
+             u.display_name AS host_name, u.avatar_url AS host_avatar
+      FROM rooms r
+      LEFT JOIN users u ON r.created_by = u.id
+      WHERE r.is_active = false
+        AND r.is_featured = true
+      ORDER BY r.created_at DESC
+      LIMIT 12
+    `);
+    res.json({ sessions: rows });
+  } catch {
+    res.json({ sessions: [] });
+  }
+});
+
 // Featured aspirants — public, lightweight
 app.get('/api/featured', generalLimiter, async (_req, res) => {
   try {
@@ -183,6 +202,8 @@ async function start() {
     // Auto-migrate: safe to run on every boot
     await pool.query(`ALTER TABLE rooms ADD COLUMN IF NOT EXISTS emptied_at TIMESTAMP`);
     await pool.query(`ALTER TABLE rooms ADD COLUMN IF NOT EXISTS max_participants INT DEFAULT 8`);
+    await pool.query(`ALTER TABLE rooms ADD COLUMN IF NOT EXISTS summary TEXT`);
+    await pool.query(`ALTER TABLE rooms ADD COLUMN IF NOT EXISTS is_featured BOOLEAN DEFAULT false`);
     await pool.query(`ALTER TABLE users ADD COLUMN IF NOT EXISTS is_banned BOOLEAN DEFAULT false`);
     await pool.query(`ALTER TABLE scheduled_sessions ADD COLUMN IF NOT EXISTS reminder_sent BOOLEAN DEFAULT false`);
     await pool.query(`ALTER TABLE scheduled_sessions ADD COLUMN IF NOT EXISTS host_reminder_sent BOOLEAN DEFAULT false`);

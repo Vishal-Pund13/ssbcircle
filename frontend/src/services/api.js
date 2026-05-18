@@ -101,6 +101,11 @@ export const startSession = async (id) => {
   return data.room;
 };
 
+export const getPastSessions = async () => {
+  const { data } = await api.get('/api/rooms/past');
+  return data.sessions;
+};
+
 export const getFeatured = async () => {
   const { data } = await api.get('/api/featured');
   return data;
