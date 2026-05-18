@@ -40,21 +40,26 @@ function sessionStatus(s) {
 }
 
 function RoomRow({ r, onClose, onFeature, CATEGORY_COLORS }) {
-  const [editing, setEditing] = useState(false);
-  const [draft,   setDraft]   = useState(r.summary || '');
-  const [saving,  setSaving]  = useState(false);
+  const [editing,  setEditing]  = useState(false);
+  const [draft,    setDraft]    = useState(r.summary || '');
+  const [saving,   setSaving]   = useState(false);
+  const [toggling, setToggling] = useState(false);
 
-  async function save() {
-    setSaving(true);
-    await onFeature(r.room_code, true, draft);
-    setSaving(false);
-    setEditing(false);
+  async function toggleFeature() {
+    setToggling(true);
+    try {
+      await onFeature(r.room_code, !r.is_featured, r.is_featured ? '' : draft);
+    } catch {}
+    setToggling(false);
   }
 
-  async function unfeature() {
-    await onFeature(r.room_code, false, '');
-    setDraft('');
-    setEditing(false);
+  async function saveSummary() {
+    setSaving(true);
+    try {
+      await onFeature(r.room_code, true, draft);
+      setEditing(false);
+    } catch {}
+    setSaving(false);
   }
 
   return (
@@ -88,22 +93,25 @@ function RoomRow({ r, onClose, onFeature, CATEGORY_COLORS }) {
         <td className="px-4 py-3 hidden sm:table-cell text-xs text-gray-400">{timeAgo(r.created_at)}</td>
         <td className="px-4 py-3 text-right">
           <div className="flex items-center gap-1 justify-end">
-            {!r.is_active && !r.is_featured && (
-              <button onClick={() => setEditing(v => !v)} title="Feature on homepage"
-                className="p-1.5 rounded-lg text-gray-300 hover:text-amber-500 hover:bg-amber-50 transition-colors cursor-pointer">
-                <Star className="w-3.5 h-3.5"/>
-              </button>
-            )}
-            {!r.is_active && r.is_featured && (
+            {!r.is_active && (
               <>
-                <button onClick={() => setEditing(v => !v)} title="Edit summary"
-                  className="p-1.5 rounded-lg text-amber-400 hover:text-brand-600 hover:bg-brand-50 transition-colors cursor-pointer">
-                  <Edit3 className="w-3.5 h-3.5"/>
+                {/* Star: instantly features/unfeatures */}
+                <button onClick={toggleFeature} disabled={toggling}
+                  title={r.is_featured ? 'Remove from homepage' : 'Feature on homepage'}
+                  className={`p-1.5 rounded-lg transition-colors cursor-pointer disabled:opacity-40 ${
+                    r.is_featured
+                      ? 'text-amber-400 hover:text-amber-600 hover:bg-amber-50'
+                      : 'text-gray-300 hover:text-amber-500 hover:bg-amber-50'
+                  }`}>
+                  <Star className={`w-3.5 h-3.5 ${r.is_featured ? 'fill-amber-400' : ''}`}/>
                 </button>
-                <button onClick={unfeature} title="Remove from homepage"
-                  className="p-1.5 rounded-lg text-gray-300 hover:text-red-500 hover:bg-red-50 transition-colors cursor-pointer">
-                  <Trash2 className="w-3.5 h-3.5"/>
-                </button>
+                {/* Edit summary — only shown for featured rooms */}
+                {r.is_featured && (
+                  <button onClick={() => setEditing(v => !v)} title="Edit session summary"
+                    className="p-1.5 rounded-lg text-gray-300 hover:text-brand-600 hover:bg-brand-50 transition-colors cursor-pointer">
+                    <Edit3 className="w-3.5 h-3.5"/>
+                  </button>
+                )}
               </>
             )}
             {r.is_active && (
@@ -115,11 +123,11 @@ function RoomRow({ r, onClose, onFeature, CATEGORY_COLORS }) {
           </div>
         </td>
       </tr>
-      {editing && (
+      {editing && r.is_featured && (
         <tr className="bg-amber-50/40">
           <td colSpan={6} className="px-4 py-3">
             <p className="text-[11px] text-amber-700 font-semibold mb-1.5">
-              ★ Feature this session on the homepage — add a summary of what was discussed
+              Session summary — shown on the homepage under Notable Sessions
             </p>
             <div className="flex gap-2">
               <textarea
@@ -127,11 +135,11 @@ function RoomRow({ r, onClose, onFeature, CATEGORY_COLORS }) {
                 onChange={e => setDraft(e.target.value)}
                 maxLength={400}
                 rows={2}
-                placeholder="e.g. 'Discussed AI's role in modern warfare. Group debated drone policy and dual-use technology with a recommended candidate from 2024 NDA batch.'"
+                placeholder="e.g. 'Discussed AI's role in modern warfare with a 2024 NDA recommended candidate. Group debated drone policy and dual-use technology.'"
                 className="flex-1 text-xs text-gray-700 border border-amber-200 rounded-lg px-3 py-2 resize-none focus:outline-none focus:border-amber-400"
               />
               <div className="flex flex-col gap-1.5">
-                <button onClick={save} disabled={saving || !draft.trim()}
+                <button onClick={saveSummary} disabled={saving}
                   className="p-2 rounded-lg bg-amber-500 hover:bg-amber-600 text-white transition-colors cursor-pointer disabled:opacity-50">
                   <Check className="w-3.5 h-3.5"/>
                 </button>
@@ -141,7 +149,7 @@ function RoomRow({ r, onClose, onFeature, CATEGORY_COLORS }) {
                 </button>
               </div>
             </div>
-            <p className="text-[10px] text-gray-400 mt-1">{draft.length}/400 chars</p>
+            <p className="text-[10px] text-gray-400 mt-1">{draft.length}/400 chars · summary is optional</p>
           </td>
         </tr>
       )}
