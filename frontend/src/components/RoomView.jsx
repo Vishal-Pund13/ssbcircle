@@ -453,17 +453,39 @@ function VoiceRoomUI({ room, isAdmin, roomCode, showTimer, setShowTimer, showPan
   }
 
   // Participant mini-tile for the screen-share sidebar strip
-  function MiniTile({ p }) {
-    const name     = p.name || p.identity;
-    const initials = name.split(' ').map(w => w[0]).join('').toUpperCase().slice(0, 2);
+  function MiniTile({ p, overlay = false }) {
+    const name       = p.name || p.identity;
+    const initials   = name.split(' ').map(w => w[0]).join('').toUpperCase().slice(0, 2);
+    const handRaised = raisedHands.has(p.identity);
+    if (overlay) {
+      // Compact version for the mobile video overlay
+      return (
+        <div className={`shrink-0 relative flex flex-col items-center gap-0.5 px-1.5 py-1 rounded-lg bg-black/50 backdrop-blur-sm border ${
+          p.isSpeaking ? 'border-brand-400' : 'border-white/10'
+        }`}>
+          {handRaised && (
+            <span className="absolute -top-2 -right-1 text-[10px]">✋</span>
+          )}
+          <div className={`w-7 h-7 rounded-full bg-brand-600 flex items-center justify-center text-[10px] font-bold text-white ${
+            p.isSpeaking ? 'ring-2 ring-brand-400' : ''
+          }`}>{initials}</div>
+          <span className="text-[8px] text-white/80 truncate max-w-[40px] text-center leading-tight">{p.isLocal ? 'You' : name.split(' ')[0]}</span>
+          {!p.isMicrophoneEnabled && <MicOff className="w-2.5 h-2.5 text-red-400" />}
+        </div>
+      );
+    }
     return (
-      <div className={`shrink-0 flex flex-col items-center gap-1 p-2 rounded-lg border transition-all ${
+      <div className={`shrink-0 flex flex-col items-center gap-1 p-2 rounded-lg border transition-all relative ${
         p.isSpeaking ? 'border-brand-600 bg-brand-50' : 'border-gray-200 bg-white'
       }`}>
+        {handRaised && (
+          <span className="absolute -top-2 -right-1 text-sm">✋</span>
+        )}
         <div className={`w-9 h-9 rounded-full bg-brand-600 flex items-center justify-center text-[11px] font-bold text-white ${
           p.isSpeaking ? 'ring-2 ring-brand-600/30' : ''
         }`}>{initials}</div>
         <span className="text-[9px] text-gray-500 truncate w-full text-center">{p.isLocal ? 'You' : name}</span>
+        {!p.isMicrophoneEnabled && <MicOff className="w-2.5 h-2.5 text-red-400" />}
       </div>
     );
   }
@@ -505,18 +527,26 @@ function VoiceRoomUI({ room, isAdmin, roomCode, showTimer, setShowTimer, showPan
           )}
 
           {activeScreen ? (
-            /* ── Screen share active — video top/left, participants strip bottom/right ── */
+            /* ── Screen share active ── */
             <div className="flex-1 flex flex-col sm:flex-row overflow-hidden">
-              {/* Screen video — full width on mobile, flex-1 on desktop */}
+              {/* Video — takes full flex-1 on both mobile and desktop */}
               <div className="flex-1 bg-gray-900 relative overflow-hidden flex items-center justify-center min-h-0">
                 <VideoTrack trackRef={activeScreen} className="max-w-full max-h-full object-contain" />
+
+                {/* Sharing label */}
                 <div className="absolute top-3 left-3 flex items-center gap-1.5 bg-black/60 text-white text-xs px-2.5 py-1.5 rounded-full backdrop-blur-sm">
                   <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
                   {activeScreen.participant.isLocal ? 'You are' : `${activeScreen.participant.name || activeScreen.participant.identity} is`} sharing screen
                 </div>
+
+                {/* Mobile: participant overlay at bottom of video */}
+                <div className="absolute bottom-2 left-2 right-2 sm:hidden flex gap-1.5 overflow-x-auto pb-0.5 scrollbar-hide">
+                  {participants.map(p => <MiniTile key={p.identity} p={p} overlay />)}
+                </div>
               </div>
-              {/* Participant strip — horizontal bottom on mobile, vertical right on desktop */}
-              <div className="flex sm:flex-col gap-2 p-2 bg-white border-t sm:border-t-0 sm:border-l border-gray-200 overflow-x-auto sm:overflow-y-auto sm:overflow-x-hidden shrink-0 sm:w-44">
+
+              {/* Desktop: vertical sidebar — hidden on mobile */}
+              <div className="hidden sm:flex sm:flex-col gap-2 p-2 bg-white border-l border-gray-200 overflow-y-auto overflow-x-hidden shrink-0 w-44">
                 {participants.map(p => <MiniTile key={p.identity} p={p} />)}
               </div>
             </div>
