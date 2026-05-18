@@ -79,6 +79,26 @@ router.post('/', authMiddleware, createRoomLimiter, async (req, res) => {
   }
 });
 
+// Past featured sessions — public
+router.get('/past', async (_req, res) => {
+  try {
+    const { rows } = await pool.query(`
+      SELECT r.room_code, r.topic, r.category, r.subcategory, r.summary, r.created_at,
+             u.display_name AS host_name, u.avatar_url AS host_avatar
+      FROM rooms r
+      LEFT JOIN users u ON r.created_by = u.id
+      WHERE r.is_active = false
+        AND r.is_featured = true
+      ORDER BY r.created_at DESC
+      LIMIT 12
+    `);
+    res.json({ sessions: rows });
+  } catch (err) {
+    console.error('Past sessions error:', err);
+    res.json({ sessions: [] });
+  }
+});
+
 // Active rooms — public
 router.get('/active', async (_req, res) => {
   try {
