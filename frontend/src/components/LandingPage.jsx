@@ -279,7 +279,7 @@ function UpcomingTab({ sessions, loading, user, onRefresh, navigate, onInterest,
           {sessions.map(s => {
             const dt = new Date(s.scheduled_at);
             const isHost = user?.id === s.created_by;
-            const isLive = !!s.room_code;
+            const isLive = !!s.is_room_active;
             const canStart = !isLive && isHost && (Date.now() >= dt.getTime() - 10 * 60000);
             return (
               <div key={s.id} className={`bg-white border rounded-xl overflow-hidden hover:shadow-md transition-all flex flex-col ${isLive ? 'border-emerald-300 hover:border-emerald-400' : 'border-gray-200 hover:border-brand-600/30'}`}>
@@ -494,6 +494,91 @@ function FaqSection() {
   );
 }
 
+// ── Swap AUTHOR_PHOTO with actual URL when available ─────────────────────
+const AUTHOR_PHOTO = null; // e.g. '/deepak-surana.jpg'
+
+const DEEPAK_BOOKS = [
+  { title: 'The Shershah of Kargil',       cover: 'https://m.media-amazon.com/images/S/compressed.photo.goodreads.com/books/1697890147i/69104661.jpg',    link: 'https://www.goodreads.com/book/show/69104661-shershah-of-kargil' },
+  { title: 'The Kargil Story',             cover: 'https://m.media-amazon.com/images/S/compressed.photo.goodreads.com/books/1676206099i/111336817.jpg',    link: 'https://www.goodreads.com/book/show/111336817-the-kargil-story' },
+  { title: 'Para Commando',                cover: 'https://www.srishtipublishers.com/wp-content/uploads/2025/11/PARA-COMMANDO_FLAP_RGB_300-600x923.jpg',   link: 'https://www.srishtipublishers.com/product/para-commando/' },
+  { title: 'The Liberators of Bangladesh', cover: 'https://rukminim2.flixcart.com/image/480/640/xif0q/book/h/3/i/the-liberators-of-bangladesh-original-imah2tms35yyt5bn.jpeg?q=20', link: 'https://www.flipkart.com/the-liberators-of-bangladesh/p/itm4c0424e14a733' },
+];
+
+function SpecialEventBanner() {
+  return (
+    <div className="border-b border-gray-100 bg-white px-4 sm:px-6 py-5 sm:py-6">
+      <div className="max-w-5xl mx-auto">
+
+        <div className="rounded-2xl border border-brand-100 bg-brand-50 px-5 sm:px-7 py-5 sm:py-6 flex flex-col sm:flex-row items-start sm:items-center gap-5 sm:gap-8">
+
+          {/* Author avatar */}
+          <div className="shrink-0 flex flex-row sm:flex-col items-center gap-3 sm:gap-2 w-full sm:w-auto">
+            {AUTHOR_PHOTO ? (
+              <img src={AUTHOR_PHOTO} alt="Deepak Surana"
+                className="w-14 h-14 sm:w-16 sm:h-16 rounded-full object-cover ring-2 ring-brand-200" />
+            ) : (
+              <div className="w-14 h-14 sm:w-16 sm:h-16 rounded-full bg-brand-600 flex items-center justify-center shrink-0 ring-2 ring-brand-200">
+                <span className="text-lg font-bold text-white">DS</span>
+              </div>
+            )}
+            <div className="sm:hidden">
+              <p className="text-sm font-bold text-gray-900">Deepak Surana</p>
+              <p className="text-xs text-gray-500 italic">The Shershah of Kargil</p>
+            </div>
+          </div>
+
+          {/* Info */}
+          <div className="flex-1 min-w-0">
+            <div className="inline-flex items-center gap-1.5 bg-brand-100 text-brand-600 text-[10px] font-bold px-2.5 py-0.5 rounded-full mb-2 tracking-widest uppercase">
+              <span className="w-1.5 h-1.5 rounded-full bg-brand-600 animate-pulse shrink-0" />
+              Special Event
+            </div>
+            <h2 className="text-gray-900 text-base sm:text-lg font-bold leading-snug mb-0.5">
+              In Conversation with <span className="text-brand-600">Deepak Surana</span>
+            </h2>
+            <p className="text-gray-500 text-xs sm:text-sm mb-3">
+              Author · <span className="italic">The Shershah of Kargil</span> · Credited in <span className="font-semibold text-gray-700">Shershaah</span>
+            </p>
+
+            {/* Book covers */}
+            <div className="flex items-end gap-2.5 overflow-x-auto pb-0.5 scrollbar-hide mb-3">
+              {DEEPAK_BOOKS.map(book => (
+                <a key={book.title} href={book.link} target="_blank" rel="noopener noreferrer"
+                  className="shrink-0 group" title={book.title}>
+                  <img
+                    src={book.cover}
+                    alt={book.title}
+                    className="h-14 sm:h-16 w-auto rounded-md shadow-sm border border-gray-100 group-hover:scale-105 group-hover:shadow-md transition-all duration-200 object-cover cursor-pointer"
+                  />
+                </a>
+              ))}
+            </div>
+
+            <div className="flex items-center gap-3 flex-wrap">
+              <span className="flex items-center gap-1.5 text-[11px] text-gray-500 font-medium">
+                <Calendar className="w-3 h-3" /> Coming Soon
+              </span>
+              <span className="w-1 h-1 rounded-full bg-gray-300" />
+              <span className="flex items-center gap-1.5 text-[11px] text-gray-500 font-medium">
+                <Users className="w-3 h-3" /> 75 seats · Free
+              </span>
+            </div>
+          </div>
+
+          {/* CTA */}
+          <div className="shrink-0 flex flex-col items-center gap-1.5 w-full sm:w-auto">
+            <button className="btn-primary text-sm px-5 py-2.5 w-full sm:w-auto text-center whitespace-nowrap">
+              Get Notified
+            </button>
+            <p className="text-gray-400 text-[10px]">Be first when slots open</p>
+          </div>
+
+        </div>
+      </div>
+    </div>
+  );
+}
+
 export default function LandingPage() {
   const navigate = useNavigate();
   const { user, logout } = useAuth();
@@ -609,6 +694,9 @@ export default function LandingPage() {
       </header>
 
       <main>
+
+        {/* ── Special Event Banner ── */}
+        <SpecialEventBanner />
 
         {/* ── Hero ── */}
         <section className="border-b border-gray-100 py-6 sm:py-10 px-4 sm:px-6">

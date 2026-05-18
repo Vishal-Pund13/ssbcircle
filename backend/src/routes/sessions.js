@@ -19,7 +19,11 @@ router.get('/', async (req, res) => {
         s.scheduled_at, s.admin_username, s.room_code, s.created_by, s.created_at,
         u.display_name AS host_display_name,
         COUNT(DISTINCT si.user_id)::int AS interest_count,
-        COALESCE(BOOL_OR(si.user_id = $1), false) AS is_interested
+        COALESCE(BOOL_OR(si.user_id = $1), false) AS is_interested,
+        EXISTS(
+          SELECT 1 FROM rooms r
+          WHERE r.room_code = s.room_code AND r.is_active = true
+        ) AS is_room_active
       FROM scheduled_sessions s
       LEFT JOIN users u ON s.created_by = u.id
       LEFT JOIN session_interests si ON s.id = si.session_id
