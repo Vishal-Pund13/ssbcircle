@@ -1,13 +1,13 @@
 import { ComposableMap, Geographies, Geography, Marker, Line } from 'react-simple-maps';
 
-const GEO_URL = 'https://cdn.jsdelivr.net/npm/world-atlas@2/countries-110m.json';
+const GEO_URL = 'https://gist.githubusercontent.com/jbrobst/56c13bbbf9d97d187fea01ca62ea5112/raw/e388c4cae20aa53cb5090210a42ebb9b765c0a36/india_states.geojson';
 
 // Logo placed over Madhya Pradesh
 const CENTER = [78.5, 23.5];
 
 const CITIES = [
   // North
-  { name: 'Srinagar',      coords: [74.8, 34.1] },
+  { name: 'Srinagar',      coords: [74.8, 34.1],  label: 'Srinagar',  dx: 5,   dy: -5  },
   { name: 'Chandigarh',    coords: [76.8, 30.7] },
   { name: 'Delhi',         coords: [77.2, 28.6],  label: 'Delhi',     dx: 5,   dy: -5  },
   { name: 'Jaipur',        coords: [75.8, 26.9] },
@@ -30,6 +30,9 @@ const CITIES = [
   { name: 'Bangalore',     coords: [77.6, 13.0],  label: 'Bangalore', dx: -5,  dy: -5, anchor: 'end' },
   { name: 'Chennai',       coords: [80.3, 13.1],  label: 'Chennai',   dx: 5,   dy: -5  },
   { name: 'Kochi',         coords: [76.3, 10.0],  label: 'Kochi',     dx: -5,  dy: -5, anchor: 'end' },
+  // Islands
+  { name: 'Port Blair',    coords: [92.7, 11.7],  label: 'Port Blair', dx: 5,  dy: -4  },
+  { name: 'Kavaratti',     coords: [72.6, 10.6],  label: 'Kavaratti',  dx: -5, dy: -4, anchor: 'end' },
 ];
 
 const MAP_STYLE = {
@@ -40,10 +43,10 @@ const MAP_STYLE = {
 
 export default function HeroMapAnimation() {
   return (
-    <div className="w-full max-w-[200px] sm:max-w-[280px] select-none">
+    <div className="w-full max-w-[260px] sm:max-w-[340px] lg:max-w-[420px] select-none">
       <ComposableMap
         projection="geoMercator"
-        projectionConfig={{ center: [82, 22], scale: 900 }}
+        projectionConfig={{ center: [82.5, 23], scale: 560 }}
         width={340}
         height={420}
         style={{ width: '100%', height: 'auto' }}
@@ -68,18 +71,16 @@ export default function HeroMapAnimation() {
         {/* India fill */}
         <Geographies geography={GEO_URL}>
           {({ geographies }) =>
-            geographies
-              .filter(geo => geo.id === '356')
-              .map(geo => (
-                <Geography
-                  key={geo.rsmKey}
-                  geography={geo}
-                  fill="#dbeafe"
-                  stroke="#93c5fd"
-                  strokeWidth={0.6}
-                  style={MAP_STYLE}
-                />
-              ))
+            geographies.map(geo => (
+              <Geography
+                key={geo.rsmKey}
+                geography={geo}
+                fill="#dbeafe"
+                stroke="#dbeafe"
+                strokeWidth={1}
+                style={MAP_STYLE}
+              />
+            ))
           }
         </Geographies>
 
@@ -118,10 +119,10 @@ export default function HeroMapAnimation() {
               <text
                 x={city.dx}
                 y={city.dy}
-                fontSize={10}
+                fontSize={8}
                 fontFamily="Inter, sans-serif"
-                fontWeight="700"
-                fill="#1e3a5f"
+                fontWeight="500"
+                fill="#3b6ea0"
                 textAnchor={city.anchor || 'start'}
                 style={{ pointerEvents: 'none' }}
               >
