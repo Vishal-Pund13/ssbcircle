@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useNavigate, Link, useSearchParams } from 'react-router-dom';
 import { getActiveRooms, closeRoom, getSessions, toggleInterest, cancelSession, startSession, getFeatured, getPastSessions } from '../services/api';
 import { useAuth } from '../context/AuthContext';
@@ -360,6 +360,7 @@ export default function LandingPage() {
   const navigate = useNavigate();
   const { user, logout } = useAuth();
   const [searchParams] = useSearchParams();
+  const tabsSectionRef = useRef(null);
   const [showTips,        setShowTips]        = useState(false);
   const [showEarlyAccess, setShowEarlyAccess] = useState(false);
   const [rooms,           setRooms]           = useState([]);
@@ -395,6 +396,13 @@ export default function LandingPage() {
     // Featured aspirants + past sessions — load once
     getFeatured().then(d => setAspirants(d.aspirants || [])).catch(() => {});
     getPastSessions().then(d => setPastSessions(d || [])).catch(() => {});
+
+    // Scroll to tabs section if URL has ?tab= param
+    if (searchParams.get('tab')) {
+      setTimeout(() => {
+        tabsSectionRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }, 300);
+    }
 
     // Background refresh — silent (no skeleton flash)
     const roomTimer    = setInterval(() => fetchRooms(false), 20_000);
@@ -518,7 +526,7 @@ export default function LandingPage() {
         </section>
 
         {/* ── Live / Upcoming tabs ── */}
-        <section className="max-w-5xl mx-auto px-4 sm:px-6 py-8 sm:py-12">
+        <section ref={tabsSectionRef} className="max-w-5xl mx-auto px-4 sm:px-6 py-8 sm:py-12">
 
           {/* Tab switcher */}
           <div className="flex items-center gap-1 bg-gray-100 p-1 rounded-xl w-full sm:w-fit mb-6">
