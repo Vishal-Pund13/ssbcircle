@@ -164,7 +164,11 @@ router.get('/sessions', adminGuard, async (_req, res) => {
       SELECT s.id, s.topic, s.category, s.subcategory, s.scheduled_at,
              s.is_active, s.room_code, s.reminder_sent, s.created_at,
              u.display_name AS host_display_name, u.email AS host_email,
-             COUNT(DISTINCT si.user_id)::int AS interest_count
+             COUNT(DISTINCT si.user_id)::int AS interest_count,
+             EXISTS(
+               SELECT 1 FROM rooms r
+               WHERE r.room_code = s.room_code AND r.is_active = true
+             ) AS is_room_active
       FROM scheduled_sessions s
       LEFT JOIN users u ON s.created_by = u.id
       LEFT JOIN session_interests si ON s.id = si.session_id

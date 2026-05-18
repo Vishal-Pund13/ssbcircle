@@ -33,8 +33,8 @@ const CATEGORY_COLORS = {
 };
 
 function sessionStatus(s) {
-  if (!s.is_active)  return { label: 'Cancelled', cls: 'bg-red-50 text-red-500' };
-  if (s.room_code)   return { label: 'Live',       cls: 'bg-emerald-50 text-emerald-700' };
+  if (!s.is_active)      return { label: 'Cancelled', cls: 'bg-red-50 text-red-500' };
+  if (s.is_room_active)  return { label: 'Live',       cls: 'bg-emerald-50 text-emerald-700' };
   if (new Date(s.scheduled_at) < new Date()) return { label: 'Expired', cls: 'bg-gray-100 text-gray-400' };
   return { label: 'Upcoming', cls: 'bg-blue-50 text-blue-700' };
 }
@@ -485,7 +485,7 @@ export default function SuperAdminDashboard() {
                     ))
                   ) : sessions.map(s => {
                     const { label, cls } = sessionStatus(s);
-                    const canCancel = s.is_active && !s.room_code;
+                    const canCancel = s.is_active;
                     return (
                       <tr key={s.id} className="hover:bg-gray-50 transition-colors">
                         <td className="px-4 py-3">
