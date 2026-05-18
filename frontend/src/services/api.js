@@ -52,7 +52,7 @@ export const createRoom = async (title, description, category, subcategory, max_
 
 export const getRoom = async (code) => {
   const { data } = await api.get(`/api/rooms/${code}`);
-  return data.room;
+  return data; // { room } | { pending_session }
 };
 
 export const getActiveRooms = async () => {

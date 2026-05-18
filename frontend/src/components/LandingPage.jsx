@@ -58,7 +58,12 @@ function Avatar({ name, avatarUrl }) {
 
 async function share({ title, text, url }) {
   if (navigator.share) {
-    try { await navigator.share({ title, text, url }); return true; } catch {}
+    try {
+      await navigator.share({ title, text, url });
+      return true;
+    } catch (err) {
+      if (err?.name === 'AbortError') return false; // user dismissed — don't copy
+    }
   }
   try { await navigator.clipboard.writeText(url); return 'copied'; } catch {}
   return false;
@@ -68,12 +73,16 @@ function ShareButton({ title, text, url }) {
   const [done, setDone] = useState(false);
   async function handleShare() {
     const result = await share({ title, text, url });
-    if (result) { setDone(true); setTimeout(() => setDone(false), 2000); }
+    if (result === true || result === 'copied') {
+      setDone(result);
+      setTimeout(() => setDone(false), 2000);
+    }
   }
+  const label = done === 'copied' ? 'Link copied!' : done ? 'Shared!' : 'Share';
   return (
     <button onClick={handleShare}
       className="p-1.5 rounded-lg text-gray-300 hover:text-brand-600 hover:bg-brand-50 transition-colors cursor-pointer"
-      title={done ? 'Link copied!' : 'Share'}>
+      title={label}>
       {done ? <Check className="w-3.5 h-3.5 text-emerald-500" /> : <Share2 className="w-3.5 h-3.5" />}
     </button>
   );
@@ -294,8 +303,8 @@ function UpcomingTab({ sessions, loading, user, onRefresh, navigate, onInterest,
                       )}
                       <ShareButton
                         title={s.topic}
-                        text={`Join "${s.topic}" (${s.category}) on SSBCircle — ${dt.toLocaleDateString('en-IN', { day:'numeric', month:'short' })} at ${dt.toLocaleTimeString('en-IN', { hour:'2-digit', minute:'2-digit' })}`}
-                        url={isLive ? `${window.location.origin}/room/${s.room_code}` : `${window.location.origin}/?tab=upcoming`}
+                        text={`Join "${s.topic}" (${s.category}) on SSBCircle — ${dt.toLocaleDateString('en-IN', { day:'numeric', month:'short' })} at ${dt.toLocaleTimeString('en-IN', { hour:'2-digit', minute:'2-digit' })}. Room code: ${s.room_code}`}
+                        url={`${window.location.origin}/room/${s.room_code}`}
                       />
                     </div>
                   </div>
@@ -353,6 +362,135 @@ function UpcomingTab({ sessions, loading, user, onRefresh, navigate, onInterest,
         </div>
       )}
     </div>
+  );
+}
+
+const FAQ_ITEMS = [
+  {
+    q: 'What is SSBCircle and what can I practice on it?',
+    a: 'SSBCircle is a free platform for SSB interview preparation. Practice GD, PPDT, Lecturette, IO mock interviews, share SSB experiences, and improve English communication — in live voice rooms with real defence aspirants. No download, no subscription.',
+  },
+  {
+    q: 'How does SSBCircle help improve English speaking and communication skills?',
+    a: 'Speaking on structured topics in front of real peers — with a timer and live transcript — builds fluency and reduces hesitation fast.',
+    steps: [
+      'Join any live room',
+      'Speak on a timed topic',
+      'Live transcript records your words',
+      'Review after the session',
+      'Track improvement over time',
+    ],
+  },
+  {
+    q: 'How to practice SSB Group Discussion (GD) on SSBCircle?',
+    a: 'Matches the real SSB GD format — 8 participants, timed discussion, live transcript.',
+    steps: [
+      'Create GD room & set topic',
+      'Share 6-letter code with peers',
+      'Start GD timer',
+      'Discuss — live transcript on',
+      'Review transcript after',
+    ],
+  },
+  {
+    q: 'How to practice PPDT (Picture Perception & Discussion Test) on SSBCircle?',
+    a: 'Simulates the full Day 1 PPDT flow — picture viewing, story writing, narration, and group discussion.',
+    steps: [
+      'Host creates PPDT room',
+      'Share screen — show picture to group',
+      'View picture — 30 sec timer',
+      'Everyone writes story — 4 min',
+      'Narrate stories — 1 min each',
+      'Group discussion begins',
+    ],
+  },
+  {
+    q: 'How to practice Lecturette on SSBCircle?',
+    a: 'Replicates the SSB Lecturette format — 4 topics, 1-min prep, 3-min talk to the group.',
+    steps: [
+      'Host creates Lecturette room',
+      'Host announces 4 topics',
+      'Each person picks a topic',
+      '1 min preparation time',
+      'Speak 3 min — timer running',
+      'Peer feedback & discussion',
+    ],
+  },
+  {
+    q: 'How to practice SSB IO mock interview on SSBCircle?',
+    a: 'Simulates the SSB personal interview — one person plays the IO, others observe and give feedback.',
+    steps: [
+      'Create IO Practice room',
+      'One person plays interviewer (IO)',
+      'Q&A — background, hobbies, current affairs',
+      'Swap roles with next person',
+      'Group debrief & feedback',
+    ],
+  },
+  {
+    q: 'Can I share my SSB experience with other aspirants?',
+    a: 'Yes. Create a room, share your firsthand SSB centre experience, and help others understand what to expect. Peer knowledge beats any coaching material.',
+    steps: [
+      'Create a room (any category)',
+      'Share your SSB centre experience',
+      'Others ask questions',
+      'Discuss tips & lessons learned',
+    ],
+  },
+  {
+    q: 'Is SSBCircle free?',
+    a: 'Yes — 100% free for all SSB aspirants. NDA, CDS, AFCAT, TA, TES, UES — all entry schemes. Sign in with Google and start instantly. No subscription, no paywall, no hidden charges.',
+  },
+];
+
+function StepFlow({ steps }) {
+  return (
+    <div className="flex flex-wrap gap-1.5 mt-3">
+      {steps.map((step, i) => (
+        <div key={i} className="flex items-center gap-1.5">
+          <div className="flex items-center gap-1.5 bg-brand-50 border border-brand-100 rounded-lg px-2.5 py-1.5">
+            <span className="w-4 h-4 rounded-full bg-brand-600 text-white text-[9px] font-bold flex items-center justify-center shrink-0">{i + 1}</span>
+            <span className="text-xs text-gray-700 font-medium">{step}</span>
+          </div>
+          {i < steps.length - 1 && (
+            <ArrowRight className="w-3 h-3 text-gray-300 shrink-0" />
+          )}
+        </div>
+      ))}
+    </div>
+  );
+}
+
+function FaqSection() {
+  const [open, setOpen] = useState(null);
+  return (
+    <section className="border-t border-gray-100 bg-gray-50 py-10 sm:py-14 px-4 sm:px-6">
+      <div className="max-w-5xl mx-auto">
+        <div className="mb-8">
+          <h2 className="text-xl sm:text-2xl font-bold text-gray-900">SSB Interview — Frequently Asked Questions</h2>
+          <p className="text-sm text-gray-400 mt-1">How to use SSBCircle for every part of SSB interview prep.</p>
+        </div>
+        <div className="divide-y divide-gray-100 rounded-2xl border border-gray-100 bg-white overflow-hidden">
+          {FAQ_ITEMS.map((item, i) => (
+            <div key={i}>
+              <button
+                onClick={() => setOpen(p => p === i ? null : i)}
+                className="w-full flex items-center justify-between gap-4 px-5 py-4 text-left hover:bg-gray-50 transition-colors cursor-pointer"
+              >
+                <span className="text-sm font-semibold text-gray-800">{item.q}</span>
+                <ChevronDown className={`w-4 h-4 text-gray-400 shrink-0 transition-transform duration-200 ${open === i ? 'rotate-180' : ''}`} />
+              </button>
+              {open === i && (
+                <div className="px-5 pb-5">
+                  {item.a && <p className="text-sm text-gray-500 leading-relaxed">{item.a}</p>}
+                  {item.steps && <StepFlow steps={item.steps} />}
+                </div>
+              )}
+            </div>
+          ))}
+        </div>
+      </div>
+    </section>
   );
 }
 
@@ -487,11 +625,11 @@ export default function LandingPage() {
               </div>
 
               <h1 className="text-[2rem] sm:text-5xl lg:text-6xl font-bold text-gray-900 leading-[1.1] tracking-tight mb-4 sm:mb-5">
-                Practice GD with<br />
+                Practice SSB GD with<br />
                 <span className="text-brand-600">real aspirants.</span>
               </h1>
               <p className="text-gray-500 text-sm sm:text-lg leading-relaxed mb-6 sm:mb-8">
-                Connecting defence aspirants from across India. Practice GD, PPDT, Lecturette and mock interviews — free, together.
+                India's free platform for SSB interview preparation. Practice Group Discussion (GD), PPDT, Lecturette and IO online with real defence aspirants — anywhere, anytime.
               </p>
 
               <div className="flex flex-col sm:flex-row gap-3 mb-8">
@@ -762,7 +900,7 @@ export default function LandingPage() {
         {/* ── How it works ── */}
         <section className="border-t border-gray-100 bg-white py-10 sm:py-14 px-4 sm:px-6">
           <div className="max-w-5xl mx-auto">
-            <h2 className="text-lg font-bold text-gray-900 mb-8">How it works</h2>
+            <h2 className="text-lg font-bold text-gray-900 mb-8">How SSBCircle Works for SSB Prep</h2>
             <div className="relative">
               <div className="hidden sm:block absolute top-[15px] left-[3rem] right-[3rem]"
                 style={{ height: '1px', background: 'repeating-linear-gradient(to right,#bfdbfe 0,#bfdbfe 6px,transparent 6px,transparent 14px)' }} />
@@ -856,6 +994,9 @@ export default function LandingPage() {
         </section>
 
       </main>
+
+      {/* ── SSB FAQ Section ── */}
+      <FaqSection />
 
       <footer className="border-t border-gray-100 py-5 px-4 sm:px-6">
         <div className="max-w-5xl mx-auto flex items-center justify-between">

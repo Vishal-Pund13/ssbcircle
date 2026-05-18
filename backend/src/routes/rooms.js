@@ -191,9 +191,22 @@ router.get('/:code', authMiddleware, async (req, res) => {
     const { code } = req.params;
     if (!/^[A-Z0-9]{6}$/i.test(code))
       return res.status(400).json({ error: 'Invalid room code format' });
+
     const room = await getRoomByCode(code);
-    if (!room) return res.status(404).json({ error: 'Room not found or no longer active' });
-    res.json({ room });
+    if (room) return res.json({ room });
+
+    // No active room — check if a scheduled session owns this code
+    const { rows } = await pool.query(
+      `SELECT s.id, s.topic, s.category, s.subcategory, s.scheduled_at, s.room_code,
+              u.display_name AS host_display_name
+       FROM scheduled_sessions s
+       LEFT JOIN users u ON s.created_by = u.id
+       WHERE s.room_code = $1 AND s.is_active = true`,
+      [code.toUpperCase()]
+    );
+    if (rows.length) return res.json({ pending_session: rows[0] });
+
+    return res.status(404).json({ error: 'Room not found or no longer active' });
   } catch (err) {
     console.error('Get room error:', err);
     res.status(500).json({ error: 'Failed to fetch room' });

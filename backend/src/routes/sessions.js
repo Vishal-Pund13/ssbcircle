@@ -2,7 +2,7 @@ const express = require('express');
 const router  = express.Router();
 const pool    = require('../db');
 const auth    = require('../middleware/auth');
-const { createRoom } = require('../models/Room');
+const { createRoomWithCode, generateUniqueRoomCode } = require('../models/Room');
 const { sendInterestConfirmation, sendRoomLive } = require('../email');
 
 // List upcoming sessions (auth optional — needed for is_interested)
@@ -59,12 +59,13 @@ router.post('/', auth, async (req, res) => {
       });
     }
 
+    const roomCode = await generateUniqueRoomCode();
     const { rows } = await pool.query(`
       INSERT INTO scheduled_sessions
-        (topic, description, category, subcategory, scheduled_at, created_by, admin_username)
-      VALUES ($1,$2,$3,$4,$5,$6,$7) RETURNING *
+        (topic, description, category, subcategory, scheduled_at, created_by, admin_username, room_code)
+      VALUES ($1,$2,$3,$4,$5,$6,$7,$8) RETURNING *
     `, [topic.trim(), description?.trim() || null, category || 'GD', subcategory || null,
-        scheduledDate, req.userId, req.displayName]);
+        scheduledDate, req.userId, req.displayName, roomCode]);
     res.json({ session: rows[0] });
   } catch (err) {
     console.error(err);
@@ -130,12 +131,10 @@ router.post('/:id/start', auth, async (req, res) => {
     );
     if (!rows.length) return res.status(404).json({ error: 'Session not found' });
     const session = rows[0];
-    const room = await createRoom(
-      session.topic, session.description, session.category,
-      session.subcategory, req.userId, req.displayName
+    const room = await createRoomWithCode(
+      session.room_code, session.topic, session.description,
+      session.category, session.subcategory, req.userId, req.displayName
     );
-    await pool.query('UPDATE scheduled_sessions SET room_code=$1 WHERE id=$2',
-      [room.room_code, session.id]);
     res.json({ room });
     // Notify all interested users (best-effort)
     pool.query(`

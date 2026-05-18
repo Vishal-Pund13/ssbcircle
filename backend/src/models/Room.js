@@ -31,15 +31,24 @@ function generateRoomCode() {
   return code;
 }
 
-async function createRoom(title, description, category, subcategory, userId, displayName, maxParticipants = 8) {
-  let roomCode;
+async function generateUniqueRoomCode() {
   for (let attempts = 0; attempts < 10; attempts++) {
-    const candidate = generateRoomCode();
-    const { rows } = await pool.query('SELECT id FROM rooms WHERE room_code = $1', [candidate]);
-    if (rows.length === 0) { roomCode = candidate; break; }
+    const code = generateRoomCode();
+    const { rows } = await pool.query(
+      'SELECT id FROM rooms WHERE room_code=$1 UNION SELECT id FROM scheduled_sessions WHERE room_code=$1',
+      [code]
+    );
+    if (rows.length === 0) return code;
   }
-  if (!roomCode) throw new Error('Could not generate unique room code');
+  throw new Error('Could not generate unique room code');
+}
 
+async function createRoom(title, description, category, subcategory, userId, displayName, maxParticipants = 8) {
+  const roomCode = await generateUniqueRoomCode();
+  return createRoomWithCode(roomCode, title, description, category, subcategory, userId, displayName, maxParticipants);
+}
+
+async function createRoomWithCode(roomCode, title, description, category, subcategory, userId, displayName, maxParticipants = 8) {
   const jitsiRoomName = `SSBCircle_${roomCode}`;
   const max = Math.min(8, Math.max(4, parseInt(maxParticipants) || 8));
   const { rows } = await pool.query(
@@ -120,4 +129,4 @@ async function closeRoom(code) {
   return rows[0] || null;
 }
 
-module.exports = { createRoom, getRoomByCode, getActiveRooms, closeRoom };
+module.exports = { createRoom, createRoomWithCode, generateUniqueRoomCode, getRoomByCode, getActiveRooms, closeRoom };

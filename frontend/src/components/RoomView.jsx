@@ -693,32 +693,68 @@ export default function RoomView() {
   const navigate  = useNavigate();
   const { user }  = useAuth();
 
-  const [room,          setRoom]          = useState(null);
-  const [token,         setToken]         = useState('');
-  const [livekitUrl,    setLivekitUrl]    = useState('');
-  const [fetchStatus,   setFetchStatus]   = useState('loading');
-  const [error,         setError]         = useState('');
-  const [showTimer,     setShowTimer]     = useState(false);
-  const [showPanel,     setShowPanel]     = useState(false);
-  const [isTranscribing, setIsTranscribing] = useState(false);
+  const [room,            setRoom]            = useState(null);
+  const [pendingSession,  setPendingSession]  = useState(null);
+  const [token,           setToken]           = useState('');
+  const [livekitUrl,      setLivekitUrl]      = useState('');
+  const [fetchStatus,     setFetchStatus]     = useState('loading');
+  const [error,           setError]           = useState('');
+  const [showTimer,       setShowTimer]       = useState(false);
+  const [showPanel,       setShowPanel]       = useState(false);
+  const [isTranscribing,  setIsTranscribing]  = useState(false);
 
   const isAdmin = room && user && room.created_by === user.id;
 
-  // Show transcription status in browser tab title when minimized
+  // Dynamic page title + OG meta for bots that execute JS (Googlebot, Telegram)
   useEffect(() => {
-    document.title = isTranscribing ? '● Transcribing | SSBCircle' : 'SSBCircle';
-    return () => { document.title = 'SSBCircle'; };
-  }, [isTranscribing]);
+    if (!room) return;
+    const prev = document.title;
+    document.title = isTranscribing
+      ? `● Transcribing | SSBCircle`
+      : `${room.topic} — ${room.category} Room | SSBCircle`;
+
+    function setMeta(attr, key, content) {
+      let el = document.querySelector(`meta[${attr}="${key}"]`);
+      if (!el) { el = document.createElement('meta'); el.setAttribute(attr, key); document.head.appendChild(el); }
+      el.setAttribute('content', content);
+    }
+    const url  = window.location.href;
+    const desc = `Join "${room.topic}" (${room.category}) on SSBCircle — live voice room, GD timer, transcript. Room code: ${room.room_code}`;
+    setMeta('property', 'og:title',       `${room.topic} — SSBCircle ${room.category} Room`);
+    setMeta('property', 'og:description', desc);
+    setMeta('property', 'og:url',         url);
+    setMeta('name',     'description',    desc);
+
+    return () => {
+      document.title = prev;
+      setMeta('property', 'og:title',       'SSBCircle – Free SSB Interview GD Practice Online | Service Selection Board Prep');
+      setMeta('property', 'og:description', 'Practice SSB interview Group Discussions online with real defence aspirants. Free voice rooms, GD timer, live transcripts.');
+      setMeta('property', 'og:url',         'https://www.ssbcircle.com/');
+      setMeta('name',     'description',    'Practice SSB interview Group Discussions online with real defence aspirants. Free voice rooms, GD timer, live transcripts.');
+    };
+  }, [room, isTranscribing]);
 
   useEffect(() => {
     let cancelled = false;
-    Promise.all([getRoom(code), getRoomToken(code)])
-      .then(([roomData, tokenData]) => {
-        if (!cancelled) {
-          setRoom(roomData);
-          setToken(tokenData.token);
-          setLivekitUrl(tokenData.url);
-          setFetchStatus('done');
+    getRoom(code)
+      .then(async (data) => {
+        if (cancelled) return;
+        if (data.pending_session) {
+          setPendingSession(data.pending_session);
+          setFetchStatus('pending');
+          return;
+        }
+        // Active room — now fetch token
+        try {
+          const tokenData = await getRoomToken(code);
+          if (!cancelled) {
+            setRoom(data.room);
+            setToken(tokenData.token);
+            setLivekitUrl(tokenData.url);
+            setFetchStatus('done');
+          }
+        } catch (err) {
+          if (!cancelled) { setError(err.message); setFetchStatus('error'); }
         }
       })
       .catch(err => { if (!cancelled) { setError(err.message); setFetchStatus('error'); } });
@@ -726,6 +762,41 @@ export default function RoomView() {
   }, [code]);
 
   function handleLeave() { navigate('/'); }
+
+  if (fetchStatus === 'pending' && pendingSession) {
+    const dt = new Date(pendingSession.scheduled_at);
+    const diff = dt - Date.now();
+    const h = Math.floor(diff / 3600000);
+    const m = Math.floor((diff % 3600000) / 60000);
+    const timeStr = diff <= 0 ? 'Starting very soon' : h > 0 ? `in ${h}h ${m}m` : `in ${m}m`;
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center px-4">
+        <div className="bg-white border border-gray-200 rounded-xl shadow-sm p-8 w-full max-w-sm text-center">
+          <div className="w-12 h-12 bg-brand-50 rounded-full flex items-center justify-center mx-auto mb-4">
+            <Timer className="w-6 h-6 text-brand-600"/>
+          </div>
+          <span className="text-xs font-semibold px-2.5 py-0.5 rounded-full bg-blue-50 text-blue-700 border border-blue-100">
+            {pendingSession.category}
+          </span>
+          <h2 className="text-lg font-semibold text-gray-900 mt-3 mb-1">{pendingSession.topic}</h2>
+          <p className="text-sm text-gray-400 mb-1">
+            {dt.toLocaleDateString('en-IN', { weekday: 'short', day: 'numeric', month: 'short' })}
+            {' · '}
+            {dt.toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' })}
+          </p>
+          <p className="text-sm font-semibold text-brand-600 mb-2">{timeStr}</p>
+          {pendingSession.host_display_name && (
+            <p className="text-xs text-gray-400 mb-6">Hosted by {pendingSession.host_display_name}</p>
+          )}
+          <p className="text-xs text-gray-400 mb-6">The host hasn't started the room yet. Come back at the scheduled time.</p>
+          <div className="flex gap-3 justify-center">
+            <Link to="/" className="btn-secondary text-sm px-4 py-2">Home</Link>
+            <button onClick={() => window.location.reload()} className="btn-primary text-sm px-4 py-2">Refresh</button>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   if (fetchStatus === 'error') {
     return (
