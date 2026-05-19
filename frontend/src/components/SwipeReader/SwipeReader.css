@@ -44,10 +44,9 @@
 .swipe-reader {
   height: 100dvh;
 }
-@media (min-width: 640px) {
-  .swipe-reader {
-    height: min(88vh, 720px);
-  }
+/* Desktop card height — fills the content area (viewport - topbar 48px - py padding 48px) */
+.desktop-reader {
+  height: min(calc(100vh - 96px), 760px);
 }
 
 /* Smooth scene transitions */
