@@ -587,7 +587,7 @@ function StepFlow({ steps }) {
       {steps.map((step, i) => (
         <div key={i} className="flex items-center gap-1.5">
           <div className="flex items-center gap-1.5 bg-brand-50 border border-brand-100 rounded-lg px-2.5 py-1.5">
-            <span className="w-4 h-4 rounded-full bg-brand-600 text-white text-[9px] font-bold flex items-center justify-center shrink-0">{i + 1}</span>
+            <span className="w-4 h-4 rounded-full bg-brand-600 text-white text-[10px] font-bold flex items-center justify-center shrink-0">{i + 1}</span>
             <span className="text-xs text-gray-700 font-medium">{step}</span>
           </div>
           {i < steps.length - 1 && (
@@ -927,7 +927,7 @@ export default function LandingPage() {
         {/* <SpecialEventBanner /> */}
 
         {/* ── Hero ── */}
-        <section className="border-b border-gray-100 py-6 sm:py-10 px-4 sm:px-6">
+        <section className="border-b border-gray-100 py-10 sm:py-16 lg:py-20 px-4 sm:px-6">
           <div className="max-w-5xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-10 items-center">
             <div>
               <div className="inline-flex items-center gap-2 bg-emerald-50 text-emerald-700 text-xs font-semibold px-3 py-1.5 rounded-full mb-6 border border-emerald-100">
@@ -1010,7 +1010,7 @@ export default function LandingPage() {
         </section>
 
         {/* ── Live / Upcoming tabs ── */}
-        <section ref={tabsSectionRef} className="max-w-5xl mx-auto px-4 sm:px-6 py-8 sm:py-12">
+        <section ref={tabsSectionRef} className="max-w-5xl mx-auto px-4 sm:px-6 py-10 sm:py-14">
 
           {/* Tab switcher */}
           <div className="flex items-center gap-1 bg-gray-100 p-1 rounded-xl w-full sm:w-fit mb-6">
@@ -1207,7 +1207,7 @@ export default function LandingPage() {
 
         {/* ── Recent Discussions ── */}
         {pastSessions.length > 0 && (
-          <section className="border-t border-gray-100 bg-white py-10 sm:py-12 px-4 sm:px-6">
+          <section className="border-t border-gray-100 bg-white py-10 sm:py-14 px-4 sm:px-6">
             <div className="max-w-5xl mx-auto">
               <div className="flex items-center justify-between mb-6">
                 <div>
@@ -1287,7 +1287,7 @@ export default function LandingPage() {
         {/* ── How it works ── */}
         <section className="border-t border-gray-100 bg-white py-10 sm:py-14 px-4 sm:px-6">
           <div className="max-w-5xl mx-auto">
-            <h2 className="text-lg font-bold text-gray-900 mb-8">How SSBCircle Works for SSB Prep</h2>
+            <h2 className="text-xl sm:text-2xl font-bold text-gray-900 mb-8">How SSBCircle Works for SSB Prep</h2>
             <div className="relative">
               <div className="hidden sm:block absolute top-[15px] left-[3rem] right-[3rem]"
                 style={{ height: '1px', background: 'repeating-linear-gradient(to right,#bfdbfe 0,#bfdbfe 6px,transparent 6px,transparent 14px)' }} />
@@ -1299,7 +1299,7 @@ export default function LandingPage() {
                 ].map(({ n, title, desc }) => (
                   <div key={n} className="flex sm:flex-col gap-4 sm:gap-0">
                     <div className="shrink-0 z-10 w-8 h-8 rounded-full bg-brand-600 border-4 border-white ring-2 ring-blue-100 flex items-center justify-center shadow-sm">
-                      <span className="text-[9px] font-bold text-white">{n}</span>
+                      <span className="text-[10px] font-bold text-white">{n}</span>
                     </div>
                     <div className="sm:mt-5">
                       <h3 className="text-sm font-bold text-gray-900 mb-1">{title}</h3>
@@ -1385,7 +1385,7 @@ export default function LandingPage() {
       {/* ── SSB FAQ Section ── */}
       <FaqSection />
 
-      <footer className="border-t border-gray-100 py-5 px-4 sm:px-6">
+      <footer className="border-t border-gray-100 py-8 px-4 sm:px-6">
         <div className="max-w-5xl mx-auto flex items-center justify-between">
           <Logo />
           <p className="text-xs text-gray-300">© {new Date().getFullYear()} SSBCircle</p>
