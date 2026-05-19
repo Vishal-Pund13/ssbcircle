@@ -873,6 +873,12 @@ export default function LandingPage() {
                   <span className="font-semibold text-gray-700">100+</span> aspirants joined · <span className="font-semibold text-gray-700">Free</span>
                 </p>
               </div>
+
+              {/* India map — below aspirants, visible on all screen sizes */}
+              <div className="mt-6">
+                <HeroMapAnimation />
+                <p className="text-xs text-gray-400 font-medium mt-2">Connecting aspirants to learn and practice communication skills</p>
+              </div>
             </div>
 
             <div className="hidden lg:flex flex-col justify-center items-center">
@@ -1139,12 +1145,6 @@ export default function LandingPage() {
             <Link to="/current-affairs" className="text-xs font-bold text-brand-600 shrink-0 sm:hidden">Explore →</Link>
           </div>
         </section>
-
-        {/* ── India map — mobile only, below live rooms ── */}
-        <div className="lg:hidden border-t border-gray-100 py-6 flex flex-col items-center gap-3 bg-white">
-          <p className="text-xs text-gray-400 font-medium text-center px-4">Connecting aspirants to learn and practice communication skills</p>
-          <HeroMapAnimation />
-        </div>
 
         {/* ── How it works ── */}
         <section className="border-t border-gray-100 bg-white py-10 sm:py-14 px-4 sm:px-6">
