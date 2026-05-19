@@ -758,16 +758,27 @@ export default function LandingPage() {
         {/* ── News Cards banner ── */}
         <section className="border-y border-gray-100 bg-gray-50 px-4 sm:px-6 py-4">
           <div className="max-w-5xl mx-auto flex items-center gap-4">
-            {/* Stacked cards icon */}
-            <div className="relative shrink-0 w-10 h-8">
-              <div className="absolute inset-0 bg-brand-100 border border-brand-200 rounded-lg" style={{ transform: 'rotate(-8deg)' }} />
-              <div className="absolute inset-0 bg-brand-50 border border-brand-200 rounded-lg" style={{ transform: 'rotate(-3deg)' }} />
-              <div className="absolute inset-0 bg-white border border-brand-200 rounded-lg flex flex-col justify-center px-1.5 gap-0.5">
-                <div className="h-1 bg-brand-200 rounded-full" />
-                <div className="h-1 bg-brand-100 rounded-full w-4/5" />
-                <div className="h-1 bg-brand-100 rounded-full w-3/5" />
-              </div>
-            </div>
+            {/* SSBCircle branded News Cards icon */}
+            <svg viewBox="0 0 72 56" fill="none" className="shrink-0 w-14 h-11">
+              {/* Back card */}
+              <rect x="2" y="10" width="46" height="34" rx="5" fill="#e0e7ff" transform="rotate(-9 25 27)" />
+              {/* Middle card */}
+              <rect x="7" y="8" width="46" height="34" rx="5" fill="#eef2ff" transform="rotate(-4 30 25)" />
+              {/* Front card */}
+              <rect x="14" y="8" width="46" height="34" rx="5" fill="white" stroke="#c7d2fe" strokeWidth="1.2" />
+              {/* Mini SSBCircle logo */}
+              <circle cx="28" cy="20" r="7.5" stroke="#1e3a5f" strokeWidth="1.3" />
+              <circle cx="24.8" cy="18.8" r="1.3" fill="#1e3a5f" />
+              <circle cx="28" cy="15.8" r="1.3" fill="#1e3a5f" />
+              <circle cx="31.2" cy="18.8" r="1.3" fill="#1e3a5f" />
+              <circle cx="30.1" cy="23" r="1.3" fill="#1e3a5f" />
+              <circle cx="25.9" cy="23" r="1.3" fill="#1e3a5f" />
+              {/* "NEWS" label */}
+              <text x="39" y="22" fontSize="5.5" fontWeight="800" fill="#1e3a5f" fontFamily="system-ui,sans-serif" letterSpacing="0.5">NEWS</text>
+              {/* Content lines */}
+              <line x1="18" y1="33" x2="56" y2="33" stroke="#e0e7ff" strokeWidth="1.8" strokeLinecap="round" />
+              <line x1="18" y1="38" x2="50" y2="38" stroke="#e0e7ff" strokeWidth="1.8" strokeLinecap="round" />
+            </svg>
             <div className="flex-1 min-w-0">
               <p className="text-xs font-bold text-brand-600 uppercase tracking-widest mb-0.5">New · News Cards</p>
               <p className="text-sm text-gray-600 leading-snug">No GD topic? Read a card on Defence, Economy, Polity or more — then come back and speak.</p>

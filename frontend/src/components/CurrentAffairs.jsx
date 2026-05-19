@@ -59,19 +59,32 @@ function ArticleCard({ article, onClick }) {
     <div onClick={onClick}
       className="bg-white border border-gray-200 rounded-xl overflow-hidden hover:border-brand-600/30 hover:shadow-md transition-all duration-200 flex flex-col cursor-pointer group">
       <div className="h-0.5 bg-brand-600" />
-      <div className="p-4 flex flex-col gap-3 flex-1">
+      <div className="p-4 flex flex-col gap-2.5 flex-1">
+        {/* Badge + date */}
         <div className="flex items-center justify-between gap-2">
           <PillarBadge id={article.category} />
           <span className="text-[11px] text-gray-400 shrink-0">{fmtDate(article.published_at)}</span>
         </div>
+        {/* Title + summary */}
         <div className="flex-1">
           <h3 className="text-sm font-semibold text-gray-800 leading-snug mb-1.5 group-hover:text-brand-600 transition-colors">
             {article.title}
           </h3>
-          <p className="text-xs text-gray-400 leading-relaxed line-clamp-3">{article.summary}</p>
+          <p className="text-xs text-gray-400 leading-relaxed line-clamp-2">{article.summary}</p>
         </div>
-        <div className="flex items-center justify-between gap-2 pt-1 border-t border-gray-50">
-          <div className="flex items-center gap-2.5">
+        {/* SSB tags — above footer */}
+        {article.ssb_relevance?.length > 0 && (
+          <div className="flex flex-wrap gap-1">
+            {article.ssb_relevance.map(r => (
+              <span key={r} className="text-[9px] font-semibold text-brand-600 bg-brand-50 px-2 py-0.5 rounded-full border border-brand-100">
+                {r}
+              </span>
+            ))}
+          </div>
+        )}
+        {/* Footer */}
+        <div className="flex items-center justify-between gap-2 pt-2 border-t border-gray-100">
+          <div className="flex items-center gap-2">
             {article.reading_time && (
               <span className="flex items-center gap-1 text-[10px] text-gray-400">
                 <Clock className="w-3 h-3" /> {article.reading_time}
@@ -83,32 +96,23 @@ function ArticleCard({ article, onClick }) {
               </span>
             )}
           </div>
-          <div className="flex items-center gap-1.5">
+          <div className="flex items-center gap-2 shrink-0">
             {hasSwipe && (
               <button
                 onClick={e => { e.stopPropagation(); navigate(`/read/${swipeKey}`); }}
-                className="flex items-center gap-1.5 text-xs font-bold text-white bg-brand-600 hover:bg-brand-700 px-3 py-1.5 rounded-full transition-all animate-bounce-slow shadow-sm shadow-brand-600/30">
-                <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                className="flex items-center gap-1 text-[11px] font-bold text-white bg-brand-600 hover:bg-brand-700 px-2.5 py-1 rounded-full transition-all animate-bounce-slow">
+                <svg className="w-3 h-3 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                   <rect x="2" y="7" width="20" height="14" rx="2" />
                   <path strokeLinecap="round" strokeLinejoin="round" d="M16 3H8a2 2 0 00-2 2v2h12V5a2 2 0 00-2-2z" />
                 </svg>
-                Read Cards
+                Cards
               </button>
             )}
-            <span className="flex items-center gap-0.5 text-[11px] font-semibold text-brand-600">
+            <span className="flex items-center gap-0.5 text-[11px] font-semibold text-brand-600 shrink-0">
               Read <ChevronRight className="w-3 h-3" />
             </span>
           </div>
         </div>
-        {article.ssb_relevance?.length > 0 && (
-          <div className="flex flex-wrap gap-1">
-            {article.ssb_relevance.map(r => (
-              <span key={r} className="text-[9px] font-semibold text-brand-600 bg-brand-50 px-2 py-0.5 rounded-full border border-brand-100">
-                {r}
-              </span>
-            ))}
-          </div>
-        )}
       </div>
     </div>
   );

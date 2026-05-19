@@ -26,7 +26,7 @@ export default function ReadPage() {
   return (
     /* Mobile: true full-screen (no header, no padding, edge-to-edge)
        Desktop: centered card on gray background */
-    <div className="bg-white sm:bg-gray-100 flex items-center justify-center h-screen" style={{ height: '100dvh' }}>
+    <div className="bg-white sm:bg-gray-100 flex items-center justify-center h-screen overflow-hidden" style={{ height: '100dvh' }}>
       <SwipeReader article={article} onClose={() => navigate('/current-affairs')} />
     </div>
   );
