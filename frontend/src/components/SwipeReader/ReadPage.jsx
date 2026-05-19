@@ -1,9 +1,11 @@
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import SwipeReader from './SwipeReader';
-import rupeeData from '../../data/articles/rupee-depreciation.json';
+import rupeeData   from '../../data/articles/rupee-depreciation.json';
+import elNinoData  from '../../data/articles/super-el-nino.json';
 
 const ARTICLES = {
   'rupee-depreciation': rupeeData,
+  'super-el-nino':      elNinoData,
 };
 
 export default function ReadPage() {

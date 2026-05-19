@@ -1,5 +1,11 @@
+import { lazy, Suspense } from 'react';
+const IndiaImpactMap = lazy(() => import('./IndiaImpactMap'));
+
+const GEO_VISUALS = { india_el_nino: IndiaImpactMap };
+
 export default function ContextScene({ scene }) {
-  const { title, body, key_numbers, timeline } = scene;
+  const { title, body, key_numbers, timeline, geo_visual } = scene;
+  const GeoComponent = geo_visual ? GEO_VISUALS[geo_visual] : null;
 
   const dotColor = {
     positive: 'bg-brand-600',
@@ -24,6 +30,13 @@ export default function ContextScene({ scene }) {
             </div>
           ))}
         </div>
+      )}
+
+      {/* Geographic impact map */}
+      {GeoComponent && (
+        <Suspense fallback={<div className="h-48 bg-gray-50 rounded-xl animate-pulse" />}>
+          <GeoComponent title="State-level impact" />
+        </Suspense>
       )}
 
       {/* Timeline */}

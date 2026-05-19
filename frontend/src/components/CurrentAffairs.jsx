@@ -48,7 +48,10 @@ function PillarBadge({ id }) {
 }
 
 // Swipe reader slug map — matches data/articles filenames
-const SWIPE_ARTICLES = { 'rupee-depreciation': true };
+const SWIPE_ARTICLES = {
+  'rupee-depreciation': true,
+  'super-el-nino':      true,
+};
 
 // Article card — same pattern as RoomCard in LandingPage
 function ArticleCard({ article, onClick }) {

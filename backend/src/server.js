@@ -397,6 +397,27 @@ REER|Rupee's value adjusted for inflation — the real exchange rate
       ]);
       console.log('✓ Seeded first article: The Rupee Story');
     }
+
+    // Seed Super El Niño article if not already present
+    const { rows: elNinoExists } = await pool.query("SELECT id FROM articles WHERE slug = 'super-el-nino' LIMIT 1");
+    if (!elNinoExists.length) {
+      await pool.query(`
+        INSERT INTO articles (title, category, summary, content, tags, is_published, published_at, reading_time, difficulty, ssb_relevance, slug)
+        VALUES ($1, $2, $3, $4, $5, true, NOW(), $6, $7, $8, $9)
+      `, [
+        'Super El Niño: When the Pacific Runs a Fever, India Pays the Price',
+        'geographic',
+        'A Super El Niño is forming in the Pacific — potentially the strongest since the 1870s. Here\'s what it means for India\'s monsoon, food prices, and 600 million farmers.',
+        'A Super El Niño is forming in 2026. NOAA says it could be the largest since the 1870s. India\'s monsoon, food security, and 600 million livelihoods are directly in its path.',
+        ['el-nino', 'monsoon', 'climate', 'food-security', 'ENSO', 'pacific', 'IMD', 'geography'],
+        '5 min',
+        'Beginner',
+        ['GD Topics', 'Lecturette', 'PI'],
+        'super-el-nino',
+      ]);
+      console.log('✓ Seeded article: Super El Niño');
+    }
+
     await pool.query(`
       CREATE TABLE IF NOT EXISTS scheduled_sessions (
         id UUID PRIMARY KEY DEFAULT gen_random_uuid(),

@@ -1,0 +1,160 @@
+{
+  "id": "super-el-nino",
+  "title": "Super El Niño",
+  "category": "geographic",
+  "ssb_tags": ["GD", "Lecturette", "PI"],
+  "reading_time": 5,
+  "last_updated": "May 2026",
+  "difficulty": "Beginner",
+  "scenes": [
+    {
+      "type": "hook",
+      "headline": "The Pacific Ocean is running a fever — and India will feel it.",
+      "subtext": "A Super El Niño is forming in 2026. NOAA says it could be the largest since the 1870s.",
+      "stat": {
+        "value": "+2°C",
+        "label": "Pacific sea surface temperature above normal — the Super El Niño threshold",
+        "trend": "up"
+      }
+    },
+    {
+      "type": "concept",
+      "title": "What is El Niño — and why is 'Super' a different beast?",
+      "body": "Normally, strong trade winds push warm Pacific water westward toward Asia. During El Niño, those winds weaken — warm water sloshes back eastward toward South America. This single shift rewrites weather patterns across the entire planet. A Super El Niño is when sea surface temperatures rise more than 2°C above normal — at least four times the intensity of a standard El Niño. Only three have occurred in recorded history: 1982–83, 1997–98, and 2015–16.",
+      "analogy": "Think of the Pacific Ocean as a giant bathtub. Normally, someone tilts it so warm water stays at one end. El Niño is when that tilt suddenly reverses. Super El Niño is when the tilt reverses AND someone turns on the hot tap at full blast.",
+      "visual": {
+        "type": "slider",
+        "data": {
+          "min": 0,
+          "max": 3,
+          "default": 0.5,
+          "unit": "°C",
+          "label": "Pacific SST anomaly (°C above normal)",
+          "zones": [
+            { "range": [0, 0.5], "label": "Normal — trade winds steady, monsoon unaffected", "sentiment": "positive" },
+            { "range": [0.5, 1.5], "label": "El Niño — weak monsoon risk, global disruption begins", "sentiment": "caution" },
+            { "range": [1.5, 2.0], "label": "Strong El Niño — drought, food price spike, heatwaves", "sentiment": "negative" },
+            { "range": [2.0, 3.0], "label": "Super El Niño — planetary-scale crisis, 2026 territory", "sentiment": "negative" }
+          ]
+        }
+      }
+    },
+    {
+      "type": "breakdown",
+      "title": "How does it actually work?",
+      "intro": "Five connected chain reactions explain this whole phenomenon. Tap each.",
+      "items": [
+        {
+          "icon": "💨",
+          "title": "Trade winds weaken",
+          "detail": "Normally, equatorial trade winds blow west, piling up warm water near Asia. During El Niño, these winds slow down or reverse direction. Without the winds holding it back, warm water slides east toward South America like a released spring.",
+          "stat": null
+        },
+        {
+          "icon": "🌊",
+          "title": "Warm water migrates east (Kelvin Wave)",
+          "detail": "A massive underwater wave of warm water — called a Kelvin Wave — travels eastward along the equator. It raises sea surface temperatures near Peru and Ecuador by 2–3°C. This is measurable from satellites and is the earliest warning sign.",
+          "stat": "SST near South America already rose 1°C+ above normal in early 2026"
+        },
+        {
+          "icon": "☁️",
+          "title": "Walker Circulation collapses",
+          "detail": "The Walker Circulation is a giant loop of air — warm air rises over the western Pacific, cools, and sinks over the eastern Pacific. El Niño breaks this loop. The result: less moisture rises over India and Southeast Asia, weakening the monsoon.",
+          "stat": null
+        },
+        {
+          "icon": "🌧️",
+          "title": "India's monsoon gets strangled",
+          "detail": "India's southwest monsoon depends on warm Indian Ocean water generating moisture. When the Pacific sucks atmospheric energy eastward, the moisture engine weakens. 7 out of 10 El Niño years in India have seen below-normal monsoon rainfall.",
+          "stat": "IMD projected 2026 monsoon at 92% of long-term average — below normal"
+        },
+        {
+          "icon": "🔥",
+          "title": "Climate change amplifies everything",
+          "detail": "Global warming has already raised baseline ocean temperatures. El Niño now builds on top of a warmer ocean — making each event potentially stronger than the last. The 2015–16 Super El Niño set a global temperature record. 2026–27 could break it.",
+          "stat": "2027 projected to potentially be the hottest year in recorded history"
+        }
+      ]
+    },
+    {
+      "type": "two_sides",
+      "title": "It doesn't hit everyone the same way",
+      "left_label": "Who gets hit hardest",
+      "right_label": "Unexpected silver linings",
+      "left_items": [
+        { "icon": "🌾", "label": "Indian farmers", "detail": "Below-normal monsoon means drought, crop failure, falling incomes for 600M+ agriculture-dependent people" },
+        { "icon": "💧", "label": "Water-stressed states", "detail": "Maharashtra, Karnataka, Rajasthan reservoirs deplete — drinking water and hydropower both shrink" },
+        { "icon": "🥗", "label": "Urban poor via food inflation", "detail": "Crop losses raise prices of rice, pulses, vegetables — hits lowest-income households hardest" },
+        { "icon": "🌏", "label": "Sub-Saharan Africa", "detail": "Severe droughts in Ethiopia, Central Africa — food insecurity spikes, aid demands rise" }
+      ],
+      "right_items": [
+        { "icon": "🌀", "label": "Fewer Atlantic hurricanes", "detail": "Strong upper winds from El Niño shear apart forming Atlantic storms — US East Coast gets relief" },
+        { "icon": "🌧️", "label": "Northeast India gets more rain", "detail": "El Niño often boosts the northeast monsoon — Tamil Nadu, Andhra Pradesh, Odisha see above-normal rains" },
+        { "icon": "🐟", "label": "Peru's fishing & tourism", "detail": "Warm Pacific waters bring biodiversity changes — some marine species populations recover in warm cycles" },
+        { "icon": "☀️", "label": "Solar energy stays strong", "detail": "Reduced cloud cover in some regions means higher solar power generation — India's solar capacity benefits" }
+      ],
+      "officer_framing": "Super El Niño is not a uniform disaster — it redistributes climate stress globally. For India, the strategic challenge is food security and water management, not just weather forecasting. The real test is institutional preparedness, not just meteorological prediction."
+    },
+    {
+      "type": "context",
+      "title": "This has happened before — and it was catastrophic",
+      "body": "Super El Niño events are rare but historically devastating. The 1877 El Niño triggered a global famine that killed over 50 million people. Modern India has stronger systems, but 18% of GDP and 600 million livelihoods still depend on the monsoon.",
+      "geo_visual": "india_el_nino",
+      "key_numbers": [
+        { "value": "3", "label": "Super El Niño events in recorded history (1982, 1997, 2015)" },
+        { "value": "18%", "label": "Agriculture's share of India's GDP — directly monsoon-dependent" },
+        { "value": "92%", "label": "IMD's 2026 monsoon forecast — below the 100% long-term average" },
+        { "value": "50M+", "label": "Deaths in the 1877 El Niño-triggered global famine" }
+      ],
+      "timeline": [
+        { "year": "1877", "event": "El Niño triggers Great Famine — 50M deaths globally, India devastated", "type": "negative" },
+        { "year": "1982–83", "event": "First recorded Super El Niño — droughts in India, Australia; floods in South America", "type": "negative" },
+        { "year": "1997–98", "event": "Second Super El Niño — India's monsoon deficient; global food prices spike", "type": "negative" },
+        { "year": "2015–16", "event": "Third Super El Niño — hottest year on record; India heatwaves kill 2,500+", "type": "negative" },
+        { "year": "2023–24", "event": "Standard El Niño — India's agri output fell 6.1%; government restricted farm exports", "type": "negative" },
+        { "year": "2026–27", "event": "Super El Niño forming — NOAA forecasts peak Oct 2026–Feb 2027", "type": "neutral" }
+      ]
+    },
+    {
+      "type": "ssb_application",
+      "title": "Use this in SSB",
+      "pi_question": "What is El Niño and how does it affect India?",
+      "gd_line": "Super El Niño is not just a weather event — it is a food security, water management, and economic stability challenge simultaneously. India's response needs to go beyond IMD forecasts and focus on reservoir management, crop insurance, and pre-positioned food stocks.",
+      "lecturette_structure": [
+        "Open: The Pacific Ocean is running a fever — and India is going to feel it. A Super El Niño is forming in 2026.",
+        "Define it: Abnormal warming of Pacific SST by 2°C+ — disrupts Walker Circulation, weakens trade winds, starves India's monsoon of moisture.",
+        "Why it matters: 18% of GDP, 600M livelihoods on monsoon. 7 of 10 El Niño years saw below-normal rainfall. 2026 IMD forecast already at 92%.",
+        "Two sides: Northeast India may gain rains; fewer Atlantic hurricanes — but agriculture, water, food prices take the hit.",
+        "Close: India's strength is early warning systems, PMFBY crop insurance, and strategic food reserves. Preparedness, not panic, is the officer's response."
+      ],
+      "pi_answer": "Sir, El Niño is the warming of Pacific Ocean surface temperatures that disrupts global atmospheric circulation and weakens India's southwest monsoon. A Super El Niño, where temperatures rise above 2°C above normal, is forming in 2026 — potentially the strongest since the 1870s. For India, the direct impact is below-normal monsoon rainfall, crop losses, water stress, and food inflation. However, India has improved its institutional response — IMD's seasonal forecasts, PMFBY crop insurance, and strategic food reserves provide buffers that didn't exist in earlier events. The challenge is not prediction, but timely preparedness at the state level.",
+      "one_liner": "El Niño is nature's way of reminding us that India's food security begins not in the fields — but in the Pacific Ocean."
+    },
+    {
+      "type": "quiz",
+      "title": "Test yourself",
+      "questions": [
+        {
+          "q": "In a GD, someone says: 'Super El Niño is a foreign problem — India has its own monsoon system and shouldn't worry.' How do you respond?",
+          "options": [
+            "Agree — India's monsoon is independent of Pacific Ocean temperatures",
+            "That's not accurate — India's monsoon is directly driven by Walker Circulation which El Niño disrupts. 7 of 10 El Niño years saw below-normal rainfall, impacting 18% of GDP and 600M livelihoods.",
+            "Strongly disagree — India will be completely destroyed by El Niño"
+          ],
+          "correct": 1,
+          "explanation": "The correct answer shows knowledge (Walker Circulation, statistical link) and balance (not panic, not dismissal). That's the OLQ response — informed, calm, specific."
+        },
+        {
+          "q": "What is the key mechanism by which El Niño weakens India's monsoon?",
+          "options": [
+            "It directly reduces rainfall over the Indian Ocean",
+            "It disrupts the Walker Circulation — breaking the atmospheric loop that drives moisture toward India",
+            "It increases solar radiation over India, evaporating clouds"
+          ],
+          "correct": 1,
+          "explanation": "Walker Circulation collapse is the core mechanism. Warm Pacific water shifts atmospheric convection eastward, starving the Indian Ocean moisture engine. This is the precise answer that impresses a PI board."
+        }
+      ]
+    }
+  ]
+}
