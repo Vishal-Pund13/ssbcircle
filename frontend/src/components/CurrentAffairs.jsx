@@ -53,7 +53,8 @@ const SWIPE_ARTICLES = { 'rupee-depreciation': true };
 // Article card — same pattern as RoomCard in LandingPage
 function ArticleCard({ article, onClick }) {
   const navigate = useNavigate();
-  const hasSwipe = SWIPE_ARTICLES[article.id];
+  const swipeKey = article.slug || article.id;
+  const hasSwipe = SWIPE_ARTICLES[swipeKey];
   return (
     <div onClick={onClick}
       className="bg-white border border-gray-200 rounded-xl overflow-hidden hover:border-brand-600/30 hover:shadow-md transition-all duration-200 flex flex-col cursor-pointer group">
@@ -85,7 +86,7 @@ function ArticleCard({ article, onClick }) {
           <div className="flex items-center gap-1.5">
             {hasSwipe && (
               <button
-                onClick={e => { e.stopPropagation(); navigate(`/read/${article.id}`); }}
+                onClick={e => { e.stopPropagation(); navigate(`/read/${swipeKey}`); }}
                 className="text-[10px] font-semibold text-gray-500 bg-gray-100 hover:bg-brand-50 hover:text-brand-600 px-2 py-0.5 rounded-full border border-gray-200 hover:border-brand-100 transition-all">
                 ↕ Swipe
               </button>

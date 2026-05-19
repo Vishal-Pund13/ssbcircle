@@ -14,7 +14,7 @@ router.get('/', async (req, res) => {
     }
     params.push(parseInt(limit) || 20, parseInt(offset) || 0);
     const { rows } = await pool.query(`
-      SELECT id, title, category, summary, tags, published_at, reading_time, difficulty, ssb_relevance
+      SELECT id, slug, title, category, summary, tags, published_at, reading_time, difficulty, ssb_relevance
       FROM articles
       WHERE ${where.join(' AND ')}
       ORDER BY published_at DESC
@@ -27,12 +27,16 @@ router.get('/', async (req, res) => {
   }
 });
 
-// Single article — public
+// Single article — fetch by slug or UUID
 router.get('/:id', async (req, res) => {
   try {
+    const { id } = req.params;
+    const isUuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(id);
     const { rows } = await pool.query(
-      'SELECT * FROM articles WHERE id = $1 AND is_published = true',
-      [req.params.id]
+      isUuid
+        ? 'SELECT * FROM articles WHERE id = $1 AND is_published = true'
+        : 'SELECT * FROM articles WHERE slug = $1 AND is_published = true',
+      [id]
     );
     if (!rows.length) return res.status(404).json({ error: 'Article not found' });
     res.json({ article: rows[0] });

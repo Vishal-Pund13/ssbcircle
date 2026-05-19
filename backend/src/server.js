@@ -245,6 +245,10 @@ async function start() {
     await pool.query(`ALTER TABLE articles ADD COLUMN IF NOT EXISTS reading_time  VARCHAR(20)  DEFAULT NULL`);
     await pool.query(`ALTER TABLE articles ADD COLUMN IF NOT EXISTS difficulty    VARCHAR(20)  DEFAULT NULL`);
     await pool.query(`ALTER TABLE articles ADD COLUMN IF NOT EXISTS ssb_relevance TEXT[]       DEFAULT '{}'`);
+    await pool.query(`ALTER TABLE articles ADD COLUMN IF NOT EXISTS slug          VARCHAR(200) DEFAULT NULL`);
+    await pool.query(`CREATE UNIQUE INDEX IF NOT EXISTS idx_articles_slug ON articles(slug) WHERE slug IS NOT NULL`);
+    // Backfill slug for the first seeded article
+    await pool.query(`UPDATE articles SET slug = 'rupee-depreciation' WHERE slug IS NULL AND title LIKE '%Rupee Story%'`);
 
     // Seed first article if none exist
     const { rows: existingArticles } = await pool.query('SELECT id FROM articles LIMIT 1');
@@ -378,8 +382,8 @@ REER|Rupee's value adjusted for inflation — the real exchange rate
 [QUOTE]The rupee's fall is not a collapse — it's a managed descent. The goal isn't to hold the parachute shut, it's to make sure it opens at the right time.[/QUOTE]`;
 
       await pool.query(`
-        INSERT INTO articles (title, category, summary, content, tags, is_published, published_at, reading_time, difficulty, ssb_relevance)
-        VALUES ($1, $2, $3, $4, $5, true, NOW(), $6, $7, $8)
+        INSERT INTO articles (title, category, summary, content, tags, is_published, published_at, reading_time, difficulty, ssb_relevance, slug)
+        VALUES ($1, $2, $3, $4, $5, true, NOW(), $6, $7, $8, $9)
       `, [
         'The Rupee Story: Why India\'s Currency Falls — and Why That\'s Not Always Bad',
         'economic',
@@ -389,6 +393,7 @@ REER|Rupee's value adjusted for inflation — the real exchange rate
         '8 min',
         'Beginner',
         ['GD Topics', 'Lecturette', 'PI'],
+        'rupee-depreciation',
       ]);
       console.log('✓ Seeded first article: The Rupee Story');
     }
