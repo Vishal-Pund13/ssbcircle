@@ -48,23 +48,35 @@ function SpreadNewsCards({ small = false }) {
 
   return (
     <div className="flex flex-col items-center gap-3 select-none">
+      <style>{`
+        @keyframes heroCardFloat {
+          0%, 100% { transform: translateY(0px); }
+          50%       { transform: translateY(-9px); }
+        }
+      `}</style>
+
       {/* Card spread */}
       <div className="relative" style={{ width: cW, height: cH }}>
         {HERO_CARDS.map((card, i) => {
           const isHov = hovered === i && !card.ghost;
           return (
+            /* Float wrapper — bobs up/down independently */
             <div
               key={i}
+              style={{
+                position: 'absolute', top: '50%', left: '50%',
+                width: W, zIndex: isHov ? 10 : i + 1,
+                animation: isHov || card.ghost
+                  ? 'none'
+                  : `heroCardFloat ${2.6 + i * 0.55}s ease-in-out ${i * 0.55}s infinite`,
+              }}
+            >
+            <div
               onClick={() => !card.ghost && navigate(`/read/${card.slug}`)}
               onMouseEnter={() => setHovered(i)}
               onMouseLeave={() => setHovered(null)}
               className={card.ghost ? '' : 'cursor-pointer'}
               style={{
-                position:   'absolute',
-                top:        '50%',
-                left:       '50%',
-                width:      W,
-                zIndex:     isHov ? 10 : i + 1,
                 transform:  isHov
                   ? `translate(calc(-50% + ${card.x}px), calc(-50% + ${card.y - 14}px)) rotate(0deg) scale(1.06)`
                   : `translate(calc(-50% + ${card.x}px), calc(-50% + ${card.y}px)) rotate(${card.rotate}deg)`,
@@ -122,6 +134,7 @@ function SpreadNewsCards({ small = false }) {
                   )}
                 </div>
               </div>
+            </div>
             </div>
           );
         })}
@@ -846,10 +859,24 @@ export default function LandingPage() {
                   : 'Live voice rooms · Join any time'}
               </div>
 
-              <h1 className="text-[2rem] sm:text-5xl lg:text-6xl font-bold text-gray-900 leading-[1.1] tracking-tight mb-4 sm:mb-5">
+              <h1 className="text-[2rem] sm:text-5xl lg:text-6xl font-bold text-gray-900 leading-[1.1] tracking-tight mb-3 sm:mb-4">
                 Practice SSB GD with<br />
                 <span className="text-brand-600">real aspirants.</span>
               </h1>
+
+              {/* News Cards chip — small, non-intrusive */}
+              <Link to="/current-affairs"
+                className="inline-flex items-center gap-2.5 text-xs font-semibold text-brand-600 bg-brand-50 border border-brand-100 px-3 py-1.5 rounded-full hover:bg-brand-100 transition-colors mb-4 sm:mb-5">
+                <span>+ News Cards</span>
+                {/* 3 tiny overlapping cards */}
+                <span className="flex items-end -space-x-1.5 select-none">
+                  {[{r:-9,bg:'#e0e7ff'},{r:-3,bg:'#eef2ff'},{r:3,bg:'#fff'}].map((c,i) => (
+                    <span key={i} className="block w-3 h-[15px] rounded-sm border border-brand-200 shrink-0"
+                      style={{ background: c.bg, transform: `rotate(${c.r}deg)`, marginBottom: i === 1 ? '1px' : '0' }} />
+                  ))}
+                </span>
+              </Link>
+
               <p className="text-gray-500 text-sm sm:text-lg leading-relaxed mb-6 sm:mb-8">
                 India's free platform for SSB interview preparation. Practice Group Discussion (GD), PPDT, Lecturette and IO online with real defence aspirants — anywhere, anytime.
               </p>
@@ -1072,6 +1099,12 @@ export default function LandingPage() {
               <span className="font-bold">Hosts — once your session is over, please delete your room</span> using the <span className="font-semibold">"End & Delete Room"</span> button inside the room. This keeps the platform open for others to practise.
             </p>
           </div>
+        </div>
+
+        {/* ── India map — mobile only, below host caution ── */}
+        <div className="lg:hidden border-t border-gray-100 py-6 flex flex-col items-center gap-2 bg-white">
+          <HeroMapAnimation />
+          <p className="text-xs text-gray-400 font-medium text-center px-4">Connecting aspirants across India</p>
         </div>
 
         {/* ── Recent Discussions ── */}
