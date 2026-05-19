@@ -65,7 +65,6 @@ export default function SwipeReader({ article, onClose }) {
   const [scene,      setScene]      = useState(0);
   const [dir,        setDir]        = useState(1);
   const [showHint,   setShowHint]   = useState(true);
-  const [hoveredDot, setHoveredDot] = useState(null);
   const total = article.scenes.length;
 
   useEffect(() => {
@@ -218,59 +217,47 @@ export default function SwipeReader({ article, onClose }) {
         {/* Dots + Card */}
         <div className="flex-1 flex items-center justify-center gap-6 overflow-hidden px-8 py-6">
 
-          {/* Vertical dot line with hover labels */}
-          <div className="flex flex-col items-center shrink-0 select-none relative">
-            {article.scenes.map((s, i) => (
-              <div key={i} className="flex flex-col items-center relative">
-
-                {/* Hover label — floats to the LEFT of the dot */}
-                <AnimatePresence>
-                  {hoveredDot === i && (
-                    <motion.div
-                      initial={{ opacity: 0, x: 4 }}
-                      animate={{ opacity: 1, x: 0 }}
-                      exit={{ opacity: 0, x: 4 }}
-                      transition={{ duration: 0.12 }}
-                      className="absolute right-full mr-3 top-1/2 -translate-y-1/2 z-20 pointer-events-none"
-                    >
-                      <div className="flex items-center gap-2 bg-white border border-gray-200 rounded-lg px-2.5 py-1.5 shadow-md whitespace-nowrap">
-                        <SceneIcon type={s.type}
-                          className={`w-3 h-3 shrink-0 ${i === scene ? 'text-brand-600' : 'text-gray-400'}`} />
-                        <span className={`text-[11px] font-semibold ${i === scene ? 'text-brand-700' : 'text-gray-600'}`}>
-                          {SCENE_LABELS[s.type]}
-                        </span>
-                      </div>
-                    </motion.div>
+          {/* Vertical index — always-visible labels + dots */}
+          <div className="flex flex-col shrink-0 select-none">
+            {article.scenes.map((s, i) => {
+              const isActive = i === scene;
+              const isDone   = i < scene;
+              return (
+                <div key={i}>
+                  <button
+                    onClick={() => goTo(i)}
+                    className={`flex items-center gap-3 cursor-pointer group w-full transition-opacity ${
+                      isActive ? 'opacity-100' : 'opacity-40 hover:opacity-70'
+                    }`}
+                  >
+                    {/* Label + icon — right side of label block */}
+                    <div className="flex items-center gap-1.5 flex-1 justify-end">
+                      <SceneIcon
+                        type={s.type}
+                        className={`w-3 h-3 shrink-0 transition-colors ${isActive ? 'text-brand-600' : 'text-gray-500'}`}
+                      />
+                      <span className={`text-[11px] font-semibold whitespace-nowrap transition-colors ${
+                        isActive ? 'text-brand-700' : 'text-gray-600'
+                      }`}>
+                        {SCENE_LABELS[s.type]}
+                      </span>
+                    </div>
+                    {/* Dot */}
+                    <div className="w-4 flex items-center justify-center shrink-0">
+                      <span className={`rounded-full block transition-all duration-200 ${
+                        isActive ? 'w-3 h-3 bg-brand-600' : isDone ? 'w-2 h-2 bg-brand-300' : 'w-2 h-2 bg-gray-300 group-hover:bg-gray-400'
+                      }`} />
+                    </div>
+                  </button>
+                  {/* Connecting line — right-aligned under the dot */}
+                  {i < total - 1 && (
+                    <div className="flex justify-end pr-1.5" style={{ height: 20 }}>
+                      <div className={`w-px ${isDone ? 'bg-brand-200' : 'bg-gray-200'}`} />
+                    </div>
                   )}
-                </AnimatePresence>
-
-                {/* Dot button */}
-                <button
-                  onClick={() => goTo(i)}
-                  onMouseEnter={() => setHoveredDot(i)}
-                  onMouseLeave={() => setHoveredDot(null)}
-                  className="group relative flex items-center justify-center cursor-pointer"
-                  style={{ width: 20, height: 20 }}
-                >
-                  <span className={`absolute rounded-full transition-all duration-200 ${
-                    i === scene ? 'w-5 h-5 bg-brand-600/10' : 'w-0 h-0 group-hover:w-5 group-hover:h-5 bg-gray-200/60'
-                  }`} />
-                  <span className={`rounded-full transition-all duration-200 ${
-                    i === scene
-                      ? 'w-3 h-3 bg-brand-600'
-                      : i < scene
-                        ? 'w-2 h-2 bg-brand-300'
-                        : 'w-2 h-2 bg-gray-300 group-hover:bg-gray-400'
-                  }`} />
-                </button>
-
-                {/* Connecting line */}
-                {i < total - 1 && (
-                  <div className={`w-px transition-colors duration-300 ${i < scene ? 'bg-brand-200' : 'bg-gray-200'}`}
-                    style={{ height: 28 }} />
-                )}
-              </div>
-            ))}
+                </div>
+              );
+            })}
           </div>
 
           {/* Card */}

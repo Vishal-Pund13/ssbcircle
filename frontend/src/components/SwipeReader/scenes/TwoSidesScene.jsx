@@ -11,7 +11,11 @@ export default function TwoSidesScene({ scene }) {
           <p className="text-[10px] font-bold text-brand-600 uppercase tracking-widest">{left_label}</p>
           {left_items.map((item, i) => (
             <div key={i} className="flex items-start gap-2">
-              <span className="text-base shrink-0 leading-none mt-0.5">{item.icon}</span>
+              <div className="w-5 h-5 rounded-full bg-brand-100 border border-brand-200 flex items-center justify-center shrink-0 mt-0.5">
+                <svg className="w-2.5 h-2.5 text-brand-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+                </svg>
+              </div>
               <div>
                 <p className="text-xs font-semibold text-gray-800 leading-snug">{item.label}</p>
                 <p className="text-[11px] text-gray-500 leading-snug mt-0.5">{item.detail}</p>
@@ -25,7 +29,11 @@ export default function TwoSidesScene({ scene }) {
           <p className="text-[10px] font-bold text-gray-500 uppercase tracking-widest">{right_label}</p>
           {right_items.map((item, i) => (
             <div key={i} className="flex items-start gap-2">
-              <span className="text-base shrink-0 leading-none mt-0.5">{item.icon}</span>
+              <div className="w-5 h-5 rounded-full bg-gray-100 border border-gray-200 flex items-center justify-center shrink-0 mt-0.5">
+                <svg className="w-2.5 h-2.5 text-gray-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M20 12H4" />
+                </svg>
+              </div>
               <div>
                 <p className="text-xs font-semibold text-gray-800 leading-snug">{item.label}</p>
                 <p className="text-[11px] text-gray-500 leading-snug mt-0.5">{item.detail}</p>

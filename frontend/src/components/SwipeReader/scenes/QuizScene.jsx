@@ -145,6 +145,17 @@ export default function QuizScene({ scene, article, onClose }) {
 
   return (
     <div className="px-5 py-5 flex flex-col gap-5">
+      {/* Gentle suggestion — not forced */}
+      <div className="flex items-start gap-3 bg-brand-50 border border-brand-100 rounded-xl px-4 py-3">
+        <svg className="w-4 h-4 text-brand-600 shrink-0 mt-0.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+          <path strokeLinecap="round" strokeLinejoin="round" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
+        </svg>
+        <div>
+          <p className="text-xs font-bold text-brand-700 mb-0.5">Quick self-check</p>
+          <p className="text-[11px] text-brand-600 leading-relaxed">We suggest trying these 2 questions — takes 30 seconds and helps things stick. No pressure though.</p>
+        </div>
+      </div>
+
       <span className="text-[10px] font-bold text-brand-600 uppercase tracking-widest bg-brand-50 border border-brand-100 px-2.5 py-0.5 rounded-full w-fit">
         {title}
       </span>

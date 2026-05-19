@@ -23,8 +23,10 @@ export default function BreakdownScene({ scene }) {
               }`}
             >
               <div className="flex items-center gap-3 px-4 py-3">
-                <span className="w-9 h-9 bg-white rounded-lg flex items-center justify-center text-lg shadow-sm shrink-0">
-                  {item.icon}
+                <span className={`w-7 h-7 rounded-full flex items-center justify-center text-[11px] font-bold shrink-0 transition-colors ${
+                  isOpen ? 'bg-brand-600 text-white' : 'bg-brand-50 border border-brand-100 text-brand-600'
+                }`}>
+                  {i + 1}
                 </span>
                 <span className={`text-sm font-medium flex-1 text-left ${isOpen ? 'text-brand-700' : 'text-gray-900'}`}>
                   {item.title}
