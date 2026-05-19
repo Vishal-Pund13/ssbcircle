@@ -755,6 +755,32 @@ export default function LandingPage() {
           </div>
         </section>
 
+        {/* ── News Cards banner ── */}
+        <section className="border-y border-gray-100 bg-gray-50 px-4 sm:px-6 py-4">
+          <div className="max-w-5xl mx-auto flex items-center gap-4">
+            {/* Stacked cards icon */}
+            <div className="relative shrink-0 w-10 h-8">
+              <div className="absolute inset-0 bg-brand-100 border border-brand-200 rounded-lg" style={{ transform: 'rotate(-8deg)' }} />
+              <div className="absolute inset-0 bg-brand-50 border border-brand-200 rounded-lg" style={{ transform: 'rotate(-3deg)' }} />
+              <div className="absolute inset-0 bg-white border border-brand-200 rounded-lg flex flex-col justify-center px-1.5 gap-0.5">
+                <div className="h-1 bg-brand-200 rounded-full" />
+                <div className="h-1 bg-brand-100 rounded-full w-4/5" />
+                <div className="h-1 bg-brand-100 rounded-full w-3/5" />
+              </div>
+            </div>
+            <div className="flex-1 min-w-0">
+              <p className="text-xs font-bold text-brand-600 uppercase tracking-widest mb-0.5">New · News Cards</p>
+              <p className="text-sm text-gray-600 leading-snug">No GD topic? Read a card on Defence, Economy, Polity or more — then come back and speak.</p>
+            </div>
+            <Link to="/current-affairs" className="btn-primary text-xs px-4 py-2 shrink-0 hidden sm:inline-flex">
+              Explore
+            </Link>
+            <Link to="/current-affairs" className="text-xs font-semibold text-brand-600 shrink-0 sm:hidden">
+              Explore →
+            </Link>
+          </div>
+        </section>
+
         {/* ── Live / Upcoming tabs ── */}
         <section ref={tabsSectionRef} className="max-w-5xl mx-auto px-4 sm:px-6 py-8 sm:py-12">
 
@@ -897,13 +923,10 @@ export default function LandingPage() {
               <button onClick={() => navigate(user ? '/create' : '/register')} className="btn-primary text-xs py-2 px-5">
                 {user ? 'Create a Room' : 'Get started free'}
               </button>
-              <div className="mt-5 pt-5 border-t border-gray-100">
-                <p className="text-xs text-gray-400 mb-2">No GD topic in mind?</p>
-                <Link to="/current-affairs" className="inline-flex items-center gap-1.5 text-xs font-semibold text-brand-600 hover:text-brand-700 transition-colors">
-                  <span>Browse News Cards, pick a topic, then come back and speak</span>
-                  <ChevronDown className="w-3 h-3 -rotate-90" />
-                </Link>
-              </div>
+              <p className="text-xs text-gray-400 mt-4">
+                No GD topic?{' '}
+                <Link to="/current-affairs" className="text-brand-600 font-semibold hover:underline">Browse News Cards →</Link>
+              </p>
             </div>
           ) : (
             <>
@@ -931,20 +954,6 @@ export default function LandingPage() {
                   <button onClick={() => navigate('/create')} className="btn-primary text-xs py-2 px-4 shrink-0 w-full sm:w-auto">Create a Room</button>
                 </div>
               )}
-              {/* News Cards nudge */}
-              <Link to="/current-affairs"
-                className="mt-3 flex items-center justify-between gap-3 bg-brand-50 border border-brand-100 rounded-xl px-4 sm:px-5 py-3 group hover:border-brand-200 transition-colors">
-                <div className="flex items-center gap-3">
-                  {/* Mini stacked cards icon */}
-                  <div className="relative w-8 h-6 shrink-0">
-                    <div className="absolute inset-0 bg-brand-200 rounded" style={{ transform: 'rotate(-8deg)' }} />
-                    <div className="absolute inset-0 bg-brand-100 rounded" style={{ transform: 'rotate(-3deg)' }} />
-                    <div className="absolute inset-0 bg-white border border-brand-200 rounded" />
-                  </div>
-                  <p className="text-xs text-brand-700 font-medium">No GD idea? Read a News Card, learn, then jump in and speak.</p>
-                </div>
-                <ChevronDown className="w-4 h-4 text-brand-400 -rotate-90 shrink-0 group-hover:translate-x-0.5 transition-transform" />
-              </Link>
             </>
           )}
           </>)}
@@ -1107,44 +1116,6 @@ export default function LandingPage() {
         </section>
 
       </main>
-
-      {/* ── News Cards banner ── */}
-      <section className="border-t border-gray-100 bg-white px-4 sm:px-6 py-8 sm:py-10">
-        <div className="max-w-5xl mx-auto">
-          <div className="rounded-2xl border border-brand-100 bg-brand-50 px-5 sm:px-8 py-6 flex flex-col sm:flex-row items-center gap-6">
-
-            {/* Overlapping cards icon */}
-            <div className="shrink-0 relative w-16 h-14">
-              {/* Back card */}
-              <div className="absolute inset-0 bg-brand-100 border border-brand-200 rounded-xl"
-                style={{ transform: 'rotate(-10deg) translate(-4px, 2px)' }} />
-              {/* Middle card */}
-              <div className="absolute inset-0 bg-brand-50 border border-brand-200 rounded-xl"
-                style={{ transform: 'rotate(-4deg) translate(-1px, 0px)' }} />
-              {/* Front card */}
-              <div className="absolute inset-0 bg-white border border-brand-200 rounded-xl flex flex-col justify-center px-2.5 gap-1">
-                <div className="h-1.5 bg-brand-200 rounded-full w-full" />
-                <div className="h-1.5 bg-brand-100 rounded-full w-4/5" />
-                <div className="h-1.5 bg-brand-100 rounded-full w-3/5" />
-              </div>
-            </div>
-
-            <div className="flex-1 min-w-0">
-              <div className="inline-flex items-center gap-1.5 bg-brand-100 text-brand-600 text-[10px] font-bold px-2.5 py-0.5 rounded-full mb-2 uppercase tracking-widest">
-                New Feature
-              </div>
-              <h2 className="text-lg sm:text-xl font-bold text-gray-900 mb-1">News Cards</h2>
-              <p className="text-sm text-gray-500 leading-relaxed max-w-lg">
-                Stuck on GD topics? Swipe through bite-sized news cards on Defence, Economy, Polity, Geography & Society — then walk into any discussion ready to speak.
-              </p>
-            </div>
-            <Link to="/current-affairs"
-              className="btn-primary text-sm px-5 py-2.5 shrink-0 w-full sm:w-auto text-center">
-              Explore Cards
-            </Link>
-          </div>
-        </div>
-      </section>
 
       {/* ── SSB FAQ Section ── */}
       <FaqSection />
