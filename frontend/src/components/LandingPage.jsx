@@ -987,14 +987,8 @@ export default function LandingPage() {
           </section>
         )}
 
-        {/* ── India map — mobile only, below live rooms ── */}
-        <div className="lg:hidden border-t border-gray-100 py-6 flex flex-col items-center gap-3 bg-white">
-          <p className="text-xs text-gray-400 font-medium text-center px-4">Connecting aspirants to learn and practice communication skills</p>
-          <HeroMapAnimation />
-        </div>
-
         {/* ── News Cards banner ── */}
-        <section className="border-t border-gray-100 bg-gray-50 px-4 sm:px-6 py-5">
+        <section className="border-t border-gray-100 bg-brand-50 px-4 sm:px-6 py-5">
           <div className="max-w-5xl mx-auto flex items-center gap-4">
             <svg viewBox="0 0 72 56" fill="none" className="shrink-0 w-14 h-11">
               <rect x="2" y="10" width="46" height="34" rx="5" fill="#e0e7ff" transform="rotate(-9 25 27)" />
@@ -1011,13 +1005,20 @@ export default function LandingPage() {
               <line x1="18" y1="38" x2="50" y2="38" stroke="#e0e7ff" strokeWidth="1.8" strokeLinecap="round" />
             </svg>
             <div className="flex-1 min-w-0">
-              <p className="text-xs font-bold text-brand-600 uppercase tracking-widest mb-0.5">New · News Cards</p>
-              <p className="text-sm text-gray-600 leading-snug">No GD topic? Read a card on Defence, Economy, Polity or more — then come back and speak.</p>
+              <p className="text-[10px] font-bold text-brand-600 uppercase tracking-widest mb-0.5">✦ Latest Addition</p>
+              <p className="text-sm font-semibold text-gray-800 leading-snug mb-0.5">News Cards</p>
+              <p className="text-xs text-gray-500 leading-snug">No GD topic? Read a card, learn the issue, come back and speak.</p>
             </div>
             <Link to="/current-affairs" className="btn-primary text-xs px-4 py-2 shrink-0 hidden sm:inline-flex">Explore</Link>
-            <Link to="/current-affairs" className="text-xs font-semibold text-brand-600 shrink-0 sm:hidden">Explore →</Link>
+            <Link to="/current-affairs" className="text-xs font-bold text-brand-600 shrink-0 sm:hidden">Explore →</Link>
           </div>
         </section>
+
+        {/* ── India map — mobile only, below live rooms ── */}
+        <div className="lg:hidden border-t border-gray-100 py-6 flex flex-col items-center gap-3 bg-white">
+          <p className="text-xs text-gray-400 font-medium text-center px-4">Connecting aspirants to learn and practice communication skills</p>
+          <HeroMapAnimation />
+        </div>
 
         {/* ── How it works ── */}
         <section className="border-t border-gray-100 bg-white py-10 sm:py-14 px-4 sm:px-6">
