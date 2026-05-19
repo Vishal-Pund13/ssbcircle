@@ -1287,21 +1287,58 @@ export default function LandingPage() {
         {/* ── How it works ── */}
         <section className="border-t border-gray-100 bg-white py-10 sm:py-14 px-4 sm:px-6">
           <div className="max-w-5xl mx-auto">
-            <h2 className="text-xl sm:text-2xl font-bold text-gray-900 mb-8">How SSBCircle Works for SSB Prep</h2>
+            <h2 className="text-xl sm:text-2xl font-bold text-gray-900 mb-2">How SSBCircle Works for SSB Prep</h2>
+            <p className="text-sm text-gray-400 mb-8">From knowing nothing about a topic to speaking confidently in a live GD — in four steps.</p>
             <div className="relative">
               <div className="hidden sm:block absolute top-[15px] left-[3rem] right-[3rem]"
                 style={{ height: '1px', background: 'repeating-linear-gradient(to right,#bfdbfe 0,#bfdbfe 6px,transparent 6px,transparent 14px)' }} />
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-8 sm:gap-6">
+              <div className="grid grid-cols-1 sm:grid-cols-4 gap-8 sm:gap-5">
                 {[
-                  { n: '01', title: 'Sign in with Google',   desc: 'One tap with your Google account — no password, no forms, no friction.' },
-                  { n: '02', title: 'Open or join a room',   desc: 'Host a session with a topic, or enter a 6-letter code to join one.' },
-                  { n: '03', title: 'Practice and improve',  desc: 'Use the timer, transcript and checklist every session to track your growth.' },
-                ].map(({ n, title, desc }) => (
+                  {
+                    n: '01',
+                    title: 'Sign in with Google',
+                    desc: 'One tap with your Google account — no password, no forms, no friction.',
+                    tag: null,
+                  },
+                  {
+                    n: '02',
+                    title: 'Read a News Card',
+                    desc: 'Swipe through a bite-sized card on Defence, Economy, Polity or Geography — 5 minutes, GD-ready.',
+                    tag: 'News Cards',
+                    tagLink: '/current-affairs',
+                  },
+                  {
+                    n: '03',
+                    title: 'Open or join a room',
+                    desc: 'Host a session on the topic you just read, or enter a 6-letter code to join one.',
+                    tag: null,
+                  },
+                  {
+                    n: '04',
+                    title: 'Practice and improve',
+                    desc: 'Use the timer, live transcript and checklist every session to track your growth.',
+                    tag: null,
+                  },
+                ].map(({ n, title, desc, tag, tagLink }) => (
                   <div key={n} className="flex sm:flex-col gap-4 sm:gap-0">
-                    <div className="shrink-0 z-10 w-8 h-8 rounded-full bg-brand-600 border-4 border-white ring-2 ring-blue-100 flex items-center justify-center shadow-sm">
+                    <div className={`shrink-0 z-10 w-8 h-8 rounded-full border-4 border-white ring-2 flex items-center justify-center shadow-sm ${tag ? 'bg-brand-600 ring-brand-100' : 'bg-brand-600 ring-blue-100'}`}>
                       <span className="text-[10px] font-bold text-white">{n}</span>
                     </div>
                     <div className="sm:mt-5">
+                      {tag && (
+                        <Link to={tagLink}
+                          className="inline-flex items-center gap-1 text-[10px] font-bold text-brand-600 bg-brand-50 border border-brand-100 px-2 py-0.5 rounded-full mb-1.5 hover:bg-brand-100 transition-colors">
+                          <svg viewBox="0 0 34 24" fill="none" className="w-5 h-3.5 shrink-0">
+                            <rect x="1" y="5" width="20" height="14" rx="2.5" fill="#e0e7ff" transform="rotate(-11 11 12)" />
+                            <rect x="5" y="3" width="20" height="14" rx="2.5" fill="#eef2ff" transform="rotate(-5 15 10)" />
+                            <rect x="10" y="2" width="20" height="14" rx="2.5" fill="white" stroke="#c7d2fe" strokeWidth="1.2" />
+                            <line x1="13.5" y1="8" x2="27" y2="8" stroke="#1e3a5f" strokeWidth="1.6" strokeLinecap="round" />
+                            <line x1="13.5" y1="11.5" x2="25" y2="11.5" stroke="#c7d2fe" strokeWidth="1.3" strokeLinecap="round" />
+                            <line x1="13.5" y1="14.5" x2="22" y2="14.5" stroke="#c7d2fe" strokeWidth="1.3" strokeLinecap="round" />
+                          </svg>
+                          {tag}
+                        </Link>
+                      )}
                       <h3 className="text-sm font-bold text-gray-900 mb-1">{title}</h3>
                       <p className="text-xs text-gray-400 leading-relaxed">{desc}</p>
                     </div>
