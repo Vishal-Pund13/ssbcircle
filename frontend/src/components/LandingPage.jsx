@@ -1,9 +1,11 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState, lazy, Suspense } from 'react';
 import { useNavigate, Link, useSearchParams } from 'react-router-dom';
 import { getActiveRooms, closeRoom, getSessions, toggleInterest, cancelSession, startSession, getFeatured, getPastSessions } from '../services/api';
 import { useAuth } from '../context/AuthContext';
 import { Mic, Timer, FileText, CheckSquare, Radio, ArrowRight, Trash2, Zap, Lightbulb, Users, Presentation, Target, Headphones, RefreshCw, X, Calendar, Heart, PlayCircle, Share2, Check, Sparkles, ChevronDown, Shield, Star, Lock, BookOpen } from 'lucide-react';
-import HeroMapAnimation from './HeroMapAnimation';
+
+// Lazy-loaded — keeps react-simple-maps out of the main bundle
+const HeroMapAnimation = lazy(() => import('./HeroMapAnimation'));
 
 const HERO_CARDS = [
   {
@@ -48,27 +50,20 @@ function SpreadNewsCards({ small = false }) {
 
   return (
     <div className="flex flex-col items-center gap-3 select-none">
-      <style>{`
-        @keyframes heroCardFloat {
-          0%, 100% { transform: translateY(0px); }
-          50%       { transform: translateY(-9px); }
-        }
-      `}</style>
-
       {/* Card spread */}
       <div className="relative" style={{ width: cW, height: cH }}>
         {HERO_CARDS.map((card, i) => {
           const isHov = hovered === i && !card.ghost;
           return (
-            /* Float wrapper — bobs up/down independently */
+            /* Float wrapper — bobs via CSS class in index.css */
             <div
               key={i}
+              className={!isHov && !card.ghost ? 'hero-card-float' : ''}
               style={{
                 position: 'absolute', top: '50%', left: '50%',
                 width: W, zIndex: isHov ? 10 : i + 1,
-                animation: isHov || card.ghost
-                  ? 'none'
-                  : `heroCardFloat ${2.6 + i * 0.55}s ease-in-out ${i * 0.55}s infinite`,
+                '--float-duration': `${2.6 + i * 0.55}s`,
+                '--float-delay':    `${i * 0.55}s`,
               }}
             >
             <div
@@ -993,7 +988,9 @@ export default function LandingPage() {
             </div>
 
             <div className="hidden lg:flex flex-col justify-center items-center gap-3">
-              <HeroMapAnimation />
+              <Suspense fallback={<div className="w-[340px] h-[360px] bg-gray-50 rounded-2xl animate-pulse" />}>
+                <HeroMapAnimation />
+              </Suspense>
               <p className="text-xs text-gray-400 font-medium text-center">Connecting aspirants to learn and practice communication skills</p>
             </div>
           </div>
@@ -1189,7 +1186,9 @@ export default function LandingPage() {
 
         {/* ── India map — mobile only, below host caution ── */}
         <div className="lg:hidden border-t border-gray-100 py-6 flex flex-col items-center gap-2 bg-white">
-          <HeroMapAnimation />
+          <Suspense fallback={<div className="w-[300px] h-[320px] bg-gray-50 rounded-xl animate-pulse" />}>
+            <HeroMapAnimation />
+          </Suspense>
           <p className="text-xs text-gray-400 font-medium text-center px-4">Connecting aspirants across India</p>
         </div>
 

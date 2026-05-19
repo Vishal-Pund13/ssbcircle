@@ -27,3 +27,10 @@
            focus:border-brand-600 focus:ring-2 focus:ring-brand-100 transition-all;
   }
 }
+
+/* Hero spread-cards float animation */
+@keyframes heroCardFloat {
+  0%, 100% { transform: translateY(0px); }
+  50%       { transform: translateY(-9px); }
+}
+.hero-card-float { animation: heroCardFloat var(--float-duration, 3s) ease-in-out var(--float-delay, 0s) infinite; }
