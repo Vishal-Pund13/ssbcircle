@@ -5,6 +5,133 @@ import { useAuth } from '../context/AuthContext';
 import { Mic, Timer, FileText, CheckSquare, Radio, ArrowRight, Trash2, Zap, Lightbulb, Users, Presentation, Target, Headphones, RefreshCw, X, Calendar, Heart, PlayCircle, Share2, Check, Sparkles, ChevronDown, Shield, Star, Lock, BookOpen } from 'lucide-react';
 import HeroMapAnimation from './HeroMapAnimation';
 
+const HERO_CARDS = [
+  {
+    slug:     null,
+    category: null,
+    stat:     '+ more',
+    title:    'More cards coming',
+    hint:     'Defence · Polity · Socio-Cultural',
+    rotate:   -13,
+    x:        -62,
+    y:        22,
+    ghost:    true,
+  },
+  {
+    slug:     'super-el-nino',
+    category: 'Geographic',
+    stat:     '+2°C',
+    title:    'Super El Niño',
+    hint:     "India's monsoon & 600M farmers at risk",
+    rotate:   -4,
+    x:        -14,
+    y:        4,
+  },
+  {
+    slug:     'rupee-depreciation',
+    category: 'Economic',
+    stat:     '₹90',
+    title:    'The Rupee Story',
+    hint:     'Why the rupee falls — and why that\'s not always bad',
+    rotate:   7,
+    x:        38,
+    y:        -14,
+  },
+];
+
+function SpreadNewsCards() {
+  const navigate = useNavigate();
+  const [hovered, setHovered] = useState(null);
+
+  return (
+    <div className="flex flex-col items-center gap-4 select-none">
+      {/* Card spread */}
+      <div className="relative" style={{ width: 300, height: 320 }}>
+        {HERO_CARDS.map((card, i) => {
+          const isHov = hovered === i && !card.ghost;
+          return (
+            <div
+              key={i}
+              onClick={() => !card.ghost && navigate(`/read/${card.slug}`)}
+              onMouseEnter={() => setHovered(i)}
+              onMouseLeave={() => setHovered(null)}
+              className={card.ghost ? '' : 'cursor-pointer'}
+              style={{
+                position:   'absolute',
+                top:        '50%',
+                left:       '50%',
+                width:      176,
+                zIndex:     isHov ? 10 : i + 1,
+                transform:  isHov
+                  ? `translate(calc(-50% + ${card.x}px), calc(-50% + ${card.y - 14}px)) rotate(0deg) scale(1.06)`
+                  : `translate(calc(-50% + ${card.x}px), calc(-50% + ${card.y}px)) rotate(${card.rotate}deg)`,
+                transition: 'transform 0.22s cubic-bezier(0.34,1.4,0.64,1), box-shadow 0.2s ease',
+              }}
+            >
+              <div
+                className={`rounded-2xl overflow-hidden ${card.ghost ? 'border-2 border-dashed border-gray-200 bg-white/60' : 'border border-gray-200 bg-white'}`}
+                style={{
+                  boxShadow: isHov
+                    ? '0 28px 56px rgba(30,58,95,0.2), 0 4px 12px rgba(30,58,95,0.08)'
+                    : '0 4px 18px rgba(0,0,0,0.09)',
+                }}
+              >
+                {!card.ghost && <div className="h-0.5 bg-brand-600" />}
+                <div className={`p-4 ${card.ghost ? 'opacity-35' : ''}`}>
+                  {/* Header row */}
+                  <div className="flex items-center justify-between mb-3">
+                    {card.category ? (
+                      <span className="text-[8px] font-bold text-brand-600 bg-brand-50 px-2 py-0.5 rounded-full border border-brand-100 uppercase tracking-widest">
+                        {card.category}
+                      </span>
+                    ) : (
+                      <span className="text-[8px] font-bold text-gray-400 bg-gray-100 px-2 py-0.5 rounded-full uppercase tracking-widest">
+                        Coming soon
+                      </span>
+                    )}
+                    {/* Mini SSBCircle logo */}
+                    <svg viewBox="0 0 48 48" fill="none" className="w-3.5 h-3.5 opacity-25 shrink-0">
+                      <circle cx="24" cy="24" r="22" stroke="#1e3a5f" strokeWidth="3" />
+                      <circle cx="14" cy="20" r="3.5" fill="#1e3a5f" />
+                      <circle cx="24" cy="14" r="3.5" fill="#1e3a5f" />
+                      <circle cx="34" cy="20" r="3.5" fill="#1e3a5f" />
+                      <circle cx="30" cy="31" r="3.5" fill="#1e3a5f" />
+                      <circle cx="18" cy="31" r="3.5" fill="#1e3a5f" />
+                      <path d="M14 20 L24 14 L34 20 L30 31 L18 31 Z" stroke="#1e3a5f" strokeWidth="1.5" fill="none" />
+                    </svg>
+                  </div>
+
+                  {/* Big stat */}
+                  <p className={`font-extrabold leading-none mb-2 ${card.ghost ? 'text-xl text-gray-300' : 'text-[2rem] text-gray-900 tracking-tight'}`}>
+                    {card.stat}
+                  </p>
+                  <p className="text-xs font-bold text-gray-800 leading-snug mb-1.5">{card.title}</p>
+                  <p className="text-[10px] text-gray-400 leading-relaxed">{card.hint}</p>
+
+                  {/* Read CTA — fades in on hover */}
+                  {!card.ghost && (
+                    <div className={`mt-3 pt-2.5 border-t border-gray-100 flex items-center gap-1 text-[10px] font-bold text-brand-600 transition-opacity duration-200 ${isHov ? 'opacity-100' : 'opacity-0'}`}>
+                      Read card
+                      <svg className="w-3 h-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
+                      </svg>
+                    </div>
+                  )}
+                </div>
+              </div>
+            </div>
+          );
+        })}
+      </div>
+
+      {/* Caption */}
+      <p className="text-[11px] text-gray-400 font-medium text-center">
+        Click any card to read · <Link to="/current-affairs" className="text-brand-600 hover:underline font-semibold">Browse all News Cards</Link>
+      </p>
+    </div>
+  );
+}
+
 const CATEGORIES = ['All', 'GD', 'PPDT', 'Lecturette', 'IO Practice'];
 const GD_SUBCATEGORIES = ['Defence', 'International Relations', 'Society', 'Economy', 'Science & Tech', 'Environment', 'Sports & Awards'];
 const PAGE_SIZE = 6;
@@ -748,9 +875,8 @@ export default function LandingPage() {
               </div>
             </div>
 
-            <div className="hidden lg:flex flex-col justify-center items-center gap-3">
-              <HeroMapAnimation />
-              <p className="text-xs text-gray-400 font-medium text-center">Connecting aspirants to learn and practice communication skills</p>
+            <div className="hidden lg:flex flex-col justify-center items-center">
+              <SpreadNewsCards />
             </div>
           </div>
         </section>
