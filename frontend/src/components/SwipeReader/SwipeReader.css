@@ -46,7 +46,7 @@
 }
 @media (min-width: 640px) {
   .swipe-reader {
-    height: min(85vh, 680px);
+    height: min(88vh, 720px);
   }
 }
 

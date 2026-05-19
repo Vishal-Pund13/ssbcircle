@@ -81,7 +81,7 @@ export default function SwipeReader({ article, onClose }) {
       {/* ── Card ── */}
       <div
         ref={containerRef}
-        className="swipe-reader relative bg-white flex flex-col overflow-hidden w-full sm:rounded-2xl sm:border sm:border-gray-200 sm:shadow-xl sm:max-w-sm"
+        className="swipe-reader relative bg-white flex flex-col overflow-hidden w-full sm:rounded-2xl sm:border sm:border-gray-200 sm:shadow-xl sm:max-w-xl"
       >
         {/* Progress bar */}
         <div className="shrink-0">
