@@ -168,9 +168,22 @@ export default function SwipeReader({ article, onClose }) {
 
           <SceneArea variants={mobileVariants} />
 
+          {/* Persistent swipe hint */}
+          <div className="shrink-0 flex justify-center pt-1.5 pb-0 bg-white">
+            <p className="text-[10px] text-gray-300 flex items-center gap-2 font-medium select-none">
+              <svg className="w-3 h-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M5 15l7-7 7 7" />
+              </svg>
+              swipe up · swipe down
+              <svg className="w-3 h-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
+              </svg>
+            </p>
+          </div>
+
           {/* Bottom nav */}
-          <div className="shrink-0 border-t border-gray-100 px-4 py-3 flex items-center justify-between bg-white"
-            style={{ paddingBottom: 'max(env(safe-area-inset-bottom, 0px) + 12px, 12px)' }}>
+          <div className="shrink-0 border-t border-gray-100 px-4 py-2.5 flex items-center justify-between bg-white"
+            style={{ paddingBottom: 'max(env(safe-area-inset-bottom, 0px) + 10px, 10px)' }}>
             <button onClick={prev} disabled={scene === 0}
               className="flex items-center gap-1 text-xs font-semibold disabled:opacity-30 cursor-pointer disabled:cursor-not-allowed text-brand-600">
               <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">

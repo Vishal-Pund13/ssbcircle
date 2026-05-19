@@ -39,14 +39,17 @@ const HERO_CARDS = [
   },
 ];
 
-function SpreadNewsCards() {
+function SpreadNewsCards({ small = false }) {
   const navigate = useNavigate();
   const [hovered, setHovered] = useState(null);
+  const W = small ? 140 : 176;
+  const cW = small ? 220 : 300;
+  const cH = small ? 240 : 320;
 
   return (
-    <div className="flex flex-col items-center gap-4 select-none">
+    <div className="flex flex-col items-center gap-3 select-none">
       {/* Card spread */}
-      <div className="relative" style={{ width: 300, height: 320 }}>
+      <div className="relative" style={{ width: cW, height: cH }}>
         {HERO_CARDS.map((card, i) => {
           const isHov = hovered === i && !card.ghost;
           return (
@@ -60,7 +63,7 @@ function SpreadNewsCards() {
                 position:   'absolute',
                 top:        '50%',
                 left:       '50%',
-                width:      176,
+                width:      W,
                 zIndex:     isHov ? 10 : i + 1,
                 transform:  isHov
                   ? `translate(calc(-50% + ${card.x}px), calc(-50% + ${card.y - 14}px)) rotate(0deg) scale(1.06)`
@@ -874,15 +877,11 @@ export default function LandingPage() {
                 </p>
               </div>
 
-              {/* India map — below aspirants, visible on all screen sizes */}
-              <div className="mt-6">
-                <HeroMapAnimation />
-                <p className="text-xs text-gray-400 font-medium mt-2">Connecting aspirants to learn and practice communication skills</p>
-              </div>
             </div>
 
-            <div className="hidden lg:flex flex-col justify-center items-center">
-              <SpreadNewsCards />
+            <div className="hidden lg:flex flex-col justify-center items-center gap-3">
+              <HeroMapAnimation />
+              <p className="text-xs text-gray-400 font-medium text-center">Connecting aspirants to learn and practice communication skills</p>
             </div>
           </div>
         </section>
@@ -1119,30 +1118,38 @@ export default function LandingPage() {
           </section>
         )}
 
-        {/* ── News Cards banner ── */}
-        <section className="border-t border-gray-100 bg-brand-50 px-4 sm:px-6 py-5">
-          <div className="max-w-5xl mx-auto flex items-center gap-4">
-            <svg viewBox="0 0 72 56" fill="none" className="shrink-0 w-14 h-11">
-              <rect x="2" y="10" width="46" height="34" rx="5" fill="#e0e7ff" transform="rotate(-9 25 27)" />
-              <rect x="7" y="8" width="46" height="34" rx="5" fill="#eef2ff" transform="rotate(-4 30 25)" />
-              <rect x="14" y="8" width="46" height="34" rx="5" fill="white" stroke="#c7d2fe" strokeWidth="1.2" />
-              <circle cx="28" cy="20" r="7.5" stroke="#1e3a5f" strokeWidth="1.3" />
-              <circle cx="24.8" cy="18.8" r="1.3" fill="#1e3a5f" />
-              <circle cx="28" cy="15.8" r="1.3" fill="#1e3a5f" />
-              <circle cx="31.2" cy="18.8" r="1.3" fill="#1e3a5f" />
-              <circle cx="30.1" cy="23" r="1.3" fill="#1e3a5f" />
-              <circle cx="25.9" cy="23" r="1.3" fill="#1e3a5f" />
-              <text x="39" y="22" fontSize="5.5" fontWeight="800" fill="#1e3a5f" fontFamily="system-ui,sans-serif" letterSpacing="0.5">NEWS</text>
-              <line x1="18" y1="33" x2="56" y2="33" stroke="#e0e7ff" strokeWidth="1.8" strokeLinecap="round" />
-              <line x1="18" y1="38" x2="50" y2="38" stroke="#e0e7ff" strokeWidth="1.8" strokeLinecap="round" />
-            </svg>
+        {/* ── News Cards feature showcase ── */}
+        <section className="border-t border-gray-100 bg-gray-50 px-4 sm:px-6 py-10 sm:py-14">
+          <div className="max-w-5xl mx-auto flex flex-col sm:flex-row items-center gap-8 sm:gap-12">
+
+            {/* Left: text */}
             <div className="flex-1 min-w-0">
-              <p className="text-[10px] font-bold text-brand-600 uppercase tracking-widest mb-0.5">✦ Latest Addition</p>
-              <p className="text-sm font-semibold text-gray-800 leading-snug mb-0.5">News Cards</p>
-              <p className="text-xs text-gray-500 leading-snug">No GD topic? Read a card, learn the issue, come back and speak.</p>
+              <p className="text-[10px] font-bold text-brand-600 uppercase tracking-widest mb-3">✦ Latest Addition</p>
+              <h2 className="text-2xl sm:text-3xl font-bold text-gray-900 leading-snug mb-3">News Cards</h2>
+              <p className="text-sm text-gray-500 leading-relaxed mb-6 max-w-sm">
+                No GD topic? Swipe through bite-sized cards on Defence, Economy, Polity, Geography & Society — then walk into any discussion ready to speak.
+              </p>
+              <div className="flex flex-col gap-2 mb-6">
+                {['Read a card in 5 minutes', 'Learn the issue with data & examples', 'Practice speaking it in a live GD room'].map((s, i) => (
+                  <div key={i} className="flex items-center gap-2.5 text-sm text-gray-600">
+                    <span className="w-5 h-5 rounded-full bg-brand-600 flex items-center justify-center shrink-0">
+                      <svg className="w-2.5 h-2.5 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3">
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+                      </svg>
+                    </span>
+                    {s}
+                  </div>
+                ))}
+              </div>
+              <Link to="/current-affairs" className="btn-primary text-sm px-6 py-2.5 inline-flex">
+                Explore News Cards
+              </Link>
             </div>
-            <Link to="/current-affairs" className="btn-primary text-xs px-4 py-2 shrink-0 hidden sm:inline-flex">Explore</Link>
-            <Link to="/current-affairs" className="text-xs font-bold text-brand-600 shrink-0 sm:hidden">Explore →</Link>
+
+            {/* Right: spread cards */}
+            <div className="shrink-0">
+              <SpreadNewsCards small />
+            </div>
           </div>
         </section>
 
