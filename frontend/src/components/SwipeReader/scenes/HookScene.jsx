@@ -27,13 +27,13 @@ export default function HookScene({ scene, article }) {
               {stat.value}
             </span>
             {isDown && (
-              <svg className="w-8 h-8 text-red-500 mb-1" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
-                <path strokeLinecap="round" strokeLinejoin="round" d="M12 5v14M5 16l7 6 7-6" />
+              <svg className="w-8 h-8 text-gray-400 mb-1" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
               </svg>
             )}
             {isUp && (
-              <svg className="w-8 h-8 text-emerald-500 mb-1" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
-                <path strokeLinecap="round" strokeLinejoin="round" d="M12 19V5M5 8l7-6 7 6" />
+              <svg className="w-8 h-8 text-brand-600 mb-1" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M5 15l7-7 7 7" />
               </svg>
             )}
           </div>

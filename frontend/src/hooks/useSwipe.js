@@ -17,8 +17,25 @@ export function useSwipe({ onSwipeUp, onSwipeDown, threshold = 50, elementRef })
     };
 
     const handleMove = (e) => {
-      // Prevent pull-to-refresh and page scroll while a swipe is in progress
-      if (startY.current !== null) e.preventDefault();
+      if (startY.current === null) return;
+
+      const deltaY = startY.current - e.touches[0].clientY;
+
+      // Walk up from the touch target to find a scrollable ancestor within the reader
+      let node = e.target;
+      while (node && node !== el) {
+        if (node.scrollHeight > node.clientHeight + 2) {
+          const atTop    = node.scrollTop <= 0;
+          const atBottom = node.scrollTop >= node.scrollHeight - node.clientHeight - 2;
+          // Allow native scroll unless we're already at the boundary in the swipe direction
+          if (!(atTop && deltaY < 0) && !(atBottom && deltaY > 0)) return;
+          break;
+        }
+        node = node.parentElement;
+      }
+
+      // No scrollable content in swipe direction — block pull-to-refresh / page scroll
+      e.preventDefault();
     };
 
     const handleEnd = (e) => {

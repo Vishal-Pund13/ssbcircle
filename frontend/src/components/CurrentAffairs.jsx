@@ -88,8 +88,9 @@ function ArticleCard({ article, onClick }) {
               <button
                 onClick={e => { e.stopPropagation(); navigate(`/read/${swipeKey}`); }}
                 className="flex items-center gap-1.5 text-xs font-bold text-white bg-brand-600 hover:bg-brand-700 px-3 py-1.5 rounded-full transition-all animate-bounce-slow shadow-sm shadow-brand-600/30">
-                <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M12 5v14M5 12l7-7 7 7M5 12l7 7 7-7" />
+                <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                  <rect x="2" y="7" width="20" height="14" rx="2" />
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M16 3H8a2 2 0 00-2 2v2h12V5a2 2 0 00-2-2z" />
                 </svg>
                 Read Cards
               </button>
@@ -255,11 +256,11 @@ export default function CurrentAffairs() {
           <section className="border-b border-gray-100 px-4 sm:px-6 py-8 sm:py-10">
             <div className="max-w-5xl mx-auto">
               <div className="inline-flex items-center gap-2 bg-brand-50 text-brand-600 text-[11px] font-bold px-3 py-1 rounded-full mb-4 border border-brand-100 uppercase tracking-widest">
-                <BookOpen className="w-3.5 h-3.5" /> Current Affairs
+                <BookOpen className="w-3.5 h-3.5" /> News Cards
               </div>
-              <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-2">Contemporary Issues</h1>
+              <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-2">News Cards</h1>
               <p className="text-sm text-gray-500 max-w-xl">
-                Stay informed across 5 key pillars — essential for SSB interviews, GD preparation and Lecturette topics.
+                Bite-sized explainers across 5 SSB pillars — read a card, understand the issue, then walk into any GD or Lecturette ready to speak.
               </p>
 
               {/* 5 pillar overview */}

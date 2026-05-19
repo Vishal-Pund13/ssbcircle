@@ -71,9 +71,9 @@ export default function SSBScene({ scene }) {
 
       {/* One-liner */}
       {one_liner && (
-        <div className="bg-amber-50 border border-amber-200 rounded-xl px-3 py-3 mt-auto">
-          <p className="text-[10px] font-semibold text-amber-700 uppercase tracking-wide mb-1">Key takeaway</p>
-          <p className="text-sm text-amber-800 italic font-medium leading-relaxed">"{one_liner}"</p>
+        <div className="bg-brand-50 border border-brand-100 rounded-xl px-3 py-3 mt-auto">
+          <p className="text-[10px] font-semibold text-brand-600 uppercase tracking-wide mb-1">Key takeaway</p>
+          <p className="text-sm text-brand-700 italic font-medium leading-relaxed">"{one_liner}"</p>
         </div>
       )}
     </div>
