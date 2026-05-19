@@ -945,17 +945,30 @@ export default function LandingPage() {
                 <span className="text-brand-600">real aspirants.</span>
               </h1>
 
-              {/* News Cards chip — small, non-intrusive */}
+              {/* News Cards chip */}
               <Link to="/current-affairs"
-                className="inline-flex items-center gap-2.5 text-xs font-semibold text-brand-600 bg-brand-50 border border-brand-100 px-3 py-1.5 rounded-full hover:bg-brand-100 transition-colors mb-4 sm:mb-5">
-                <span>+ News Cards</span>
-                {/* 3 tiny overlapping cards */}
-                <span className="flex items-end -space-x-1.5 select-none">
-                  {[{r:-9,bg:'#e0e7ff'},{r:-3,bg:'#eef2ff'},{r:3,bg:'#fff'}].map((c,i) => (
-                    <span key={i} className="block w-3 h-[15px] rounded-sm border border-brand-200 shrink-0"
-                      style={{ background: c.bg, transform: `rotate(${c.r}deg)`, marginBottom: i === 1 ? '1px' : '0' }} />
-                  ))}
-                </span>
+                className="inline-flex items-center gap-2 text-xs font-semibold text-brand-600 bg-brand-50 border border-brand-100 px-3 py-1.5 rounded-full hover:bg-brand-100 transition-colors mb-4 sm:mb-5 select-none">
+                {/* Stacked cards icon */}
+                <svg viewBox="0 0 34 24" fill="none" className="w-7 h-5 shrink-0">
+                  {/* Back card */}
+                  <rect x="1" y="5" width="20" height="14" rx="2.5" fill="#e0e7ff"
+                    transform="rotate(-11 11 12)" />
+                  {/* Middle card */}
+                  <rect x="5" y="3" width="20" height="14" rx="2.5" fill="#eef2ff"
+                    transform="rotate(-5 15 10)" />
+                  {/* Front card */}
+                  <rect x="10" y="2" width="20" height="14" rx="2.5" fill="white"
+                    stroke="#c7d2fe" strokeWidth="1.2" />
+                  {/* Headline line */}
+                  <line x1="13.5" y1="8" x2="27" y2="8"
+                    stroke="#1e3a5f" strokeWidth="1.6" strokeLinecap="round" />
+                  {/* Body lines */}
+                  <line x1="13.5" y1="11.5" x2="25" y2="11.5"
+                    stroke="#c7d2fe" strokeWidth="1.3" strokeLinecap="round" />
+                  <line x1="13.5" y1="14.5" x2="22" y2="14.5"
+                    stroke="#c7d2fe" strokeWidth="1.3" strokeLinecap="round" />
+                </svg>
+                <span>News Cards</span>
               </Link>
 
               <p className="text-gray-500 text-sm sm:text-lg leading-relaxed mb-6 sm:mb-8">
