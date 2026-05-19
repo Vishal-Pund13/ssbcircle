@@ -52,7 +52,8 @@ export default function SwipeReader({ article, onClose }) {
     return () => window.removeEventListener('keydown', onKey);
   }, [next, prev, onClose]);
 
-  const { onTouchStart, onTouchEnd } = useSwipe({ onSwipeUp: next, onSwipeDown: prev });
+  const containerRef = useRef(null);
+  useSwipe({ onSwipeUp: next, onSwipeDown: prev, elementRef: containerRef });
 
   const currentScene  = article.scenes[scene];
   const sceneLabel    = SCENE_LABELS[currentScene?.type] || '';
@@ -60,9 +61,8 @@ export default function SwipeReader({ article, onClose }) {
 
   return (
     <div
+      ref={containerRef}
       className="swipe-reader relative bg-white flex flex-col overflow-hidden w-full sm:rounded-2xl sm:border sm:border-gray-200 sm:shadow-xl sm:max-w-sm"
-      onTouchStart={onTouchStart}
-      onTouchEnd={onTouchEnd}
     >
       {/* ── Progress bar ── */}
       <div className="shrink-0">
