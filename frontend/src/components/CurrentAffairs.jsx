@@ -87,8 +87,11 @@ function ArticleCard({ article, onClick }) {
             {hasSwipe && (
               <button
                 onClick={e => { e.stopPropagation(); navigate(`/read/${swipeKey}`); }}
-                className="text-[10px] font-semibold text-gray-500 bg-gray-100 hover:bg-brand-50 hover:text-brand-600 px-2 py-0.5 rounded-full border border-gray-200 hover:border-brand-100 transition-all">
-                ↕ Swipe
+                className="flex items-center gap-1.5 text-xs font-bold text-white bg-brand-600 hover:bg-brand-700 px-3 py-1.5 rounded-full transition-all animate-bounce-slow shadow-sm shadow-brand-600/30">
+                <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M12 5v14M5 12l7-7 7 7M5 12l7 7 7-7" />
+                </svg>
+                Read Cards
               </button>
             )}
             <span className="flex items-center gap-0.5 text-[11px] font-semibold text-brand-600">
