@@ -727,6 +727,7 @@ export default function LandingPage() {
   const { user, logout } = useAuth();
   const [searchParams] = useSearchParams();
   const tabsSectionRef = useRef(null);
+  const [menuOpen,        setMenuOpen]        = useState(false);
   const [showTips,        setShowTips]        = useState(false);
   const [showEarlyAccess, setShowEarlyAccess] = useState(false);
   const [rooms,           setRooms]           = useState([]);
@@ -811,33 +812,118 @@ export default function LandingPage() {
     <div className="min-h-screen bg-white">
 
       {/* ── Navbar ── */}
-      <header className="border-b border-gray-100 sticky top-0 z-50 bg-white/90 backdrop-blur-md">
+      <header className="border-b border-gray-100 sticky top-0 z-50 bg-white/95 backdrop-blur-md">
         <div className="max-w-5xl mx-auto px-4 sm:px-6 h-14 flex items-center justify-between gap-3">
           <Link to="/"><Logo /></Link>
-          <nav className="flex items-center gap-1.5 sm:gap-2">
-            <Link to="/current-affairs" className="text-sm text-gray-500 hover:text-gray-900 px-2 sm:px-3 py-2 font-medium">
-              <span className="hidden sm:inline">News Cards</span>
-              <span className="sm:hidden text-xs font-semibold">Cards</span>
-            </Link>
+
+          {/* ── Desktop nav ── */}
+          <nav className="hidden sm:flex items-center gap-2">
+            <Link to="/current-affairs" className="text-sm text-gray-500 hover:text-gray-900 px-3 py-2 font-medium">News Cards</Link>
             {user ? (
               <>
                 <Link to="/profile" className="flex items-center gap-1.5 px-2 py-1.5 rounded-lg hover:bg-gray-50 transition-colors">
                   <Avatar name={user.display_name} avatarUrl={user.avatar_url} />
-                  <span className="hidden sm:block text-sm text-gray-600 font-medium">{user.display_name}</span>
+                  <span className="text-sm text-gray-600 font-medium">{user.display_name}</span>
                 </Link>
-                <button onClick={() => navigate('/join')} className="hidden sm:flex btn-secondary py-1.5 px-3 text-xs">Join</button>
-                <button onClick={() => navigate('/create')} className="btn-primary py-1.5 px-3 text-xs sm:px-4 sm:text-sm">Create Room</button>
-                <button onClick={logout} className="text-xs text-gray-400 hover:text-gray-600 px-2 cursor-pointer transition-colors hidden sm:block">Sign out</button>
+                <button onClick={() => navigate('/join')} className="btn-secondary py-1.5 px-3 text-xs">Join</button>
+                <button onClick={() => navigate('/create')} className="btn-primary py-1.5 px-4 text-sm">Create Room</button>
+                <button onClick={logout} className="text-xs text-gray-400 hover:text-gray-600 px-2 cursor-pointer transition-colors">Sign out</button>
               </>
             ) : (
               <>
-                <Link to="/login" className="text-sm text-gray-500 hover:text-gray-900 px-3 py-2 font-medium hidden sm:block">Sign in</Link>
-                <Link to="/login" className="text-sm text-gray-500 hover:text-gray-900 px-2 py-2 font-medium sm:hidden">Sign in</Link>
-                <Link to="/register" className="btn-primary py-1.5 px-3 text-xs sm:px-4 sm:text-sm">Get started</Link>
+                <Link to="/login" className="text-sm text-gray-500 hover:text-gray-900 px-3 py-2 font-medium">Sign in</Link>
+                <Link to="/register" className="btn-primary py-1.5 px-4 text-sm">Get started</Link>
               </>
             )}
           </nav>
+
+          {/* ── Mobile right: primary action + hamburger ── */}
+          <div className="sm:hidden flex items-center gap-2">
+            {user ? (
+              <button onClick={() => navigate('/create')} className="btn-primary py-1.5 px-3 text-xs">
+                + Create
+              </button>
+            ) : (
+              <Link to="/register" className="btn-primary py-1.5 px-3 text-xs">Get started</Link>
+            )}
+            <button
+              onClick={() => setMenuOpen(v => !v)}
+              className="flex items-center justify-center w-9 h-9 rounded-xl border border-gray-200 bg-white hover:bg-gray-50 transition-colors cursor-pointer"
+              aria-label="Menu"
+            >
+              {menuOpen ? (
+                <X className="w-4 h-4 text-gray-600" />
+              ) : (
+                <svg className="w-4 h-4 text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M4 6h16M4 12h16M4 18h9" />
+                </svg>
+              )}
+            </button>
+          </div>
         </div>
+
+        {/* ── Mobile menu panel ── */}
+        {menuOpen && (
+          <div className="sm:hidden bg-white border-t border-gray-100 shadow-xl">
+            <div className="px-4 py-4 flex flex-col gap-1">
+
+              {/* News Cards row */}
+              <Link to="/current-affairs"
+                onClick={() => setMenuOpen(false)}
+                className="flex items-center gap-3 px-3 py-3 rounded-xl hover:bg-brand-50 transition-colors group">
+                <div className="w-8 h-8 rounded-lg bg-brand-50 border border-brand-100 flex items-center justify-center shrink-0 group-hover:bg-brand-100 transition-colors">
+                  <BookOpen className="w-4 h-4 text-brand-600" />
+                </div>
+                <div>
+                  <p className="text-sm font-semibold text-gray-800">News Cards</p>
+                  <p className="text-[11px] text-gray-400">GD topics · Lecturette prep</p>
+                </div>
+              </Link>
+
+              <div className="h-px bg-gray-100 my-1" />
+
+              {user ? (
+                <>
+                  {/* Profile */}
+                  <Link to="/profile" onClick={() => setMenuOpen(false)}
+                    className="flex items-center gap-3 px-3 py-3 rounded-xl hover:bg-gray-50 transition-colors">
+                    <Avatar name={user.display_name} avatarUrl={user.avatar_url} />
+                    <div>
+                      <p className="text-sm font-semibold text-gray-800">{user.display_name}</p>
+                      <p className="text-[11px] text-gray-400">View profile</p>
+                    </div>
+                  </Link>
+
+                  <div className="h-px bg-gray-100 my-1" />
+
+                  {/* Room actions */}
+                  <div className="grid grid-cols-2 gap-2 px-1">
+                    <button onClick={() => { navigate('/join'); setMenuOpen(false); }}
+                      className="btn-secondary text-sm py-2.5 w-full">Join Room</button>
+                    <button onClick={() => { navigate('/create'); setMenuOpen(false); }}
+                      className="btn-primary text-sm py-2.5 w-full">Create Room</button>
+                  </div>
+
+                  <div className="h-px bg-gray-100 my-1" />
+
+                  <button onClick={() => { logout(); setMenuOpen(false); }}
+                    className="text-sm text-gray-400 hover:text-gray-600 text-left px-3 py-2.5 cursor-pointer transition-colors">
+                    Sign out
+                  </button>
+                </>
+              ) : (
+                <>
+                  <div className="grid grid-cols-2 gap-2 px-1 mt-1">
+                    <Link to="/login" onClick={() => setMenuOpen(false)}
+                      className="btn-secondary text-sm py-2.5 text-center">Sign in</Link>
+                    <Link to="/register" onClick={() => setMenuOpen(false)}
+                      className="btn-primary text-sm py-2.5 text-center">Get started</Link>
+                  </div>
+                </>
+              )}
+            </div>
+          </div>
+        )}
       </header>
 
       <main>
