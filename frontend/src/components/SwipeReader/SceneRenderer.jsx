@@ -16,7 +16,7 @@ const SCENE_MAP = {
   quiz:            QuizScene,
 };
 
-export default function SceneRenderer({ scene, article }) {
+export default function SceneRenderer({ scene, article, onClose }) {
   const Component = SCENE_MAP[scene.type];
   if (!Component) {
     return (
@@ -25,5 +25,5 @@ export default function SceneRenderer({ scene, article }) {
       </div>
     );
   }
-  return <Component scene={scene} article={article} />;
+  return <Component scene={scene} article={article} onClose={onClose} />;
 }

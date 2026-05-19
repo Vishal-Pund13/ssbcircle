@@ -83,7 +83,7 @@ function StarRating({ articleId }) {
   );
 }
 
-export default function QuizScene({ scene, article }) {
+export default function QuizScene({ scene, article, onClose }) {
   const { title, questions } = scene;
   const [answers, setAnswers] = useState({});
   const [done,    setDone]    = useState(false);
@@ -126,6 +126,19 @@ export default function QuizScene({ scene, article }) {
             Now practice using this in a live GD room on SSBCircle to build fluency under pressure.
           </p>
         </div>
+
+        {/* Exit button — prominent, easy to find */}
+        {onClose && (
+          <button
+            onClick={onClose}
+            className="flex items-center gap-2 px-5 py-2.5 rounded-full border border-gray-200 bg-white text-sm font-semibold text-gray-600 hover:border-brand-300 hover:text-brand-600 hover:bg-brand-50 transition-all cursor-pointer shadow-sm"
+          >
+            <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+              <path strokeLinecap="round" strokeLinejoin="round" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+            </svg>
+            Back to News Cards
+          </button>
+        )}
       </div>
     );
   }
