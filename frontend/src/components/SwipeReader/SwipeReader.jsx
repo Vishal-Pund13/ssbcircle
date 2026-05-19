@@ -132,9 +132,11 @@ export default function SwipeReader({ article, onClose }) {
               animate="center"
               exit="exit"
               transition={{ duration: 0.25, ease: 'easeOut' }}
-              className="absolute inset-0 overflow-y-auto"
+              className="absolute inset-0 overflow-hidden"
             >
-              <SceneRenderer scene={currentScene} article={article} />
+              <div className="h-full overflow-y-auto">
+                <SceneRenderer scene={currentScene} article={article} />
+              </div>
             </motion.div>
           </AnimatePresence>
 
