@@ -9,6 +9,7 @@ const roomsRouter    = require('./routes/rooms');
 const authRouter     = require('./routes/auth');
 const adminRouter    = require('./routes/admin');
 const sessionsRouter = require('./routes/sessions');
+const articlesRouter = require('./routes/articles');
 const { startCleanup, runCleanup } = require('./cleanup');
 const { sendReminder, sendHostStartReminder } = require('./email');
 
@@ -50,6 +51,9 @@ app.use('/api/admin', generalLimiter, adminRouter);
 
 // Sessions
 app.use('/api/sessions', generalLimiter, sessionsRouter);
+
+// Articles (public read)
+app.use('/api/articles', generalLimiter, articlesRouter);
 
 // Report a user (any signed-in user)
 const authMw = require('./middleware/auth');
@@ -222,6 +226,172 @@ async function start() {
     await pool.query(`CREATE INDEX IF NOT EXISTS idx_interests_session ON session_interests(session_id)`);
     await pool.query(`CREATE INDEX IF NOT EXISTS idx_users_google      ON users(google_id)`);
     await pool.query(`CREATE INDEX IF NOT EXISTS idx_users_email       ON users(email)`);
+
+    await pool.query(`
+      CREATE TABLE IF NOT EXISTS articles (
+        id           UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+        title        VARCHAR(300) NOT NULL,
+        category     VARCHAR(50)  NOT NULL,
+        summary      TEXT         NOT NULL,
+        content      TEXT         NOT NULL,
+        tags         TEXT[]       DEFAULT '{}',
+        is_published BOOLEAN      DEFAULT false,
+        published_at TIMESTAMP,
+        created_at   TIMESTAMP    DEFAULT NOW()
+      )
+    `);
+    await pool.query(`CREATE INDEX IF NOT EXISTS idx_articles_category  ON articles(category)     WHERE is_published = true`);
+    await pool.query(`CREATE INDEX IF NOT EXISTS idx_articles_published ON articles(published_at DESC) WHERE is_published = true`);
+    await pool.query(`ALTER TABLE articles ADD COLUMN IF NOT EXISTS reading_time  VARCHAR(20)  DEFAULT NULL`);
+    await pool.query(`ALTER TABLE articles ADD COLUMN IF NOT EXISTS difficulty    VARCHAR(20)  DEFAULT NULL`);
+    await pool.query(`ALTER TABLE articles ADD COLUMN IF NOT EXISTS ssb_relevance TEXT[]       DEFAULT '{}'`);
+
+    // Seed first article if none exist
+    const { rows: existingArticles } = await pool.query('SELECT id FROM articles LIMIT 1');
+    if (existingArticles.length === 0) {
+      const content = `[CALLOUT]Before you read: You don't need to be an economics student to understand this. If you've ever wondered why your petrol price goes up when the news says "rupee falls" — this article will make that click for you.[/CALLOUT]
+
+## The Headline That Confused a Million Aspirants
+
+**₹90 per dollar.**
+
+In 2025, the Indian rupee hit an all-time low against the US dollar. News channels went into overdrive. WhatsApp forwards declared economic doom.
+
+But here's what nobody told you clearly:
+
+**A falling rupee is not always a crisis. Sometimes, it's a calculated move.**
+
+By the end of this article, you'll be able to explain this confidently in a GD or Lecturette — without sounding like you're reading from a textbook.
+
+## What Even Is the Rupee's Value?
+
+Imagine you're buying apples. If everyone wants apples and there aren't many, the price goes up. If nobody wants them and there are too many, the price falls.
+
+**Currency works the same way.**
+
+The rupee's value against the dollar is just a price — determined by supply and demand. When more people want dollars and fewer want rupees, the rupee's price falls.
+
+**₹84 per dollar → ₹90 per dollar** means you now need MORE rupees to buy the same dollar. That's depreciation.
+
+[INFOGRAPHIC:1]
+
+## Who Decides the Rupee's Value?
+
+Short answer: **the market does. But RBI watches carefully.**
+
+Before 1991, the Indian government fixed the rupee's value — like a shopkeeper deciding the price regardless of what buyers want. That system nearly broke India when we ran out of dollars in 1991 — the famous Balance of Payments crisis.
+
+After 1991, India switched to a **managed float system**:
+
+- The market sets the rate based on demand and supply
+- RBI steps in only when things get too volatile — not to fix a price, but to prevent panic
+
+Think of RBI as a traffic cop — it doesn't build the roads or decide where you're going, but it ensures there's no accident at the junction.
+
+[INFOGRAPHIC:2]
+
+## Why Does the Rupee Fall? The 5 Real Reasons
+
+### Reason 1 — We Import More Than We Export
+
+India buys a lot from the world — crude oil, electronics, gold, machinery. We pay in **dollars**, not rupees. So importers flood the forex market with rupees and buy dollars. More demand for dollars → dollar becomes expensive → rupee becomes cheap.
+
+In October 2025, India's exports fell 11.8% while imports surged 16.6%. That gap — the **trade deficit** — put enormous pressure on the rupee.
+
+[INFOGRAPHIC:3]
+
+### Reason 2 — Foreign Investors Pulling Out (FPI Outflows)
+
+Foreign Portfolio Investors are large global funds that invest in Indian stocks and bonds. When they leave, they sell Indian stocks → get rupees → convert to dollars → exit. That last step floods the market with rupees and sucks up dollars, weakening the rupee.
+
+In 2025, FPIs pulled out over **₹1.48 lakh crore** from Indian markets.
+
+[INFOGRAPHIC:4]
+
+### Reason 3 — The Dollar Got Stronger
+
+The US Federal Reserve raised interest rates aggressively. Higher US rates = better returns on dollar investments = global investors prefer dollars. When the whole world wants dollars, **every currency weakens** — not just the rupee. This is a global phenomenon, not an India-specific failure.
+
+### Reason 4 — Gold & Oil: India's Two Expensive Habits
+
+India is the world's second-largest gold consumer and one of the largest oil importers. In FY26, India imported gold worth **$72 billion** and oil worth **$135 billion** — over **$206 billion** on just two items. Every dollar spent is a dollar that leaves India, weakening the rupee.
+
+### Reason 5 — Sentiment and Expectations
+
+Sometimes the rupee falls simply because people expect it to fall. This becomes self-fulfilling — investors rush to buy dollars now, which weakens the rupee immediately. Currency markets run 20% on fundamentals and 80% on sentiment.
+
+## Is a Falling Rupee Always Bad?
+
+**No. And this is the part most people miss.**
+
+[INFOGRAPHIC:5]
+
+India's IT sector — which earns billions in dollars — actually profits when the rupee weakens. Companies like TCS and Infosys often see profits rise on rupee depreciation news because they earn in dollars but pay salaries in rupees.
+
+## What Does RBI Actually Do?
+
+**RBI's actual job:** Prevent chaos, not prevent change.
+
+In 2025, RBI shifted strategy — instead of defending specific rupee levels, it lets the market determine direction but steps in when the fall becomes too steep, too sudden.
+
+If you're letting air out of a tyre — controlled deflation is fine. Blowout is not.
+
+[INFOGRAPHIC:6]
+
+## The Big Picture — Is India in Trouble?
+
+Context matters. The rupee has been depreciating since 1991 — from ₹17 to ₹90. That's 34 years at roughly 4.5% per year on average. **This is structural, not sudden.**
+
+Despite depreciation, India remains one of the fastest-growing major economies, a net recipient of FDI, a country with strong forex reserves, and a growing services export powerhouse in IT, healthcare, and education.
+
+The rupee is adjusting — not collapsing. There's a difference.
+
+[SSB-GD]**Don't say:** "The rupee falling is bad for India."
+
+**Say instead:** "Rupee depreciation is a double-edged sword — while it hurts importers and raises inflation risks, it makes Indian exports more competitive and boosts IT sector earnings. The key question is whether RBI can manage the pace of depreciation without letting it become disorderly."
+
+That one line shows analytical thinking — an Officer-Like Quality.[/SSB-GD]
+
+[SSB-LECTURETTE]**Suggested structure (under 3 minutes):**
+1. Open with the headline — "₹90 to a dollar — crisis or correction?"
+2. Explain depreciation — simple supply-demand
+3. Give 2–3 causes — trade deficit, FPI outflows, strong dollar
+4. Balance it — winners and losers
+5. Close with RBI's role and India's resilience[/SSB-LECTURETTE]
+
+[SSB-PI]**If asked:** "What do you think about the falling rupee?"
+
+**Say:** "Sir, a falling rupee reflects structural economic realities — our trade deficit, global dollar strength, and capital flows. It's not a one-dimensional problem. The more important question is whether India has the forex reserves, institutional strength, and policy framework to manage the adjustment — and currently, we do."[/SSB-PI]
+
+[KEY-TERMS]
+Depreciation|Rupee falls naturally due to market forces
+Devaluation|Government deliberately reduces rupee's value
+Trade Deficit|India imports more than it exports
+Current Account Deficit (CAD)|Broader trade gap including services and income flows
+FPI|Foreign Portfolio Investors — invest in stocks/bonds, can leave quickly
+FDI|Foreign Direct Investment — companies building factories, stay longer
+Forex Reserves|RBI's stockpile of foreign currency — India's financial shield
+Managed Float|Market sets the rate; RBI prevents extreme swings
+REER|Rupee's value adjusted for inflation — the real exchange rate
+[/KEY-TERMS]
+
+[QUOTE]The rupee's fall is not a collapse — it's a managed descent. The goal isn't to hold the parachute shut, it's to make sure it opens at the right time.[/QUOTE]`;
+
+      await pool.query(`
+        INSERT INTO articles (title, category, summary, content, tags, is_published, published_at, reading_time, difficulty, ssb_relevance)
+        VALUES ($1, $2, $3, $4, $5, true, NOW(), $6, $7, $8)
+      `, [
+        'The Rupee Story: Why India\'s Currency Falls — and Why That\'s Not Always Bad',
+        'economic',
+        'India\'s rupee hit ₹90 per dollar in 2025. But is a falling rupee always bad? This beginner-friendly explainer breaks down currency depreciation, its causes, who wins and who loses — and how to discuss it confidently in SSB GD, Lecturette and PI.',
+        content,
+        ['economy', 'rupee', 'RBI', 'forex', 'current-affairs', 'GD-topics', 'lecturette', 'PI-prep'],
+        '8 min',
+        'Beginner',
+        ['GD Topics', 'Lecturette', 'PI'],
+      ]);
+      console.log('✓ Seeded first article: The Rupee Story');
+    }
     await pool.query(`
       CREATE TABLE IF NOT EXISTS scheduled_sessions (
         id UUID PRIMARY KEY DEFAULT gen_random_uuid(),

@@ -13,6 +13,8 @@ const JoinRoom            = lazy(() => import('./components/JoinRoom'));
 const RoomView            = lazy(() => import('./components/RoomView'));
 const SuperAdminLogin     = lazy(() => import('./components/SuperAdminLogin'));
 const SuperAdminDashboard = lazy(() => import('./components/SuperAdminDashboard'));
+const CurrentAffairs      = lazy(() => import('./components/CurrentAffairs'));
+const ReadPage            = lazy(() => import('./components/SwipeReader/ReadPage'));
 
 function PageLoader() {
   return (
@@ -36,6 +38,8 @@ export default function App() {
             <Route path="/join"    element={<JoinRoom />} />
             <Route path="/join/:code" element={<JoinRoom />} />
             <Route path="/room/:code" element={<ProtectedRoute><RoomView /></ProtectedRoute>} />
+            <Route path="/current-affairs" element={<CurrentAffairs />} />
+            <Route path="/read/:articleId"  element={<ReadPage />} />
             <Route path="/sa"           element={<SuperAdminLogin />} />
             <Route path="/sa/dashboard" element={<SuperAdminDashboard />} />
             <Route path="*" element={<Navigate to="/" replace />} />

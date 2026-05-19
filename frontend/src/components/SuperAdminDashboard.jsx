@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Users, Radio, FolderOpen, CalendarDays, Trash2, LogOut, RefreshCw, Calendar, Bell, PlayCircle, Ban, ShieldCheck, Flag, CheckCircle, Edit3, Check, Star } from 'lucide-react';
+import { Users, Radio, FolderOpen, CalendarDays, Trash2, LogOut, RefreshCw, Calendar, Bell, PlayCircle, Ban, ShieldCheck, Flag, CheckCircle, Edit3, Check, Star, BookOpen, Plus, Eye, EyeOff } from 'lucide-react';
 
 const API = import.meta.env.VITE_API_URL || 'http://localhost:4000';
 
@@ -167,6 +167,110 @@ function RoomRow({ r, onClose, onFeature, CATEGORY_COLORS }) {
   );
 }
 
+const ARTICLE_CATEGORIES = [
+  { id: 'defence',        label: 'Defence & Security' },
+  { id: 'economic',       label: 'Economic' },
+  { id: 'polity',         label: 'Polity' },
+  { id: 'geographic',     label: 'Geographic' },
+  { id: 'socio-cultural', label: 'Socio-Cultural' },
+];
+
+function ArticleForm({ initial, onSave, onCancel }) {
+  const [form,    setForm]    = useState({ reading_time: '', difficulty: 'Beginner', ssb_relevance: [], ...initial });
+  const [saving,  setSaving]  = useState(false);
+  const [error,   setError]   = useState('');
+  const isEdit = !!initial.id;
+
+  function set(k, v) { setForm(p => ({ ...p, [k]: v })); }
+
+  async function submit(publish) {
+    setSaving(true); setError('');
+    try { await onSave({ ...form, is_published: publish }); }
+    catch (e) { setError(e.message); }
+    finally { setSaving(false); }
+  }
+
+  return (
+    <div className="bg-white border border-gray-200 rounded-xl p-6 space-y-4">
+      <div className="flex items-center justify-between mb-2">
+        <h3 className="font-bold text-gray-900">{isEdit ? 'Edit Article' : 'New Article'}</h3>
+        <button onClick={onCancel} className="text-xs text-gray-400 hover:text-gray-600 cursor-pointer">Cancel</button>
+      </div>
+      {error && <p className="text-xs text-red-500 bg-red-50 border border-red-100 rounded-lg px-3 py-2">{error}</p>}
+
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        <div className="sm:col-span-2">
+          <label className="block text-xs font-semibold text-gray-600 mb-1">Title</label>
+          <input value={form.title} onChange={e => set('title', e.target.value)} maxLength={300}
+            placeholder="Article title..."
+            className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm text-gray-900 focus:outline-none focus:border-brand-400" />
+        </div>
+        <div>
+          <label className="block text-xs font-semibold text-gray-600 mb-1">Category (Pillar)</label>
+          <select value={form.category} onChange={e => set('category', e.target.value)}
+            className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm text-gray-900 focus:outline-none focus:border-brand-400">
+            {ARTICLE_CATEGORIES.map(c => (
+              <option key={c.id} value={c.id}>{c.label}</option>
+            ))}
+          </select>
+        </div>
+        <div>
+          <label className="block text-xs font-semibold text-gray-600 mb-1">Tags (comma separated)</label>
+          <input value={(form.tags || []).join(', ')}
+            onChange={e => set('tags', e.target.value.split(',').map(t => t.trim()).filter(Boolean))}
+            placeholder="e.g. GDP, Budget, RBI"
+            className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm text-gray-900 focus:outline-none focus:border-brand-400" />
+        </div>
+        <div>
+          <label className="block text-xs font-semibold text-gray-600 mb-1">Reading Time</label>
+          <input value={form.reading_time || ''} onChange={e => set('reading_time', e.target.value)}
+            placeholder="e.g. 8 min"
+            className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm text-gray-900 focus:outline-none focus:border-brand-400" />
+        </div>
+        <div>
+          <label className="block text-xs font-semibold text-gray-600 mb-1">Difficulty</label>
+          <select value={form.difficulty || 'Beginner'} onChange={e => set('difficulty', e.target.value)}
+            className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm text-gray-900 focus:outline-none focus:border-brand-400">
+            <option>Beginner</option><option>Intermediate</option><option>Advanced</option>
+          </select>
+        </div>
+        <div className="sm:col-span-2">
+          <label className="block text-xs font-semibold text-gray-600 mb-1">SSB Relevance (comma separated)</label>
+          <input value={(form.ssb_relevance || []).join(', ')}
+            onChange={e => set('ssb_relevance', e.target.value.split(',').map(t => t.trim()).filter(Boolean))}
+            placeholder="e.g. GD Topics, Lecturette, PI"
+            className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm text-gray-900 focus:outline-none focus:border-brand-400" />
+        </div>
+        <div className="sm:col-span-2">
+          <label className="block text-xs font-semibold text-gray-600 mb-1">Summary (shown in card)</label>
+          <textarea value={form.summary} onChange={e => set('summary', e.target.value)} rows={2} maxLength={500}
+            placeholder="2-3 line summary for the article card..."
+            className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm text-gray-900 resize-none focus:outline-none focus:border-brand-400" />
+        </div>
+        <div className="sm:col-span-2">
+          <label className="block text-xs font-semibold text-gray-600 mb-1">
+            Full Content <span className="text-gray-400 font-normal">(separate paragraphs with a blank line)</span>
+          </label>
+          <textarea value={form.content} onChange={e => set('content', e.target.value)} rows={16}
+            placeholder="Write the full article here. Use blank lines between paragraphs..."
+            className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm text-gray-900 resize-y focus:outline-none focus:border-brand-400 font-mono" />
+        </div>
+      </div>
+
+      <div className="flex items-center gap-3 pt-2">
+        <button onClick={() => submit(true)} disabled={saving}
+          className="btn-primary text-sm px-5 py-2.5 disabled:opacity-50">
+          {saving ? 'Saving…' : isEdit ? 'Save & Publish' : 'Publish Now'}
+        </button>
+        <button onClick={() => submit(false)} disabled={saving}
+          className="btn-secondary text-sm px-5 py-2.5 disabled:opacity-50">
+          {saving ? 'Saving…' : 'Save as Draft'}
+        </button>
+      </div>
+    </div>
+  );
+}
+
 export default function SuperAdminDashboard() {
   const navigate = useNavigate();
   const [stats,    setStats]    = useState(null);
@@ -174,7 +278,9 @@ export default function SuperAdminDashboard() {
   const [users,    setUsers]    = useState([]);
   const [sessions, setSessions] = useState([]);
   const [reports,  setReports]  = useState([]);
+  const [articles, setArticles] = useState([]);
   const [tab,      setTab]      = useState('reports');
+  const [articleForm, setArticleForm] = useState(null);
   const [loading,  setLoading]  = useState(true);
   const [error,    setError]    = useState('');
 
@@ -190,13 +296,17 @@ export default function SuperAdminDashboard() {
       if (sRes.status === 401 || sRes.status === 403) {
         sessionStorage.removeItem('sa_token'); navigate('/sa'); return;
       }
-      const repRes = await fetch(`${API}/api/admin/reports`, { headers: authHeaders() });
-      const [s, r, u, ss, rep] = await Promise.all([sRes.json(), rRes.json(), uRes.json(), ssRes.json(), repRes.json()]);
+      const [repRes, artRes] = await Promise.all([
+        fetch(`${API}/api/admin/reports`,  { headers: authHeaders() }),
+        fetch(`${API}/api/admin/articles`, { headers: authHeaders() }),
+      ]);
+      const [s, r, u, ss, rep, art] = await Promise.all([sRes.json(), rRes.json(), uRes.json(), ssRes.json(), repRes.json(), artRes.json()]);
       setStats(s);
       setRooms(r.rooms || []);
       setUsers(u.users || []);
       setSessions(ss.sessions || []);
       setReports(rep.reports || []);
+      setArticles(art.articles || []);
     } catch {
       setError('Failed to load data. Check your connection.');
     } finally {
@@ -251,9 +361,40 @@ export default function SuperAdminDashboard() {
     navigate('/sa');
   }
 
+  async function handleSaveArticle(form) {
+    const isEdit = !!form.id;
+    const url = isEdit ? `${API}/api/admin/articles/${form.id}` : `${API}/api/admin/articles`;
+    const res = await fetch(url, {
+      method: isEdit ? 'PATCH' : 'POST',
+      headers: authHeaders(),
+      body: JSON.stringify(form),
+    });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.error || 'Failed');
+    if (isEdit) setArticles(p => p.map(a => a.id === form.id ? data.article : a));
+    else setArticles(p => [data.article, ...p]);
+    setArticleForm(null);
+  }
+
+  async function handleTogglePublish(article) {
+    const res = await fetch(`${API}/api/admin/articles/${article.id}`, {
+      method: 'PATCH', headers: authHeaders(),
+      body: JSON.stringify({ is_published: !article.is_published }),
+    });
+    const data = await res.json();
+    if (res.ok) setArticles(p => p.map(a => a.id === article.id ? data.article : a));
+  }
+
+  async function handleDeleteArticle(id) {
+    if (!window.confirm('Delete this article?')) return;
+    await fetch(`${API}/api/admin/articles/${id}`, { method: 'DELETE', headers: authHeaders() });
+    setArticles(p => p.filter(a => a.id !== id));
+  }
+
   const pendingReports = reports.filter(r => r.status === 'pending').length;
   const TABS = [
     { id: 'reports',  label: 'Reports',  count: pendingReports, alert: pendingReports > 0 },
+    { id: 'articles', label: 'Articles', count: articles.length },
     { id: 'rooms',    label: 'Rooms',    count: rooms.length },
     { id: 'sessions', label: 'Sessions', count: sessions.length },
     { id: 'users',    label: 'Users',    count: users.length },
@@ -412,6 +553,83 @@ export default function SuperAdminDashboard() {
                 </tbody>
               </table>
             </div>
+          </div>
+        )}
+
+        {/* ── Articles ── */}
+        {tab === 'articles' && (
+          <div>
+            {articleForm ? (
+              <ArticleForm
+                initial={articleForm}
+                onSave={handleSaveArticle}
+                onCancel={() => setArticleForm(null)}
+              />
+            ) : (
+              <>
+                <div className="flex items-center justify-between mb-4">
+                  <p className="text-sm text-gray-500">{articles.length} article{articles.length !== 1 ? 's' : ''} total</p>
+                  <button onClick={() => setArticleForm({ title:'', category:'economic', summary:'', content:'', tags:[], is_published:false })}
+                    className="flex items-center gap-1.5 btn-primary text-xs py-2 px-4">
+                    <Plus className="w-3.5 h-3.5" /> New Article
+                  </button>
+                </div>
+                <div className="bg-white border border-gray-200 rounded-xl overflow-hidden">
+                  {articles.length === 0 ? (
+                    <p className="text-sm text-gray-400 text-center py-12">No articles yet — click "New Article" to write the first one.</p>
+                  ) : (
+                    <table className="w-full text-sm">
+                      <thead>
+                        <tr className="border-b border-gray-100 bg-gray-50 text-left">
+                          <th className="px-4 py-3 text-[11px] font-semibold text-gray-500 uppercase tracking-wide">Title</th>
+                          <th className="px-4 py-3 text-[11px] font-semibold text-gray-500 uppercase tracking-wide hidden sm:table-cell">Category</th>
+                          <th className="px-4 py-3 text-[11px] font-semibold text-gray-500 uppercase tracking-wide">Status</th>
+                          <th className="px-4 py-3 text-[11px] font-semibold text-gray-500 uppercase tracking-wide hidden sm:table-cell">Date</th>
+                          <th className="px-4 py-3" />
+                        </tr>
+                      </thead>
+                      <tbody className="divide-y divide-gray-50">
+                        {articles.map(a => (
+                          <tr key={a.id} className="hover:bg-gray-50 transition-colors">
+                            <td className="px-4 py-3">
+                              <p className="font-medium text-gray-900 truncate max-w-[200px]">{a.title}</p>
+                              <p className="text-[11px] text-gray-400 truncate max-w-[200px] mt-0.5">{a.summary}</p>
+                            </td>
+                            <td className="px-4 py-3 hidden sm:table-cell">
+                              <span className="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-brand-50 text-brand-600">{a.category}</span>
+                            </td>
+                            <td className="px-4 py-3">
+                              <span className={`text-[10px] font-semibold px-2 py-0.5 rounded-full ${a.is_published ? 'bg-emerald-50 text-emerald-700' : 'bg-gray-100 text-gray-500'}`}>
+                                {a.is_published ? 'Published' : 'Draft'}
+                              </span>
+                            </td>
+                            <td className="px-4 py-3 hidden sm:table-cell text-xs text-gray-400">
+                              {a.published_at ? fmtDate(a.published_at) : '—'}
+                            </td>
+                            <td className="px-4 py-3 text-right">
+                              <div className="flex items-center gap-1 justify-end">
+                                <button onClick={() => handleTogglePublish(a)} title={a.is_published ? 'Unpublish' : 'Publish'}
+                                  className="p-1.5 rounded-lg text-gray-300 hover:text-emerald-600 hover:bg-emerald-50 transition-colors cursor-pointer">
+                                  {a.is_published ? <EyeOff className="w-3.5 h-3.5"/> : <Eye className="w-3.5 h-3.5"/>}
+                                </button>
+                                <button onClick={() => setArticleForm(a)} title="Edit"
+                                  className="p-1.5 rounded-lg text-gray-300 hover:text-brand-600 hover:bg-brand-50 transition-colors cursor-pointer">
+                                  <Edit3 className="w-3.5 h-3.5"/>
+                                </button>
+                                <button onClick={() => handleDeleteArticle(a.id)} title="Delete"
+                                  className="p-1.5 rounded-lg text-gray-300 hover:text-red-500 hover:bg-red-50 transition-colors cursor-pointer">
+                                  <Trash2 className="w-3.5 h-3.5"/>
+                                </button>
+                              </div>
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  )}
+                </div>
+              </>
+            )}
           </div>
         )}
 

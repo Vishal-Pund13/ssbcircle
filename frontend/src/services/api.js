@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 const api = axios.create({
-  baseURL: import.meta.env.VITE_API_URL || 'http://localhost:4000',
+  baseURL: import.meta.env.VITE_API_URL || '',
   timeout: 10000,
   headers: { 'Content-Type': 'application/json' },
 });
@@ -114,4 +114,16 @@ export const getFeatured = async () => {
 export const reportUser = async (payload) => {
   const { data } = await api.post('/api/reports', payload);
   return data;
+};
+
+// Articles
+export const getArticles = async (category) => {
+  const params = category ? `?category=${category}` : '';
+  const { data } = await api.get(`/api/articles${params}`);
+  return data.articles;
+};
+
+export const getArticle = async (id) => {
+  const { data } = await api.get(`/api/articles/${id}`);
+  return data.article;
 };

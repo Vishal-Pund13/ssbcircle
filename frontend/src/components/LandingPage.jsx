@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from 'react';
 import { useNavigate, Link, useSearchParams } from 'react-router-dom';
 import { getActiveRooms, closeRoom, getSessions, toggleInterest, cancelSession, startSession, getFeatured, getPastSessions } from '../services/api';
 import { useAuth } from '../context/AuthContext';
-import { Mic, Timer, FileText, CheckSquare, Radio, ArrowRight, Trash2, Zap, Lightbulb, Users, Presentation, Target, Headphones, RefreshCw, X, Calendar, Heart, PlayCircle, Share2, Check, Sparkles, ChevronDown, Shield, Star, Lock } from 'lucide-react';
+import { Mic, Timer, FileText, CheckSquare, Radio, ArrowRight, Trash2, Zap, Lightbulb, Users, Presentation, Target, Headphones, RefreshCw, X, Calendar, Heart, PlayCircle, Share2, Check, Sparkles, ChevronDown, Shield, Star, Lock, BookOpen } from 'lucide-react';
 import HeroMapAnimation from './HeroMapAnimation';
 
 const CATEGORIES = ['All', 'GD', 'PPDT', 'Lecturette', 'IO Practice'];
@@ -672,6 +672,10 @@ export default function LandingPage() {
         <div className="max-w-5xl mx-auto px-4 sm:px-6 h-14 flex items-center justify-between gap-3">
           <Link to="/"><Logo /></Link>
           <nav className="flex items-center gap-1.5 sm:gap-2">
+            <Link to="/current-affairs" className="text-sm text-gray-500 hover:text-gray-900 px-2 sm:px-3 py-2 font-medium">
+              <span className="hidden sm:inline">Current Affairs</span>
+              <span className="sm:hidden text-xs font-semibold">News</span>
+            </Link>
             {user ? (
               <>
                 <Link to="/profile" className="flex items-center gap-1.5 px-2 py-1.5 rounded-lg hover:bg-gray-50 transition-colors">
@@ -1082,6 +1086,27 @@ export default function LandingPage() {
         </section>
 
       </main>
+
+      {/* ── Current Affairs banner ── */}
+      <section className="border-t border-gray-100 bg-white px-4 sm:px-6 py-8 sm:py-10">
+        <div className="max-w-5xl mx-auto">
+          <div className="rounded-2xl border border-brand-100 bg-brand-50 px-5 sm:px-8 py-6 flex flex-col sm:flex-row items-start sm:items-center gap-5">
+            <div className="flex-1 min-w-0">
+              <div className="inline-flex items-center gap-1.5 bg-brand-100 text-brand-600 text-[10px] font-bold px-2.5 py-0.5 rounded-full mb-3 uppercase tracking-widest">
+                <BookOpen className="w-3 h-3" /> New
+              </div>
+              <h2 className="text-lg sm:text-xl font-bold text-gray-900 mb-1">Contemporary Issues</h2>
+              <p className="text-sm text-gray-500 leading-relaxed max-w-lg">
+                Stay sharp on Defence, Economy, Polity, Geography & Society — 5 key pillars for SSB GD, Lecturette and PI. Swipe through bite-sized explainers on your phone.
+              </p>
+            </div>
+            <Link to="/current-affairs"
+              className="btn-primary text-sm px-5 py-2.5 shrink-0 w-full sm:w-auto text-center">
+              Read Now
+            </Link>
+          </div>
+        </div>
+      </section>
 
       {/* ── SSB FAQ Section ── */}
       <FaqSection />

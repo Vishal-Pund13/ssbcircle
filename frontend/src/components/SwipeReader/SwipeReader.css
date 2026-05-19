@@ -1,0 +1,55 @@
+/* Swipe reader — only styles that Tailwind can't do */
+
+/* Range input — navy thumb to match brand-600 */
+.swipe-slider {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 100%;
+  height: 4px;
+  border-radius: 2px;
+  background: #e0e7ff;
+  outline: none;
+  cursor: pointer;
+}
+
+.swipe-slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: #1e3a5f;
+  cursor: pointer;
+  box-shadow: 0 1px 4px rgba(30,58,95,0.25);
+  transition: transform 0.1s ease;
+}
+
+.swipe-slider::-webkit-slider-thumb:active {
+  transform: scale(1.15);
+}
+
+.swipe-slider::-moz-range-thumb {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: #1e3a5f;
+  cursor: pointer;
+  border: none;
+  box-shadow: 0 1px 4px rgba(30,58,95,0.25);
+}
+
+/* Responsive reader height:
+   Mobile → true full-screen (no chrome, edge-to-edge)
+   Desktop → card format */
+.swipe-reader {
+  height: 100dvh;
+}
+@media (min-width: 640px) {
+  .swipe-reader {
+    height: min(85vh, 680px);
+  }
+}
+
+/* Smooth scene transitions */
+.scene-enter { animation: sceneIn 0.25s ease-out forwards; }
+@keyframes sceneIn { from { opacity: 0; } to { opacity: 1; } }

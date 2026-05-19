@@ -1,0 +1,159 @@
+{
+  "id": "rupee-depreciation",
+  "title": "The Rupee Story",
+  "category": "Economy",
+  "ssb_tags": ["GD", "Lecturette", "PI"],
+  "reading_time": 4,
+  "last_updated": "May 2026",
+  "difficulty": "Beginner",
+  "scenes": [
+    {
+      "type": "hook",
+      "headline": "₹90 per dollar.",
+      "subtext": "All-time low in 2025. Crisis — or correction?",
+      "stat": {
+        "value": "₹90",
+        "label": "per US dollar in 2025",
+        "trend": "down"
+      }
+    },
+    {
+      "type": "concept",
+      "title": "What does 'rupee falling' actually mean?",
+      "body": "The rupee's value against the dollar is just a price — determined by supply and demand, like any market. When more people want dollars than rupees, the dollar becomes expensive. That's depreciation.",
+      "analogy": "Think of it like apples. If everyone wants apples and there aren't many, the price goes up. Currency works exactly the same way.",
+      "visual": {
+        "type": "slider",
+        "data": {
+          "min": 70,
+          "max": 100,
+          "default": 84,
+          "unit": "₹",
+          "label": "Rupees per 1 USD",
+          "zones": [
+            { "range": [70, 79], "label": "Strong rupee — imports cheaper, exports costly", "sentiment": "positive" },
+            { "range": [80, 84], "label": "Stable zone — manageable for both sides", "sentiment": "neutral" },
+            { "range": [85, 89], "label": "Weakening — oil bill rises, IT sector profits", "sentiment": "caution" },
+            { "range": [90, 100], "label": "Historical lows — RBI managing descent", "sentiment": "negative" }
+          ]
+        }
+      }
+    },
+    {
+      "type": "breakdown",
+      "title": "Why does it fall?",
+      "intro": "Five forces pulled the rupee to ₹90 in 2025. Tap each to understand it.",
+      "items": [
+        {
+          "icon": "🛢️",
+          "title": "Trade deficit — we import more than we export",
+          "detail": "India's exports fell 11.8% in Oct 2025 while imports surged 16.6%. Every import is paid in dollars. More dollar demand = weaker rupee.",
+          "stat": "$206B spent on oil + gold alone in FY26"
+        },
+        {
+          "icon": "✈️",
+          "title": "FPI outflows — foreign money leaving",
+          "detail": "Foreign Portfolio Investors sell Indian stocks, convert rupees to dollars, and leave. This floods the market with rupees.",
+          "stat": "₹1.48 lakh crore pulled out in 2025"
+        },
+        {
+          "icon": "🦅",
+          "title": "Strong dollar — global, not India-specific",
+          "detail": "When US Fed raises rates, global money flows toward dollar investments. Every currency weakens — not just the rupee.",
+          "stat": null
+        },
+        {
+          "icon": "🪙",
+          "title": "Gold imports — India's expensive habit",
+          "detail": "India is the world's 2nd largest gold consumer. Gold imports grew ~200% in Oct 2025, widening the current account deficit.",
+          "stat": "$72 billion in gold imports FY26"
+        },
+        {
+          "icon": "💬",
+          "title": "Sentiment — fear becomes self-fulfilling",
+          "detail": "If traders expect the rupee to fall, they rush to buy dollars now. That expectation itself causes the fall.",
+          "stat": null
+        }
+      ]
+    },
+    {
+      "type": "two_sides",
+      "title": "Not everyone loses",
+      "left_label": "Who benefits",
+      "right_label": "Who gets hurt",
+      "left_color": "green",
+      "right_color": "red",
+      "left_items": [
+        { "icon": "💻", "label": "IT & software exporters", "detail": "Earn in dollars, spend in rupees — more profit" },
+        { "icon": "💸", "label": "NRIs sending remittances", "detail": "Their dollars buy more rupees for family" },
+        { "icon": "📷", "label": "Tourism sector", "detail": "India becomes a cheaper destination" },
+        { "icon": "👘", "label": "Textile & garment exporters", "detail": "Indian goods cheaper for foreign buyers" }
+      ],
+      "right_items": [
+        { "icon": "⛽", "label": "Oil importers & consumers", "detail": "Same oil, more rupees — petrol prices rise" },
+        { "icon": "🎓", "label": "Students studying abroad", "detail": "Dollar fees become significantly costlier" },
+        { "icon": "💳", "label": "Companies with dollar loans", "detail": "Repayment becomes more expensive" },
+        { "icon": "📈", "label": "Common man via inflation", "detail": "Costlier imports = higher prices for all" }
+      ],
+      "officer_framing": "Rupee depreciation redistributes advantage — the real question is whether India's export gains outweigh its import inflation. With $250B+ in IT exports and $120B in NRI remittances, India has structural buffers."
+    },
+    {
+      "type": "context",
+      "title": "The big picture — India is not collapsing",
+      "body": "The rupee has depreciated from ₹17 to ₹90 since 1991 — that's 34 years at ~4.5% per year. This is structural, not sudden. India remains one of the fastest-growing major economies with strong forex reserves.",
+      "key_numbers": [
+        { "value": "₹17→₹90", "label": "Since 1991 liberalisation" },
+        { "value": "$650B+", "label": "Forex reserves (2025)" },
+        { "value": "$250B+", "label": "IT/services exports" },
+        { "value": "4.5%", "label": "Avg annual depreciation since 1991" }
+      ],
+      "timeline": [
+        { "year": "Pre-1991", "event": "Fixed exchange rate — govt pegged rupee to dollar", "type": "neutral" },
+        { "year": "1991", "event": "India nearly ran out of dollars. Had to pledge gold with IMF.", "type": "negative" },
+        { "year": "1992", "event": "Switched to managed float — market determines rate, RBI prevents chaos", "type": "positive" },
+        { "year": "2025", "event": "Rupee hits ₹90. RBI shifts from defending levels to managing volatility.", "type": "neutral" }
+      ]
+    },
+    {
+      "type": "ssb_application",
+      "title": "Use this in SSB",
+      "pi_question": "What do you think about the falling rupee?",
+      "gd_line": "Rupee depreciation is a double-edged sword — while it raises import inflation, it makes Indian exports more competitive and boosts IT sector earnings. The concern is not the direction, but the pace of the fall.",
+      "lecturette_structure": [
+        "Open: ₹90 per dollar — historical low in 2025. Crisis or correction?",
+        "What it means: supply-demand of currencies, depreciation vs devaluation",
+        "Why it happened: trade deficit, FPI outflows, strong dollar",
+        "Two sides: IT gains vs import inflation — balanced view",
+        "Close: India's forex reserves and structural resilience — managed descent, not free fall"
+      ],
+      "pi_answer": "Sir, a falling rupee reflects structural realities — our trade deficit, global dollar strength, and capital flow dynamics. It's not inherently bad — our IT sector earns $250B+ annually in dollars, and NRI remittances hit $120B+. The real question is whether RBI can manage the pace of depreciation, and with $650B in forex reserves, India has the firepower to do that.",
+      "one_liner": "The rupee's fall is a managed descent — the goal isn't to hold the parachute shut, it's to make sure it opens at the right time."
+    },
+    {
+      "type": "quiz",
+      "title": "Test yourself",
+      "questions": [
+        {
+          "q": "Someone in GD says: 'The falling rupee is a sign of India's economic failure.' Your response?",
+          "options": [
+            "Agree — a weak currency always signals weakness",
+            "That's one dimension — but rupee depreciation also boosts IT exports, NRI remittances, and tourism. The key is managing the pace, not stopping the fall.",
+            "Disagree — a falling rupee is completely fine"
+          ],
+          "correct": 1,
+          "explanation": "Balance is the OLQ response. Never take an extreme position on a complex economic topic in GD."
+        },
+        {
+          "q": "What is the primary mechanism that weakens the rupee?",
+          "options": [
+            "RBI prints too many rupees",
+            "Dollar demand exceeds supply in forex markets — due to trade deficits, FPI outflows, or a globally strong dollar",
+            "The government borrows too much"
+          ],
+          "correct": 1,
+          "explanation": "Currency value is fundamentally a supply-demand story in the forex market. This is the clean one-liner for PI."
+        }
+      ]
+    }
+  ]
+}

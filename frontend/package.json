@@ -11,6 +11,7 @@
   "dependencies": {
     "@livekit/components-react": "^2.9.21",
     "axios": "^1.7.2",
+    "framer-motion": "^12.39.0",
     "livekit-client": "^2.19.0",
     "lucide-react": "^1.16.0",
     "react": "^18.3.1",

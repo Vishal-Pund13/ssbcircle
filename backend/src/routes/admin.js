@@ -244,4 +244,84 @@ router.delete('/rooms/:code', adminGuard, async (req, res) => {
   }
 });
 
+// ── Articles ──────────────────────────────────────────────────────────────────
+
+// List all articles
+router.get('/articles', adminGuard, async (_req, res) => {
+  try {
+    const { rows } = await pool.query(
+      `SELECT id, title, category, summary, tags, is_published, published_at, created_at
+       FROM articles ORDER BY created_at DESC`
+    );
+    res.json({ articles: rows });
+  } catch (err) {
+    res.status(500).json({ error: 'Failed to fetch articles' });
+  }
+});
+
+// Create article
+router.post('/articles', adminGuard, async (req, res) => {
+  try {
+    const { title, category, summary, content, tags, is_published } = req.body;
+    if (!title?.trim() || !category || !summary?.trim() || !content?.trim())
+      return res.status(400).json({ error: 'title, category, summary and content are required' });
+    const validCategories = ['defence', 'economic', 'polity', 'geographic', 'socio-cultural'];
+    if (!validCategories.includes(category))
+      return res.status(400).json({ error: 'Invalid category' });
+    const publish = !!is_published;
+    const { rows } = await pool.query(`
+      INSERT INTO articles (title, category, summary, content, tags, is_published, published_at)
+      VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING *
+    `, [title.trim(), category, summary.trim(), content.trim(),
+        tags || [], publish, publish ? new Date() : null]);
+    res.json({ article: rows[0] });
+  } catch (err) {
+    console.error('Create article error:', err);
+    res.status(500).json({ error: 'Failed to create article' });
+  }
+});
+
+// Update article
+router.patch('/articles/:id', adminGuard, async (req, res) => {
+  try {
+    const { title, category, summary, content, tags, is_published } = req.body;
+    const { rows: existing } = await pool.query('SELECT * FROM articles WHERE id=$1', [req.params.id]);
+    if (!existing.length) return res.status(404).json({ error: 'Article not found' });
+    const cur = existing[0];
+    const publish = is_published !== undefined ? !!is_published : cur.is_published;
+    const { rows } = await pool.query(`
+      UPDATE articles SET
+        title        = $1,
+        category     = $2,
+        summary      = $3,
+        content      = $4,
+        tags         = $5,
+        is_published = $6,
+        published_at = CASE WHEN $6 = true AND NOT $7 THEN NOW() ELSE published_at END
+      WHERE id = $8 RETURNING *
+    `, [
+      title?.trim()   || cur.title,
+      category        || cur.category,
+      summary?.trim() || cur.summary,
+      content?.trim() || cur.content,
+      tags            || cur.tags,
+      publish, cur.is_published,
+      req.params.id,
+    ]);
+    res.json({ article: rows[0] });
+  } catch (err) {
+    res.status(500).json({ error: 'Failed to update article' });
+  }
+});
+
+// Delete article
+router.delete('/articles/:id', adminGuard, async (req, res) => {
+  try {
+    await pool.query('DELETE FROM articles WHERE id=$1', [req.params.id]);
+    res.json({ message: 'Article deleted' });
+  } catch (err) {
+    res.status(500).json({ error: 'Failed to delete article' });
+  }
+});
+
 module.exports = router;
