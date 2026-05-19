@@ -127,3 +127,13 @@ export const getArticle = async (id) => {
   const { data } = await api.get(`/api/articles/${id}`);
   return data.article;
 };
+
+export const voteArticle = async (slug, value) => {
+  const { data } = await api.post(`/api/articles/${slug}/vote`, { value });
+  return data;
+};
+
+export const getArticleVotes = async (slug) => {
+  const { data } = await api.get(`/api/articles/${slug}/vote`);
+  return data;
+};

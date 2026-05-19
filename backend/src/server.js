@@ -247,6 +247,20 @@ async function start() {
     await pool.query(`ALTER TABLE articles ADD COLUMN IF NOT EXISTS ssb_relevance TEXT[]       DEFAULT '{}'`);
     await pool.query(`ALTER TABLE articles ADD COLUMN IF NOT EXISTS slug          VARCHAR(200) DEFAULT NULL`);
     await pool.query(`CREATE UNIQUE INDEX IF NOT EXISTS idx_articles_slug ON articles(slug) WHERE slug IS NOT NULL`);
+
+    // Article votes table
+    await pool.query(`
+      CREATE TABLE IF NOT EXISTS article_votes (
+        id           UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+        article_slug VARCHAR(200) NOT NULL,
+        user_id      UUID REFERENCES users(id) ON DELETE SET NULL,
+        value        INTEGER NOT NULL CHECK (value BETWEEN 1 AND 5),
+        created_at   TIMESTAMP DEFAULT NOW()
+      )
+    `);
+    await pool.query(`CREATE UNIQUE INDEX IF NOT EXISTS idx_article_votes_user ON article_votes(article_slug, user_id) WHERE user_id IS NOT NULL`);
+    await pool.query(`CREATE INDEX IF NOT EXISTS idx_article_votes_slug ON article_votes(article_slug)`);
+
     // Backfill slug for the first seeded article
     await pool.query(`UPDATE articles SET slug = 'rupee-depreciation' WHERE slug IS NULL AND title LIKE '%Rupee Story%'`);
 
