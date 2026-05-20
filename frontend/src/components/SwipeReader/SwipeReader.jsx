@@ -31,16 +31,15 @@ function SceneIcon({ type, className = 'w-3.5 h-3.5' }) {
   );
 }
 
-// Scenes slide left/right (Inshorts-style horizontal swipe)
 const mobileVariants = {
-  enter:  (dir) => ({ x: dir > 0 ? 60 : -60, opacity: 0 }),
-  center: { x: 0, opacity: 1 },
-  exit:   (dir) => ({ x: dir > 0 ? -60 : 60, opacity: 0 }),
+  enter:  (dir) => ({ y: dir > 0 ? 48 : -48, opacity: 0 }),
+  center: { y: 0, opacity: 1 },
+  exit:   (dir) => ({ y: dir > 0 ? -48 : 48, opacity: 0 }),
 };
 const desktopVariants = {
-  enter:  (dir) => ({ x: dir > 0 ? 40 : -40, opacity: 0 }),
-  center: { x: 0, opacity: 1 },
-  exit:   (dir) => ({ x: dir > 0 ? -40 : 40, opacity: 0 }),
+  enter:  (dir) => ({ y: dir > 0 ? 24 : -24, opacity: 0 }),
+  center: { y: 0, opacity: 1 },
+  exit:   (dir) => ({ y: dir > 0 ? -24 : 24, opacity: 0 }),
 };
 
 /* Shared close button — prominent pill */
@@ -62,52 +61,39 @@ function CloseBtn({ onClick, mobile }) {
   );
 }
 
-export default function SwipeReader({ article, onClose, onNextArticle, onPrevArticle }) {
+export default function SwipeReader({ article, onClose }) {
   const [scene,      setScene]      = useState(0);
   const [dir,        setDir]        = useState(1);
   const [showHint,   setShowHint]   = useState(true);
   const total = article.scenes.length;
 
   useEffect(() => {
-    const t = setTimeout(() => setShowHint(false), 3000);
+    const t = setTimeout(() => setShowHint(false), 2500);
     return () => clearTimeout(t);
   }, []);
 
-  // Scene navigation — horizontal (left/right)
   const next = useCallback(() => {
     if (scene < total - 1) { setDir(1); setScene(s => s + 1); setShowHint(false); }
-    else onNextArticle?.();   // last scene → next article
-  }, [scene, total, onNextArticle]);
-
+  }, [scene, total]);
   const prev = useCallback(() => {
     if (scene > 0) { setDir(-1); setScene(s => s - 1); setShowHint(false); }
-    else onPrevArticle?.();   // first scene → prev article
-  }, [scene, onPrevArticle]);
-
+  }, [scene]);
   const goTo = useCallback((i) => {
     setDir(i > scene ? 1 : -1); setScene(i); setShowHint(false);
   }, [scene]);
 
   useEffect(() => {
     function onKey(e) {
-      if (e.key === 'ArrowRight') next();
-      if (e.key === 'ArrowLeft')  prev();
-      if (e.key === 'ArrowDown')  onNextArticle?.();
-      if (e.key === 'ArrowUp')    onPrevArticle?.();
+      if (e.key === 'ArrowDown' || e.key === 'ArrowRight') next();
+      if (e.key === 'ArrowUp'   || e.key === 'ArrowLeft')  prev();
       if (e.key === 'Escape' && onClose) onClose();
     }
     window.addEventListener('keydown', onKey);
     return () => window.removeEventListener('keydown', onKey);
-  }, [next, prev, onClose, onNextArticle, onPrevArticle]);
+  }, [next, prev, onClose]);
 
   const containerRef = useRef(null);
-  useSwipe({
-    onSwipeLeft:  next,           // swipe left  → next scene (or next article)
-    onSwipeRight: prev,           // swipe right → prev scene (or prev article)
-    onSwipeUp:    onNextArticle,  // swipe up    → next article
-    onSwipeDown:  onPrevArticle,  // swipe down  → prev article
-    elementRef: containerRef,
-  });
+  useSwipe({ onSwipeUp: next, onSwipeDown: prev, elementRef: containerRef });
 
   const currentScene = article.scenes[scene];
   const sceneLabel   = SCENE_LABELS[currentScene?.type] || '';
@@ -135,21 +121,13 @@ export default function SwipeReader({ article, onClose, onNextArticle, onPrevArt
               className="absolute inset-x-0 bottom-4 flex justify-center sm:hidden pointer-events-none">
               <div className="bg-gray-900/75 backdrop-blur-sm text-white text-[11px] font-semibold px-4 py-2 rounded-full flex items-center gap-3">
                 <span className="flex items-center gap-1">
-                  <svg className="w-3.5 h-3.5 animate-pulse" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" />
-                  </svg>
-                  Swipe left/right
-                  <svg className="w-3.5 h-3.5 animate-pulse" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
-                  </svg>
-                </span>
-                <span className="w-px h-3 bg-white/30" />
-                <span className="flex items-center gap-1">
-                  <svg className="w-3 h-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+                  <svg className="w-3.5 h-3.5 animate-bounce" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
                     <path strokeLinecap="round" strokeLinejoin="round" d="M5 15l7-7 7 7" />
                   </svg>
-                  ↕ next article
+                  Swipe up
                 </span>
+                <span className="w-px h-3 bg-white/30" />
+                <span>Swipe down</span>
               </div>
             </motion.div>
           )}
@@ -194,11 +172,11 @@ export default function SwipeReader({ article, onClose, onNextArticle, onPrevArt
           <div className="shrink-0 flex justify-center pt-1.5 pb-0 bg-white">
             <p className="text-[10px] text-gray-300 flex items-center gap-2 font-medium select-none">
               <svg className="w-3 h-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                <path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" />
+                <path strokeLinecap="round" strokeLinejoin="round" d="M5 15l7-7 7 7" />
               </svg>
-              ← swipe for cards → · ↕ next article
+              swipe up · swipe down
               <svg className="w-3 h-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
+                <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
               </svg>
             </p>
           </div>
@@ -240,7 +218,7 @@ export default function SwipeReader({ article, onClose, onNextArticle, onPrevArt
             News Cards
           </button>
           <div className="flex items-center gap-3 text-[10px] text-gray-400">
-            <span>← → scenes · ↑↓ articles</span>
+            <span>← → keys to navigate</span>
             {article.ssb_tags?.map(tag => (
               <span key={tag} className="font-semibold px-2 py-0.5 rounded-full bg-brand-50 text-brand-600 border border-brand-100">
                 {tag}
