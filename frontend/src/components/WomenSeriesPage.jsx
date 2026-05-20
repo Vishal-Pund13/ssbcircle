@@ -113,7 +113,6 @@ export default function WomenSeriesPage() {
               </span>
             )}
           </div>
-        </div>
 
             </div>{/* end flex-1 */}
             {/* Woman silhouette — visible on sm+ */}
