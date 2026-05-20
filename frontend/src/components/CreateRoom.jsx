@@ -1,8 +1,8 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate, useLocation, Link } from 'react-router-dom';
-import { createRoom, createSession } from '../services/api';
+import { createRoom, createSession, getArticles } from '../services/api';
 import { useAuth } from '../context/AuthContext';
-import { Copy, Check, ArrowRight, AlertCircle, Info, Lightbulb, Calendar, Zap, Radio } from 'lucide-react';
+import { Copy, Check, ArrowRight, AlertCircle, Info, Lightbulb, Calendar, Zap, Radio, ChevronDown } from 'lucide-react';
 
 const CATEGORIES = ['GD', 'PPDT', 'Lecturette', 'IO Practice'];
 const GD_SUBCATEGORIES = ['Defence', 'International Relations', 'Society', 'Economy', 'Science & Tech', 'Environment', 'Sports & Awards'];
@@ -63,6 +63,12 @@ export default function CreateRoom() {
   const [copied,          setCopied]          = useState(false);
   const [errors,          setErrors]          = useState({});
   const [existingRoom,    setExistingRoom]    = useState(null); // for 409 conflict
+  const [articles,        setArticles]        = useState([]);
+  const [showPicker,      setShowPicker]      = useState(false);
+
+  useEffect(() => {
+    getArticles().then(setArticles).catch(() => {});
+  }, []);
 
   const shareUrl = room ? `${window.location.origin}/join/${room.room_code}` : '';
 
@@ -116,6 +122,16 @@ export default function CreateRoom() {
     } finally {
       setLoading(false);
     }
+  }
+
+  function pickCard(article) {
+    setTitle(article.title);
+    const desc = category === 'Lecturette'
+      ? `Lecturette on "${article.title}" — each participant picks a sub-topic and speaks for 3 minutes.`
+      : `GD on "${article.title}" — discuss key facts, multiple perspectives, and India's position on the issue.`;
+    setDescription(desc);
+    setShowPicker(false);
+    setErrors(p => ({ ...p, title: '', description: '' }));
   }
 
   async function handleCopy() {
@@ -353,6 +369,55 @@ export default function CreateRoom() {
                     </button>
                   ))}
                 </div>
+              </div>
+            )}
+
+            {/* News Cards topic picker — GD & Lecturette only */}
+            {(category === 'GD' || category === 'Lecturette') && articles.length > 0 && (
+              <div>
+                <button
+                  type="button"
+                  onClick={() => setShowPicker(v => !v)}
+                  className="inline-flex items-center gap-1.5 text-xs font-semibold text-brand-600 bg-brand-50 border border-brand-100 px-3 py-1.5 rounded-full hover:bg-brand-100 transition-colors"
+                >
+                  <svg viewBox="0 0 34 24" fill="none" className="w-5 h-3.5 shrink-0">
+                    <rect x="1" y="5" width="20" height="14" rx="2.5" fill="#e0e7ff" transform="rotate(-11 11 12)" />
+                    <rect x="5" y="3" width="20" height="14" rx="2.5" fill="#eef2ff" transform="rotate(-5 15 10)" />
+                    <rect x="10" y="2" width="20" height="14" rx="2.5" fill="white" stroke="#c7d2fe" strokeWidth="1.2" />
+                    <line x1="13.5" y1="8" x2="27" y2="8" stroke="#1e3a5f" strokeWidth="1.6" strokeLinecap="round" />
+                    <line x1="13.5" y1="11.5" x2="25" y2="11.5" stroke="#c7d2fe" strokeWidth="1.3" strokeLinecap="round" />
+                    <line x1="13.5" y1="14.5" x2="22" y2="14.5" stroke="#c7d2fe" strokeWidth="1.3" strokeLinecap="round" />
+                  </svg>
+                  Pick from News Cards
+                  <ChevronDown className={`w-3.5 h-3.5 transition-transform duration-200 ${showPicker ? 'rotate-180' : ''}`} />
+                </button>
+
+                {showPicker && (
+                  <div className="mt-3 flex gap-2.5 overflow-x-auto pb-2 scrollbar-hide -mx-1 px-1">
+                    {articles.map(article => (
+                      <button
+                        key={article.slug}
+                        type="button"
+                        onClick={() => pickCard(article)}
+                        className="shrink-0 w-40 text-left bg-white border border-gray-200 rounded-xl overflow-hidden hover:border-brand-600/50 hover:shadow-md transition-all cursor-pointer group"
+                      >
+                        <div className="h-0.5 bg-brand-600" />
+                        <div className="p-3">
+                          <span className="text-[9px] font-bold text-brand-600 bg-brand-50 px-1.5 py-0.5 rounded-full border border-brand-100 uppercase tracking-widest">
+                            {article.category}
+                          </span>
+                          <p className="text-xs font-semibold text-gray-800 mt-2 leading-snug">{article.title}</p>
+                          <p className="text-[10px] text-brand-600 font-semibold mt-2.5 opacity-0 group-hover:opacity-100 transition-opacity flex items-center gap-0.5">
+                            Use this
+                            <svg className="w-2.5 h-2.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+                              <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
+                            </svg>
+                          </p>
+                        </div>
+                      </button>
+                    ))}
+                  </div>
+                )}
               </div>
             )}
 
