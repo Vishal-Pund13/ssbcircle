@@ -341,6 +341,80 @@ function AdminPanel({ participants, roomCode, onMuteAll, onEndRoom, onMutePartic
   );
 }
 
+// ── Topic strip — pinned above participant grid when room has a linked News Card ──
+function TopicStrip({ article }) {
+  const [expanded, setExpanded] = useState(false);
+  const [dismissed, setDismissed] = useState(false);
+  if (dismissed) return null;
+
+  const hook      = article.scenes?.find(s => s.type === 'hook');
+  const breakdown = article.scenes?.find(s => s.type === 'breakdown');
+  const ssbApp    = article.scenes?.find(s => s.type === 'ssb_application');
+  const slug      = article.id || article.slug;
+
+  return (
+    <div className="shrink-0 border-b border-brand-100 bg-white">
+      {/* Collapsed header — always visible */}
+      <div className="flex items-center gap-2.5 px-4 py-2">
+        <svg viewBox="0 0 34 24" fill="none" className="w-6 h-4 shrink-0">
+          <rect x="1" y="5" width="20" height="14" rx="2.5" fill="#e0e7ff" transform="rotate(-11 11 12)" />
+          <rect x="5" y="3" width="20" height="14" rx="2.5" fill="#eef2ff" transform="rotate(-5 15 10)" />
+          <rect x="10" y="2" width="20" height="14" rx="2.5" fill="white" stroke="#c7d2fe" strokeWidth="1.2" />
+          <line x1="13.5" y1="8" x2="27" y2="8" stroke="#1e3a5f" strokeWidth="1.6" strokeLinecap="round" />
+          <line x1="13.5" y1="11.5" x2="25" y2="11.5" stroke="#c7d2fe" strokeWidth="1.3" strokeLinecap="round" />
+        </svg>
+        <span className="text-[9px] font-bold text-brand-600 bg-brand-50 border border-brand-100 px-1.5 py-0.5 rounded-full uppercase tracking-widest shrink-0">
+          {article.category}
+        </span>
+        <p className="text-xs font-bold text-gray-800 truncate flex-1">{article.title}</p>
+        {hook?.stat?.value && (
+          <span className="text-sm font-extrabold text-brand-600 shrink-0">{hook.stat.value}</span>
+        )}
+        <button
+          onClick={() => setExpanded(v => !v)}
+          className="shrink-0 text-[10px] font-semibold text-brand-600 hover:text-brand-700 flex items-center gap-0.5 cursor-pointer px-1.5 py-1 rounded hover:bg-brand-50 transition-colors">
+          {expanded ? 'Less ▲' : 'Key points ▼'}
+        </button>
+        <button onClick={() => setDismissed(true)}
+          className="shrink-0 text-gray-300 hover:text-gray-500 cursor-pointer text-base leading-none ml-1">×</button>
+      </div>
+
+      {/* Expanded content */}
+      {expanded && (
+        <div className="px-4 pb-3 flex flex-col sm:flex-row gap-4 border-t border-gray-100 pt-3">
+          {/* Key points */}
+          {breakdown?.items?.length > 0 && (
+            <div className="flex-1 min-w-0">
+              <p className="text-[9px] font-bold text-gray-400 uppercase tracking-widest mb-1.5">Key Points</p>
+              <div className="flex flex-col gap-1">
+                {breakdown.items.slice(0, 4).map((item, i) => (
+                  <div key={i} className="flex items-start gap-1.5">
+                    <span className="w-3.5 h-3.5 rounded-full bg-brand-600 text-white text-[8px] font-bold flex items-center justify-center shrink-0 mt-0.5">{i + 1}</span>
+                    <p className="text-[11px] text-gray-700 leading-snug">{item.title}</p>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* GD opener */}
+          {ssbApp?.gd_line && (
+            <div className="sm:max-w-xs">
+              <p className="text-[9px] font-bold text-brand-600 uppercase tracking-widest mb-1.5">GD opener</p>
+              <p className="text-[11px] text-brand-800 leading-relaxed italic">"{ssbApp.gd_line}"</p>
+            </div>
+          )}
+
+          <a href={`/read/${slug}`} target="_blank" rel="noopener noreferrer"
+            className="self-end sm:self-center shrink-0 text-[10px] font-semibold text-brand-600 hover:underline flex items-center gap-1">
+            Read full card →
+          </a>
+        </div>
+      )}
+    </div>
+  );
+}
+
 // ── Voice room UI ────────────────────────────────────────────────────────────
 function VoiceRoomUI({ room, isAdmin, roomCode, showTimer, setShowTimer, showPanel, setShowPanel, onLeave, setIsTranscribing, topicArticle }) {
   const lkRoom = useRoomContext();
@@ -511,6 +585,9 @@ function VoiceRoomUI({ room, isAdmin, roomCode, showTimer, setShowTimer, showPan
 
         {/* ── Main content area ── */}
         <div className="flex-1 flex flex-col overflow-hidden bg-gray-50">
+
+          {/* ── Topic card strip — visible when room was created from a News Card ── */}
+          {topicArticle && <TopicStrip article={topicArticle} />}
 
           {/* Host-only screen share tip — dismissible */}
           {isAdmin && !hostTipDismissed && !isScreenSharing && (

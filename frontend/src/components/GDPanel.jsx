@@ -508,20 +508,15 @@ function TopicTab({ article }) {
 }
 
 // ─── Panel ────────────────────────────────────────────────────────────────────
-const BASE_TABS = [
+const TABS = [
   { id: 'chat',       label: 'Chat',       Icon: MessageSquare },
   { id: 'transcript', label: 'Transcript', Icon: Mic },
   { id: 'notes',      label: 'Notes',      Icon: FileText },
   { id: 'checklist',  label: 'Checklist',  Icon: CheckSquare },
 ];
 
-export default function GDPanel({ show, onClose, chatMessages = [], onSendMessage, activeTab, onTabChange, onTranscriptStateChange, topicArticle }) {
-  const tabs = topicArticle
-    ? [{ id: 'topic', label: 'Topic', Icon: BookOpen }, ...BASE_TABS]
-    : BASE_TABS;
-
-  const defaultTab = topicArticle ? 'topic' : 'chat';
-  const [active, setActive] = useState(activeTab ?? defaultTab);
+export default function GDPanel({ show, onClose, chatMessages = [], onSendMessage, activeTab, onTabChange, onTranscriptStateChange }) {
+  const [active, setActive] = useState(activeTab ?? 'chat');
 
   useEffect(() => { if (activeTab) setActive(activeTab); }, [activeTab]);
 
@@ -530,10 +525,10 @@ export default function GDPanel({ show, onClose, chatMessages = [], onSendMessag
   return (
     <div className={`${show ? '' : 'hidden'} fixed inset-0 z-50 bg-white flex flex-col sm:relative sm:inset-auto sm:z-20 sm:w-80 sm:shrink-0 sm:border-l sm:border-gray-200 sm:shadow-none shadow-2xl`}>
       {/* Tab bar */}
-      <div className="flex items-center border-b border-gray-200 shrink-0 overflow-x-auto">
-        {tabs.map(({ id, label, Icon }) => (
+      <div className="flex items-center border-b border-gray-200 shrink-0">
+        {TABS.map(({ id, label, Icon }) => (
           <button key={id} onClick={() => handleTab(id)}
-            className={`shrink-0 flex-1 flex flex-col items-center gap-0.5 py-2.5 text-[10px] font-semibold tracking-wide uppercase transition-all cursor-pointer border-b-2 min-w-[52px] ${
+            className={`flex-1 flex flex-col items-center gap-0.5 py-2.5 text-[10px] font-semibold tracking-wide uppercase transition-all cursor-pointer border-b-2 ${
               active === id
                 ? 'text-brand-600 border-brand-600'
                 : 'text-gray-400 border-transparent hover:text-gray-600'
@@ -551,7 +546,6 @@ export default function GDPanel({ show, onClose, chatMessages = [], onSendMessag
 
       {/* All tabs mounted — CSS controls visibility so state is never lost */}
       <div className="flex-1 overflow-hidden relative">
-        {topicArticle && <div className={`absolute inset-0 flex flex-col ${active === 'topic'      ? '' : 'hidden'}`}><TopicTab article={topicArticle}/></div>}
         <div className={`absolute inset-0 flex flex-col ${active === 'chat'       ? '' : 'hidden'}`}><ChatTab messages={chatMessages} onSend={onSendMessage}/></div>
         <div className={`absolute inset-0 flex flex-col ${active === 'transcript' ? '' : 'hidden'}`}><TranscriptTab onStateChange={onTranscriptStateChange}/></div>
         <div className={`absolute inset-0 flex flex-col ${active === 'notes'      ? '' : 'hidden'}`}><NotesTab/></div>
