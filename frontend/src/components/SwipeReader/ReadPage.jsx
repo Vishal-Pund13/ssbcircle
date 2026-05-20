@@ -1,4 +1,5 @@
-import { useParams, Link, useNavigate } from 'react-router-dom';
+import { useParams, Link, useNavigate, useLocation } from 'react-router-dom';
+import { AnimatePresence, motion } from 'framer-motion';
 import SwipeReader from './SwipeReader';
 import rupeeData             from '../../data/articles/rupee-depreciation.json';
 import elNinoData            from '../../data/articles/super-el-nino.json';
@@ -38,7 +39,13 @@ const ARTICLE_ORDER = [
 export default function ReadPage() {
   const { articleId } = useParams();
   const navigate      = useNavigate();
+  const location      = useLocation();
   const article       = ARTICLES[articleId];
+
+  // navDir: 1 = swiped up (next article enters from below),
+  //        -1 = swiped down (prev article enters from above),
+  //         0 = direct navigation (no animation)
+  const navDir = location.state?.navDir ?? 0;
 
   const idx      = ARTICLE_ORDER.indexOf(articleId);
   const nextSlug = idx >= 0 && idx < ARTICLE_ORDER.length - 1 ? ARTICLE_ORDER[idx + 1] : null;
@@ -56,14 +63,34 @@ export default function ReadPage() {
     );
   }
 
+  const goNext = nextSlug ? () => navigate(`/read/${nextSlug}`, { state: { navDir: 1 }  }) : undefined;
+  const goPrev = prevSlug ? () => navigate(`/read/${prevSlug}`, { state: { navDir: -1 } }) : undefined;
+
   return (
-    <div className="h-screen overflow-hidden" style={{ height: '100dvh' }}>
-      <SwipeReader
-        article={article}
-        onClose={() => navigate('/current-affairs')}
-        onNextArticle={nextSlug ? () => navigate(`/read/${nextSlug}`) : undefined}
-        onPrevArticle={prevSlug ? () => navigate(`/read/${prevSlug}`) : undefined}
-      />
+    <div className="overflow-hidden" style={{ height: '100dvh' }}>
+      <AnimatePresence mode="wait" initial={false}>
+        <motion.div
+          key={articleId}
+          initial={{
+            y:       navDir === 1 ? '8%' : navDir === -1 ? '-8%' : 0,
+            opacity: navDir !== 0 ? 0 : 1,
+          }}
+          animate={{ y: 0, opacity: 1 }}
+          exit={{
+            y:       navDir === 1 ? '-8%' : navDir === -1 ? '8%' : 0,
+            opacity: 0,
+          }}
+          transition={{ duration: 0.26, ease: [0.25, 0.46, 0.45, 0.94] }}
+          style={{ height: '100%' }}
+        >
+          <SwipeReader
+            article={article}
+            onClose={() => navigate('/current-affairs')}
+            onNextArticle={goNext}
+            onPrevArticle={goPrev}
+          />
+        </motion.div>
+      </AnimatePresence>
     </div>
   );
 }
