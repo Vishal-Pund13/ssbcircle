@@ -142,6 +142,7 @@ export default function WomenSeriesPage() {
             const isDone  = read.has(card.slug);
             const isHov   = hovered === i;
             const cat     = CAT[card.category];
+
             const topColor = isDone ? '#34d399' : cat.top;
 
             return (
@@ -200,14 +201,8 @@ export default function WomenSeriesPage() {
                     </p>
 
                     {/* Footer */}
-                    <div className="mt-3 pt-2.5 border-t border-gray-100 flex items-center justify-between">
+                    <div className="mt-3 pt-2.5 border-t border-gray-100">
                       <span className="text-[9px] text-gray-400">{card.reading_time} min read</span>
-                      <div className={`flex items-center gap-1 text-[10px] font-bold text-brand-600 transition-opacity duration-150 ${isHov ? 'opacity-100' : 'opacity-0'}`}>
-                        Read card
-                        <svg className="w-3 h-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
-                          <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
-                        </svg>
-                      </div>
                     </div>
                   </div>
                 </div>
