@@ -1,6 +1,6 @@
 import { useEffect, useState, useRef } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
-import { getRoom, getRoomToken, closeRoom, kickParticipant, reportUser, getArticle } from '../services/api';
+import { getRoom, getRoomToken, closeRoom, kickParticipant, reportUser } from '../services/api';
 import { useAuth } from '../context/AuthContext';
 import GDTimer from './GDTimer';
 import GDPanel from './GDPanel';
@@ -785,7 +785,9 @@ export default function RoomView() {
             setLivekitUrl(tokenData.url);
             setFetchStatus('done');
             if (data.room.article_slug) {
-              getArticle(data.room.article_slug).then(setTopicArticle).catch(() => {});
+              import(`../data/articles/${data.room.article_slug}.json`)
+                .then(mod => setTopicArticle(mod.default))
+                .catch(() => {});
             }
           }
         } catch (err) {
