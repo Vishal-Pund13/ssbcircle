@@ -22,10 +22,16 @@ const ARTICLES = {
   'women-health-india':         womenHealthData,
 };
 
+const WOMEN_SLUGS = new Set([
+  'women-workforce-paradox', 'women-proxy-representation', 'women-glass-ceiling',
+  'women-gender-pay-gap', 'women-safety-economy', 'women-education-gap', 'women-health-india',
+]);
+
 export default function ReadPage() {
   const { articleId } = useParams();
   const navigate      = useNavigate();
   const article       = ARTICLES[articleId];
+  const closeTarget   = WOMEN_SLUGS.has(articleId) ? '/series/women-india' : '/current-affairs';
 
   if (!article) {
     return (
@@ -43,7 +49,7 @@ export default function ReadPage() {
     /* Mobile: true full-screen (no header, no padding, edge-to-edge)
        Desktop: centered card on gray background */
     <div className="h-screen overflow-hidden" style={{ height: '100dvh' }}>
-      <SwipeReader article={article} onClose={() => navigate('/current-affairs')} />
+      <SwipeReader article={article} onClose={() => navigate(closeTarget)} />
     </div>
   );
 }
