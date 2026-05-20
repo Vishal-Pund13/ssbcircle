@@ -49,8 +49,12 @@ function PillarBadge({ id }) {
 
 // Swipe reader slug map — matches data/articles filenames
 const SWIPE_ARTICLES = {
-  'rupee-depreciation': true,
-  'super-el-nino':      true,
+  'rupee-depreciation':         true,
+  'super-el-nino':              true,
+  'women-workforce-paradox':    true,
+  'women-proxy-representation': true,
+  'women-glass-ceiling':        true,
+  'women-gender-pay-gap':       true,
 };
 
 // Article card — same pattern as RoomCard in LandingPage

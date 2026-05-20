@@ -433,6 +433,57 @@ REER|Rupee's value adjusted for inflation — the real exchange rate
       console.log('✓ Seeded article: Super El Niño');
     }
 
+    // Seed Women in India series (4 cards)
+    const womenSeries = [
+      {
+        slug: 'women-workforce-paradox',
+        title: 'The Workforce Paradox',
+        category: 'economic',
+        summary: "India is growing richer — but women are working less. The story behind India's female labour force participation puzzle, and what it means for our economy.",
+        tags: ['FLFPR', 'pink-collar', 'women-employment', 'economy', 'care-economy'],
+        reading_time: '5 min',
+        difficulty: 'Beginner',
+      },
+      {
+        slug: 'women-proxy-representation',
+        title: 'Power Without Authority',
+        category: 'polity',
+        summary: "46.6% of panchayat seats are held by women. But in thousands of villages, their husbands run the office. Meet the Sarpanch Pati — democracy's most stubborn loophole.",
+        tags: ['sarpanch-pati', 'proxy-representation', 'panchayati-raj', '73rd-amendment', 'women-in-politics'],
+        reading_time: '4 min',
+        difficulty: 'Beginner',
+      },
+      {
+        slug: 'women-glass-ceiling',
+        title: 'The Invisible Ceiling',
+        category: 'economic',
+        summary: "Women make up half the entry-level workforce. Only 17% reach the C-suite. The glass ceiling, glass cliff, and broken rung — three invisible forces that stop women at the top.",
+        tags: ['glass-ceiling', 'glass-cliff', 'broken-rung', 'corporate-leadership', 'gender-gap'],
+        reading_time: '5 min',
+        difficulty: 'Intermediate',
+      },
+      {
+        slug: 'women-gender-pay-gap',
+        title: 'The Pay Gap Nobody Talks About',
+        category: 'economic',
+        summary: "For every ₹100 a man earns, a woman earns ₹76 in urban India — and less in rural areas. The gender pay gap is real, measurable, and getting worse at the top.",
+        tags: ['gender-pay-gap', 'equal-remuneration', 'unpaid-care-work', 'wage-discrimination', 'women-economy'],
+        reading_time: '4 min',
+        difficulty: 'Beginner',
+      },
+    ];
+    for (const art of womenSeries) {
+      const { rows: exists } = await pool.query('SELECT id FROM articles WHERE slug = $1 LIMIT 1', [art.slug]);
+      if (!exists.length) {
+        await pool.query(
+          `INSERT INTO articles (title, category, summary, content, tags, is_published, published_at, reading_time, difficulty, ssb_relevance, slug)
+           VALUES ($1, $2, $3, $4, $5, true, NOW(), $6, $7, $8, $9)`,
+          [art.title, art.category, art.summary, art.summary, art.tags, art.reading_time, art.difficulty, ['GD Topics', 'Lecturette', 'PI'], art.slug]
+        );
+        console.log(`✓ Seeded article: ${art.title}`);
+      }
+    }
+
     await pool.query(`
       CREATE TABLE IF NOT EXISTS scheduled_sessions (
         id UUID PRIMARY KEY DEFAULT gen_random_uuid(),

@@ -1,0 +1,147 @@
+{
+  "id": "women-gender-pay-gap",
+  "title": "The Pay Gap Nobody Talks About",
+  "category": "Economic",
+  "ssb_tags": ["GD", "PI"],
+  "reading_time": 4,
+  "last_updated": "May 2026",
+  "difficulty": "Beginner",
+  "scenes": [
+    {
+      "type": "hook",
+      "headline": "Same office. Same desk. Different salary.",
+      "subtext": "India's gender pay gap isn't just about different jobs — it's about unequal pay for identical work. And it widens as women rise.",
+      "stat": {
+        "value": "₹76",
+        "label": "earned by women for every ₹100 earned by men in urban India — PLFS 2024",
+        "trend": "down"
+      }
+    },
+    {
+      "type": "concept",
+      "title": "What exactly is the gender pay gap?",
+      "body": "The gender pay gap has two layers: the 'explained' gap (women and men work in different sectors and roles) and the 'unexplained' gap (same role, same skills, different pay — pure discrimination). In India's tech sector, the IIT Kharagpur 2025 study found that even after controlling for every variable, an unexplained gap of over 30% remains.",
+      "analogy": "Think of two runners in the same race, on the same track, wearing the same shoes. One starts 30 metres behind for no reason. That's the unexplained pay gap — not different races, not different shoes. Just a handicap built into the starting line.",
+      "visual": {
+        "type": "comparison",
+        "data": {
+          "left": { "label": "Urban men (monthly)", "value": "₹26,105 average earnings — PLFS 2024" },
+          "right": { "label": "Urban women (monthly)", "value": "₹19,879 average earnings — same survey" }
+        }
+      }
+    },
+    {
+      "type": "breakdown",
+      "title": "Why does the pay gap exist?",
+      "intro": "Five overlapping causes create and sustain the gap.",
+      "items": [
+        {
+          "icon": "💼",
+          "title": "Occupational segregation — different jobs pay differently",
+          "detail": "Women are concentrated in lower-paying sectors — education, care work, garments. Men dominate higher-paying sectors — finance, engineering, management. This is the 'explained' gap — explained by historical discrimination, not free choice.",
+          "stat": null
+        },
+        {
+          "icon": "🧮",
+          "title": "Unequal pay for equal work — the unexplained gap",
+          "detail": "Even in the same firm, same role, same qualification — women earn less. The IIT Kharagpur 2025 study found a 30.51% gap in India's tech industry even after controlling for all other variables. This is pure wage discrimination.",
+          "stat": "30.51% unexplained pay gap in India's tech sector — IIT Kharagpur 2025"
+        },
+        {
+          "icon": "👶",
+          "title": "The motherhood penalty",
+          "detail": "After maternity leave, women return to jobs that have moved on without them — missed promotions, projects, pay raises. Men's salaries accelerate with fatherhood (the 'fatherhood bonus'). Women's decelerate with motherhood.",
+          "stat": null
+        },
+        {
+          "icon": "🏠",
+          "title": "Unpaid care work is invisible in GDP",
+          "detail": "Indian women do 3-4x more unpaid domestic work than men. When women reduce paid work to do unpaid care work, their lifetime earnings fall permanently.",
+          "stat": null
+        },
+        {
+          "icon": "🤝",
+          "title": "Negotiation gap and confidence tax",
+          "detail": "Women are less likely to negotiate starting salaries. But when women do negotiate, they are more likely to be penalised socially than men. The gap is not just about women not asking — it's about what happens when they do.",
+          "stat": null
+        }
+      ]
+    },
+    {
+      "type": "two_sides",
+      "title": "Is legislation enough to close the gap?",
+      "left_label": "Legal tools exist",
+      "right_label": "Laws alone aren't working",
+      "left_items": [
+        { "label": "Equal Remuneration Act 1976", "detail": "Legally mandates equal pay for equal work — India had this law 50 years ago" },
+        { "label": "Code on Wages 2019", "detail": "Reaffirms equal pay principle across all sectors, formal and informal" },
+        { "label": "Maternity Benefit Act amendment 2017", "detail": "Extended paid maternity leave to 26 weeks — one of the most generous globally" }
+      ],
+      "right_items": [
+        { "label": "No mandatory pay transparency", "detail": "Unlike EU's Pay Transparency Directive, India has no law requiring companies to disclose gender pay data" },
+        { "label": "Informal sector is ungovernable", "detail": "90% of Indian women work in the informal sector where Equal Remuneration Act is effectively unenforceable" },
+        { "label": "42% of companies don't measure gender policy impact", "detail": "McKinsey 2025: nearly half of Indian firms have no system to know if their gender policies are working" }
+      ],
+      "officer_framing": "India has the right laws but the wrong enforcement architecture. In a country where 90% of women work informally, a law written for formal employment protects very few. Closing the pay gap requires data transparency, not just legal text."
+    },
+    {
+      "type": "context",
+      "title": "The global context — and India's position",
+      "body": "The WEF estimates the global gender pay gap will take 134 years to close at current rates. India's informal economy makes this even harder to measure. The EU has taken the strongest step globally — mandatory pay transparency laws. India has no equivalent.",
+      "key_numbers": [
+        { "value": "134 yrs", "label": "Time to close global gender pay gap at current pace — WEF" },
+        { "value": "₹6,226", "label": "Monthly urban earnings gap between men and women in India" },
+        { "value": "90%", "label": "Of Indian women working in the informal sector" },
+        { "value": "1976", "label": "Year India passed Equal Remuneration Act — 50 years ago, gap persists" }
+      ],
+      "timeline": [
+        { "year": "1976", "event": "Equal Remuneration Act passed — equal pay for equal work legally mandated", "type": "positive" },
+        { "year": "2019", "event": "Code on Wages reaffirms equal pay across formal and informal sectors", "type": "positive" },
+        { "year": "2024", "event": "EU passes mandatory Pay Transparency Directive — India has no equivalent", "type": "neutral" },
+        { "year": "2025", "event": "IIT Kharagpur study finds 30.51% unexplained pay gap in India's tech sector", "type": "negative" },
+        { "year": "2025", "event": "Economic Survey 2025-26 recommends hybrid work and equal pay enforcement", "type": "positive" }
+      ]
+    },
+    {
+      "type": "ssb_application",
+      "title": "Use this in SSB",
+      "pi_question": "What is the gender pay gap in India and what should be done about it?",
+      "gd_line": "The gender pay gap in India isn't just about unequal pay — it's about unequal opportunity, unequal care burden, and unequal accountability. Closing it requires pay transparency, childcare infrastructure, and enforcement in the informal sector — not just more laws.",
+      "lecturette_structure": [
+        "Open: Same desk, same work, different salary — ₹76 for every ₹100",
+        "Define: Explained vs unexplained gap — segregation vs discrimination",
+        "Data: 30.51% tech sector gap, ₹6,226 monthly urban earnings difference",
+        "Legal tools vs reality: Equal Remuneration Act exists but informal sector is untouched",
+        "Close: Pay transparency law, childcare infrastructure, informal sector data — the three-pronged solution"
+      ],
+      "pi_answer": "Sir, India's gender pay gap has two dimensions — women are concentrated in lower-paying sectors, and even within the same sector, women earn less for identical work. PLFS data shows urban women earn ₹19,879 monthly versus men's ₹26,105. The IIT Kharagpur 2025 study found a 30.51% unexplained gap in tech even after controlling for all variables. India has the Equal Remuneration Act since 1976, but enforcement is weak, especially in the informal sector where 90% of women work. The way forward is mandatory pay transparency, stronger childcare infrastructure, and extending labour protections to informal workers.",
+      "one_liner": "India passed an equal pay law in 1976. The gap hasn't closed because equality on paper means nothing without transparency in practice."
+    },
+    {
+      "type": "quiz",
+      "title": "Test yourself",
+      "questions": [
+        {
+          "q": "Someone argues the pay gap exists only because women choose lower-paying jobs. How do you respond?",
+          "options": [
+            "Agree — it's a free choice and not discrimination",
+            "Partly right — occupational sorting exists, but even within the same job, a 30% unexplained gap remains in India's tech sector. And the 'choice' to enter lower-paying sectors is itself shaped by historical discrimination.",
+            "Completely wrong — women are always paid less for the same work"
+          ],
+          "correct": 1,
+          "explanation": "Distinguishing between explained and unexplained gaps shows you understand the data and won't be trapped by a half-truth. That's analytical OLQ."
+        },
+        {
+          "q": "What is the 'motherhood penalty'?",
+          "options": [
+            "A legal fine for taking maternity leave",
+            "The career and earnings slowdown women experience after having children — missed promotions, lower pay raises, reduced opportunities — while men experience a 'fatherhood bonus'",
+            "The cost of childcare that reduces women's take-home pay"
+          ],
+          "correct": 1,
+          "explanation": "The motherhood penalty is a structural labour market phenomenon. The contrast with the fatherhood bonus is what makes it a systemic problem, not an individual one."
+        }
+      ]
+    }
+  ]
+}

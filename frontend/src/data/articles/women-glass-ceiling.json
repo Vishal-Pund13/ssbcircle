@@ -1,0 +1,147 @@
+{
+  "id": "women-glass-ceiling",
+  "title": "The Invisible Ceiling",
+  "category": "Economic",
+  "ssb_tags": ["GD", "Lecturette", "PI"],
+  "reading_time": 5,
+  "last_updated": "May 2026",
+  "difficulty": "Intermediate",
+  "scenes": [
+    {
+      "type": "hook",
+      "headline": "Women start the race. They rarely finish it.",
+      "subtext": "Women hold 33% of entry-level corporate jobs in India. By the C-suite? 17%. The leakage happens silently, at every rung of the ladder.",
+      "stat": {
+        "value": "17%",
+        "label": "of C-suite positions in India's private sector are held by women — McKinsey Women in Workplace 2025",
+        "trend": "down"
+      }
+    },
+    {
+      "type": "concept",
+      "title": "Three invisible forces — glass ceiling, broken rung, glass cliff",
+      "body": "The glass ceiling is the invisible barrier that stops women from reaching the top, even when they're qualified. But newer research has found two more forces: the 'broken rung' — where women are blocked at the very first promotion to manager — and the 'glass cliff' — where women are given leadership only in crisis situations, set up to fail.",
+      "analogy": "Imagine a building with a transparent floor at level 7. Women can see the top — but they hit the floor before reaching it. And the ladder? The first rung is broken. And when someone does get pulled up, it's usually when the building is on fire.",
+      "visual": {
+        "type": "comparison",
+        "data": {
+          "left": { "label": "Entry level", "value": "Women: 33% of roles (48% of university graduates)" },
+          "right": { "label": "C-suite", "value": "Women: 17% of roles — the drop happens at every rung" }
+        }
+      }
+    },
+    {
+      "type": "breakdown",
+      "title": "The three barriers decoded",
+      "intro": "Glass ceiling, broken rung, glass cliff — and the pay gap that runs through all of them.",
+      "items": [
+        {
+          "icon": "🪟",
+          "title": "The Glass Ceiling — you can see the top but can't reach it",
+          "detail": "In India's tech sector (IIT Kharagpur study, 2025): women are nearly half of junior roles but only 13% of top-level positions. At CEO/VP level, only 2 out of 28 CEO roles are held by women.",
+          "stat": "30.51% gender pay gap in India's tech sector — IIT Kharagpur 2025"
+        },
+        {
+          "icon": "🪜",
+          "title": "The Broken Rung — blocked at the very first step",
+          "detail": "McKinsey's 2025 report found India's biggest barrier isn't the CEO level — it's the first promotion from individual contributor to manager. Miss that rung and the entire ladder shifts.",
+          "stat": "Women enter the formal workforce 7 years later than men on average (age 39 vs 32)"
+        },
+        {
+          "icon": "🔥",
+          "title": "The Glass Cliff — leadership only when things are on fire",
+          "detail": "Women are disproportionately appointed to leadership roles during crises. If they succeed, credit often goes elsewhere. If they fail, the narrative becomes 'women can't lead.' This is the glass cliff — a poisoned invitation to the top.",
+          "stat": "Women executives showed greater performance consistency during COVID-19 — but received less credit"
+        },
+        {
+          "icon": "🧱",
+          "title": "The Maternal Wall — invisible penalty for becoming a mother",
+          "detail": "After having children, women are seen as less committed, less ambitious, less available. They get passed over for promotions and high-profile projects. The maternal wall is the most socially accepted form of workplace discrimination.",
+          "stat": "India's new Labour Codes allow WFH after maternity leave — government acknowledgment of the maternal wall"
+        },
+        {
+          "icon": "📊",
+          "title": "The pay gap that widens as you rise",
+          "detail": "The IIT Kharagpur 2025 study found the gender pay gap actually widens at higher income levels. Senior women earn proportionally less compared to senior men than junior women do compared to junior men. Success doesn't fix the gap. It deepens it.",
+          "stat": "Urban women: ₹19,879/month vs men's ₹26,105 — PLFS 2024"
+        }
+      ]
+    },
+    {
+      "type": "two_sides",
+      "title": "Is India making progress?",
+      "left_label": "Signs of progress",
+      "right_label": "Structural barriers remain",
+      "left_items": [
+        { "label": "Legal framework exists", "detail": "Equal Remuneration Act 1976, POSH Act 2013, maternity benefit protections — legal tools are in place" },
+        { "label": "IT sector leading change", "detail": "IT and healthcare are India's most gender-inclusive sectors — remote work helped women retain careers" },
+        { "label": "Corporate accountability growing", "detail": "SEBI mandates at least one woman director on listed company boards — compliance is near-universal now" }
+      ],
+      "right_items": [
+        { "label": "15% of boards track gender diversity", "detail": "McKinsey 2025: only 15% of corporate boards monitor gender diversity outcomes" },
+        { "label": "Financial sector worst offender", "detail": "Women: 31% of entry-level in financial services, just 13% of C-suite" },
+        { "label": "No mandatory pay transparency", "detail": "Unlike EU, India has no law requiring companies to disclose gender pay gaps" }
+      ],
+      "officer_framing": "India has the legal framework — what's missing is enforcement, accountability, and a cultural shift in how ambition is perceived in women. The ceiling isn't glass anymore; it's become a one-way mirror."
+    },
+    {
+      "type": "context",
+      "title": "India vs the world",
+      "body": "India ranked 131st in WEF's Global Gender Gap Report 2025 — slipping 2 places from 129th. India is in the bottom 5 globally on 'Economic Participation and Opportunity'. For context: Bangladesh is ranked higher than India on gender economic parity.",
+      "key_numbers": [
+        { "value": "131st", "label": "India's rank in WEF Global Gender Gap Index 2025" },
+        { "value": "30.51%", "label": "Gender pay gap in India's tech sector — IIT Kharagpur 2025" },
+        { "value": "13%", "label": "Women in top-level tech roles in India" },
+        { "value": "42%", "label": "Indian companies that don't measure gender policy impact — McKinsey 2025" }
+      ],
+      "timeline": [
+        { "year": "1976", "event": "Equal Remuneration Act — equal pay for equal work legally mandated", "type": "positive" },
+        { "year": "2013", "event": "POSH Act — workplace harassment legal framework established", "type": "positive" },
+        { "year": "2014", "event": "SEBI mandates at least one woman on listed company boards", "type": "positive" },
+        { "year": "2025", "event": "McKinsey report: India's broken rung identified; women enter workforce 7 years later", "type": "negative" },
+        { "year": "2025", "event": "WEF drops India 2 ranks — bottom 5 globally on economic participation for women", "type": "negative" }
+      ]
+    },
+    {
+      "type": "ssb_application",
+      "title": "Use this in SSB",
+      "pi_question": "What is the glass ceiling and how does it affect women in India?",
+      "gd_line": "The glass ceiling, broken rung, and glass cliff together explain why women start strong but rarely finish at the top. The solution isn't just legal — it requires changing how organisations measure success, track promotions, and define leadership potential.",
+      "lecturette_structure": [
+        "Open: Women hold 33% of entry-level roles. Only 17% reach the C-suite. What happens in between?",
+        "Define the three barriers: glass ceiling, broken rung, glass cliff — one sentence each",
+        "Data: 30.51% pay gap in tech, 131st rank globally, maternal wall effect",
+        "What's working: SEBI mandate, POSH Act, IT sector progress",
+        "Close: Legal tools exist — enforcement and cultural change are the remaining gaps"
+      ],
+      "pi_answer": "Sir, the glass ceiling refers to the invisible barrier preventing women from reaching top leadership despite being qualified. In India, women hold 33% of entry-level roles but only 17% of C-suite positions. The problem starts even earlier at the 'broken rung' — the first promotion to manager. India has strong legal frameworks — Equal Remuneration Act, POSH Act, SEBI's board diversity mandate — but lacks mandatory pay transparency and robust enforcement. The path forward is accountability, not just aspiration.",
+      "one_liner": "The ceiling isn't glass anymore — it's a one-way mirror. Women can't see it, but the gatekeepers above can."
+    },
+    {
+      "type": "quiz",
+      "title": "Test yourself",
+      "questions": [
+        {
+          "q": "What is the 'broken rung' as opposed to the 'glass ceiling'?",
+          "options": [
+            "Both mean the same thing — barriers to women's advancement",
+            "The broken rung is the specific barrier at the first promotion to manager — before women even reach the glass ceiling. Fix the rung, and the ceiling becomes reachable.",
+            "The broken rung refers to pay gaps at the senior level"
+          ],
+          "correct": 1,
+          "explanation": "The glass ceiling is a mid-to-senior level barrier. The broken rung is earlier — and often more damaging because it stops the climb before it begins."
+        },
+        {
+          "q": "A company claims it is gender-equal because 48% of its employees are women. As an officer, how would you evaluate this claim?",
+          "options": [
+            "Accept it — 48% is near parity so the company is doing well",
+            "Probe further — what percentage of managers and senior leaders are women? Entry-level diversity means little if the promotion pipeline leaks at every rung.",
+            "Reject it — companies always lie about diversity"
+          ],
+          "correct": 1,
+          "explanation": "Representation at entry level is the floor, not the ceiling. An officer's analysis looks at pipeline data, not just snapshot numbers."
+        }
+      ]
+    }
+  ]
+}

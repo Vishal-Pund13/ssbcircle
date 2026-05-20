@@ -1,11 +1,19 @@
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import SwipeReader from './SwipeReader';
-import rupeeData   from '../../data/articles/rupee-depreciation.json';
-import elNinoData  from '../../data/articles/super-el-nino.json';
+import rupeeData             from '../../data/articles/rupee-depreciation.json';
+import elNinoData            from '../../data/articles/super-el-nino.json';
+import womenWorkforceData    from '../../data/articles/women-workforce-paradox.json';
+import womenProxyData        from '../../data/articles/women-proxy-representation.json';
+import womenGlassCeilingData from '../../data/articles/women-glass-ceiling.json';
+import womenPayGapData       from '../../data/articles/women-gender-pay-gap.json';
 
 const ARTICLES = {
-  'rupee-depreciation': rupeeData,
-  'super-el-nino':      elNinoData,
+  'rupee-depreciation':       rupeeData,
+  'super-el-nino':            elNinoData,
+  'women-workforce-paradox':  womenWorkforceData,
+  'women-proxy-representation': womenProxyData,
+  'women-glass-ceiling':      womenGlassCeilingData,
+  'women-gender-pay-gap':     womenPayGapData,
 };
 
 export default function ReadPage() {
