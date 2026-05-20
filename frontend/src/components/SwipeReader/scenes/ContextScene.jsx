@@ -1,11 +1,27 @@
 import { lazy, Suspense } from 'react';
+import {
+  FlfprChart, CorporatePipelineChart, PayGapChart,
+  SafetyBarriersChart, EducationFunnelChart, HealthDashboard, ProxyGapChart,
+} from './WomenDataVisuals';
+
 const IndiaImpactMap = lazy(() => import('./IndiaImpactMap'));
 
 const GEO_VISUALS = { india_el_nino: IndiaImpactMap };
 
+const DATA_VISUALS = {
+  women_flfpr:       FlfprChart,
+  women_pipeline:    CorporatePipelineChart,
+  women_pay_gap:     PayGapChart,
+  women_safety:      SafetyBarriersChart,
+  women_education:   EducationFunnelChart,
+  women_health:      HealthDashboard,
+  women_proxy:       ProxyGapChart,
+};
+
 export default function ContextScene({ scene }) {
-  const { title, body, key_numbers, timeline, geo_visual } = scene;
-  const GeoComponent = geo_visual ? GEO_VISUALS[geo_visual] : null;
+  const { title, body, key_numbers, timeline, geo_visual, data_visual } = scene;
+  const GeoComponent  = geo_visual  ? GEO_VISUALS[geo_visual]   : null;
+  const DataComponent = data_visual ? DATA_VISUALS[data_visual] : null;
 
   const dotColor = {
     positive: 'bg-brand-600',
@@ -38,6 +54,9 @@ export default function ContextScene({ scene }) {
           <GeoComponent title="State-level impact" />
         </Suspense>
       )}
+
+      {/* Inline data visualisation */}
+      {DataComponent && <DataComponent />}
 
       {/* Timeline */}
       {timeline?.length > 0 && (
