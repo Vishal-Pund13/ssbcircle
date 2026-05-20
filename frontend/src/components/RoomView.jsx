@@ -364,38 +364,59 @@ function TopicStrip({ article }) {
 
   return (
     <>
-      <div className="shrink-0 border-b border-brand-100 bg-white">
-        {/* Collapsed header — always visible */}
-        <div className="flex items-center gap-2.5 px-4 py-2">
-          <svg viewBox="0 0 34 24" fill="none" className="w-6 h-4 shrink-0">
-            <rect x="1" y="5" width="20" height="14" rx="2.5" fill="#e0e7ff" transform="rotate(-11 11 12)" />
-            <rect x="5" y="3" width="20" height="14" rx="2.5" fill="#eef2ff" transform="rotate(-5 15 10)" />
-            <rect x="10" y="2" width="20" height="14" rx="2.5" fill="white" stroke="#c7d2fe" strokeWidth="1.2" />
-            <line x1="13.5" y1="8" x2="27" y2="8" stroke="#1e3a5f" strokeWidth="1.6" strokeLinecap="round" />
+      <div className="shrink-0 border-b border-brand-100 bg-brand-50">
+        {/* Main row */}
+        <div className="flex items-center gap-3 px-4 py-2.5">
+
+          {/* Left: stacked cards icon */}
+          <svg viewBox="0 0 34 24" fill="none" className="w-7 h-5 shrink-0">
+            <rect x="1" y="5" width="20" height="14" rx="2.5" fill="#c7d2fe" transform="rotate(-11 11 12)" />
+            <rect x="5" y="3" width="20" height="14" rx="2.5" fill="#e0e7ff" transform="rotate(-5 15 10)" />
+            <rect x="10" y="2" width="20" height="14" rx="2.5" fill="white" stroke="#a5b4fc" strokeWidth="1.2" />
+            <line x1="13.5" y1="8"   x2="27" y2="8"   stroke="#1e3a5f" strokeWidth="1.6" strokeLinecap="round" />
             <line x1="13.5" y1="11.5" x2="25" y2="11.5" stroke="#c7d2fe" strokeWidth="1.3" strokeLinecap="round" />
+            <line x1="13.5" y1="14.5" x2="22" y2="14.5" stroke="#c7d2fe" strokeWidth="1.3" strokeLinecap="round" />
           </svg>
-          <span className="text-[9px] font-bold text-brand-600 bg-brand-50 border border-brand-100 px-1.5 py-0.5 rounded-full uppercase tracking-widest shrink-0">
-            {article.category}
-          </span>
-          <p className="text-xs font-bold text-gray-800 truncate flex-1">{article.title}</p>
-          {hook?.stat?.value && (
-            <span className="text-sm font-extrabold text-brand-600 shrink-0">{hook.stat.value}</span>
-          )}
-          <button
-            onClick={() => setExpanded(v => !v)}
-            className="shrink-0 text-[10px] font-semibold text-brand-600 hover:text-brand-700 flex items-center gap-0.5 cursor-pointer px-1.5 py-1 rounded hover:bg-brand-50 transition-colors">
-            {expanded ? 'Less ▲' : 'Key points ▼'}
-          </button>
-          <button onClick={() => setDismissed(true)}
-            className="shrink-0 text-gray-300 hover:text-gray-500 cursor-pointer text-base leading-none ml-1">×</button>
+
+          {/* Middle: label + title + stat */}
+          <div className="flex-1 min-w-0">
+            <p className="text-[9px] font-bold text-brand-600 uppercase tracking-widest leading-none mb-0.5">
+              GD Topic · News Card
+            </p>
+            <p className="text-xs font-bold text-gray-900 truncate leading-snug">
+              {article.title}
+              {hook?.stat?.value && (
+                <span className="ml-2 text-brand-600">{hook.stat.value}</span>
+              )}
+            </p>
+          </div>
+
+          {/* Right: action buttons */}
+          <div className="flex items-center gap-1.5 shrink-0">
+            <button
+              onClick={() => setShowReader(true)}
+              className="flex items-center gap-1.5 bg-brand-600 hover:bg-brand-700 text-white text-[11px] font-bold px-3 py-1.5 rounded-lg transition-colors cursor-pointer">
+              <svg className="w-3 h-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
+              </svg>
+              Read card
+            </button>
+            <button
+              onClick={() => setExpanded(v => !v)}
+              className="text-[11px] font-semibold text-brand-700 hover:text-brand-900 px-2 py-1.5 rounded-lg hover:bg-brand-100 transition-colors cursor-pointer whitespace-nowrap">
+              {expanded ? 'Hide ▲' : 'Key points ▼'}
+            </button>
+            <button onClick={() => setDismissed(true)}
+              className="text-brand-300 hover:text-brand-500 cursor-pointer text-base leading-none px-1">×</button>
+          </div>
         </div>
 
-        {/* Expanded content */}
+        {/* Expanded key points */}
         {expanded && (
-          <div className="px-4 pb-3 flex flex-col sm:flex-row gap-4 border-t border-gray-100 pt-3">
+          <div className="px-4 pb-3 pt-2 border-t border-brand-100 flex flex-col sm:flex-row gap-4">
             {breakdown?.items?.length > 0 && (
               <div className="flex-1 min-w-0">
-                <p className="text-[9px] font-bold text-gray-400 uppercase tracking-widest mb-1.5">Key Points</p>
+                <p className="text-[9px] font-bold text-brand-600 uppercase tracking-widest mb-1.5">Key Points</p>
                 <div className="flex flex-col gap-1">
                   {breakdown.items.slice(0, 4).map((item, i) => (
                     <div key={i} className="flex items-start gap-1.5">
@@ -412,11 +433,6 @@ function TopicStrip({ article }) {
                 <p className="text-[11px] text-brand-800 leading-relaxed italic">"{ssbApp.gd_line}"</p>
               </div>
             )}
-            <button
-              onClick={() => setShowReader(true)}
-              className="self-end sm:self-center shrink-0 text-[10px] font-semibold text-brand-600 hover:underline flex items-center gap-1 cursor-pointer">
-              Read full card →
-            </button>
           </div>
         )}
       </div>
