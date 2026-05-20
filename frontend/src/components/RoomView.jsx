@@ -1,4 +1,4 @@
-import { useEffect, useState, useRef, lazy, Suspense } from 'react';
+import { useEffect, useState, useRef, useCallback, lazy, Suspense } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import { getRoom, getRoomToken, closeRoom, kickParticipant, reportUser } from '../services/api';
 import { useAuth } from '../context/AuthContext';
@@ -344,9 +344,32 @@ function AdminPanel({ participants, roomCode, onMuteAll, onEndRoom, onMutePartic
 const SwipeReaderLazy = lazy(() => import('./SwipeReader/SwipeReader'));
 
 function SwipeReaderInRoom({ article, onClose }) {
+  const closedRef = useRef(false);
+
+  const safeClose = useCallback(() => {
+    if (closedRef.current) return;
+    closedRef.current = true;
+    onClose();
+  }, [onClose]);
+
+  useEffect(() => {
+    // Push a history entry so the back gesture pops THIS state
+    // instead of navigating out of the room
+    window.history.pushState({ readerOverlay: true }, '');
+
+    const handlePop = () => safeClose();
+    window.addEventListener('popstate', handlePop);
+    return () => window.removeEventListener('popstate', handlePop);
+  }, [safeClose]);
+
+  function handleClose() {
+    // history.back() pops our pushed state → fires popstate → safeClose
+    window.history.back();
+  }
+
   return (
     <Suspense fallback={<div className="flex-1 flex items-center justify-center text-sm text-gray-400">Loading…</div>}>
-      <SwipeReaderLazy article={article} onClose={onClose} />
+      <SwipeReaderLazy article={article} onClose={handleClose} />
     </Suspense>
   );
 }
