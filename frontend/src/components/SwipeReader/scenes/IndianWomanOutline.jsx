@@ -1,117 +1,137 @@
-// Geometric outline of a rural Indian woman carrying a water pot.
-// Drawn in the same line-art style as the India map — brand-navy strokes,
-// clean paths, no fill (except accent dots for bindi/bangles).
+// Line-art outline of an Indian Army woman officer — peaked cap, epaulettes,
+// rank stars, medal ribbons, belt, trousers and boots. Brand-navy strokes.
 
 export default function IndianWomanOutline({ className = '', color = '#1e3a5f' }) {
   return (
     <svg
-      viewBox="0 0 140 290"
+      viewBox="0 0 100 268"
       fill="none"
       stroke={color}
       strokeLinecap="round"
       strokeLinejoin="round"
       className={className}
-      aria-label="Rural Indian woman"
+      aria-label="Indian Army woman officer"
     >
-      {/* ── Water pot (matka) ── */}
-      <ellipse cx="68" cy="14"  rx="18" ry="12" strokeWidth="1.6"/>
-      <ellipse cx="68" cy="6"   rx="10" ry="4.5" strokeWidth="1.4"/>
-      <path    d="M50 20 Q68 30 86 20"              strokeWidth="1.4"/>
-      {/* pot handles */}
-      <path d="M52 10 Q46 14 49 20" strokeWidth="1.1" strokeOpacity="0.5"/>
-      <path d="M84 10 Q90 14 87 20" strokeWidth="1.1" strokeOpacity="0.5"/>
+      {/* ── Peaked cap ── */}
+      {/* Crown dome */}
+      <path d="M32 60 Q34 40 50 38 Q66 40 68 60" strokeWidth="1.8" />
+      {/* Band */}
+      <line x1="26" y1="60" x2="74" y2="60" strokeWidth="2.6" />
+      {/* Brim curve */}
+      <path d="M26 60 Q50 66 74 60" strokeWidth="1.3" />
+      {/* Cap badge — 5-pt star */}
+      <path d="M50 50 L51.5 54 L55.5 54 L52.3 56.4 L53.6 60.4 L50 58 L46.4 60.4 L47.7 56.4 L44.5 54 L48.5 54 Z"
+        fill={color} stroke="none" opacity="0.6" />
 
       {/* ── Head ── */}
-      <circle cx="68" cy="48" r="20" strokeWidth="1.6"/>
+      <circle cx="50" cy="73" r="17" strokeWidth="1.7" />
 
-      {/* ── Hair / juda (bun at back-top) ── */}
-      <path d="M80 33 Q92 26 94 34 Q94 43 87 43 Q81 43 80 37" strokeWidth="1.4"/>
-      {/* loose hair strands */}
-      <path d="M84 36 Q88 40 86 44" strokeWidth="1"  strokeOpacity="0.45"/>
-      <path d="M88 30 Q95 28 96 34" strokeWidth="1"  strokeOpacity="0.35"/>
+      {/* ── Hair lines at temples (bun pulled back) ── */}
+      <path d="M34 62 Q37 58 39 65" strokeWidth="1" strokeOpacity="0.45" />
+      <path d="M66 62 Q63 58 61 65" strokeWidth="1" strokeOpacity="0.45" />
 
-      {/* ── Face details ── */}
-      {/* bindi */}
-      <circle cx="68" cy="44" r="2" fill={color} stroke="none"/>
-      {/* eyes */}
-      <ellipse cx="60" cy="50" rx="3.5" ry="2" strokeWidth="1.1"/>
-      <ellipse cx="76" cy="50" rx="3.5" ry="2" strokeWidth="1.1"/>
-      <circle  cx="61" cy="50" r="1.2"  fill={color} stroke="none"/>
-      <circle  cx="77" cy="50" r="1.2"  fill={color} stroke="none"/>
-      {/* nose */}
-      <path d="M68 52 Q65 57 67 59 Q68 60 69 59 Q71 57 68 52" strokeWidth="1"/>
-      {/* lips */}
-      <path d="M63 63 Q68 67 73 63" strokeWidth="1.2"/>
-      {/* ear */}
-      <path d="M48 47 Q44 50 46 56 Q48 60 52 58" strokeWidth="1.1"/>
-      {/* earring */}
-      <circle cx="45" cy="53" r="3" strokeWidth="1.1"/>
-      <line x1="45" y1="56" x2="45" y2="61" strokeWidth="1.1"/>
-      <circle cx="45" cy="63" r="2.5" strokeWidth="1.1"/>
+      {/* ── Face ── */}
+      {/* Eyes */}
+      <ellipse cx="43" cy="71" rx="3" ry="1.8" strokeWidth="1.1" />
+      <ellipse cx="57" cy="71" rx="3" ry="1.8" strokeWidth="1.1" />
+      <circle cx="44" cy="71" r="1.1" fill={color} stroke="none" />
+      <circle cx="58" cy="71" r="1.1" fill={color} stroke="none" />
+      {/* Nose */}
+      <path d="M50 74 Q48 78 49 80 Q50 81 51 80 Q52 78 50 74" strokeWidth="0.9" />
+      {/* Composed mouth */}
+      <path d="M45 84 Q50 87 55 84" strokeWidth="1.1" />
+
+      {/* ── Ears ── */}
+      <path d="M33 69 Q29 73 31 79 Q33 83 37 81" strokeWidth="1.1" />
+      <path d="M67 69 Q71 73 69 79 Q67 83 63 81" strokeWidth="1.1" />
+      {/* Small earrings */}
+      <circle cx="30" cy="76" r="1.4" strokeWidth="1.1" />
+      <circle cx="70" cy="76" r="1.4" strokeWidth="1.1" />
 
       {/* ── Neck ── */}
-      <path d="M60 68 L58 78 M76 68 L74 78"  strokeWidth="1.4"/>
-      <path d="M58 78 Q68 82 74 78"           strokeWidth="1.4"/>
-      {/* necklace */}
-      <path d="M56 82 Q68 90 80 82"          strokeWidth="1"   strokeOpacity="0.55"/>
-      <circle cx="68" cy="89" r="2"           strokeWidth="1"   strokeOpacity="0.55"/>
+      <path d="M44 90 L42 99" strokeWidth="1.4" />
+      <path d="M56 90 L58 99" strokeWidth="1.4" />
+      <path d="M42 99 Q50 103 58 99" strokeWidth="1.3" />
 
-      {/* ── Blouse (choli) ── */}
-      <path d="M46 76 Q52 72 68 72 Q84 72 90 76 Q96 82 90 92 Q84 98 68 98 Q52 98 46 92 Q40 82 46 76 Z" strokeWidth="1.5"/>
-      {/* blouse pattern lines */}
-      <path d="M50 80 Q68 76 86 80" strokeWidth="0.8" strokeOpacity="0.35"/>
+      {/* ── Uniform jacket ── */}
+      <path d="M16 110 Q14 136 14 158 L86 158 Q86 136 84 110 Q68 100 50 100 Q32 100 16 110 Z"
+        strokeWidth="1.6" />
 
-      {/* ── Saree pallu (over left shoulder, flowing) ── */}
-      <path d="M46 76 Q36 84 28 96 Q22 108 26 122 Q30 134 40 140" strokeWidth="1.4"/>
-      {/* pallu drape folds */}
-      <path d="M30 100 Q24 112 26 124" strokeWidth="1"   strokeOpacity="0.5"/>
-      <path d="M34 96  Q28 108 30 120" strokeWidth="1"   strokeOpacity="0.4"/>
-      {/* pallu hanging end */}
-      <path d="M26 122 Q20 136 18 152 Q16 162 20 170" strokeWidth="1.3" strokeOpacity="0.7"/>
+      {/* Collar — V shape */}
+      <path d="M42 99 L36 110 L46 118" strokeWidth="1.3" />
+      <path d="M58 99 L64 110 L54 118" strokeWidth="1.3" />
+      {/* Centre line */}
+      <line x1="50" y1="102" x2="50" y2="120" strokeWidth="0.9" strokeOpacity="0.5" />
 
-      {/* ── Left arm (slightly raised, hand at side) ── */}
-      <path d="M46 84 Q38 96 34 112 Q30 126 34 138" strokeWidth="1.5"/>
-      {/* left hand fingers */}
-      <path d="M34 138 Q30 142 28 140 M34 138 Q32 144 30 143 M34 138 Q34 145 32 145" strokeWidth="1" strokeOpacity="0.6"/>
-      {/* bangles */}
-      <ellipse cx="34" cy="128" rx="5" ry="2"  strokeWidth="1.2"/>
-      <ellipse cx="34" cy="133" rx="5" ry="2"  strokeWidth="1.2"/>
-      <ellipse cx="34" cy="138" rx="4.5" ry="2" strokeWidth="1.2"/>
+      {/* ── Left epaulette (shoulder board) ── */}
+      <path d="M16 110 L5 105 Q3 97 10 95 Q21 92 27 104 L20 112" strokeWidth="1.3" />
+      {/* 3 rank stars */}
+      <circle cx="9"  cy="100" r="1.9" fill={color} stroke="none" opacity="0.8" />
+      <circle cx="14" cy="97"  r="1.9" fill={color} stroke="none" opacity="0.8" />
+      <circle cx="19" cy="95"  r="1.9" fill={color} stroke="none" opacity="0.8" />
 
-      {/* ── Right arm (down, holding saree end) ── */}
-      <path d="M90 84 Q100 98 104 114 Q106 126 102 136" strokeWidth="1.5"/>
-      {/* right hand */}
-      <path d="M102 136 Q106 140 108 138 M102 136 Q104 143 106 142 M102 136 Q102 143 104 144" strokeWidth="1" strokeOpacity="0.6"/>
-      {/* right bangles */}
-      <ellipse cx="104" cy="120" rx="5" ry="2" strokeWidth="1.2"/>
-      <ellipse cx="105" cy="126" rx="5" ry="2" strokeWidth="1.2"/>
+      {/* ── Right epaulette ── */}
+      <path d="M84 110 L95 105 Q97 97 90 95 Q79 92 73 104 L80 112" strokeWidth="1.3" />
+      {/* 3 rank stars */}
+      <circle cx="91" cy="100" r="1.9" fill={color} stroke="none" opacity="0.8" />
+      <circle cx="86" cy="97"  r="1.9" fill={color} stroke="none" opacity="0.8" />
+      <circle cx="81" cy="95"  r="1.9" fill={color} stroke="none" opacity="0.8" />
 
-      {/* ── Saree body (main draped fabric) ── */}
-      <path d="M46 98 Q40 128 38 160 Q36 188 40 210 Q44 228 68 232 Q92 228 96 210 Q100 188 98 160 Q96 128 90 98" strokeWidth="1.6"/>
+      {/* ── Buttons down centre ── */}
+      <circle cx="50" cy="120" r="1.8" fill={color} stroke="none" opacity="0.6" />
+      <circle cx="50" cy="131" r="1.8" fill={color} stroke="none" opacity="0.6" />
+      <circle cx="50" cy="142" r="1.8" fill={color} stroke="none" opacity="0.6" />
+      <circle cx="50" cy="153" r="1.8" fill={color} stroke="none" opacity="0.6" />
 
-      {/* ── Saree pleats (front, fan-folded) ── */}
-      <path d="M52 178 Q56 172 60 178 Q64 184 68 178 Q72 172 76 178 Q80 184 84 178" strokeWidth="1.2" strokeOpacity="0.7"/>
-      <path d="M50 188 Q54 182 58 188 Q62 194 66 188 Q70 182 74 188 Q78 194 82 188 Q86 182 90 188" strokeWidth="1.2" strokeOpacity="0.55"/>
-      {/* horizontal saree border lines */}
-      <path d="M40 208 Q68 214 96 208" strokeWidth="1.1" strokeOpacity="0.45"/>
-      <path d="M42 212 Q68 218 94 212" strokeWidth="1.1" strokeOpacity="0.35"/>
+      {/* ── Medal ribbons (left chest) ── */}
+      <rect x="26" y="120" width="11" height="6" rx="0.5" strokeWidth="1.2" />
+      <line x1="28.7" y1="120" x2="28.7" y2="126" strokeWidth="0.9" />
+      <line x1="31.5" y1="120" x2="31.5" y2="126" strokeWidth="0.9" />
+      <line x1="34.3" y1="120" x2="34.3" y2="126" strokeWidth="0.9" />
 
-      {/* ── Legs / feet (under saree) ── */}
-      <path d="M56 232 Q54 248 52 262 Q50 272 52 278" strokeWidth="1.4"/>
-      <path d="M80 232 Q80 248 80 262 Q80 272 78 278" strokeWidth="1.4"/>
-      {/* feet / payal (anklet) */}
-      <path d="M46 276 Q52 280 60 278" strokeWidth="1.2"/>
-      <path d="M78 276 Q82 280 90 278" strokeWidth="1.2"/>
-      <ellipse cx="52" cy="268" rx="6" ry="2"  strokeWidth="1"  strokeOpacity="0.6"/>
-      <ellipse cx="80" cy="268" rx="6" ry="2"  strokeWidth="1"  strokeOpacity="0.6"/>
+      {/* ── Belt ── */}
+      <line x1="14" y1="158" x2="86" y2="158" strokeWidth="2.4" />
+      {/* Buckle */}
+      <rect x="44" y="154" width="12" height="8" rx="1" strokeWidth="1.3" />
+      <line x1="50" y1="154" x2="50" y2="162" strokeWidth="1" strokeOpacity="0.45" />
 
-      {/* ── Ground line ── */}
-      <line x1="32" y1="282" x2="104" y2="282" strokeWidth="1.2" strokeOpacity="0.25"/>
+      {/* ── Left arm (at side, at attention) ── */}
+      <path d="M14 114 Q6 134 6 154 Q6 166 10 175" strokeWidth="1.5" />
+      <path d="M6 167 Q8 172 12 172" strokeWidth="1.2" />
+      {/* fingers */}
+      <path d="M10 175 Q6 179 8 181 M10 175 Q8 181 10 184 M10 175 Q13 180 15 179"
+        strokeWidth="0.9" strokeOpacity="0.6" />
 
-      {/* ── Shadow dots (artistic accent) ── */}
-      <circle cx="50"  cy="220" r="1"   fill={color} stroke="none" opacity="0.2"/>
-      <circle cx="86"  cy="220" r="1"   fill={color} stroke="none" opacity="0.2"/>
-      <circle cx="68"  cy="224" r="1.2" fill={color} stroke="none" opacity="0.2"/>
+      {/* ── Right arm ── */}
+      <path d="M86 114 Q94 134 94 154 Q94 166 90 175" strokeWidth="1.5" />
+      <path d="M94 167 Q92 172 88 172" strokeWidth="1.2" />
+      {/* fingers */}
+      <path d="M90 175 Q94 179 92 181 M90 175 Q92 181 90 184 M90 175 Q87 180 85 179"
+        strokeWidth="0.9" strokeOpacity="0.6" />
+
+      {/* ── Trouser waistband ── */}
+      <path d="M16 162 Q50 166 84 162" strokeWidth="1.4" />
+
+      {/* ── Left trouser leg ── */}
+      <path d="M16 166 L12 252" strokeWidth="1.5" />
+      <path d="M44 166 L46 252" strokeWidth="1.5" />
+      <line x1="28" y1="168" x2="28" y2="249" strokeWidth="0.7" strokeOpacity="0.38" />
+
+      {/* ── Right trouser leg ── */}
+      <path d="M56 166 L54 252" strokeWidth="1.5" />
+      <path d="M84 166 L86 252" strokeWidth="1.5" />
+      <line x1="71" y1="168" x2="71" y2="249" strokeWidth="0.7" strokeOpacity="0.38" />
+
+      {/* ── Left boot ── */}
+      <path d="M12 250 Q8 255 8 260 Q8 266 26 266 Q40 266 42 260 Q44 254 46 250" strokeWidth="1.5" />
+      <line x1="6" y1="266" x2="44" y2="266" strokeWidth="1.3" />
+
+      {/* ── Right boot ── */}
+      <path d="M54 250 Q52 255 52 260 Q52 266 70 266 Q84 266 86 260 Q88 254 86 250" strokeWidth="1.5" />
+      <line x1="50" y1="266" x2="88" y2="266" strokeWidth="1.3" />
+
+      {/* ── Ground shadow ── */}
+      <line x1="2" y1="268" x2="98" y2="268" strokeWidth="1" strokeOpacity="0.16" />
     </svg>
   );
 }
