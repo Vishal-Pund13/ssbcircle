@@ -182,7 +182,7 @@ export default function WomenSeriesPage() {
             </div>
           ) : (
             <div>
-              <p className="text-xs text-gray-400 mb-4">{SERIES.length - done} card{SERIES.length - done > 1 ? 's' : ''} remaining · ~{(SERIES.length - done) * 4}–{(SERIES.length - done) * 5} min</p>
+              <p className="text-xs text-gray-400 mb-4">{SERIES.length - done} card{SERIES.length - done > 1 ? 's' : ''} remaining</p>
               <Link to="/current-affairs" className="text-xs text-gray-400 hover:text-gray-600 transition-colors">
                 ← Back to all News Cards
               </Link>
