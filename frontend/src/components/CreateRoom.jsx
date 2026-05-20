@@ -65,6 +65,7 @@ export default function CreateRoom() {
   const [existingRoom,    setExistingRoom]    = useState(null); // for 409 conflict
   const [articles,        setArticles]        = useState([]);
   const [showPicker,      setShowPicker]      = useState(false);
+  const [pickedSlug,      setPickedSlug]      = useState(null);
 
   useEffect(() => {
     getArticles().then(setArticles).catch(() => {});
@@ -111,7 +112,7 @@ export default function CreateRoom() {
         });
         setScheduled(sess);
       } else {
-        const created = await createRoom(title.trim(), description.trim(), category, subcategory || null, maxParticipants);
+        const created = await createRoom(title.trim(), description.trim(), category, subcategory || null, maxParticipants, pickedSlug);
         setRoom(created);
       }
     } catch (err) {
@@ -126,6 +127,7 @@ export default function CreateRoom() {
 
   function pickCard(article) {
     setTitle(article.title);
+    setPickedSlug(article.slug);
     const desc = category === 'Lecturette'
       ? `Lecturette on "${article.title}" — each participant picks a sub-topic and speaks for 3 minutes.`
       : `GD on "${article.title}" — discuss key facts, multiple perspectives, and India's position on the issue.`;

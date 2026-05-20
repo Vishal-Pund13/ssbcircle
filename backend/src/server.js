@@ -202,6 +202,7 @@ async function start() {
     await pool.query(`ALTER TABLE rooms ADD COLUMN IF NOT EXISTS max_participants INT DEFAULT 8`);
     await pool.query(`ALTER TABLE rooms ADD COLUMN IF NOT EXISTS summary TEXT`);
     await pool.query(`ALTER TABLE rooms ADD COLUMN IF NOT EXISTS is_featured BOOLEAN DEFAULT false`);
+    await pool.query(`ALTER TABLE rooms ADD COLUMN IF NOT EXISTS article_slug VARCHAR(200)`);
     await pool.query(`ALTER TABLE users ADD COLUMN IF NOT EXISTS is_banned BOOLEAN DEFAULT false`);
     await pool.query(`ALTER TABLE scheduled_sessions ADD COLUMN IF NOT EXISTS reminder_sent BOOLEAN DEFAULT false`);
     await pool.query(`ALTER TABLE scheduled_sessions ADD COLUMN IF NOT EXISTS host_reminder_sent BOOLEAN DEFAULT false`);

@@ -45,8 +45,8 @@ export const fetchMe = async () => {
 };
 
 // Rooms
-export const createRoom = async (title, description, category, subcategory, max_participants) => {
-  const { data } = await api.post('/api/rooms', { title, description, category, subcategory, max_participants });
+export const createRoom = async (title, description, category, subcategory, max_participants, article_slug = null) => {
+  const { data } = await api.post('/api/rooms', { title, description, category, subcategory, max_participants, article_slug });
   return data.room;
 };
 

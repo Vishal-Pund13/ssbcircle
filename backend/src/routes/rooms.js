@@ -28,7 +28,7 @@ router.post('/', authMiddleware, createRoomLimiter, async (req, res) => {
     if (await checkBanned(req.userId))
       return res.status(403).json({ error: 'Your account has been suspended.' });
 
-    const { title, description, category, subcategory, max_participants } = req.body;
+    const { title, description, category, subcategory, max_participants, article_slug } = req.body;
 
     if (!title || typeof title !== 'string' || title.trim().length < 5)
       return res.status(400).json({ error: 'Room title must be at least 5 characters' });
@@ -68,9 +68,10 @@ router.post('/', authMiddleware, createRoomLimiter, async (req, res) => {
       });
     }
 
+    const slug = typeof article_slug === 'string' && article_slug.trim() ? article_slug.trim() : null;
     const room = await createRoom(
       title.trim(), description.trim(), category, subcategory || null,
-      req.userId, req.displayName, maxP
+      req.userId, req.displayName, maxP, slug
     );
     res.status(201).json({ room });
   } catch (err) {

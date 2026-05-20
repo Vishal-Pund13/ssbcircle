@@ -43,18 +43,18 @@ async function generateUniqueRoomCode() {
   throw new Error('Could not generate unique room code');
 }
 
-async function createRoom(title, description, category, subcategory, userId, displayName, maxParticipants = 8) {
+async function createRoom(title, description, category, subcategory, userId, displayName, maxParticipants = 8, articleSlug = null) {
   const roomCode = await generateUniqueRoomCode();
-  return createRoomWithCode(roomCode, title, description, category, subcategory, userId, displayName, maxParticipants);
+  return createRoomWithCode(roomCode, title, description, category, subcategory, userId, displayName, maxParticipants, articleSlug);
 }
 
-async function createRoomWithCode(roomCode, title, description, category, subcategory, userId, displayName, maxParticipants = 8) {
+async function createRoomWithCode(roomCode, title, description, category, subcategory, userId, displayName, maxParticipants = 8, articleSlug = null) {
   const jitsiRoomName = `SSBCircle_${roomCode}`;
   const max = Math.min(8, Math.max(4, parseInt(maxParticipants) || 8));
   const { rows } = await pool.query(
-    `INSERT INTO rooms (topic, description, category, subcategory, room_code, jitsi_room_name, created_by, admin_username, max_participants)
-     VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9) RETURNING *`,
-    [title, description || null, category || 'GD', subcategory || null, roomCode, jitsiRoomName, userId || null, displayName || null, max]
+    `INSERT INTO rooms (topic, description, category, subcategory, room_code, jitsi_room_name, created_by, admin_username, max_participants, article_slug)
+     VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10) RETURNING *`,
+    [title, description || null, category || 'GD', subcategory || null, roomCode, jitsiRoomName, userId || null, displayName || null, max, articleSlug || null]
   );
   invalidateCache();
   return rows[0];

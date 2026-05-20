@@ -1,6 +1,6 @@
 import { useEffect, useState, useRef } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
-import { getRoom, getRoomToken, closeRoom, kickParticipant, reportUser } from '../services/api';
+import { getRoom, getRoomToken, closeRoom, kickParticipant, reportUser, getArticle } from '../services/api';
 import { useAuth } from '../context/AuthContext';
 import GDTimer from './GDTimer';
 import GDPanel from './GDPanel';
@@ -589,6 +589,7 @@ function VoiceRoomUI({ room, isAdmin, roomCode, showTimer, setShowTimer, showPan
           activeTab={panelTab}
           onTabChange={setPanelTab}
           onTranscriptStateChange={v => setIsTranscribing?.(v)}
+          topicArticle={topicArticle}
         />
       </div>
 
@@ -724,6 +725,7 @@ export default function RoomView() {
   const { user }  = useAuth();
 
   const [room,            setRoom]            = useState(null);
+  const [topicArticle,    setTopicArticle]    = useState(null);
   const [pendingSession,  setPendingSession]  = useState(null);
   const [token,           setToken]           = useState('');
   const [livekitUrl,      setLivekitUrl]      = useState('');
@@ -782,6 +784,9 @@ export default function RoomView() {
             setToken(tokenData.token);
             setLivekitUrl(tokenData.url);
             setFetchStatus('done');
+            if (data.room.article_slug) {
+              getArticle(data.room.article_slug).then(setTopicArticle).catch(() => {});
+            }
           }
         } catch (err) {
           if (!cancelled) { setError(err.message); setFetchStatus('error'); }

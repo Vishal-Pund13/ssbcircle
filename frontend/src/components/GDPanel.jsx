@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
-import { Mic, MicOff, FileText, CheckSquare, Download, Trash2, X, Plus, MessageSquare, Send } from 'lucide-react';
+import { Mic, MicOff, FileText, CheckSquare, Download, Trash2, X, Plus, MessageSquare, Send, BookOpen } from 'lucide-react';
 
 // ─── Transcript ───────────────────────────────────────────────────────────────
 const IS_IOS    = /iPhone|iPad|iPod/i.test(navigator.userAgent);
@@ -410,16 +410,109 @@ function ChatTab({ messages, onSend }) {
   );
 }
 
+// ─── Topic Tab ────────────────────────────────────────────────────────────────
+function TopicTab({ article }) {
+  const hook       = article.scenes?.find(s => s.type === 'hook');
+  const breakdown  = article.scenes?.find(s => s.type === 'breakdown');
+  const twoSides   = article.scenes?.find(s => s.type === 'two_sides');
+  const ssbApp     = article.scenes?.find(s => s.type === 'ssb_application');
+
+  return (
+    <div className="flex-1 overflow-y-auto p-4 flex flex-col gap-4">
+
+      {/* Header */}
+      <div>
+        <span className="text-[9px] font-bold text-brand-600 bg-brand-50 border border-brand-100 px-2 py-0.5 rounded-full uppercase tracking-widest">
+          {article.category}
+        </span>
+        <h3 className="text-sm font-bold text-gray-900 mt-1.5 leading-snug">{article.title}</h3>
+        {hook?.stat && (
+          <div className="mt-2 inline-flex items-baseline gap-1.5">
+            <span className="text-2xl font-extrabold text-brand-600 tracking-tight">{hook.stat}</span>
+            {hook.badge && <span className="text-[10px] font-semibold text-gray-400">{hook.badge}</span>}
+          </div>
+        )}
+        {hook?.body && <p className="text-xs text-gray-500 leading-relaxed mt-1">{hook.body}</p>}
+      </div>
+
+      {/* Key points from breakdown */}
+      {breakdown?.items?.length > 0 && (
+        <div>
+          <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-2">Key Points</p>
+          <div className="flex flex-col gap-1.5">
+            {breakdown.items.map((item, i) => (
+              <div key={i} className="flex items-start gap-2 bg-gray-50 border border-gray-100 rounded-lg px-2.5 py-2">
+                <span className="w-4 h-4 rounded-full bg-brand-600 text-white text-[9px] font-bold flex items-center justify-center shrink-0 mt-0.5">{i + 1}</span>
+                <p className="text-xs font-semibold text-gray-700 leading-snug">{item.heading}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* Two sides */}
+      {twoSides && (
+        <div>
+          <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-2">Two Sides</p>
+          <div className="grid grid-cols-2 gap-2">
+            <div className="bg-brand-50 border border-brand-100 rounded-lg p-2.5">
+              <p className="text-[9px] font-bold text-brand-600 uppercase tracking-widest mb-1.5">{twoSides.left_label}</p>
+              {twoSides.left_items?.slice(0, 3).map((item, i) => (
+                <p key={i} className="text-[11px] text-gray-700 leading-snug mb-1">· {item.label}</p>
+              ))}
+            </div>
+            <div className="bg-gray-50 border border-gray-200 rounded-lg p-2.5">
+              <p className="text-[9px] font-bold text-gray-500 uppercase tracking-widest mb-1.5">{twoSides.right_label}</p>
+              {twoSides.right_items?.slice(0, 3).map((item, i) => (
+                <p key={i} className="text-[11px] text-gray-700 leading-snug mb-1">· {item.label}</p>
+              ))}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* SSB application points */}
+      {ssbApp?.points?.length > 0 && (
+        <div>
+          <p className="text-[10px] font-bold text-brand-600 uppercase tracking-widest mb-2">SSB Angles to Raise</p>
+          <div className="flex flex-col gap-1.5">
+            {ssbApp.points.map((pt, i) => (
+              <div key={i} className="flex items-start gap-2">
+                <svg className="w-3 h-3 text-brand-600 shrink-0 mt-0.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+                </svg>
+                <p className="text-xs text-gray-600 leading-snug">{pt}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* Read full card link */}
+      <a href={`/read/${article.slug}`} target="_blank" rel="noopener noreferrer"
+        className="mt-auto flex items-center justify-center gap-1.5 text-xs font-semibold text-brand-600 bg-brand-50 border border-brand-100 rounded-xl py-2.5 hover:bg-brand-100 transition-colors">
+        <BookOpen className="w-3.5 h-3.5" />
+        Read full card
+      </a>
+    </div>
+  );
+}
+
 // ─── Panel ────────────────────────────────────────────────────────────────────
-const TABS = [
+const BASE_TABS = [
   { id: 'chat',       label: 'Chat',       Icon: MessageSquare },
   { id: 'transcript', label: 'Transcript', Icon: Mic },
   { id: 'notes',      label: 'Notes',      Icon: FileText },
   { id: 'checklist',  label: 'Checklist',  Icon: CheckSquare },
 ];
 
-export default function GDPanel({ show, onClose, chatMessages = [], onSendMessage, activeTab, onTabChange, onTranscriptStateChange }) {
-  const [active, setActive] = useState(activeTab ?? 'chat');
+export default function GDPanel({ show, onClose, chatMessages = [], onSendMessage, activeTab, onTabChange, onTranscriptStateChange, topicArticle }) {
+  const tabs = topicArticle
+    ? [{ id: 'topic', label: 'Topic', Icon: BookOpen }, ...BASE_TABS]
+    : BASE_TABS;
+
+  const defaultTab = topicArticle ? 'topic' : 'chat';
+  const [active, setActive] = useState(activeTab ?? defaultTab);
 
   useEffect(() => { if (activeTab) setActive(activeTab); }, [activeTab]);
 
@@ -428,10 +521,10 @@ export default function GDPanel({ show, onClose, chatMessages = [], onSendMessag
   return (
     <div className={`${show ? '' : 'hidden'} fixed inset-0 z-50 bg-white flex flex-col sm:relative sm:inset-auto sm:z-20 sm:w-80 sm:shrink-0 sm:border-l sm:border-gray-200 sm:shadow-none shadow-2xl`}>
       {/* Tab bar */}
-      <div className="flex items-center border-b border-gray-200 shrink-0">
-        {TABS.map(({ id, label, Icon }) => (
+      <div className="flex items-center border-b border-gray-200 shrink-0 overflow-x-auto">
+        {tabs.map(({ id, label, Icon }) => (
           <button key={id} onClick={() => handleTab(id)}
-            className={`flex-1 flex flex-col items-center gap-0.5 py-2.5 text-[10px] font-semibold tracking-wide uppercase transition-all cursor-pointer border-b-2 ${
+            className={`shrink-0 flex-1 flex flex-col items-center gap-0.5 py-2.5 text-[10px] font-semibold tracking-wide uppercase transition-all cursor-pointer border-b-2 min-w-[52px] ${
               active === id
                 ? 'text-brand-600 border-brand-600'
                 : 'text-gray-400 border-transparent hover:text-gray-600'
@@ -449,6 +542,7 @@ export default function GDPanel({ show, onClose, chatMessages = [], onSendMessag
 
       {/* All tabs mounted — CSS controls visibility so state is never lost */}
       <div className="flex-1 overflow-hidden relative">
+        {topicArticle && <div className={`absolute inset-0 flex flex-col ${active === 'topic'      ? '' : 'hidden'}`}><TopicTab article={topicArticle}/></div>}
         <div className={`absolute inset-0 flex flex-col ${active === 'chat'       ? '' : 'hidden'}`}><ChatTab messages={chatMessages} onSend={onSendMessage}/></div>
         <div className={`absolute inset-0 flex flex-col ${active === 'transcript' ? '' : 'hidden'}`}><TranscriptTab onStateChange={onTranscriptStateChange}/></div>
         <div className={`absolute inset-0 flex flex-col ${active === 'notes'      ? '' : 'hidden'}`}><NotesTab/></div>
