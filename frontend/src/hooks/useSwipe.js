@@ -1,63 +1,96 @@
 import { useRef, useEffect } from 'react';
 
-export function useSwipe({ onSwipeUp, onSwipeDown, threshold = 80, elementRef }) {
+export function useSwipe({
+  onSwipeUp, onSwipeDown,
+  onSwipeLeft, onSwipeRight,
+  threshold = 80,
+  elementRef,
+}) {
+  const startX        = useRef(null);
   const startY        = useRef(null);
-  const isScrolling   = useRef(false);   // true once committed to native scroll
-  const swipeUpRef    = useRef(onSwipeUp);
-  const swipeDownRef  = useRef(onSwipeDown);
+  const committed     = useRef(null);   // 'h' | 'v' | null
+  const isScrolling   = useRef(false);
 
-  useEffect(() => { swipeUpRef.current   = onSwipeUp;   });
-  useEffect(() => { swipeDownRef.current = onSwipeDown; });
+  const upRef    = useRef(onSwipeUp);
+  const downRef  = useRef(onSwipeDown);
+  const leftRef  = useRef(onSwipeLeft);
+  const rightRef = useRef(onSwipeRight);
+
+  useEffect(() => { upRef.current    = onSwipeUp;    });
+  useEffect(() => { downRef.current  = onSwipeDown;  });
+  useEffect(() => { leftRef.current  = onSwipeLeft;  });
+  useEffect(() => { rightRef.current = onSwipeRight; });
 
   useEffect(() => {
     const el = elementRef?.current;
     if (!el) return;
 
     const handleStart = (e) => {
-      startY.current      = e.touches[0].clientY;
+      startX.current    = e.touches[0].clientX;
+      startY.current    = e.touches[0].clientY;
+      committed.current = null;
       isScrolling.current = false;
     };
 
     const handleMove = (e) => {
-      if (startY.current === null) return;
+      if (startX.current === null || startY.current === null) return;
 
-      // Once committed to scroll, never block it
+      const dx = e.touches[0].clientX - startX.current;
+      const dy = e.touches[0].clientY - startY.current;
+
+      // Commit to a direction once we have 8px of movement
+      if (!committed.current) {
+        if (Math.abs(dx) > 8 || Math.abs(dy) > 8) {
+          committed.current = Math.abs(dx) > Math.abs(dy) ? 'h' : 'v';
+        } else {
+          return; // not enough movement yet
+        }
+      }
+
+      if (committed.current === 'h') {
+        // Horizontal — block any accidental horizontal browser scroll
+        e.preventDefault();
+        return;
+      }
+
+      // Vertical — check for scrollable content (existing logic)
       if (isScrolling.current) return;
 
-      const deltaY = startY.current - e.touches[0].clientY;
-
-      // Walk up from touch target looking for a scrollable ancestor inside the reader
       let node = e.target;
       while (node && node !== el) {
         if (node.scrollHeight > node.clientHeight + 2) {
           const atTop    = node.scrollTop <= 0;
           const atBottom = node.scrollTop >= node.scrollHeight - node.clientHeight - 2;
-
-          // Content can scroll in this direction — commit to scroll, never navigate
-          if (!(atTop && deltaY < 0) && !(atBottom && deltaY > 0)) {
+          if (!(atTop && dy > 0) && !(atBottom && dy < 0)) {
             isScrolling.current = true;
             return;
           }
-          break; // at boundary → fall through to swipe navigation
+          break;
         }
         node = node.parentElement;
       }
 
-      // No scrollable content (or at scroll boundary) — block pull-to-refresh
+      // No scrollable content blocking — prevent pull-to-refresh
       e.preventDefault();
     };
 
     const handleEnd = (e) => {
-      if (startY.current === null) return;
+      if (startX.current === null || startY.current === null) return;
 
-      // Skip navigation entirely if the gesture was a content scroll
-      if (!isScrolling.current) {
-        const delta = startY.current - e.changedTouches[0].clientY;
-        if (delta > threshold)       swipeUpRef.current?.();
-        else if (delta < -threshold) swipeDownRef.current?.();
+      const dx = e.changedTouches[0].clientX - startX.current;
+      const dy = e.changedTouches[0].clientY - startY.current;
+
+      if (committed.current === 'h') {
+        if (dx < -threshold)      leftRef.current?.();
+        else if (dx > threshold)  rightRef.current?.();
+      } else if (committed.current === 'v' && !isScrolling.current) {
+        if (dy < -threshold)      upRef.current?.();
+        else if (dy > threshold)  downRef.current?.();
       }
 
+      startX.current      = null;
       startY.current      = null;
+      committed.current   = null;
       isScrolling.current = false;
     };
 

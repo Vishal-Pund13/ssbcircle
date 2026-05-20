@@ -22,10 +22,27 @@ const ARTICLES = {
   'women-health-india':         womenHealthData,
 };
 
+// Ordered list — defines swipe-up/down article navigation sequence
+const ARTICLE_ORDER = [
+  'rupee-depreciation',
+  'super-el-nino',
+  'women-workforce-paradox',
+  'women-proxy-representation',
+  'women-glass-ceiling',
+  'women-gender-pay-gap',
+  'women-safety-economy',
+  'women-education-gap',
+  'women-health-india',
+];
+
 export default function ReadPage() {
   const { articleId } = useParams();
   const navigate      = useNavigate();
   const article       = ARTICLES[articleId];
+
+  const idx      = ARTICLE_ORDER.indexOf(articleId);
+  const nextSlug = idx >= 0 && idx < ARTICLE_ORDER.length - 1 ? ARTICLE_ORDER[idx + 1] : null;
+  const prevSlug = idx > 0 ? ARTICLE_ORDER[idx - 1] : null;
 
   if (!article) {
     return (
@@ -40,10 +57,13 @@ export default function ReadPage() {
   }
 
   return (
-    /* Mobile: true full-screen (no header, no padding, edge-to-edge)
-       Desktop: centered card on gray background */
     <div className="h-screen overflow-hidden" style={{ height: '100dvh' }}>
-      <SwipeReader article={article} onClose={() => navigate('/current-affairs')} />
+      <SwipeReader
+        article={article}
+        onClose={() => navigate('/current-affairs')}
+        onNextArticle={nextSlug ? () => navigate(`/read/${nextSlug}`) : undefined}
+        onPrevArticle={prevSlug ? () => navigate(`/read/${prevSlug}`) : undefined}
+      />
     </div>
   );
 }
