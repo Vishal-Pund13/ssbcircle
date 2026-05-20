@@ -506,23 +506,24 @@ function UpcomingTab({ sessions, loading, user, onRefresh, navigate, onInterest,
 const FAQ_ITEMS = [
   {
     q: 'What is SSBCircle and what can I practice on it?',
-    a: 'SSBCircle is a free platform for SSB interview preparation. Practice GD, PPDT, Lecturette, IO mock interviews, share SSB experiences, and improve English communication — in live voice rooms with real defence aspirants. No download, no subscription.',
+    a: 'SSBCircle is a free platform built exclusively for SSB interview preparation. Read News Cards to get GD-ready on current affairs, then jump into live voice rooms to practice Group Discussion, PPDT, Lecturette, and IO mock interviews with real defence aspirants — no download, no subscription.',
   },
   {
-    q: 'How does SSBCircle help improve English speaking and communication skills?',
-    a: 'Speaking on structured topics in front of real peers — with a timer and live transcript — builds fluency and reduces hesitation fast.',
+    q: 'What are News Cards on SSBCircle?',
+    a: 'News Cards are bite-sized swipeable topic cards on Defence, Economy, Polity, Geography & Society — built specifically for SSB GD and Lecturette prep. Each card takes about 5 minutes and gives you key data, multiple perspectives, and how to frame the topic in an SSB discussion. There is a short quiz at the end to lock it in.',
     steps: [
-      'Join any live room',
-      'Speak on a timed topic',
-      'Live transcript records your words',
-      'Review after the session',
-      'Track improvement over time',
+      'Open News Cards from the homepage',
+      'Pick a topic — Rupee, El Niño, etc.',
+      'Swipe through scenes: hook → concept → breakdown → two sides',
+      'Take the optional quick quiz',
+      'Open a GD room on the same topic',
     ],
   },
   {
     q: 'How to practice SSB Group Discussion (GD) on SSBCircle?',
-    a: 'Matches the real SSB GD format — 8 participants, timed discussion, live transcript.',
+    a: 'Matches the real SSB GD format — up to 8 participants, timed discussion, live transcript. No GD topic? Read a News Card first.',
     steps: [
+      'Read a News Card for topic ideas',
       'Create GD room & set topic',
       'Share 6-letter code with peers',
       'Start GD timer',
@@ -544,14 +545,14 @@ const FAQ_ITEMS = [
   },
   {
     q: 'How to practice Lecturette on SSBCircle?',
-    a: 'Replicates the SSB Lecturette format — 4 topics, 1-min prep, 3-min talk to the group.',
+    a: 'Replicates the SSB Lecturette format — 4 topics, 1-min prep, 3-min talk to the group. Use News Cards to prepare solid talking points before the session.',
     steps: [
+      'Read a News Card to prepare content',
       'Host creates Lecturette room',
       'Host announces 4 topics',
       'Each person picks a topic',
       '1 min preparation time',
       'Speak 3 min — timer running',
-      'Peer feedback & discussion',
     ],
   },
   {
@@ -563,16 +564,6 @@ const FAQ_ITEMS = [
       'Q&A — background, hobbies, current affairs',
       'Swap roles with next person',
       'Group debrief & feedback',
-    ],
-  },
-  {
-    q: 'Can I share my SSB experience with other aspirants?',
-    a: 'Yes. Create a room, share your firsthand SSB centre experience, and help others understand what to expect. Peer knowledge beats any coaching material.',
-    steps: [
-      'Create a room (any category)',
-      'Share your SSB centre experience',
-      'Others ask questions',
-      'Discuss tips & lessons learned',
     ],
   },
   {
@@ -1298,7 +1289,18 @@ export default function LandingPage() {
                     n: '01',
                     title: 'Sign in with Google',
                     desc: 'One tap with your Google account — no password, no forms, no friction.',
-                    tag: null,
+                    badge: {
+                      label: 'Google',
+                      cls: 'text-gray-600 bg-white border-gray-200',
+                      icon: (
+                        <svg viewBox="0 0 18 18" className="w-3.5 h-3.5 shrink-0">
+                          <path fill="#4285F4" d="M17.64 9.2c0-.637-.057-1.251-.164-1.84H9v3.481h4.844c-.209 1.125-.843 2.078-1.796 2.717v2.258h2.908c1.702-1.567 2.684-3.875 2.684-6.615z"/>
+                          <path fill="#34A853" d="M9 18c2.43 0 4.467-.806 5.956-2.18l-2.908-2.259c-.806.54-1.837.86-3.048.86-2.344 0-4.328-1.584-5.036-3.711H.957v2.332C2.438 15.983 5.482 18 9 18z"/>
+                          <path fill="#FBBC05" d="M3.964 10.71c-.18-.54-.282-1.117-.282-1.71s.102-1.17.282-1.71V4.958H.957C.347 6.173 0 7.548 0 9s.348 2.827.957 4.042l3.007-2.332z"/>
+                          <path fill="#EA4335" d="M9 3.58c1.321 0 2.508.454 3.44 1.345l2.582-2.58C13.463.891 11.426 0 9 0 5.482 0 2.438 2.017.957 4.958L3.964 6.29C4.672 4.163 6.656 3.58 9 3.58z"/>
+                        </svg>
+                      ),
+                    },
                   },
                   {
                     n: '02',
@@ -1311,17 +1313,39 @@ export default function LandingPage() {
                     n: '03',
                     title: 'Open or join a room',
                     desc: 'Host a session on the topic you just read, or enter a 6-letter code to join one.',
-                    tag: null,
+                    badge: {
+                      label: 'Live Room',
+                      cls: 'text-emerald-700 bg-emerald-50 border-emerald-100',
+                      icon: (
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-3.5 h-3.5 shrink-0">
+                          <rect x="9" y="2" width="6" height="11" rx="3"/>
+                          <path d="M5 10a7 7 0 0 0 14 0"/>
+                          <line x1="12" y1="19" x2="12" y2="22"/>
+                          <line x1="8" y1="22" x2="16" y2="22"/>
+                        </svg>
+                      ),
+                    },
                   },
                   {
                     n: '04',
                     title: 'Practice and improve',
                     desc: 'Use the timer, live transcript and checklist every session to track your growth.',
-                    tag: null,
+                    badge: {
+                      label: 'Speak Up',
+                      cls: 'text-brand-600 bg-brand-50 border-brand-100',
+                      icon: (
+                        <svg viewBox="0 0 24 24" fill="none" className="w-3.5 h-3.5 shrink-0">
+                          <circle cx="8" cy="7" r="3" fill="currentColor" opacity="0.85"/>
+                          <path d="M2 21c0-3.314 2.686-6 6-6" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
+                          <path d="M15 9a3 3 0 0 1 0 6" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
+                          <path d="M18.5 6a7 7 0 0 1 0 12" stroke="currentColor" strokeWidth="2" strokeLinecap="round" opacity="0.5"/>
+                        </svg>
+                      ),
+                    },
                   },
-                ].map(({ n, title, desc, tag, tagLink }) => (
+                ].map(({ n, title, desc, tag, tagLink, badge }) => (
                   <div key={n} className="flex sm:flex-col gap-4 sm:gap-0">
-                    <div className={`shrink-0 z-10 w-8 h-8 rounded-full border-4 border-white ring-2 flex items-center justify-center shadow-sm ${tag ? 'bg-brand-600 ring-brand-100' : 'bg-brand-600 ring-blue-100'}`}>
+                    <div className="shrink-0 z-10 w-8 h-8 rounded-full bg-brand-600 border-4 border-white ring-2 ring-blue-100 flex items-center justify-center shadow-sm">
                       <span className="text-[10px] font-bold text-white">{n}</span>
                     </div>
                     <div className="sm:mt-5">
@@ -1338,6 +1362,12 @@ export default function LandingPage() {
                           </svg>
                           {tag}
                         </Link>
+                      )}
+                      {badge && (
+                        <div className={`inline-flex items-center gap-1 text-[10px] font-bold px-2 py-0.5 rounded-full mb-1.5 border ${badge.cls}`}>
+                          {badge.icon}
+                          {badge.label}
+                        </div>
                       )}
                       <h3 className="text-sm font-bold text-gray-900 mb-1">{title}</h3>
                       <p className="text-xs text-gray-400 leading-relaxed">{desc}</p>
