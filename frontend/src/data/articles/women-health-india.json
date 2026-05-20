@@ -2,7 +2,11 @@
   "id": "women-health-india",
   "title": "The Health Silence",
   "category": "Socio-Cultural",
-  "ssb_tags": ["GD", "Lecturette", "PI"],
+  "ssb_tags": [
+    "GD",
+    "Lecturette",
+    "PI"
+  ],
   "reading_time": 5,
   "last_updated": "May 2026",
   "difficulty": "Beginner",
@@ -15,7 +19,8 @@
         "value": "63M",
         "label": "Estimated 'missing women' in India due to gender-biased mortality and sex selection — Amartya Sen",
         "trend": "down"
-      }
+      },
+      "hook_visual": "women_health"
     },
     {
       "type": "concept",
@@ -25,8 +30,14 @@
       "visual": {
         "type": "comparison",
         "data": {
-          "left": { "label": "Expected sex ratio", "value": "950-1000 women per 1000 men (biological norm)" },
-          "right": { "label": "India's sex ratio", "value": "943 women per 1000 men (Census 2011) — worse in child sex ratio" }
+          "left": {
+            "label": "Expected sex ratio",
+            "value": "950-1000 women per 1000 men (biological norm)"
+          },
+          "right": {
+            "label": "India's sex ratio",
+            "value": "943 women per 1000 men (Census 2011) — worse in child sex ratio"
+          }
         }
       }
     },
@@ -67,14 +78,32 @@
       "left_label": "Genuine progress",
       "right_label": "Critical gaps remain",
       "left_items": [
-        { "label": "MMR halved in 15 years", "detail": "Maternal Mortality Ratio fell from 254 to 97 — significant institutional delivery and healthcare improvement" },
-        { "label": "Vaccination coverage improved", "detail": "Full immunisation coverage for children rose significantly — NFHS-5 shows improvements across states" },
-        { "label": "Institutional delivery rising", "detail": "NFHS-5: 89% of births in institutional facilities — up from 39% in 2005-06. Massive shift in 15 years." }
+        {
+          "label": "MMR halved in 15 years",
+          "detail": "Maternal Mortality Ratio fell from 254 to 97 — significant institutional delivery and healthcare improvement"
+        },
+        {
+          "label": "Vaccination coverage improved",
+          "detail": "Full immunisation coverage for children rose significantly — NFHS-5 shows improvements across states"
+        },
+        {
+          "label": "Institutional delivery rising",
+          "detail": "NFHS-5: 89% of births in institutional facilities — up from 39% in 2005-06. Massive shift in 15 years."
+        }
       ],
       "right_items": [
-        { "label": "Anaemia worsening, not improving", "detail": "Anaemia prevalence increased from 53% (NFHS-4) to 57% (NFHS-5) — a policy failure during the supposed decade of progress" },
-        { "label": "Sub-national disparities severe", "detail": "Assam's MMR (195) is 14x Kerala's (19) — India's health indices hide enormous state-level inequality" },
-        { "label": "Menstrual health remains stigmatised", "detail": "Access to menstrual hygiene products and open conversation remains poor — menstruation is still a barrier to school attendance for many girls" }
+        {
+          "label": "Anaemia worsening, not improving",
+          "detail": "Anaemia prevalence increased from 53% (NFHS-4) to 57% (NFHS-5) — a policy failure during the supposed decade of progress"
+        },
+        {
+          "label": "Sub-national disparities severe",
+          "detail": "Assam's MMR (195) is 14x Kerala's (19) — India's health indices hide enormous state-level inequality"
+        },
+        {
+          "label": "Menstrual health remains stigmatised",
+          "detail": "Access to menstrual hygiene products and open conversation remains poor — menstruation is still a barrier to school attendance for many girls"
+        }
       ],
       "officer_framing": "India's women's health story is one of genuine progress in mortality indicators and near-complete failure on nutrition indicators. The institutional delivery push worked — the nutrition ecosystem didn't. Health policy must treat women as complete human beings, not just childbearing units."
     },
@@ -84,17 +113,49 @@
       "title": "The SDG lens — where India stands globally",
       "body": "Under SDG 3, India committed to reducing MMR to below 70 per lakh live births by 2030. At 97, progress is real but the target remains challenging. Anaemia is SDG 2 (Zero Hunger) territory — and India's worsening anaemia numbers represent a failure of the nutrition ecosystem, not just health infrastructure.",
       "key_numbers": [
-        { "value": "63M", "label": "Missing women in India — Amartya Sen's estimate" },
-        { "value": "57%", "label": "Indian women aged 15-49 who are anaemic — NFHS-5" },
-        { "value": "97", "label": "India's MMR per lakh live births — SDG target is below 70 by 2030" },
-        { "value": "919", "label": "Girls per 1000 boys in 0-6 age group — Census 2011 child sex ratio" }
+        {
+          "value": "63M",
+          "label": "Missing women in India — Amartya Sen's estimate"
+        },
+        {
+          "value": "57%",
+          "label": "Indian women aged 15-49 who are anaemic — NFHS-5"
+        },
+        {
+          "value": "97",
+          "label": "India's MMR per lakh live births — SDG target is below 70 by 2030"
+        },
+        {
+          "value": "919",
+          "label": "Girls per 1000 boys in 0-6 age group — Census 2011 child sex ratio"
+        }
       ],
       "timeline": [
-        { "year": "1994", "event": "PCPNDT Act bans sex-selective abortion — important but enforcement weak", "type": "positive" },
-        { "year": "2005", "event": "NFHS-3: MMR at 254, institutional delivery at 39% — starting point of reform", "type": "negative" },
-        { "year": "2015", "event": "Beti Bachao Beti Padhao launched — targets child sex ratio improvement", "type": "positive" },
-        { "year": "2019-21", "event": "NFHS-5: MMR at 97, institutional delivery at 89% — but anaemia worsens to 57%", "type": "neutral" },
-        { "year": "2030", "event": "SDG target: MMR below 70 per lakh live births — achievable but requires acceleration", "type": "neutral" }
+        {
+          "year": "1994",
+          "event": "PCPNDT Act bans sex-selective abortion — important but enforcement weak",
+          "type": "positive"
+        },
+        {
+          "year": "2005",
+          "event": "NFHS-3: MMR at 254, institutional delivery at 39% — starting point of reform",
+          "type": "negative"
+        },
+        {
+          "year": "2015",
+          "event": "Beti Bachao Beti Padhao launched — targets child sex ratio improvement",
+          "type": "positive"
+        },
+        {
+          "year": "2019-21",
+          "event": "NFHS-5: MMR at 97, institutional delivery at 89% — but anaemia worsens to 57%",
+          "type": "neutral"
+        },
+        {
+          "year": "2030",
+          "event": "SDG target: MMR below 70 per lakh live births — achievable but requires acceleration",
+          "type": "neutral"
+        }
       ]
     },
     {

@@ -2,7 +2,11 @@
   "id": "women-glass-ceiling",
   "title": "The Invisible Ceiling",
   "category": "Economic",
-  "ssb_tags": ["GD", "Lecturette", "PI"],
+  "ssb_tags": [
+    "GD",
+    "Lecturette",
+    "PI"
+  ],
   "reading_time": 5,
   "last_updated": "May 2026",
   "difficulty": "Intermediate",
@@ -15,7 +19,8 @@
         "value": "17%",
         "label": "of C-suite positions in India's private sector are held by women — McKinsey Women in Workplace 2025",
         "trend": "down"
-      }
+      },
+      "hook_visual": "women_ceiling"
     },
     {
       "type": "concept",
@@ -25,8 +30,14 @@
       "visual": {
         "type": "comparison",
         "data": {
-          "left": { "label": "Entry level", "value": "Women: 33% of roles (48% of university graduates)" },
-          "right": { "label": "C-suite", "value": "Women: 17% of roles — the drop happens at every rung" }
+          "left": {
+            "label": "Entry level",
+            "value": "Women: 33% of roles (48% of university graduates)"
+          },
+          "right": {
+            "label": "C-suite",
+            "value": "Women: 17% of roles — the drop happens at every rung"
+          }
         }
       }
     },
@@ -73,14 +84,32 @@
       "left_label": "Signs of progress",
       "right_label": "Structural barriers remain",
       "left_items": [
-        { "label": "Legal framework exists", "detail": "Equal Remuneration Act 1976, POSH Act 2013, maternity benefit protections — legal tools are in place" },
-        { "label": "IT sector leading change", "detail": "IT and healthcare are India's most gender-inclusive sectors — remote work helped women retain careers" },
-        { "label": "Corporate accountability growing", "detail": "SEBI mandates at least one woman director on listed company boards — compliance is near-universal now" }
+        {
+          "label": "Legal framework exists",
+          "detail": "Equal Remuneration Act 1976, POSH Act 2013, maternity benefit protections — legal tools are in place"
+        },
+        {
+          "label": "IT sector leading change",
+          "detail": "IT and healthcare are India's most gender-inclusive sectors — remote work helped women retain careers"
+        },
+        {
+          "label": "Corporate accountability growing",
+          "detail": "SEBI mandates at least one woman director on listed company boards — compliance is near-universal now"
+        }
       ],
       "right_items": [
-        { "label": "15% of boards track gender diversity", "detail": "McKinsey 2025: only 15% of corporate boards monitor gender diversity outcomes" },
-        { "label": "Financial sector worst offender", "detail": "Women: 31% of entry-level in financial services, just 13% of C-suite" },
-        { "label": "No mandatory pay transparency", "detail": "Unlike EU, India has no law requiring companies to disclose gender pay gaps" }
+        {
+          "label": "15% of boards track gender diversity",
+          "detail": "McKinsey 2025: only 15% of corporate boards monitor gender diversity outcomes"
+        },
+        {
+          "label": "Financial sector worst offender",
+          "detail": "Women: 31% of entry-level in financial services, just 13% of C-suite"
+        },
+        {
+          "label": "No mandatory pay transparency",
+          "detail": "Unlike EU, India has no law requiring companies to disclose gender pay gaps"
+        }
       ],
       "officer_framing": "India has the legal framework — what's missing is enforcement, accountability, and a cultural shift in how ambition is perceived in women. The ceiling isn't glass anymore; it's become a one-way mirror."
     },
@@ -90,17 +119,49 @@
       "title": "India vs the world",
       "body": "India ranked 131st in WEF's Global Gender Gap Report 2025 — slipping 2 places from 129th. India is in the bottom 5 globally on 'Economic Participation and Opportunity'. For context: Bangladesh is ranked higher than India on gender economic parity.",
       "key_numbers": [
-        { "value": "131st", "label": "India's rank in WEF Global Gender Gap Index 2025" },
-        { "value": "30.51%", "label": "Gender pay gap in India's tech sector — IIT Kharagpur 2025" },
-        { "value": "13%", "label": "Women in top-level tech roles in India" },
-        { "value": "42%", "label": "Indian companies that don't measure gender policy impact — McKinsey 2025" }
+        {
+          "value": "131st",
+          "label": "India's rank in WEF Global Gender Gap Index 2025"
+        },
+        {
+          "value": "30.51%",
+          "label": "Gender pay gap in India's tech sector — IIT Kharagpur 2025"
+        },
+        {
+          "value": "13%",
+          "label": "Women in top-level tech roles in India"
+        },
+        {
+          "value": "42%",
+          "label": "Indian companies that don't measure gender policy impact — McKinsey 2025"
+        }
       ],
       "timeline": [
-        { "year": "1976", "event": "Equal Remuneration Act — equal pay for equal work legally mandated", "type": "positive" },
-        { "year": "2013", "event": "POSH Act — workplace harassment legal framework established", "type": "positive" },
-        { "year": "2014", "event": "SEBI mandates at least one woman on listed company boards", "type": "positive" },
-        { "year": "2025", "event": "McKinsey report: India's broken rung identified; women enter workforce 7 years later", "type": "negative" },
-        { "year": "2025", "event": "WEF drops India 2 ranks — bottom 5 globally on economic participation for women", "type": "negative" }
+        {
+          "year": "1976",
+          "event": "Equal Remuneration Act — equal pay for equal work legally mandated",
+          "type": "positive"
+        },
+        {
+          "year": "2013",
+          "event": "POSH Act — workplace harassment legal framework established",
+          "type": "positive"
+        },
+        {
+          "year": "2014",
+          "event": "SEBI mandates at least one woman on listed company boards",
+          "type": "positive"
+        },
+        {
+          "year": "2025",
+          "event": "McKinsey report: India's broken rung identified; women enter workforce 7 years later",
+          "type": "negative"
+        },
+        {
+          "year": "2025",
+          "event": "WEF drops India 2 ranks — bottom 5 globally on economic participation for women",
+          "type": "negative"
+        }
       ]
     },
     {

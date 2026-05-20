@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { CheckCircle, ArrowRight, BookOpen } from 'lucide-react';
+import IndianWomanOutline from './SwipeReader/scenes/IndianWomanOutline';
 
 const SERIES = [
   { slug: 'women-workforce-paradox',    n: 1, title: 'The Workforce Paradox',         category: 'Economic',       stat: '41.7%', reading_time: 5, summary: 'India grows richer — women work less. FLFPR, pink collarization, the care economy trap.' },
@@ -64,6 +65,10 @@ export default function WomenSeriesPage() {
 
         {/* ── Page header ── */}
         <div className="mb-10">
+          {/* Woman outline — decorative, right-aligned */}
+          <div className="flex items-start gap-6">
+            <div className="flex-1">
+
           <div className="flex items-center gap-2 mb-4">
             <span className="text-[10px] font-bold text-brand-600 bg-brand-50 border border-brand-100 px-2.5 py-1 rounded-full uppercase tracking-widest">
               Society
@@ -109,6 +114,14 @@ export default function WomenSeriesPage() {
             )}
           </div>
         </div>
+
+            </div>{/* end flex-1 */}
+            {/* Woman silhouette — visible on sm+ */}
+            <div className="hidden sm:block shrink-0 w-28 opacity-80 mt-2">
+              <IndianWomanOutline className="w-full h-auto" color="#1e3a5f" />
+            </div>
+          </div>{/* end flex row */}
+        </div>{/* end mb-10 */}
 
         {/* ── Divider ── */}
         <div className="border-t border-gray-100 mb-2" />

@@ -2,7 +2,11 @@
   "id": "women-proxy-representation",
   "title": "Power Without Authority",
   "category": "Polity",
-  "ssb_tags": ["GD", "Lecturette", "PI"],
+  "ssb_tags": [
+    "GD",
+    "Lecturette",
+    "PI"
+  ],
   "reading_time": 4,
   "last_updated": "May 2026",
   "difficulty": "Beginner",
@@ -15,7 +19,8 @@
         "value": "46.6%",
         "label": "of panchayat representatives are women — but effective power lags far behind",
         "trend": "up"
-      }
+      },
+      "hook_visual": "women_proxy"
     },
     {
       "type": "concept",
@@ -25,8 +30,14 @@
       "visual": {
         "type": "comparison",
         "data": {
-          "left": { "label": "Constitutional intent", "value": "Women elected → women govern → women-led development" },
-          "right": { "label": "Ground reality", "value": "Women elected → male relative governs → women sidelined" }
+          "left": {
+            "label": "Constitutional intent",
+            "value": "Women elected → women govern → women-led development"
+          },
+          "right": {
+            "label": "Ground reality",
+            "value": "Women elected → male relative governs → women sidelined"
+          }
         }
       }
     },
@@ -79,14 +90,32 @@
       "left_label": "Case for continued reservation",
       "right_label": "Concerns and critiques",
       "left_items": [
-        { "label": "Representation is the first step", "detail": "Even imperfect representation creates role models — some women do break through and govern effectively" },
-        { "label": "Women-led panchayats deliver better outcomes", "detail": "Research shows women sarpanches invest more in schools, health, and sanitation when they have real power" },
-        { "label": "Constitutional mandate must be honoured", "detail": "73rd Amendment is not optional — the state must ensure its spirit is fulfilled, not just its letter" }
+        {
+          "label": "Representation is the first step",
+          "detail": "Even imperfect representation creates role models — some women do break through and govern effectively"
+        },
+        {
+          "label": "Women-led panchayats deliver better outcomes",
+          "detail": "Research shows women sarpanches invest more in schools, health, and sanitation when they have real power"
+        },
+        {
+          "label": "Constitutional mandate must be honoured",
+          "detail": "73rd Amendment is not optional — the state must ensure its spirit is fulfilled, not just its letter"
+        }
       ],
       "right_items": [
-        { "label": "Representation without power is theatre", "detail": "Proxy leadership makes women's reservation a democratic illusion — it satisfies statistics while defeating intent" },
-        { "label": "Rotating reservations create instability", "detail": "When seats rotate every election, neither the proxy nor the woman builds long-term community roots" },
-        { "label": "Social change can't be legislated", "detail": "Without changing patriarchal norms, penalties alone push the problem underground" }
+        {
+          "label": "Representation without power is theatre",
+          "detail": "Proxy leadership makes women's reservation a democratic illusion — it satisfies statistics while defeating intent"
+        },
+        {
+          "label": "Rotating reservations create instability",
+          "detail": "When seats rotate every election, neither the proxy nor the woman builds long-term community roots"
+        },
+        {
+          "label": "Social change can't be legislated",
+          "detail": "Without changing patriarchal norms, penalties alone push the problem underground"
+        }
       ],
       "officer_framing": "Proxy representation reveals the gap between constitutional intent and social reality. Reservation opens the door — but only education, economic independence, and legal accountability can ensure women actually walk through it."
     },
@@ -96,17 +125,49 @@
       "title": "What the government is doing — and why it matters now",
       "body": "2025-26 saw significant action. MoPR launched the 'Sashakt Panchayat Netri Abhiyan', partnered with TVF for 'Asli Pradhan Kaun?', and recommended exemplary penalties for proxy leadership. The 'Say No To Proxy Sarpanch' campaign launched on International Women's Day, March 8, 2026.",
       "key_numbers": [
-        { "value": "50%", "label": "Panchayat seats reserved for women in 21 states and 2 UTs" },
-        { "value": "32", "label": "States/UTs issued NCW notices in December 2025 on proxy leadership" },
-        { "value": "30 years", "label": "Since 73rd Amendment — and Sarpanch Pati still widespread" },
-        { "value": "15.03 lakh", "label": "Women elected panchayat representatives in India" }
+        {
+          "value": "50%",
+          "label": "Panchayat seats reserved for women in 21 states and 2 UTs"
+        },
+        {
+          "value": "32",
+          "label": "States/UTs issued NCW notices in December 2025 on proxy leadership"
+        },
+        {
+          "value": "30 years",
+          "label": "Since 73rd Amendment — and Sarpanch Pati still widespread"
+        },
+        {
+          "value": "15.03 lakh",
+          "label": "Women elected panchayat representatives in India"
+        }
       ],
       "timeline": [
-        { "year": "1992", "event": "73rd Amendment — 1/3rd reservation for women in panchayats", "type": "positive" },
-        { "year": "2000s", "event": "Sarpanch Pati culture documented across Hindi heartland states", "type": "negative" },
-        { "year": "2023", "event": "MoPR constitutes panel to study and eliminate proxy participation", "type": "positive" },
-        { "year": "2025", "event": "Panel report recommends exemplary penalties; Sashakt Panchayat Netri Abhiyan launched", "type": "positive" },
-        { "year": "2026", "event": "'Say No To Proxy Sarpanch' campaign launched on International Women's Day", "type": "positive" }
+        {
+          "year": "1992",
+          "event": "73rd Amendment — 1/3rd reservation for women in panchayats",
+          "type": "positive"
+        },
+        {
+          "year": "2000s",
+          "event": "Sarpanch Pati culture documented across Hindi heartland states",
+          "type": "negative"
+        },
+        {
+          "year": "2023",
+          "event": "MoPR constitutes panel to study and eliminate proxy participation",
+          "type": "positive"
+        },
+        {
+          "year": "2025",
+          "event": "Panel report recommends exemplary penalties; Sashakt Panchayat Netri Abhiyan launched",
+          "type": "positive"
+        },
+        {
+          "year": "2026",
+          "event": "'Say No To Proxy Sarpanch' campaign launched on International Women's Day",
+          "type": "positive"
+        }
       ]
     },
     {

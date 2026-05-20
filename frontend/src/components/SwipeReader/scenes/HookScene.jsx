@@ -1,5 +1,8 @@
+import { HOOK_ICONS } from './WomenHookIcons';
+
 export default function HookScene({ scene, article }) {
-  const { headline, subtext, stat } = scene;
+  const { headline, subtext, stat, hook_visual } = scene;
+  const HookIcon = hook_visual ? HOOK_ICONS[hook_visual] : null;
 
   return (
     <div className="flex flex-col items-center justify-center min-h-full px-8 py-8 text-center gap-6">
@@ -15,6 +18,13 @@ export default function HookScene({ scene, article }) {
           {article.reading_time} min · {article.difficulty}
         </span>
       </div>
+
+      {/* Contextual icon illustration */}
+      {HookIcon && (
+        <div className="opacity-90">
+          <HookIcon />
+        </div>
+      )}
 
       {/* Big stat */}
       {stat && (

@@ -2,7 +2,11 @@
   "id": "women-education-gap",
   "title": "Education's Broken Promise",
   "category": "Socio-Cultural",
-  "ssb_tags": ["GD", "Lecturette", "PI"],
+  "ssb_tags": [
+    "GD",
+    "Lecturette",
+    "PI"
+  ],
   "reading_time": 4,
   "last_updated": "May 2026",
   "difficulty": "Beginner",
@@ -15,7 +19,8 @@
         "value": "43%",
         "label": "of STEM graduates in India are women — but only 27% work in STEM fields",
         "trend": "down"
-      }
+      },
+      "hook_visual": "women_education"
     },
     {
       "type": "concept",
@@ -31,10 +36,38 @@
           "unit": "%",
           "label": "Women's representation at each stage",
           "zones": [
-            { "range": [0, 30], "label": "Crisis — serious access barriers at this stage", "sentiment": "negative" },
-            { "range": [30, 45], "label": "Leakage zone — present but pipeline breaking", "sentiment": "caution" },
-            { "range": [45, 55], "label": "Near parity — India has achieved this at primary enrolment", "sentiment": "positive" },
-            { "range": [55, 100], "label": "Above parity — women outperform at some levels", "sentiment": "positive" }
+            {
+              "range": [
+                0,
+                30
+              ],
+              "label": "Crisis — serious access barriers at this stage",
+              "sentiment": "negative"
+            },
+            {
+              "range": [
+                30,
+                45
+              ],
+              "label": "Leakage zone — present but pipeline breaking",
+              "sentiment": "caution"
+            },
+            {
+              "range": [
+                45,
+                55
+              ],
+              "label": "Near parity — India has achieved this at primary enrolment",
+              "sentiment": "positive"
+            },
+            {
+              "range": [
+                55,
+                100
+              ],
+              "label": "Above parity — women outperform at some levels",
+              "sentiment": "positive"
+            }
           ]
         }
       }
@@ -82,14 +115,32 @@
       "left_label": "Progress made",
       "right_label": "Gaps remaining",
       "left_items": [
-        { "label": "Near parity at primary level", "detail": "Girls' enrolment at primary level is near 100% — a genuine achievement over 30 years" },
-        { "label": "Girls outperform in board exams", "detail": "Girls consistently score higher in Class 10 and 12 board exams — academic ability is not the issue" },
-        { "label": "NEP 2020 focuses on retention", "detail": "National Education Policy 2020 emphasises reducing dropout rates and improving quality — policy intent is strong" }
+        {
+          "label": "Near parity at primary level",
+          "detail": "Girls' enrolment at primary level is near 100% — a genuine achievement over 30 years"
+        },
+        {
+          "label": "Girls outperform in board exams",
+          "detail": "Girls consistently score higher in Class 10 and 12 board exams — academic ability is not the issue"
+        },
+        {
+          "label": "NEP 2020 focuses on retention",
+          "detail": "National Education Policy 2020 emphasises reducing dropout rates and improving quality — policy intent is strong"
+        }
       ],
       "right_items": [
-        { "label": "Secondary dropout crisis unresolved", "detail": "The Class 9-10 dropout wave for girls remains large — particularly in Bihar, UP, Rajasthan" },
-        { "label": "STEM-to-workforce pipeline broken", "detail": "43% STEM graduates to 27% STEM workforce — a 16-point leak between degree and career" },
-        { "label": "Child marriage data understated", "detail": "Official data likely undercounts child marriages — social and administrative barriers to reporting are high" }
+        {
+          "label": "Secondary dropout crisis unresolved",
+          "detail": "The Class 9-10 dropout wave for girls remains large — particularly in Bihar, UP, Rajasthan"
+        },
+        {
+          "label": "STEM-to-workforce pipeline broken",
+          "detail": "43% STEM graduates to 27% STEM workforce — a 16-point leak between degree and career"
+        },
+        {
+          "label": "Child marriage data understated",
+          "detail": "Official data likely undercounts child marriages — social and administrative barriers to reporting are high"
+        }
       ],
       "officer_framing": "India has solved access to education for girls — it has not solved the transition from education to employment. The broken promise is not that girls can't study; it's that the system educated them and then failed to create a world where that education could be used."
     },
@@ -99,17 +150,49 @@
       "title": "Policy responses and what's working",
       "body": "Several government schemes directly target the education-to-employment pipeline: Beti Bachao Beti Padhao, Kasturba Gandhi Balika Vidyalaya (residential schools), STEM scholarships for women, and maternity protections that allow women to return to work. NEP 2020's focus on vocational education and flexible learning is the most recent systematic response.",
       "key_numbers": [
-        { "value": "23%", "label": "India's share of world's child brides — UNICEF" },
-        { "value": "16pts", "label": "STEM graduation to employment gap for women (43% → 27%)" },
-        { "value": "48%", "label": "Women's share of university graduates — yet only 33% of entry-level corporate roles" },
-        { "value": "2.9%", "label": "Women with advanced degrees in employed female workforce — PLFS 2023-24" }
+        {
+          "value": "23%",
+          "label": "India's share of world's child brides — UNICEF"
+        },
+        {
+          "value": "16pts",
+          "label": "STEM graduation to employment gap for women (43% → 27%)"
+        },
+        {
+          "value": "48%",
+          "label": "Women's share of university graduates — yet only 33% of entry-level corporate roles"
+        },
+        {
+          "value": "2.9%",
+          "label": "Women with advanced degrees in employed female workforce — PLFS 2023-24"
+        }
       ],
       "timeline": [
-        { "year": "1986", "event": "National Policy on Education — girls' education made priority", "type": "positive" },
-        { "year": "2015", "event": "Beti Bachao Beti Padhao launched — addresses sex-selective abortion and girls' education", "type": "positive" },
-        { "year": "2020", "event": "NEP 2020 — flexible learning, vocational tracks, retention focus", "type": "positive" },
-        { "year": "2023-24", "event": "PLFS data: only 2.9% of employed women have advanced degrees — education-employment disconnect clear", "type": "negative" },
-        { "year": "2025", "event": "Economic Survey: women with advanced degrees still face employment barriers — structural, not educational", "type": "negative" }
+        {
+          "year": "1986",
+          "event": "National Policy on Education — girls' education made priority",
+          "type": "positive"
+        },
+        {
+          "year": "2015",
+          "event": "Beti Bachao Beti Padhao launched — addresses sex-selective abortion and girls' education",
+          "type": "positive"
+        },
+        {
+          "year": "2020",
+          "event": "NEP 2020 — flexible learning, vocational tracks, retention focus",
+          "type": "positive"
+        },
+        {
+          "year": "2023-24",
+          "event": "PLFS data: only 2.9% of employed women have advanced degrees — education-employment disconnect clear",
+          "type": "negative"
+        },
+        {
+          "year": "2025",
+          "event": "Economic Survey: women with advanced degrees still face employment barriers — structural, not educational",
+          "type": "negative"
+        }
       ]
     },
     {

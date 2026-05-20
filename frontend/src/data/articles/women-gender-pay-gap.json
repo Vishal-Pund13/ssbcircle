@@ -2,7 +2,10 @@
   "id": "women-gender-pay-gap",
   "title": "The Pay Gap Nobody Talks About",
   "category": "Economic",
-  "ssb_tags": ["GD", "PI"],
+  "ssb_tags": [
+    "GD",
+    "PI"
+  ],
   "reading_time": 4,
   "last_updated": "May 2026",
   "difficulty": "Beginner",
@@ -15,7 +18,8 @@
         "value": "₹76",
         "label": "earned by women for every ₹100 earned by men in urban India — PLFS 2024",
         "trend": "down"
-      }
+      },
+      "hook_visual": "women_pay_gap"
     },
     {
       "type": "concept",
@@ -25,8 +29,14 @@
       "visual": {
         "type": "comparison",
         "data": {
-          "left": { "label": "Urban men (monthly)", "value": "₹26,105 average earnings — PLFS 2024" },
-          "right": { "label": "Urban women (monthly)", "value": "₹19,879 average earnings — same survey" }
+          "left": {
+            "label": "Urban men (monthly)",
+            "value": "₹26,105 average earnings — PLFS 2024"
+          },
+          "right": {
+            "label": "Urban women (monthly)",
+            "value": "₹19,879 average earnings — same survey"
+          }
         }
       }
     },
@@ -73,14 +83,32 @@
       "left_label": "Legal tools exist",
       "right_label": "Laws alone aren't working",
       "left_items": [
-        { "label": "Equal Remuneration Act 1976", "detail": "Legally mandates equal pay for equal work — India had this law 50 years ago" },
-        { "label": "Code on Wages 2019", "detail": "Reaffirms equal pay principle across all sectors, formal and informal" },
-        { "label": "Maternity Benefit Act amendment 2017", "detail": "Extended paid maternity leave to 26 weeks — one of the most generous globally" }
+        {
+          "label": "Equal Remuneration Act 1976",
+          "detail": "Legally mandates equal pay for equal work — India had this law 50 years ago"
+        },
+        {
+          "label": "Code on Wages 2019",
+          "detail": "Reaffirms equal pay principle across all sectors, formal and informal"
+        },
+        {
+          "label": "Maternity Benefit Act amendment 2017",
+          "detail": "Extended paid maternity leave to 26 weeks — one of the most generous globally"
+        }
       ],
       "right_items": [
-        { "label": "No mandatory pay transparency", "detail": "Unlike EU's Pay Transparency Directive, India has no law requiring companies to disclose gender pay data" },
-        { "label": "Informal sector is ungovernable", "detail": "90% of Indian women work in the informal sector where Equal Remuneration Act is effectively unenforceable" },
-        { "label": "42% of companies don't measure gender policy impact", "detail": "McKinsey 2025: nearly half of Indian firms have no system to know if their gender policies are working" }
+        {
+          "label": "No mandatory pay transparency",
+          "detail": "Unlike EU's Pay Transparency Directive, India has no law requiring companies to disclose gender pay data"
+        },
+        {
+          "label": "Informal sector is ungovernable",
+          "detail": "90% of Indian women work in the informal sector where Equal Remuneration Act is effectively unenforceable"
+        },
+        {
+          "label": "42% of companies don't measure gender policy impact",
+          "detail": "McKinsey 2025: nearly half of Indian firms have no system to know if their gender policies are working"
+        }
       ],
       "officer_framing": "India has the right laws but the wrong enforcement architecture. In a country where 90% of women work informally, a law written for formal employment protects very few. Closing the pay gap requires data transparency, not just legal text."
     },
@@ -90,17 +118,49 @@
       "title": "The global context — and India's position",
       "body": "The WEF estimates the global gender pay gap will take 134 years to close at current rates. India's informal economy makes this even harder to measure. The EU has taken the strongest step globally — mandatory pay transparency laws. India has no equivalent.",
       "key_numbers": [
-        { "value": "134 yrs", "label": "Time to close global gender pay gap at current pace — WEF" },
-        { "value": "₹6,226", "label": "Monthly urban earnings gap between men and women in India" },
-        { "value": "90%", "label": "Of Indian women working in the informal sector" },
-        { "value": "1976", "label": "Year India passed Equal Remuneration Act — 50 years ago, gap persists" }
+        {
+          "value": "134 yrs",
+          "label": "Time to close global gender pay gap at current pace — WEF"
+        },
+        {
+          "value": "₹6,226",
+          "label": "Monthly urban earnings gap between men and women in India"
+        },
+        {
+          "value": "90%",
+          "label": "Of Indian women working in the informal sector"
+        },
+        {
+          "value": "1976",
+          "label": "Year India passed Equal Remuneration Act — 50 years ago, gap persists"
+        }
       ],
       "timeline": [
-        { "year": "1976", "event": "Equal Remuneration Act passed — equal pay for equal work legally mandated", "type": "positive" },
-        { "year": "2019", "event": "Code on Wages reaffirms equal pay across formal and informal sectors", "type": "positive" },
-        { "year": "2024", "event": "EU passes mandatory Pay Transparency Directive — India has no equivalent", "type": "neutral" },
-        { "year": "2025", "event": "IIT Kharagpur study finds 30.51% unexplained pay gap in India's tech sector", "type": "negative" },
-        { "year": "2025", "event": "Economic Survey 2025-26 recommends hybrid work and equal pay enforcement", "type": "positive" }
+        {
+          "year": "1976",
+          "event": "Equal Remuneration Act passed — equal pay for equal work legally mandated",
+          "type": "positive"
+        },
+        {
+          "year": "2019",
+          "event": "Code on Wages reaffirms equal pay across formal and informal sectors",
+          "type": "positive"
+        },
+        {
+          "year": "2024",
+          "event": "EU passes mandatory Pay Transparency Directive — India has no equivalent",
+          "type": "neutral"
+        },
+        {
+          "year": "2025",
+          "event": "IIT Kharagpur study finds 30.51% unexplained pay gap in India's tech sector",
+          "type": "negative"
+        },
+        {
+          "year": "2025",
+          "event": "Economic Survey 2025-26 recommends hybrid work and equal pay enforcement",
+          "type": "positive"
+        }
       ]
     },
     {
