@@ -31,37 +31,57 @@ function SceneIcon({ type, className = 'w-3.5 h-3.5' }) {
   );
 }
 
-// Scene slides left/right — Inshorts style
+// Scenes slide left/right (Inshorts-style horizontal swipe)
 const mobileVariants = {
-  enter:  (dir) => ({ x: dir > 0 ? '55%'  : '-55%',  opacity: 0 }),
+  enter:  (dir) => ({ x: dir > 0 ? 60 : -60, opacity: 0 }),
   center: { x: 0, opacity: 1 },
-  exit:   (dir) => ({ x: dir > 0 ? '-25%' : '25%',   opacity: 0 }),
+  exit:   (dir) => ({ x: dir > 0 ? -60 : 60, opacity: 0 }),
 };
 const desktopVariants = {
-  enter:  (dir) => ({ x: dir > 0 ? 50  : -50,  opacity: 0 }),
+  enter:  (dir) => ({ x: dir > 0 ? 40 : -40, opacity: 0 }),
   center: { x: 0, opacity: 1 },
-  exit:   (dir) => ({ x: dir > 0 ? -20 : 20,   opacity: 0 }),
+  exit:   (dir) => ({ x: dir > 0 ? -40 : 40, opacity: 0 }),
 };
 
+/* Shared close button — prominent pill */
+function CloseBtn({ onClick, mobile }) {
+  return (
+    <button
+      onClick={onClick}
+      className={`flex items-center gap-1.5 rounded-full border transition-all cursor-pointer font-semibold ${
+        mobile
+          ? 'px-2.5 py-1 text-[11px] bg-white border-gray-200 text-gray-500 hover:border-gray-300 hover:text-gray-700'
+          : 'px-3 py-1.5 text-xs bg-gray-100 border-gray-200 text-gray-600 hover:bg-brand-50 hover:border-brand-200 hover:text-brand-600'
+      }`}
+    >
+      <svg className={mobile ? 'w-3 h-3' : 'w-3.5 h-3.5'} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+        <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+      </svg>
+      Exit
+    </button>
+  );
+}
+
 export default function SwipeReader({ article, onClose, onNextArticle, onPrevArticle }) {
-  const [scene,    setScene]    = useState(0);
-  const [dir,      setDir]      = useState(1);
-  const [showHint, setShowHint] = useState(true);
+  const [scene,      setScene]      = useState(0);
+  const [dir,        setDir]        = useState(1);
+  const [showHint,   setShowHint]   = useState(true);
   const total = article.scenes.length;
 
   useEffect(() => {
-    const t = setTimeout(() => setShowHint(false), 2500);
+    const t = setTimeout(() => setShowHint(false), 3000);
     return () => clearTimeout(t);
   }, []);
 
+  // Scene navigation — horizontal (left/right)
   const next = useCallback(() => {
-    if (scene < total - 1) { setDir(1);  setScene(s => s + 1); setShowHint(false); }
-    else onNextArticle?.();
+    if (scene < total - 1) { setDir(1); setScene(s => s + 1); setShowHint(false); }
+    else onNextArticle?.();   // last scene → next article
   }, [scene, total, onNextArticle]);
 
   const prev = useCallback(() => {
     if (scene > 0) { setDir(-1); setScene(s => s - 1); setShowHint(false); }
-    else onPrevArticle?.();
+    else onPrevArticle?.();   // first scene → prev article
   }, [scene, onPrevArticle]);
 
   const goTo = useCallback((i) => {
@@ -82,176 +102,138 @@ export default function SwipeReader({ article, onClose, onNextArticle, onPrevArt
 
   const containerRef = useRef(null);
   useSwipe({
-    onSwipeLeft:  next,
-    onSwipeRight: prev,
-    onSwipeUp:    onNextArticle,
-    onSwipeDown:  onPrevArticle,
-    elementRef:   containerRef,
+    onSwipeLeft:  next,           // swipe left  → next scene (or next article)
+    onSwipeRight: prev,           // swipe right → prev scene (or prev article)
+    onSwipeUp:    onNextArticle,  // swipe up    → next article
+    onSwipeDown:  onPrevArticle,  // swipe down  → prev article
+    elementRef: containerRef,
   });
 
   const currentScene = article.scenes[scene];
   const sceneLabel   = SCENE_LABELS[currentScene?.type] || '';
+  const pct          = ((scene + 1) / total) * 100;
 
-  // Shared content pane used by both layouts
-  function ScenePane({ variants }) {
+  function SceneArea({ variants }) {
     return (
-      <AnimatePresence mode="wait" custom={dir}>
-        <motion.div
-          key={scene}
-          custom={dir}
-          variants={variants}
-          initial="enter"
-          animate="center"
-          exit="exit"
-          transition={{ duration: 0.2, ease: [0.25, 0.46, 0.45, 0.94] }}
-          className="absolute inset-0"
-        >
-          <div className="h-full overflow-y-auto">
-            <SceneRenderer scene={currentScene} article={article} onClose={onClose} />
-          </div>
-        </motion.div>
-      </AnimatePresence>
+      <div className="flex-1 overflow-hidden relative">
+        <AnimatePresence mode="wait" custom={dir}>
+          <motion.div key={scene} custom={dir} variants={variants}
+            initial="enter" animate="center" exit="exit"
+            transition={{ duration: 0.22, ease: 'easeOut' }}
+            className="absolute inset-0 overflow-hidden">
+            <div className="h-full overflow-y-auto">
+              <SceneRenderer scene={currentScene} article={article} onClose={onClose} />
+            </div>
+          </motion.div>
+        </AnimatePresence>
+
+        {/* Mobile swipe hint */}
+        <AnimatePresence>
+          {showHint && (
+            <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: 8 }} transition={{ duration: 0.3 }}
+              className="absolute inset-x-0 bottom-4 flex justify-center sm:hidden pointer-events-none">
+              <div className="bg-gray-900/75 backdrop-blur-sm text-white text-[11px] font-semibold px-4 py-2 rounded-full flex items-center gap-3">
+                <span className="flex items-center gap-1">
+                  <svg className="w-3.5 h-3.5 animate-pulse" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" />
+                  </svg>
+                  Swipe left/right
+                  <svg className="w-3.5 h-3.5 animate-pulse" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
+                  </svg>
+                </span>
+                <span className="w-px h-3 bg-white/30" />
+                <span className="flex items-center gap-1">
+                  <svg className="w-3 h-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M5 15l7-7 7 7" />
+                  </svg>
+                  ↕ next article
+                </span>
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
+      </div>
     );
   }
 
   return (
     <>
-      {/* ══════════════════════════════════════
-          MOBILE — Inshorts-style full-screen
-      ══════════════════════════════════════ */}
+      {/* ══════════════════════════════
+          MOBILE
+      ══════════════════════════════ */}
       <div className="sm:hidden w-full h-full">
-        <div
-          ref={containerRef}
-          className="swipe-reader relative bg-white flex flex-col overflow-hidden w-full"
-        >
+        <div ref={containerRef}
+          className="swipe-reader relative bg-white flex flex-col overflow-hidden w-full">
 
-          {/* ── Story segment bar ── */}
-          <div className="shrink-0 flex items-center gap-[3px] px-3 pt-3">
-            {article.scenes.map((_, i) => (
-              <button
-                key={i}
-                onClick={() => goTo(i)}
-                className="flex-1 py-3 -my-3 cursor-pointer"
-                aria-label={`Go to scene ${i + 1}`}
-              >
-                <div className="h-[3px] rounded-full overflow-hidden bg-gray-100">
-                  <div
-                    className="h-full bg-brand-600 transition-all duration-300"
-                    style={{ width: i <= scene ? '100%' : '0%' }}
-                  />
-                </div>
-              </button>
-            ))}
+          {/* Progress bar */}
+          <div className="shrink-0">
+            <div className="h-0.5 bg-gray-100">
+              <div className="h-full bg-brand-600 transition-all duration-300 ease-out" style={{ width: `${pct}%` }} />
+            </div>
+            {/* Header */}
+            <div className="flex items-center justify-between px-4 py-2.5 border-b border-gray-100">
+              <div className="flex items-center gap-1">
+                {article.scenes.map((_, i) => (
+                  <button key={i} onClick={() => goTo(i)}
+                    className={`rounded-full transition-all duration-200 cursor-pointer ${
+                      i === scene ? 'w-4 h-1.5 bg-brand-600' : 'w-1.5 h-1.5 bg-gray-200'
+                    }`} />
+                ))}
+              </div>
+              <p className="text-[10px] text-gray-400 font-medium">{scene + 1}/{total} · {sceneLabel}</p>
+              {/* Prominent exit for mobile */}
+              {onClose && <CloseBtn onClick={onClose} mobile />}
+            </div>
           </div>
 
-          {/* ── Article info bar ── */}
-          <div className="shrink-0 flex items-center justify-between px-3 pt-2 pb-1.5">
-            <div className="flex items-center gap-1.5 min-w-0">
-              <span className="shrink-0 text-[9px] font-bold px-1.5 py-0.5 rounded-full bg-brand-50 text-brand-700 border border-brand-100 uppercase tracking-widest">
-                {article.category}
-              </span>
-              <span className="text-[11px] font-semibold text-gray-500 truncate">
-                {article.title}
-              </span>
-            </div>
-            {onClose && (
-              <button
-                onClick={onClose}
-                className="shrink-0 ml-2 w-7 h-7 rounded-full flex items-center justify-center text-gray-400 active:bg-gray-100 cursor-pointer transition-colors"
-                aria-label="Exit"
-              >
-                <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
-                </svg>
-              </button>
-            )}
+          <SceneArea variants={mobileVariants} />
+
+          {/* Persistent swipe hint */}
+          <div className="shrink-0 flex justify-center pt-1.5 pb-0 bg-white">
+            <p className="text-[10px] text-gray-300 flex items-center gap-2 font-medium select-none">
+              <svg className="w-3 h-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" />
+              </svg>
+              ← swipe for cards → · ↕ next article
+              <svg className="w-3 h-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
+              </svg>
+            </p>
           </div>
 
-          {/* ── Scene content ── */}
-          <div className="flex-1 overflow-hidden relative">
-            <ScenePane variants={mobileVariants} />
-
-            {/* Right-edge article nav arrows */}
-            <div className="absolute right-2 inset-y-0 flex flex-col items-center justify-center gap-5 pointer-events-none select-none">
-              {onPrevArticle && (
-                <motion.div
-                  animate={{ y: [0, -5, 0] }}
-                  transition={{ repeat: Infinity, duration: 2, ease: 'easeInOut', repeatDelay: 0.8 }}
-                >
-                  <svg className="w-[15px] h-[15px] text-gray-200" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M5 15l7-7 7 7" />
-                  </svg>
-                </motion.div>
-              )}
-              {onNextArticle && (
-                <motion.div
-                  animate={{ y: [0, 5, 0] }}
-                  transition={{ repeat: Infinity, duration: 2, ease: 'easeInOut', repeatDelay: 0.8, delay: 0.4 }}
-                >
-                  <svg className="w-[15px] h-[15px] text-gray-200" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
-                  </svg>
-                </motion.div>
-              )}
-            </div>
-
-            {/* Initial hint pill */}
-            <AnimatePresence>
-              {showHint && (
-                <motion.div
-                  initial={{ opacity: 0, y: 10 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: 10 }}
-                  transition={{ duration: 0.3 }}
-                  className="absolute inset-x-0 bottom-3 flex justify-center pointer-events-none"
-                >
-                  <div className="bg-gray-900/80 backdrop-blur-sm text-white text-[11px] font-semibold px-4 py-2 rounded-full flex items-center gap-2">
-                    <svg className="w-3.5 h-3.5 opacity-70" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
-                      <path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" />
-                    </svg>
-                    <span>scenes</span>
-                    <svg className="w-3.5 h-3.5 opacity-70" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
-                      <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
-                    </svg>
-                    <span className="w-px h-3 bg-white/25 mx-0.5" />
-                    <svg className="w-3 h-3 opacity-70" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
-                      <path strokeLinecap="round" strokeLinejoin="round" d="M5 15l7-7 7 7" />
-                    </svg>
-                    <span>articles</span>
-                    <svg className="w-3 h-3 opacity-70" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
-                      <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
-                    </svg>
-                  </div>
-                </motion.div>
-              )}
-            </AnimatePresence>
-          </div>
-
-          {/* ── Bottom bar — scene label + count ── */}
-          <div
-            className="shrink-0 flex items-center justify-between px-4 py-2.5 border-t border-gray-50 bg-white"
-            style={{ paddingBottom: 'max(env(safe-area-inset-bottom, 0px) + 10px, 10px)' }}
-          >
-            <div className="flex items-center gap-1.5">
-              <SceneIcon type={currentScene?.type} className="w-3 h-3 text-gray-300" />
-              <span className="text-[10px] font-semibold text-gray-400">{sceneLabel}</span>
-            </div>
-            <span className="text-[10px] font-medium text-gray-300 tabular-nums">{scene + 1} / {total}</span>
+          {/* Bottom nav */}
+          <div className="shrink-0 border-t border-gray-100 px-4 py-2.5 flex items-center justify-between bg-white"
+            style={{ paddingBottom: 'max(env(safe-area-inset-bottom, 0px) + 10px, 10px)' }}>
+            <button onClick={prev} disabled={scene === 0}
+              className="flex items-center gap-1 text-xs font-semibold disabled:opacity-30 cursor-pointer disabled:cursor-not-allowed text-brand-600">
+              <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" />
+              </svg>
+              Prev
+            </button>
+            <p className="text-[10px] text-gray-400 text-center truncate px-2">{article.title}</p>
+            <button onClick={next} disabled={scene === total - 1}
+              className="flex items-center gap-1 text-xs font-semibold disabled:opacity-30 cursor-pointer disabled:cursor-not-allowed text-brand-600">
+              Next
+              <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
+              </svg>
+            </button>
           </div>
         </div>
       </div>
 
-      {/* ══════════════════════════════════════
-          DESKTOP — dot timeline + card
-      ══════════════════════════════════════ */}
+      {/* ══════════════════════════════
+          DESKTOP — dot line + card
+      ══════════════════════════════ */}
       <div className="hidden sm:flex flex-col h-full w-full bg-gray-50">
 
         {/* Top bar */}
         <div className="shrink-0 h-12 bg-white border-b border-gray-100 px-8 flex items-center justify-between">
-          <button
-            onClick={onClose}
-            className="flex items-center gap-2 text-sm font-semibold text-gray-500 hover:text-brand-600 transition-colors cursor-pointer group"
-          >
+          <button onClick={onClose}
+            className="flex items-center gap-2 text-sm font-semibold text-gray-500 hover:text-brand-600 transition-colors cursor-pointer group">
             <svg className="w-4 h-4 group-hover:-translate-x-0.5 transition-transform" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
               <path strokeLinecap="round" strokeLinejoin="round" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
             </svg>
@@ -267,10 +249,10 @@ export default function SwipeReader({ article, onClose, onNextArticle, onPrevArt
           </div>
         </div>
 
-        {/* Dot timeline + card */}
+        {/* Dots + Card */}
         <div className="flex-1 flex items-center justify-center gap-6 overflow-hidden px-8 py-6">
 
-          {/* Vertical scene index */}
+          {/* Vertical index — always-visible labels + dots */}
           <div className="flex flex-col shrink-0 select-none">
             {article.scenes.map((s, i) => {
               const isActive = i === scene;
@@ -283,6 +265,7 @@ export default function SwipeReader({ article, onClose, onNextArticle, onPrevArt
                       isActive ? 'opacity-100' : 'opacity-40 hover:opacity-70'
                     }`}
                   >
+                    {/* Label + icon — right side of label block */}
                     <div className="flex items-center gap-1.5 flex-1 justify-end">
                       <SceneIcon
                         type={s.type}
@@ -294,12 +277,14 @@ export default function SwipeReader({ article, onClose, onNextArticle, onPrevArt
                         {SCENE_LABELS[s.type]}
                       </span>
                     </div>
+                    {/* Dot */}
                     <div className="w-4 flex items-center justify-center shrink-0">
                       <span className={`rounded-full block transition-all duration-200 ${
                         isActive ? 'w-3 h-3 bg-brand-600' : isDone ? 'w-2 h-2 bg-brand-300' : 'w-2 h-2 bg-gray-300 group-hover:bg-gray-400'
                       }`} />
                     </div>
                   </button>
+                  {/* Connecting line — right-aligned under the dot */}
                   {i < total - 1 && (
                     <div className="flex justify-end pr-1.5" style={{ height: 20 }}>
                       <div className={`w-px ${isDone ? 'bg-brand-200' : 'bg-gray-200'}`} />
@@ -313,65 +298,30 @@ export default function SwipeReader({ article, onClose, onNextArticle, onPrevArt
           {/* Card */}
           <div className="desktop-reader relative bg-white flex flex-col overflow-hidden rounded-2xl border border-gray-200 shadow-lg max-w-xl w-full h-full">
 
-            {/* Story segments at top of card */}
-            <div className="shrink-0 flex gap-[3px] px-3 pt-3">
-              {article.scenes.map((_, i) => (
-                <button
-                  key={i}
-                  onClick={() => goTo(i)}
-                  className="flex-1 py-2 -my-2 cursor-pointer"
-                >
-                  <div className="h-[3px] rounded-full overflow-hidden bg-gray-100">
-                    <div
-                      className="h-full bg-brand-600 transition-all duration-300"
-                      style={{ width: i <= scene ? '100%' : '0%' }}
-                    />
-                  </div>
-                </button>
-              ))}
-            </div>
-
             {/* Card header */}
-            <div className="shrink-0 flex items-center justify-between px-4 py-2.5 border-b border-gray-100">
-              <div className="flex items-center gap-1.5">
-                <SceneIcon type={currentScene?.type} className="w-3 h-3 text-gray-400" />
-                <p className="text-[10px] text-gray-400 font-medium">{sceneLabel}</p>
+            <div className="shrink-0">
+              <div className="h-0.5 bg-gray-100">
+                <div className="h-full bg-brand-600 transition-all duration-300 ease-out" style={{ width: `${pct}%` }} />
               </div>
-              <p className="text-[10px] text-gray-400 font-medium tabular-nums">{scene + 1} / {total}</p>
-              {onClose && (
-                <button
-                  onClick={onClose}
-                  className="flex items-center gap-1.5 rounded-full border px-3 py-1.5 text-xs bg-gray-100 border-gray-200 text-gray-600 hover:bg-brand-50 hover:border-brand-200 hover:text-brand-600 font-semibold cursor-pointer transition-all"
-                >
-                  <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
-                  </svg>
-                  Exit
-                </button>
-              )}
+              <div className="flex items-center justify-between px-4 py-2.5 border-b border-gray-100">
+                <p className="text-[10px] text-gray-400 font-medium">{scene + 1} / {total}</p>
+                <p className="text-[10px] text-gray-400 font-medium">{sceneLabel}</p>
+                {onClose && <CloseBtn onClick={onClose} mobile={false} />}
+              </div>
             </div>
 
-            {/* Scene content */}
-            <div className="flex-1 overflow-hidden relative">
-              <ScenePane variants={desktopVariants} />
-            </div>
+            <SceneArea variants={desktopVariants} />
 
             {/* Bottom nav */}
             <div className="shrink-0 border-t border-gray-100 px-5 py-3 flex items-center justify-between bg-white">
-              <button
-                onClick={prev}
-                disabled={scene === 0 && !onPrevArticle}
-                className="text-xs font-semibold text-brand-600 hover:text-brand-700 disabled:opacity-25 disabled:cursor-not-allowed cursor-pointer transition-colors"
-              >
-                ← {scene > 0 ? SCENE_LABELS[article.scenes[scene - 1]?.type] : onPrevArticle ? 'Prev article' : 'Prev'}
+              <button onClick={prev} disabled={scene === 0}
+                className="text-xs font-semibold text-brand-600 hover:text-brand-700 disabled:opacity-30 disabled:cursor-not-allowed cursor-pointer transition-colors">
+                ← {scene > 0 ? SCENE_LABELS[article.scenes[scene - 1]?.type] : 'Prev'}
               </button>
               <p className="text-[10px] text-gray-400 truncate px-3 max-w-[180px] text-center">{article.title}</p>
-              <button
-                onClick={next}
-                disabled={scene === total - 1 && !onNextArticle}
-                className="text-xs font-semibold text-brand-600 hover:text-brand-700 disabled:opacity-25 disabled:cursor-not-allowed cursor-pointer transition-colors"
-              >
-                {scene < total - 1 ? SCENE_LABELS[article.scenes[scene + 1]?.type] : onNextArticle ? 'Next article' : 'Done'} →
+              <button onClick={next} disabled={scene === total - 1}
+                className="text-xs font-semibold text-brand-600 hover:text-brand-700 disabled:opacity-30 disabled:cursor-not-allowed cursor-pointer transition-colors">
+                {scene < total - 1 ? SCENE_LABELS[article.scenes[scene + 1]?.type] : 'Done'} →
               </button>
             </div>
           </div>
