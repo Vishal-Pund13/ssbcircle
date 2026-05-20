@@ -128,13 +128,14 @@ const SWIPE_ARTICLES = {
   'women-health-india':         true,
 };
 
-// Article card — same pattern as RoomCard in LandingPage
+// Article card — clicking goes to SwipeReader if available, otherwise blog detail
 function ArticleCard({ article, onClick }) {
   const navigate = useNavigate();
   const swipeKey = article.slug || article.id;
   const hasSwipe = SWIPE_ARTICLES[swipeKey];
+  const handleClick = hasSwipe ? () => navigate(`/read/${swipeKey}`) : onClick;
   return (
-    <div onClick={onClick}
+    <div onClick={handleClick}
       className="bg-white border border-gray-200 rounded-xl overflow-hidden hover:border-brand-600/30 hover:shadow-md transition-all duration-200 flex flex-col cursor-pointer group">
       <div className="h-0.5 bg-brand-600" />
       <div className="p-4 flex flex-col gap-2.5 flex-1">
@@ -174,22 +175,9 @@ function ArticleCard({ article, onClick }) {
               </span>
             )}
           </div>
-          <div className="flex items-center gap-2 shrink-0">
-            {hasSwipe && (
-              <button
-                onClick={e => { e.stopPropagation(); navigate(`/read/${swipeKey}`); }}
-                className="flex items-center gap-1 text-[11px] font-bold text-white bg-brand-600 hover:bg-brand-700 px-2.5 py-1 rounded-full transition-all animate-bounce-slow">
-                <svg className="w-3 h-3 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                  <rect x="2" y="7" width="20" height="14" rx="2" />
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M16 3H8a2 2 0 00-2 2v2h12V5a2 2 0 00-2-2z" />
-                </svg>
-                Cards
-              </button>
-            )}
-            <span className="flex items-center gap-0.5 text-[11px] font-semibold text-brand-600 shrink-0">
-              Read <ChevronRight className="w-3 h-3" />
-            </span>
-          </div>
+          <span className="flex items-center gap-0.5 text-[11px] font-semibold text-brand-600 shrink-0">
+            {hasSwipe ? 'Read cards' : 'Read'} <ChevronRight className="w-3 h-3" />
+          </span>
         </div>
       </div>
     </div>
