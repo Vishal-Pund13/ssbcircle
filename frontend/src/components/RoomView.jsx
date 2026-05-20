@@ -1,4 +1,4 @@
-import { useEffect, useState, useRef, useCallback, lazy, Suspense } from 'react';
+import { useEffect, useState, useRef, lazy, Suspense } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import { getRoom, getRoomToken, closeRoom, kickParticipant, reportUser } from '../services/api';
 import { useAuth } from '../context/AuthContext';
@@ -344,40 +344,34 @@ function AdminPanel({ participants, roomCode, onMuteAll, onEndRoom, onMutePartic
 const SwipeReaderLazy = lazy(() => import('./SwipeReader/SwipeReader'));
 
 function SwipeReaderInRoom({ article, onClose }) {
-  const closedRef = useRef(false);
-
-  const safeClose = useCallback(() => {
-    if (closedRef.current) return;
-    closedRef.current = true;
-    onClose();
-  }, [onClose]);
-
   useEffect(() => {
-    // popstate listener — handles hardware back button + Android back gesture
-    const handlePop = () => safeClose();
-    window.addEventListener('popstate', handlePop);
-
-    // Block iOS left-edge back swipe from passing through to the browser
-    function blockEdgeSwipe(e) {
-      if (e.touches && e.touches[0].clientX < 24) e.preventDefault();
+    // Trap navigation — push a state and re-push on every popstate
+    // so back gesture / back button never navigates out of the room
+    window.history.pushState(null, '', window.location.href);
+    function trapBack() {
+      window.history.pushState(null, '', window.location.href);
     }
-    document.addEventListener('touchstart', blockEdgeSwipe, { passive: false });
-
-    return () => {
-      window.removeEventListener('popstate', handlePop);
-      document.removeEventListener('touchstart', blockEdgeSwipe);
-    };
-  }, [safeClose]);
-
-  function handleClose() {
-    // back() pops the state pushed synchronously when overlay opened → fires popstate → safeClose
-    window.history.back();
-  }
+    window.addEventListener('popstate', trapBack);
+    return () => window.removeEventListener('popstate', trapBack);
+  }, []);
 
   return (
-    <Suspense fallback={<div className="flex-1 flex items-center justify-center text-sm text-gray-400">Loading…</div>}>
-      <SwipeReaderLazy article={article} onClose={handleClose} />
-    </Suspense>
+    <>
+      {/* Big persistent Return to Room bar — the only way out */}
+      <button
+        onClick={onClose}
+        className="shrink-0 w-full flex items-center justify-center gap-2 bg-brand-600 hover:bg-brand-700 active:bg-brand-800 text-white font-bold text-sm py-4 transition-colors cursor-pointer">
+        <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+          <path strokeLinecap="round" strokeLinejoin="round" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+        </svg>
+        Return to Room
+      </button>
+      <div className="flex-1 overflow-hidden min-h-0">
+        <Suspense fallback={<div className="h-full flex items-center justify-center text-sm text-gray-400">Loading…</div>}>
+          <SwipeReaderLazy article={article} onClose={onClose} />
+        </Suspense>
+      </div>
+    </>
   );
 }
 
@@ -424,7 +418,7 @@ function TopicStrip({ article }) {
           {/* Right: action buttons */}
           <div className="flex items-center gap-1.5 shrink-0">
             <button
-              onClick={() => { window.history.pushState({ readerOverlay: true }, ''); setShowReader(true); }}
+              onClick={() => setShowReader(true)}
               className="flex items-center gap-1.5 bg-brand-600 hover:bg-brand-700 text-white text-[11px] font-bold px-3 py-1.5 rounded-lg transition-colors cursor-pointer">
               <svg className="w-3 h-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
                 <path strokeLinecap="round" strokeLinejoin="round" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
