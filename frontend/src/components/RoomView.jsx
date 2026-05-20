@@ -342,7 +342,7 @@ function AdminPanel({ participants, roomCode, onMuteAll, onEndRoom, onMutePartic
 }
 
 // ── Voice room UI ────────────────────────────────────────────────────────────
-function VoiceRoomUI({ room, isAdmin, roomCode, showTimer, setShowTimer, showPanel, setShowPanel, onLeave, setIsTranscribing }) {
+function VoiceRoomUI({ room, isAdmin, roomCode, showTimer, setShowTimer, showPanel, setShowPanel, onLeave, setIsTranscribing, topicArticle }) {
   const lkRoom = useRoomContext();
   const participants = useParticipants();
   const { localParticipant } = useLocalParticipant();
@@ -963,6 +963,7 @@ export default function RoomView() {
             setShowPanel={setShowPanel}
             onLeave={handleLeave}
             setIsTranscribing={setIsTranscribing}
+            topicArticle={topicArticle}
           />
         </LiveKitRoom>
       )}
