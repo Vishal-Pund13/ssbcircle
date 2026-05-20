@@ -353,17 +353,24 @@ function SwipeReaderInRoom({ article, onClose }) {
   }, [onClose]);
 
   useEffect(() => {
-    // Push a history entry so the back gesture pops THIS state
-    // instead of navigating out of the room
-    window.history.pushState({ readerOverlay: true }, '');
-
+    // popstate listener — handles hardware back button + Android back gesture
     const handlePop = () => safeClose();
     window.addEventListener('popstate', handlePop);
-    return () => window.removeEventListener('popstate', handlePop);
+
+    // Block iOS left-edge back swipe from passing through to the browser
+    function blockEdgeSwipe(e) {
+      if (e.touches && e.touches[0].clientX < 24) e.preventDefault();
+    }
+    document.addEventListener('touchstart', blockEdgeSwipe, { passive: false });
+
+    return () => {
+      window.removeEventListener('popstate', handlePop);
+      document.removeEventListener('touchstart', blockEdgeSwipe);
+    };
   }, [safeClose]);
 
   function handleClose() {
-    // history.back() pops our pushed state → fires popstate → safeClose
+    // back() pops the state pushed synchronously when overlay opened → fires popstate → safeClose
     window.history.back();
   }
 
@@ -417,7 +424,7 @@ function TopicStrip({ article }) {
           {/* Right: action buttons */}
           <div className="flex items-center gap-1.5 shrink-0">
             <button
-              onClick={() => setShowReader(true)}
+              onClick={() => { window.history.pushState({ readerOverlay: true }, ''); setShowReader(true); }}
               className="flex items-center gap-1.5 bg-brand-600 hover:bg-brand-700 text-white text-[11px] font-bold px-3 py-1.5 rounded-lg transition-colors cursor-pointer">
               <svg className="w-3 h-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
                 <path strokeLinecap="round" strokeLinejoin="round" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
