@@ -1,0 +1,156 @@
+{
+  "id": "women-education-gap",
+  "title": "Education's Broken Promise",
+  "category": "Socio-Cultural",
+  "ssb_tags": ["GD", "Lecturette", "PI"],
+  "reading_time": 4,
+  "last_updated": "May 2026",
+  "difficulty": "Beginner",
+  "scenes": [
+    {
+      "type": "hook",
+      "headline": "Girls top exams. Then they disappear.",
+      "subtext": "India's school enrolment for girls is near parity. But between Class 9 and graduation, millions of girls vanish from the education system — and never return.",
+      "stat": {
+        "value": "43%",
+        "label": "of STEM graduates in India are women — but only 27% work in STEM fields",
+        "trend": "down"
+      }
+    },
+    {
+      "type": "concept",
+      "title": "The pipeline problem — enrolment vs outcomes",
+      "body": "India has made enormous strides in getting girls into school. At the primary level, gender parity in enrolment is nearly achieved. But a pipeline problem exists — girls drop out at secondary level (Class 9-10) at far higher rates than boys, and even those who complete education face the broken rung into employment. The problem isn't access to schools. It's what happens when a girl reaches puberty, marriageable age, or needs to travel further for higher education.",
+      "analogy": "Think of education as a pipeline carrying water from source to tap. At the source (primary school), the flow is strong. But there are holes in the pipe at Class 9, at Class 12, at college entry, and again at job entry. By the time water reaches the tap (formal employment), the pressure has dropped dramatically.",
+      "visual": {
+        "type": "slider",
+        "data": {
+          "min": 0,
+          "max": 100,
+          "default": 43,
+          "unit": "%",
+          "label": "Women's representation at each stage",
+          "zones": [
+            { "range": [0, 30], "label": "Crisis — serious access barriers at this stage", "sentiment": "negative" },
+            { "range": [30, 45], "label": "Leakage zone — present but pipeline breaking", "sentiment": "caution" },
+            { "range": [45, 55], "label": "Near parity — India has achieved this at primary enrolment", "sentiment": "positive" },
+            { "range": [55, 100], "label": "Above parity — women outperform at some levels", "sentiment": "positive" }
+          ]
+        }
+      }
+    },
+    {
+      "type": "breakdown",
+      "title": "Why do girls drop out?",
+      "intro": "Five barriers create the dropout crisis at different stages.",
+      "items": [
+        {
+          "icon": "💍",
+          "title": "Child marriage — the education terminator",
+          "detail": "Child marriage remains the single biggest cause of girls dropping out. Once married, girls are expected to manage households, and education is deprioritised. Despite the Prohibition of Child Marriage Act, India has the world's highest absolute number of child brides.",
+          "stat": "India has ~23% of world's child brides — UNICEF"
+        },
+        {
+          "icon": "🚶",
+          "title": "Distance and safety at secondary level",
+          "detail": "Primary schools exist in most villages. Secondary schools don't. When a girl must travel 5-10km to study, families often say no — both for financial reasons and safety concerns. The transition from primary to secondary is where the first major dropout wave occurs.",
+          "stat": null
+        },
+        {
+          "icon": "🧑‍🍳",
+          "title": "Household labour expectations",
+          "detail": "Girls in rural India typically contribute significant hours to household tasks — fetching water, cooking, caring for younger siblings. When time is scarce, education loses to household labour. Boys rarely face the same trade-off.",
+          "stat": null
+        },
+        {
+          "icon": "🔬",
+          "title": "The STEM pipeline leak",
+          "detail": "Women make up 43% of STEM graduates — impressive. But only 27% enter the STEM workforce. The dropout between graduation and employment is caused by family pressure to marry, lack of mentors, hostile workplace culture, and geographic inflexibility required for STEM jobs.",
+          "stat": "43% STEM graduates are women; only 27% in STEM workforce"
+        },
+        {
+          "icon": "💸",
+          "title": "Return on investment doubts",
+          "detail": "In poor households making difficult choices about which child to educate, the perceived return on a girl's education is lower — because social norms expect her to leave the family after marriage. This is a rational response to an irrational social norm.",
+          "stat": null
+        }
+      ]
+    },
+    {
+      "type": "two_sides",
+      "title": "Has India solved its education gender gap?",
+      "left_label": "Progress made",
+      "right_label": "Gaps remaining",
+      "left_items": [
+        { "label": "Near parity at primary level", "detail": "Girls' enrolment at primary level is near 100% — a genuine achievement over 30 years" },
+        { "label": "Girls outperform in board exams", "detail": "Girls consistently score higher in Class 10 and 12 board exams — academic ability is not the issue" },
+        { "label": "NEP 2020 focuses on retention", "detail": "National Education Policy 2020 emphasises reducing dropout rates and improving quality — policy intent is strong" }
+      ],
+      "right_items": [
+        { "label": "Secondary dropout crisis unresolved", "detail": "The Class 9-10 dropout wave for girls remains large — particularly in Bihar, UP, Rajasthan" },
+        { "label": "STEM-to-workforce pipeline broken", "detail": "43% STEM graduates to 27% STEM workforce — a 16-point leak between degree and career" },
+        { "label": "Child marriage data understated", "detail": "Official data likely undercounts child marriages — social and administrative barriers to reporting are high" }
+      ],
+      "officer_framing": "India has solved access to education for girls — it has not solved the transition from education to employment. The broken promise is not that girls can't study; it's that the system educated them and then failed to create a world where that education could be used."
+    },
+    {
+      "type": "context",
+      "title": "Policy responses and what's working",
+      "body": "Several government schemes directly target the education-to-employment pipeline: Beti Bachao Beti Padhao, Kasturba Gandhi Balika Vidyalaya (residential schools), STEM scholarships for women, and maternity protections that allow women to return to work. NEP 2020's focus on vocational education and flexible learning is the most recent systematic response.",
+      "key_numbers": [
+        { "value": "23%", "label": "India's share of world's child brides — UNICEF" },
+        { "value": "16pts", "label": "STEM graduation to employment gap for women (43% → 27%)" },
+        { "value": "48%", "label": "Women's share of university graduates — yet only 33% of entry-level corporate roles" },
+        { "value": "2.9%", "label": "Women with advanced degrees in employed female workforce — PLFS 2023-24" }
+      ],
+      "timeline": [
+        { "year": "1986", "event": "National Policy on Education — girls' education made priority", "type": "positive" },
+        { "year": "2015", "event": "Beti Bachao Beti Padhao launched — addresses sex-selective abortion and girls' education", "type": "positive" },
+        { "year": "2020", "event": "NEP 2020 — flexible learning, vocational tracks, retention focus", "type": "positive" },
+        { "year": "2023-24", "event": "PLFS data: only 2.9% of employed women have advanced degrees — education-employment disconnect clear", "type": "negative" },
+        { "year": "2025", "event": "Economic Survey: women with advanced degrees still face employment barriers — structural, not educational", "type": "negative" }
+      ]
+    },
+    {
+      "type": "ssb_application",
+      "title": "Use this in SSB",
+      "pi_question": "Has India solved the gender gap in education?",
+      "gd_line": "India has achieved near-parity in school enrolment — that is a genuine achievement. But enrolment is not the goal; employment and empowerment are. The education pipeline leaks at secondary school, at STEM entry, and at the first job — and that is where the real work remains.",
+      "lecturette_structure": [
+        "Open: Girls top board exams — then they disappear. Education's broken promise.",
+        "Progress: Near parity at primary level, girls outperform in board exams",
+        "Pipeline leak: Secondary dropout (child marriage, distance, safety), STEM gap (43% graduates → 27% workforce)",
+        "Structural barrier: Education-to-employment gap — 48% of graduates are women, only 33% in entry-level corporate roles",
+        "Close: NEP 2020, Kasturba Gandhi schools, Beti Bachao — policy direction is right, scale is insufficient"
+      ],
+      "pi_answer": "Sir, India has made genuine progress in girls' education — near parity at primary level and girls consistently outperforming boys in board exams. However, the pipeline breaks at three points: secondary school dropouts due to child marriage and commute barriers, the STEM-to-workforce gap where women drop from 43% of graduates to just 27% of the workforce, and the overall education-to-employment gap. Only 2.9% of employed women have advanced degrees despite high graduation rates — suggesting the system is educating women but not creating pathways to use that education. NEP 2020 and schemes like Kasturba Gandhi schools are steps in the right direction, but scale remains insufficient.",
+      "one_liner": "We educated the girls — then forgot to build a world where their education could matter."
+    },
+    {
+      "type": "quiz",
+      "title": "Test yourself",
+      "questions": [
+        {
+          "q": "India has achieved near parity in school enrolment for girls. Does this mean the education gender gap is solved?",
+          "options": [
+            "Yes — enrolment parity means the problem is solved",
+            "No — enrolment is just the entry point. The pipeline breaks at secondary school, at STEM employment, and at career entry. Solving access is necessary but not sufficient.",
+            "Partially — only urban girls still face barriers"
+          ],
+          "correct": 1,
+          "explanation": "Distinguishing between inputs (enrolment) and outcomes (employment, empowerment) shows systems thinking. A policy that measures only enrolment will miss all the leakage points."
+        },
+        {
+          "q": "What is the STEM pipeline problem for women in India?",
+          "options": [
+            "Girls don't study science subjects",
+            "Women make up 43% of STEM graduates but only 27% enter STEM careers — a 16-point loss between degree and employment",
+            "STEM colleges don't accept women"
+          ],
+          "correct": 1,
+          "explanation": "This is a precise, data-backed answer that shows you understand where the problem actually is — not in education access, but in the transition to employment."
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,141 @@
+{
+  "id": "women-health-india",
+  "title": "The Health Silence",
+  "category": "Socio-Cultural",
+  "ssb_tags": ["GD", "Lecturette", "PI"],
+  "reading_time": 5,
+  "last_updated": "May 2026",
+  "difficulty": "Beginner",
+  "scenes": [
+    {
+      "type": "hook",
+      "headline": "India is missing 63 million women.",
+      "subtext": "Nobel economist Amartya Sen coined the term 'missing women' to describe the demographic gap caused by gender-biased health neglect, sex-selective abortions, and higher female mortality. They haven't disappeared — they were never allowed to survive.",
+      "stat": {
+        "value": "63M",
+        "label": "Estimated 'missing women' in India due to gender-biased mortality and sex selection — Amartya Sen",
+        "trend": "down"
+      }
+    },
+    {
+      "type": "concept",
+      "title": "What are 'missing women'?",
+      "body": "In a population without gender bias, women slightly outnumber men — because women have higher biological survival rates. When you count India's actual population and compare it to expected numbers, tens of millions of women are statistically 'missing'. They were lost to sex-selective abortions, female infanticide, neglect of girls' health and nutrition, and higher female mortality from preventable causes.",
+      "analogy": "Imagine a school with 100 expected students — but only 83 show up. 17 are missing. You wouldn't say the school is fine. You'd investigate where the students went. India's 63 million missing women are that investigation — on a national scale.",
+      "visual": {
+        "type": "comparison",
+        "data": {
+          "left": { "label": "Expected sex ratio", "value": "950-1000 women per 1000 men (biological norm)" },
+          "right": { "label": "India's sex ratio", "value": "943 women per 1000 men (Census 2011) — worse in child sex ratio" }
+        }
+      }
+    },
+    {
+      "type": "breakdown",
+      "title": "India's four women's health crises",
+      "intro": "Four interconnected health crises compound each other.",
+      "items": [
+        {
+          "icon": "🤱",
+          "title": "Maternal mortality — dying to give life",
+          "detail": "India's Maternal Mortality Ratio (MMR) has improved significantly — from 254 per lakh live births in 2004-06 to 97 in 2018-20. But most maternal deaths are preventable — caused by haemorrhage, sepsis, and unsafe deliveries. Rural and tribal women face the highest risk.",
+          "stat": "MMR: 97 per 1,00,000 live births (2018-20) — Assam (195) and UP (167) remain critical"
+        },
+        {
+          "icon": "🩸",
+          "title": "Anaemia — the invisible epidemic",
+          "detail": "NFHS-5 data shows 57% of women aged 15-49 are anaemic in India. Anaemia reduces work capacity, worsens pregnancy outcomes, and impairs child development. It is caused by iron-deficient diets, frequent pregnancies, and lack of nutrition awareness.",
+          "stat": "57% of Indian women aged 15-49 are anaemic — NFHS-5"
+        },
+        {
+          "icon": "📊",
+          "title": "Sex-selective practices — female foeticide",
+          "detail": "Despite the PCPNDT Act (1994) banning sex-selective abortion, India's child sex ratio (0-6 years) stood at 919 girls per 1000 boys in Census 2011 — among the world's worst. States like Haryana (834) and Punjab (846) show severe skew.",
+          "stat": "Child sex ratio: 919 girls per 1000 boys — Census 2011"
+        },
+        {
+          "icon": "🌾",
+          "title": "Malnutrition — women eat last",
+          "detail": "In many Indian households, women eat after men — and what's left is often insufficient. Women's malnutrition is the starting point for maternal mortality, anaemia, and child stunting. The cycle is intergenerational — malnourished mothers have underweight babies who grow into malnourished adults.",
+          "stat": "NFHS-5: 18.7% of women are thin (BMI under 18.5); 22.9% are overweight — both ends of malnutrition"
+        }
+      ]
+    },
+    {
+      "type": "two_sides",
+      "title": "Is India's women's health improving?",
+      "left_label": "Genuine progress",
+      "right_label": "Critical gaps remain",
+      "left_items": [
+        { "label": "MMR halved in 15 years", "detail": "Maternal Mortality Ratio fell from 254 to 97 — significant institutional delivery and healthcare improvement" },
+        { "label": "Vaccination coverage improved", "detail": "Full immunisation coverage for children rose significantly — NFHS-5 shows improvements across states" },
+        { "label": "Institutional delivery rising", "detail": "NFHS-5: 89% of births in institutional facilities — up from 39% in 2005-06. Massive shift in 15 years." }
+      ],
+      "right_items": [
+        { "label": "Anaemia worsening, not improving", "detail": "Anaemia prevalence increased from 53% (NFHS-4) to 57% (NFHS-5) — a policy failure during the supposed decade of progress" },
+        { "label": "Sub-national disparities severe", "detail": "Assam's MMR (195) is 14x Kerala's (19) — India's health indices hide enormous state-level inequality" },
+        { "label": "Menstrual health remains stigmatised", "detail": "Access to menstrual hygiene products and open conversation remains poor — menstruation is still a barrier to school attendance for many girls" }
+      ],
+      "officer_framing": "India's women's health story is one of genuine progress in mortality indicators and near-complete failure on nutrition indicators. The institutional delivery push worked — the nutrition ecosystem didn't. Health policy must treat women as complete human beings, not just childbearing units."
+    },
+    {
+      "type": "context",
+      "title": "The SDG lens — where India stands globally",
+      "body": "Under SDG 3, India committed to reducing MMR to below 70 per lakh live births by 2030. At 97, progress is real but the target remains challenging. Anaemia is SDG 2 (Zero Hunger) territory — and India's worsening anaemia numbers represent a failure of the nutrition ecosystem, not just health infrastructure.",
+      "key_numbers": [
+        { "value": "63M", "label": "Missing women in India — Amartya Sen's estimate" },
+        { "value": "57%", "label": "Indian women aged 15-49 who are anaemic — NFHS-5" },
+        { "value": "97", "label": "India's MMR per lakh live births — SDG target is below 70 by 2030" },
+        { "value": "919", "label": "Girls per 1000 boys in 0-6 age group — Census 2011 child sex ratio" }
+      ],
+      "timeline": [
+        { "year": "1994", "event": "PCPNDT Act bans sex-selective abortion — important but enforcement weak", "type": "positive" },
+        { "year": "2005", "event": "NFHS-3: MMR at 254, institutional delivery at 39% — starting point of reform", "type": "negative" },
+        { "year": "2015", "event": "Beti Bachao Beti Padhao launched — targets child sex ratio improvement", "type": "positive" },
+        { "year": "2019-21", "event": "NFHS-5: MMR at 97, institutional delivery at 89% — but anaemia worsens to 57%", "type": "neutral" },
+        { "year": "2030", "event": "SDG target: MMR below 70 per lakh live births — achievable but requires acceleration", "type": "neutral" }
+      ]
+    },
+    {
+      "type": "ssb_application",
+      "title": "Use this in SSB",
+      "pi_question": "What are India's biggest women's health challenges?",
+      "gd_line": "India has made genuine progress on maternal mortality and institutional delivery — but anaemia worsened in the same decade. We improved the infrastructure of health while neglecting the nutrition ecosystem. A healthy woman is not a government scheme — she is a development outcome.",
+      "lecturette_structure": [
+        "Open: India is missing 63 million women — Amartya Sen's most uncomfortable statistic.",
+        "Four crises: Maternal mortality (improving), anaemia (worsening), sex-selective practices, malnutrition cycle",
+        "Progress: MMR halved, institutional delivery at 89% — real achievements",
+        "Failure: Anaemia at 57% and worsening — a nutrition policy failure",
+        "Close: SDG 2030 target for MMR — achievable. Anaemia reversal — urgent priority."
+      ],
+      "pi_answer": "Sir, India's women's health challenges are complex and uneven. On maternal mortality, India has made significant progress — MMR fell from 254 to 97 per lakh live births over 15 years. But the anaemia crisis has worsened — 57% of women aged 15-49 are anaemic as per NFHS-5, up from 53% in the previous survey. The 'missing women' phenomenon — 63 million statistically absent due to sex selection and differential neglect — represents decades of accumulated gender bias in health decisions. The way forward requires treating women's health as more than maternal health — nutrition, mental health, menstrual hygiene, and equal access to family health resources all need policy attention.",
+      "one_liner": "India saved millions of mothers from dying in childbirth — then let them waste away from hunger. Progress is real. But it is partial."
+    },
+    {
+      "type": "quiz",
+      "title": "Test yourself",
+      "questions": [
+        {
+          "q": "India's Maternal Mortality Ratio fell from 254 to 97 in 15 years. Can we say India's women's health crisis is resolved?",
+          "options": [
+            "Yes — the improvement is clear and the crisis is over",
+            "No — MMR improved but anaemia worsened (53% to 57%), child sex ratio remains skewed, and 63 million women are statistically missing. Partial progress is not resolved.",
+            "The data is unreliable so no conclusion is possible"
+          ],
+          "correct": 1,
+          "explanation": "Acknowledging genuine progress while identifying remaining gaps is the officer's analytical approach. Celebrating progress uncritically is as misleading as dismissing it entirely."
+        },
+        {
+          "q": "What are 'missing women' as described by Amartya Sen?",
+          "options": [
+            "Women who have migrated abroad from India",
+            "The statistical gap between expected and actual female population — caused by sex-selective abortions, female infanticide, and differential neglect of girls' health",
+            "Women who are unemployed and not counted in labour statistics"
+          ],
+          "correct": 1,
+          "explanation": "Amartya Sen's 'missing women' concept is a fundamental piece of gender economics — knowing this term immediately signals depth of preparation to a PI board."
+        }
+      ]
+    }
+  ]
+}

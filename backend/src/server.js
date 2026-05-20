@@ -471,6 +471,33 @@ REER|Rupee's value adjusted for inflation — the real exchange rate
         reading_time: '4 min',
         difficulty: 'Beginner',
       },
+      {
+        slug: 'women-safety-economy',
+        title: 'Safety Is an Economic Problem',
+        category: 'socio-cultural',
+        summary: "An unsafe city doesn't just endanger women — it locks them out of the economy. The direct link between women's safety, workforce participation, and India's GDP.",
+        tags: ['women-safety', 'nirbhaya-fund', 'POCSO', 'safe-cities', 'POSH-act'],
+        reading_time: '5 min',
+        difficulty: 'Beginner',
+      },
+      {
+        slug: 'women-education-gap',
+        title: "Education's Broken Promise",
+        category: 'socio-cultural',
+        summary: "Girls are enrolling in schools at record rates. Then they disappear before Class 10. The education-to-employment pipeline for women in India — where it works and where it breaks.",
+        tags: ['female-education', 'dropout-rate', 'STEM-gender-gap', 'NEP-2020', 'child-marriage'],
+        reading_time: '4 min',
+        difficulty: 'Beginner',
+      },
+      {
+        slug: 'women-health-india',
+        title: 'The Health Silence',
+        category: 'socio-cultural',
+        summary: "India loses a woman every 2 minutes to preventable causes. Maternal mortality, anaemia, malnutrition, and missing women — the health crisis nobody talks about loudly enough.",
+        tags: ['maternal-mortality', 'anaemia', 'missing-women', 'sex-ratio', 'women-health'],
+        reading_time: '5 min',
+        difficulty: 'Beginner',
+      },
     ];
     for (const art of womenSeries) {
       const { rows: exists } = await pool.query('SELECT id FROM articles WHERE slug = $1 LIMIT 1', [art.slug]);

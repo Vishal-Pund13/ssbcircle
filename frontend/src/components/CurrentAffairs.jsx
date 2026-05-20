@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { Shield, TrendingUp, Landmark, Map, Users, ArrowLeft, Calendar, Tag, ChevronRight, BookOpen, Clock, BarChart2 } from 'lucide-react';
+import { Shield, TrendingUp, Landmark, Map, Users, ArrowLeft, Calendar, Tag, ChevronRight, BookOpen, Clock, BarChart2, ArrowRight, CheckCircle } from 'lucide-react';
 import { getArticles, getArticle } from '../services/api';
 import ArticleRenderer from './ArticleRenderer';
 
@@ -10,8 +10,76 @@ const PILLARS = [
   { id: 'economic',       label: 'Economic',           icon: TrendingUp },
   { id: 'polity',         label: 'Polity',             icon: Landmark   },
   { id: 'geographic',     label: 'Geographic',         icon: Map        },
-  { id: 'socio-cultural', label: 'Socio-Cultural',     icon: Users      },
+  { id: 'socio-cultural', label: 'Society',            icon: Users      },
 ];
+
+const WOMEN_SLUGS = new Set([
+  'women-workforce-paradox', 'women-proxy-representation', 'women-glass-ceiling',
+  'women-gender-pay-gap', 'women-safety-economy', 'women-education-gap', 'women-health-india',
+]);
+
+function WomenSeriesBanner() {
+  const navigate = useNavigate();
+  let read = 0;
+  try { read = JSON.parse(localStorage.getItem('series_women_india_read') || '[]').length; } catch {}
+  return (
+    <div className="col-span-full bg-brand-600 rounded-2xl overflow-hidden cursor-pointer group relative"
+      onClick={() => navigate('/series/women-india')}>
+      {/* Dot pattern */}
+      <div className="absolute inset-0 opacity-10 pointer-events-none"
+        style={{ backgroundImage: 'radial-gradient(circle, rgba(255,255,255,0.9) 1px, transparent 1px)', backgroundSize: '20px 20px' }}/>
+
+      <div className="relative z-10 p-5 sm:p-6 flex flex-col sm:flex-row items-start sm:items-center gap-5">
+        {/* Woman mini-SVG */}
+        <div className="shrink-0 w-16 h-16 bg-white/15 border border-white/25 rounded-2xl flex items-center justify-center">
+          <svg viewBox="0 0 48 48" fill="none" className="w-10 h-10">
+            {/* Head */}
+            <circle cx="24" cy="12" r="7" fill="rgba(255,255,255,0.25)" stroke="rgba(255,255,255,0.6)" strokeWidth="1.5"/>
+            {/* Body */}
+            <path d="M15 26 Q24 21 33 26 L36 42 L12 42Z" fill="rgba(255,255,255,0.18)" stroke="rgba(255,255,255,0.45)" strokeWidth="1.2" strokeLinejoin="round"/>
+            {/* Raised arm */}
+            <path d="M33 26 Q40 20 43 14" stroke="rgba(255,255,255,0.7)" strokeWidth="2.5" strokeLinecap="round"/>
+            <circle cx="43" cy="13" r="4" fill="rgba(255,255,255,0.3)" stroke="rgba(255,255,255,0.6)" strokeWidth="1.5"/>
+            {/* Background rings */}
+            <circle cx="24" cy="24" r="22" stroke="rgba(255,255,255,0.12)" strokeWidth="1"/>
+            <circle cx="24" cy="24" r="15" stroke="rgba(255,255,255,0.1)" strokeWidth="1"/>
+          </svg>
+        </div>
+
+        {/* Text */}
+        <div className="flex-1 min-w-0">
+          <div className="flex items-center gap-2 mb-1.5">
+            <span className="text-[9px] font-bold text-brand-100 bg-white/15 border border-white/20 px-2 py-0.5 rounded-full uppercase tracking-widest">
+              Society · Women
+            </span>
+            <span className="text-[9px] font-bold text-brand-100 bg-white/15 border border-white/20 px-2 py-0.5 rounded-full uppercase tracking-widest">
+              7-Card Series
+            </span>
+          </div>
+          <h3 className="text-base sm:text-lg font-bold text-white leading-snug mb-1">
+            Major Issues Faced by Women in India
+          </h3>
+          <p className="text-xs text-brand-100 leading-relaxed">
+            7 swipe cards — Workforce paradox · Glass ceiling · Pay gap · Safety · Education · Health · Political power
+          </p>
+          {read > 0 && (
+            <div className="mt-2 flex items-center gap-2">
+              <div className="h-1.5 w-24 bg-white/20 rounded-full overflow-hidden">
+                <div className="h-full bg-white rounded-full" style={{ width: `${(read / 7) * 100}%` }} />
+              </div>
+              <span className="text-[10px] text-brand-100 font-semibold">{read}/7 read</span>
+            </div>
+          )}
+        </div>
+
+        {/* CTA */}
+        <button className="shrink-0 flex items-center gap-1.5 bg-white text-brand-700 font-bold text-xs px-4 py-2 rounded-xl group-hover:bg-brand-50 transition-colors">
+          {read === 0 ? 'Start Series' : read === 7 ? 'Review Series' : 'Continue'} <ArrowRight className="w-3.5 h-3.5" />
+        </button>
+      </div>
+    </div>
+  );
+}
 
 function getPillar(id) { return PILLARS.find(p => p.id === id) || PILLARS[1]; }
 function fmtDate(d) {
@@ -55,6 +123,9 @@ const SWIPE_ARTICLES = {
   'women-proxy-representation': true,
   'women-glass-ceiling':        true,
   'women-gender-pay-gap':       true,
+  'women-safety-economy':       true,
+  'women-education-gap':        true,
+  'women-health-india':         true,
 };
 
 // Article card — same pattern as RoomCard in LandingPage
@@ -322,13 +393,48 @@ export default function CurrentAffairs() {
                 <p className="text-sm font-medium text-gray-600 mb-1">No articles yet in this category</p>
                 <p className="text-xs text-gray-400">Articles will appear here as they are published.</p>
               </div>
-            ) : (
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-                {articles.map(a => (
-                  <ArticleCard key={a.id} article={a} onClick={() => openArticle(a)} />
-                ))}
-              </div>
-            )}
+            ) : (() => {
+              const showSociety = pillar === 'all' || pillar === 'socio-cultural';
+              const womenArticles = articles.filter(a => WOMEN_SLUGS.has(a.slug || a.id));
+              const otherArticles = articles.filter(a => !WOMEN_SLUGS.has(a.slug || a.id));
+              return (
+                <div className="space-y-8">
+                  {/* Society → Women series banner */}
+                  {showSociety && womenArticles.length > 0 && (
+                    <div>
+                      <div className="flex items-center gap-3 mb-4">
+                        <div className="flex items-center gap-2">
+                          <Users className="w-4 h-4 text-brand-600" />
+                          <span className="text-xs font-bold text-brand-600 uppercase tracking-widest">Society</span>
+                        </div>
+                        <div className="h-px flex-1 bg-gray-100" />
+                        <span className="text-[10px] text-gray-400 font-medium">Women · 7 cards</span>
+                      </div>
+                      <div className="grid grid-cols-1 gap-4">
+                        <WomenSeriesBanner />
+                      </div>
+                    </div>
+                  )}
+
+                  {/* All other articles */}
+                  {otherArticles.length > 0 && (
+                    <div>
+                      {showSociety && womenArticles.length > 0 && (
+                        <div className="flex items-center gap-3 mb-4">
+                          <span className="text-xs font-bold text-gray-400 uppercase tracking-widest">Other Cards</span>
+                          <div className="h-px flex-1 bg-gray-100" />
+                        </div>
+                      )}
+                      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                        {otherArticles.map(a => (
+                          <ArticleCard key={a.id} article={a} onClick={() => openArticle(a)} />
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                </div>
+              );
+            })()}
           </section>
         </>
       )}

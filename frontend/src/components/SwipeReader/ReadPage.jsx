@@ -6,14 +6,20 @@ import womenWorkforceData    from '../../data/articles/women-workforce-paradox.j
 import womenProxyData        from '../../data/articles/women-proxy-representation.json';
 import womenGlassCeilingData from '../../data/articles/women-glass-ceiling.json';
 import womenPayGapData       from '../../data/articles/women-gender-pay-gap.json';
+import womenSafetyData       from '../../data/articles/women-safety-economy.json';
+import womenEducationData    from '../../data/articles/women-education-gap.json';
+import womenHealthData       from '../../data/articles/women-health-india.json';
 
 const ARTICLES = {
-  'rupee-depreciation':       rupeeData,
-  'super-el-nino':            elNinoData,
-  'women-workforce-paradox':  womenWorkforceData,
+  'rupee-depreciation':         rupeeData,
+  'super-el-nino':              elNinoData,
+  'women-workforce-paradox':    womenWorkforceData,
   'women-proxy-representation': womenProxyData,
-  'women-glass-ceiling':      womenGlassCeilingData,
-  'women-gender-pay-gap':     womenPayGapData,
+  'women-glass-ceiling':        womenGlassCeilingData,
+  'women-gender-pay-gap':       womenPayGapData,
+  'women-safety-economy':       womenSafetyData,
+  'women-education-gap':        womenEducationData,
+  'women-health-india':         womenHealthData,
 };
 
 export default function ReadPage() {
