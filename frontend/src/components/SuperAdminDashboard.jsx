@@ -428,6 +428,9 @@ export default function SuperAdminDashboard() {
           <button onClick={fetchAll} className="p-1.5 rounded-lg text-gray-400 hover:text-gray-600 hover:bg-gray-100 transition-colors cursor-pointer">
             <RefreshCw className="w-4 h-4"/>
           </button>
+          <a href="/sa/export" className="flex items-center gap-1.5 text-xs font-semibold text-brand-600 bg-brand-50 hover:bg-brand-100 border border-brand-100 px-3 py-1.5 rounded-lg transition-colors">
+            📤 Export Cards
+          </a>
           <button onClick={handleLogout} className="flex items-center gap-1.5 text-xs text-gray-400 hover:text-red-500 transition-colors cursor-pointer px-2 py-1.5">
             <LogOut className="w-3.5 h-3.5"/> Sign out
           </button>

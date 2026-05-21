@@ -13,6 +13,7 @@ const JoinRoom            = lazy(() => import('./components/JoinRoom'));
 const RoomView            = lazy(() => import('./components/RoomView'));
 const SuperAdminLogin     = lazy(() => import('./components/SuperAdminLogin'));
 const SuperAdminDashboard = lazy(() => import('./components/SuperAdminDashboard'));
+const ExportCards         = lazy(() => import('./components/ExportCards'));
 const CurrentAffairs      = lazy(() => import('./components/CurrentAffairs'));
 const ReadPage            = lazy(() => import('./components/SwipeReader/ReadPage'));
 const WomenSeriesPage     = lazy(() => import('./components/WomenSeriesPage'));
@@ -44,6 +45,7 @@ export default function App() {
             <Route path="/series/women-india"     element={<WomenSeriesPage />} />
             <Route path="/sa"           element={<SuperAdminLogin />} />
             <Route path="/sa/dashboard" element={<SuperAdminDashboard />} />
+            <Route path="/sa/export"    element={<ExportCards />} />
             <Route path="*" element={<Navigate to="/" replace />} />
           </Routes>
         </Suspense>
