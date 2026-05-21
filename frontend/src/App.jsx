@@ -1,5 +1,12 @@
-import { lazy, Suspense } from 'react';
-import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
+import { lazy, Suspense, useEffect } from 'react';
+import { BrowserRouter, Routes, Route, Navigate, useLocation } from 'react-router-dom';
+import { trackPageView } from './analytics';
+
+function RouteTracker() {
+  const location = useLocation();
+  useEffect(() => { trackPageView(location.pathname); }, [location]);
+  return null;
+}
 import { AuthProvider } from './context/AuthContext';
 import ProtectedRoute from './components/ProtectedRoute';
 import LandingPage from './components/LandingPage';
@@ -31,6 +38,7 @@ export default function App() {
     <AuthProvider>
       <BrowserRouter>
         <Suspense fallback={<PageLoader />}>
+          <RouteTracker />
           <Routes>
             <Route path="/"        element={<LandingPage />} />
             <Route path="/login"   element={<LoginPage />} />
