@@ -43,7 +43,7 @@ router.post('/', authMiddleware, createRoomLimiter, async (req, res) => {
     if (subcategory && category === 'GD' && !GD_SUBCATEGORIES.includes(subcategory))
       return res.status(400).json({ error: 'Invalid subcategory' });
 
-    const maxP = Math.min(8, Math.max(2, parseInt(max_participants) || 8));
+    const maxP = Math.min(20, Math.max(2, parseInt(max_participants) || 8));
 
     // One active room per user
     const { rows: existing } = await pool.query(
@@ -153,7 +153,7 @@ router.get('/:code/token', authMiddleware, async (req, res) => {
     // Enforce max participant limit (host can always join)
     if (!isModerator) {
       const participants = await lkService().listParticipants(room.jitsi_room_name).catch(() => []);
-      if (participants.length >= (room.max_participants || 8)) {
+      if (participants.length >= (room.max_participants || 20)) {
         return res.status(403).json({ error: 'Room is full', full: true });
       }
     }

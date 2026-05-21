@@ -52,7 +52,7 @@ export default function CreateRoom() {
   const [description,     setDescription]     = useState('');
   const [category,        setCategory]        = useState('GD');
   const [subcategory,     setSubcategory]     = useState('');
-  const [maxParticipants, setMaxParticipants] = useState(8);
+  const [maxParticipants, setMaxParticipants] = useState(10);
   const [platformLimit,   setPlatformLimit]   = useState(false);
   const [sessionLimit,    setSessionLimit]    = useState(false);
   const [loading,         setLoading]         = useState(false);
@@ -496,7 +496,7 @@ export default function CreateRoom() {
                   Max participants: <span className="text-brand-600">{maxParticipants}</span>
                 </label>
                 <div className="flex gap-2">
-                  {[4,5,6,7,8].map(n => (
+                  {[5,8,10,15,20].map(n => (
                     <button key={n} type="button"
                       onClick={() => setMaxParticipants(n)}
                       className={`w-9 h-9 rounded-lg text-sm font-semibold border transition-all cursor-pointer ${maxParticipants === n ? 'bg-brand-600 text-white border-brand-600' : 'bg-white text-gray-600 border-gray-200 hover:border-brand-300'}`}>
@@ -504,7 +504,7 @@ export default function CreateRoom() {
                     </button>
                   ))}
                 </div>
-                <p className="text-[11px] text-gray-400 mt-1.5">SSB GD panels typically have 5–8 participants</p>
+                <p className="text-[11px] text-gray-400 mt-1.5">SSB GD panels: 5–8 · Batch sessions: up to 20</p>
               </div>
             )}
 
