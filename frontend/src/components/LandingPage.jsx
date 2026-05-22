@@ -680,7 +680,7 @@ function SpecialEventBanner() {
               </span>
               <span className="w-1 h-1 rounded-full bg-gray-300" />
               <span className="flex items-center gap-1.5 text-[11px] text-gray-500 font-medium">
-                <Users className="w-3 h-3" /> 30 seats · Free
+                <Users className="w-3 h-3" /> Limited seats · Free
               </span>
             </div>
           </div>
