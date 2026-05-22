@@ -211,4 +211,67 @@ async function sendHostStartReminder({ to, name, topic, category, scheduled_at }
   return resend.emails.send({ from: FROM, to, subject: `Start now: ${topic}`, html: baseTemplate({ label: 'Time to Start', body }) });
 }
 
-module.exports = { sendInterestConfirmation, sendReminder, sendRoomLive, sendHostStartReminder };
+// ── Event registration emails ─────────────────────────────────────────────────
+
+async function sendEventConfirmation(to, name) {
+  const body = `
+    <p style="font-size:15px;font-weight:700;color:#111827;margin:0 0 8px;">You're in, ${name}! 🎉</p>
+    <p style="font-size:14px;color:#374151;line-height:1.7;margin:0 0 24px;">
+      You've successfully registered for the <strong>Session by a Recommended Candidate</strong> on SSBCircle.
+      A recommended candidate will share real insights, experiences, and tips to help you crack SSB.
+    </p>
+
+    <table cellpadding="0" cellspacing="0" border="0" width="100%"
+      style="background:#f0f4ff;border:1px solid #c7d2fe;border-radius:10px;padding:20px;margin-bottom:24px;">
+      <tr>
+        <td>
+          <p style="font-size:11px;font-weight:700;color:#1e3a5f;text-transform:uppercase;letter-spacing:0.08em;margin:0 0 12px;">Session Details</p>
+          <table cellpadding="0" cellspacing="0" border="0" width="100%">
+            ${infoRow('Date',    '23 May 2026 (Friday)')}
+            ${infoRow('Time',    '10:00 PM IST')}
+            ${infoRow('Format',  'Live Interactive Session on SSBCircle')}
+            ${infoRow('For',     'Indian Army &amp; Indian Air Force aspirants')}
+          </table>
+        </td>
+      </tr>
+    </table>
+
+    <p style="font-size:14px;color:#374151;line-height:1.7;margin:0 0 20px;">
+      We'll send you a <strong>reminder 30 minutes before</strong> the session starts. The room link will be available on SSBCircle — just log in and join.
+    </p>
+    ${ctaButton('Visit SSBCircle', 'https://www.ssbcircle.com')}
+    <p style="font-size:12px;color:#9ca3af;margin:20px 0 0;">
+      Questions? Reply to this email and we'll help you out.
+    </p>`;
+  return resend.emails.send({
+    from: FROM, to,
+    subject: "You're registered! Session by a Recommended Candidate — 23 May, 10 PM IST",
+    html: baseTemplate({ label: 'Registration Confirmed ✓', body }),
+  });
+}
+
+async function sendEventReminder(to, name, scheduledAt) {
+  const body = `
+    <p style="font-size:15px;font-weight:700;color:#111827;margin:0 0 8px;">Starting in 30 minutes, ${name}!</p>
+    <p style="font-size:14px;color:#374151;line-height:1.7;margin:0 0 24px;">
+      The <strong>Session by a Recommended Candidate</strong> goes live in 30 minutes.
+      Head to SSBCircle and look for the live room — it will be pinned at the top.
+    </p>
+    <table cellpadding="0" cellspacing="0" border="0" width="100%"
+      style="background:#fef9c3;border:1px solid #fde047;border-radius:10px;padding:16px 20px;margin-bottom:24px;">
+      <tr>
+        <td style="font-size:14px;font-weight:700;color:#92400e;">
+          ⏰ Join by 10:00 PM IST — Limited to 30 participants
+        </td>
+      </tr>
+    </table>
+    ${ctaButton('Join the Session Now', 'https://www.ssbcircle.com')}`;
+  return resend.emails.send({
+    from: FROM, to,
+    subject: "Starting in 30 mins! Session by a Recommended Candidate 🎯",
+    html: baseTemplate({ label: 'Starting Soon', body }),
+    scheduledAt,
+  });
+}
+
+module.exports = { sendInterestConfirmation, sendReminder, sendRoomLive, sendHostStartReminder, sendEventConfirmation, sendEventReminder };

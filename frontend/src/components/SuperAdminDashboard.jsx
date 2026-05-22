@@ -277,9 +277,10 @@ export default function SuperAdminDashboard() {
   const [rooms,    setRooms]    = useState([]);
   const [users,    setUsers]    = useState([]);
   const [sessions, setSessions] = useState([]);
-  const [reports,  setReports]  = useState([]);
-  const [articles, setArticles] = useState([]);
-  const [tab,      setTab]      = useState('reports');
+  const [reports,       setReports]       = useState([]);
+  const [articles,      setArticles]      = useState([]);
+  const [registrations, setRegistrations] = useState([]);
+  const [tab,           setTab]           = useState('reports');
   const [articleForm, setArticleForm] = useState(null);
   const [loading,  setLoading]  = useState(true);
   const [error,    setError]    = useState('');
@@ -296,17 +297,19 @@ export default function SuperAdminDashboard() {
       if (sRes.status === 401 || sRes.status === 403) {
         sessionStorage.removeItem('sa_token'); navigate('/sa'); return;
       }
-      const [repRes, artRes] = await Promise.all([
-        fetch(`${API}/api/admin/reports`,  { headers: authHeaders() }),
-        fetch(`${API}/api/admin/articles`, { headers: authHeaders() }),
+      const [repRes, artRes, regRes] = await Promise.all([
+        fetch(`${API}/api/admin/reports`,              { headers: authHeaders() }),
+        fetch(`${API}/api/admin/articles`,             { headers: authHeaders() }),
+        fetch(`${API}/api/admin/event-registrations`,  { headers: authHeaders() }),
       ]);
-      const [s, r, u, ss, rep, art] = await Promise.all([sRes.json(), rRes.json(), uRes.json(), ssRes.json(), repRes.json(), artRes.json()]);
+      const [s, r, u, ss, rep, art, reg] = await Promise.all([sRes.json(), rRes.json(), uRes.json(), ssRes.json(), repRes.json(), artRes.json(), regRes.json()]);
       setStats(s);
       setRooms(r.rooms || []);
       setUsers(u.users || []);
       setSessions(ss.sessions || []);
       setReports(rep.reports || []);
       setArticles(art.articles || []);
+      setRegistrations(reg.registrations || []);
     } catch {
       setError('Failed to load data. Check your connection.');
     } finally {
@@ -393,11 +396,12 @@ export default function SuperAdminDashboard() {
 
   const pendingReports = reports.filter(r => r.status === 'pending').length;
   const TABS = [
-    { id: 'reports',  label: 'Reports',  count: pendingReports, alert: pendingReports > 0 },
-    { id: 'articles', label: 'Articles', count: articles.length },
-    { id: 'rooms',    label: 'Rooms',    count: rooms.length },
-    { id: 'sessions', label: 'Sessions', count: sessions.length },
-    { id: 'users',    label: 'Users',    count: users.length },
+    { id: 'reports',       label: 'Reports',       count: pendingReports,        alert: pendingReports > 0 },
+    { id: 'registrations', label: 'Registrations', count: registrations.length,  alert: registrations.length > 0 },
+    { id: 'articles',      label: 'Articles',      count: articles.length },
+    { id: 'rooms',         label: 'Rooms',         count: rooms.length },
+    { id: 'sessions',      label: 'Sessions',      count: sessions.length },
+    { id: 'users',         label: 'Users',         count: users.length },
   ];
 
   const STAT_CARDS = [
@@ -633,6 +637,63 @@ export default function SuperAdminDashboard() {
                 </div>
               </>
             )}
+          </div>
+        )}
+
+        {/* ── Event Registrations ── */}
+        {tab === 'registrations' && (
+          <div className="bg-white border border-gray-200 rounded-xl overflow-hidden">
+            <div className="px-4 py-3 border-b border-gray-100 flex items-center justify-between">
+              <p className="text-sm font-semibold text-gray-900">Session Registrations — 23 May 2026</p>
+              <span className="text-xs font-bold text-brand-600 bg-brand-50 border border-brand-100 px-2.5 py-1 rounded-full">
+                {registrations.length} / 30 registered
+              </span>
+            </div>
+            <div className="overflow-x-auto">
+              <table className="w-full text-sm">
+                <thead>
+                  <tr className="border-b border-gray-100 bg-gray-50 text-left">
+                    <th className="px-4 py-3 text-[11px] font-semibold text-gray-500 uppercase tracking-wide">Name</th>
+                    <th className="px-4 py-3 text-[11px] font-semibold text-gray-500 uppercase tracking-wide">Email</th>
+                    <th className="px-4 py-3 text-[11px] font-semibold text-gray-500 uppercase tracking-wide hidden sm:table-cell">Entry</th>
+                    <th className="px-4 py-3 text-[11px] font-semibold text-gray-500 uppercase tracking-wide hidden sm:table-cell">Attempts</th>
+                    <th className="px-4 py-3 text-[11px] font-semibold text-gray-500 uppercase tracking-wide hidden md:table-cell">Prev Rec.</th>
+                    <th className="px-4 py-3 text-[11px] font-semibold text-gray-500 uppercase tracking-wide hidden md:table-cell">Registered</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-gray-50">
+                  {loading ? (
+                    Array.from({ length: 4 }).map((_, i) => (
+                      <tr key={i} className="animate-pulse">
+                        {Array.from({ length: 6 }).map((_, j) => (
+                          <td key={j} className="px-4 py-3"><div className="h-4 bg-gray-100 rounded w-24" /></td>
+                        ))}
+                      </tr>
+                    ))
+                  ) : registrations.length === 0 ? (
+                    <tr><td colSpan={6} className="px-4 py-8 text-center text-sm text-gray-400">No registrations yet</td></tr>
+                  ) : registrations.map((r, i) => (
+                    <tr key={r.id} className="hover:bg-gray-50 transition-colors">
+                      <td className="px-4 py-3">
+                        <div className="flex items-center gap-2">
+                          <div className="w-6 h-6 rounded-full bg-brand-50 border border-brand-100 flex items-center justify-center text-[10px] font-bold text-brand-600 shrink-0">
+                            {i + 1}
+                          </div>
+                          <span className="font-medium text-gray-900 text-sm">{r.name}</span>
+                        </div>
+                      </td>
+                      <td className="px-4 py-3 text-xs text-gray-500">{r.email}</td>
+                      <td className="px-4 py-3 hidden sm:table-cell">
+                        <span className="text-[11px] font-semibold px-2 py-0.5 rounded-full bg-brand-50 text-brand-700">{r.entry_type || '—'}</span>
+                      </td>
+                      <td className="px-4 py-3 hidden sm:table-cell text-sm text-gray-700 font-medium">{r.attempts ?? '—'}</td>
+                      <td className="px-4 py-3 hidden md:table-cell text-xs text-gray-500">{r.prev_recommendation || '—'}</td>
+                      <td className="px-4 py-3 hidden md:table-cell text-xs text-gray-400">{timeAgo(r.registered_at)}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
           </div>
         )}
 

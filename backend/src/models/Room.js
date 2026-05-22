@@ -50,7 +50,7 @@ async function createRoom(title, description, category, subcategory, userId, dis
 
 async function createRoomWithCode(roomCode, title, description, category, subcategory, userId, displayName, maxParticipants = 8, articleSlug = null) {
   const jitsiRoomName = `SSBCircle_${roomCode}`;
-  const max = Math.min(20, Math.max(4, parseInt(maxParticipants) || 8));
+  const max = Math.min(30, Math.max(4, parseInt(maxParticipants) || 8));
   const { rows } = await pool.query(
     `INSERT INTO rooms (topic, description, category, subcategory, room_code, jitsi_room_name, created_by, admin_username, max_participants, article_slug)
      VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10) RETURNING *`,

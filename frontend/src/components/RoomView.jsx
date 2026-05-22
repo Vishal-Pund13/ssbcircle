@@ -1082,7 +1082,7 @@ export default function RoomView() {
         <LiveKitRoom
           token={token}
           serverUrl={livekitUrl}
-          connect audio video={false}
+          connect audio={false} video={false}
           onDisconnected={handleLeave}
           className="flex-1 flex flex-col overflow-hidden"
         >

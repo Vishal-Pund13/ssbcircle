@@ -324,4 +324,17 @@ router.delete('/articles/:id', adminGuard, async (req, res) => {
   }
 });
 
+// Event registrations
+router.get('/event-registrations', adminGuard, async (_req, res) => {
+  try {
+    const { rows } = await pool.query(
+      `SELECT id, name, email, phone, entry_type, attempts, prev_recommendation, registered_at
+       FROM event_registrations ORDER BY registered_at DESC`
+    );
+    res.json({ registrations: rows });
+  } catch (err) {
+    res.status(500).json({ error: 'Failed to fetch registrations' });
+  }
+});
+
 module.exports = router;

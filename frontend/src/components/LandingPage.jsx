@@ -640,19 +640,14 @@ function SpecialEventBanner() {
 
         <div className="rounded-2xl border border-brand-100 bg-brand-50 px-5 sm:px-7 py-5 sm:py-6 flex flex-col sm:flex-row items-start sm:items-center gap-5 sm:gap-8">
 
-          {/* Author avatar */}
+          {/* Avatar */}
           <div className="shrink-0 flex flex-row sm:flex-col items-center gap-3 sm:gap-2 w-full sm:w-auto">
-            {AUTHOR_PHOTO ? (
-              <img src={AUTHOR_PHOTO} alt="Deepak Surana"
-                className="w-14 h-14 sm:w-16 sm:h-16 rounded-full object-cover ring-2 ring-brand-200" />
-            ) : (
-              <div className="w-14 h-14 sm:w-16 sm:h-16 rounded-full bg-brand-600 flex items-center justify-center shrink-0 ring-2 ring-brand-200">
-                <span className="text-lg font-bold text-white">DS</span>
-              </div>
-            )}
+            <div className="w-14 h-14 sm:w-16 sm:h-16 rounded-full bg-brand-600 flex items-center justify-center shrink-0 ring-2 ring-brand-200">
+              <Star className="w-7 h-7 text-white" />
+            </div>
             <div className="sm:hidden">
-              <p className="text-sm font-bold text-gray-900">Deepak Surana</p>
-              <p className="text-xs text-gray-500 italic">The Shershah of Kargil</p>
+              <p className="text-sm font-bold text-gray-900">Vishal</p>
+              <p className="text-xs text-gray-500">Recommended Candidate</p>
             </div>
           </div>
 
@@ -660,46 +655,42 @@ function SpecialEventBanner() {
           <div className="flex-1 min-w-0">
             <div className="inline-flex items-center gap-1.5 bg-brand-100 text-brand-600 text-[10px] font-bold px-2.5 py-0.5 rounded-full mb-2 tracking-widest uppercase">
               <span className="w-1.5 h-1.5 rounded-full bg-brand-600 animate-pulse shrink-0" />
-              Special Event
+              Live Session · 23 May
             </div>
             <h2 className="text-gray-900 text-base sm:text-lg font-bold leading-snug mb-0.5">
-              In Conversation with <span className="text-brand-600">Deepak Surana</span>
+              In conversation with <span className="text-brand-600">Vishal</span>
             </h2>
-            <p className="text-gray-500 text-xs sm:text-sm mb-3">
-              Author · <span className="italic">The Shershah of Kargil</span> · Credited in <span className="font-semibold text-gray-700">Shershaah</span>
+            <p className="text-gray-500 text-xs sm:text-sm mb-4">
+              Recommended Candidate · Real insights · Real SSB experience
             </p>
 
-            {/* Book covers */}
-            <div className="flex items-end gap-2.5 overflow-x-auto pb-0.5 scrollbar-hide mb-3">
-              {DEEPAK_BOOKS.map(book => (
-                <a key={book.title} href={book.link} target="_blank" rel="noopener noreferrer"
-                  className="shrink-0 group" title={book.title}>
-                  <img
-                    src={book.cover}
-                    alt={book.title}
-                    className="h-14 sm:h-16 w-auto rounded-md shadow-sm border border-gray-100 group-hover:scale-105 group-hover:shadow-md transition-all duration-200 object-cover cursor-pointer"
-                  />
-                </a>
-              ))}
+            {/* Service badges */}
+            <div className="flex items-center gap-2 mb-4">
+              <span className="flex items-center gap-1.5 text-[11px] font-semibold text-brand-700 bg-white border border-brand-100 px-3 py-1.5 rounded-lg">
+                <Shield className="w-3.5 h-3.5 text-brand-500" /> Indian Army
+              </span>
+              <span className="flex items-center gap-1.5 text-[11px] font-semibold text-brand-700 bg-white border border-brand-100 px-3 py-1.5 rounded-lg">
+                <Shield className="w-3.5 h-3.5 text-brand-500" /> Indian Air Force
+              </span>
             </div>
 
             <div className="flex items-center gap-3 flex-wrap">
               <span className="flex items-center gap-1.5 text-[11px] text-gray-500 font-medium">
-                <Calendar className="w-3 h-3" /> Coming Soon
+                <Calendar className="w-3 h-3" /> 23 May 2026 · 10:00 PM IST
               </span>
               <span className="w-1 h-1 rounded-full bg-gray-300" />
               <span className="flex items-center gap-1.5 text-[11px] text-gray-500 font-medium">
-                <Users className="w-3 h-3" /> 75 seats · Free
+                <Users className="w-3 h-3" /> 30 seats · Free
               </span>
             </div>
           </div>
 
           {/* CTA */}
           <div className="shrink-0 flex flex-col items-center gap-1.5 w-full sm:w-auto">
-            <button className="btn-primary text-sm px-5 py-2.5 w-full sm:w-auto text-center whitespace-nowrap">
-              Get Notified
-            </button>
-            <p className="text-gray-400 text-[10px]">Be first when slots open</p>
+            <Link to="/session" className="btn-primary text-sm px-5 py-2.5 w-full sm:w-auto text-center whitespace-nowrap flex items-center justify-center gap-2">
+              Register Now <ArrowRight className="w-4 h-4" />
+            </Link>
+            <p className="text-gray-400 text-[10px]">30 min reminder via email</p>
           </div>
 
         </div>
@@ -915,7 +906,7 @@ export default function LandingPage() {
       <main>
 
         {/* ── Special Event Banner ── */}
-        {/* <SpecialEventBanner /> */}
+        <SpecialEventBanner />
 
         {/* ── Hero ── */}
         <section className="border-b border-gray-100 py-10 sm:py-16 lg:py-20 px-4 sm:px-6">

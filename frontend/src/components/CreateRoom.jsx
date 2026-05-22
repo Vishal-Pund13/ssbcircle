@@ -496,7 +496,7 @@ export default function CreateRoom() {
                   Max participants: <span className="text-brand-600">{maxParticipants}</span>
                 </label>
                 <div className="flex gap-2">
-                  {[5,8,10,15,20].map(n => (
+                  {[5,8,10,15,20,30].map(n => (
                     <button key={n} type="button"
                       onClick={() => setMaxParticipants(n)}
                       className={`w-9 h-9 rounded-lg text-sm font-semibold border transition-all cursor-pointer ${maxParticipants === n ? 'bg-brand-600 text-white border-brand-600' : 'bg-white text-gray-600 border-gray-200 hover:border-brand-300'}`}>

@@ -3,7 +3,12 @@
     "allow": [
       "Bash(npm install *)",
       "WebSearch",
-      "WebFetch(domain:livekit.com)"
+      "WebFetch(domain:livekit.com)",
+      "Bash(Get-ChildItem -Path \"c:\\\\Users\\\\hp\\\\OneDrive\\\\Desktop\\\\talk4ssb\" -Recurse -Directory)",
+      "Bash(Select-Object -ExpandProperty FullName)",
+      "Bash(cat backend/.gitignore)",
+      "Bash(cat .gitignore)",
+      "Bash(node -e \"const rsm = require\\('./node_modules/react-simple-maps/dist/index.js'\\); console.log\\(Object.keys\\(rsm\\)\\);\")"
     ]
   }
 }

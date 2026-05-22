@@ -10,6 +10,7 @@ const authRouter     = require('./routes/auth');
 const adminRouter    = require('./routes/admin');
 const sessionsRouter = require('./routes/sessions');
 const articlesRouter = require('./routes/articles');
+const eventRouter    = require('./routes/event');
 const { startCleanup, runCleanup } = require('./cleanup');
 const { sendReminder, sendHostStartReminder } = require('./email');
 
@@ -54,6 +55,9 @@ app.use('/api/sessions', generalLimiter, sessionsRouter);
 
 // Articles (public read)
 app.use('/api/articles', generalLimiter, articlesRouter);
+
+// Event registration (public)
+app.use('/api/event', generalLimiter, eventRouter);
 
 // Report a user (any signed-in user)
 const authMw = require('./middleware/auth');
@@ -206,6 +210,21 @@ async function start() {
     await pool.query(`ALTER TABLE users ADD COLUMN IF NOT EXISTS is_banned BOOLEAN DEFAULT false`);
     await pool.query(`ALTER TABLE scheduled_sessions ADD COLUMN IF NOT EXISTS reminder_sent BOOLEAN DEFAULT false`);
     await pool.query(`ALTER TABLE scheduled_sessions ADD COLUMN IF NOT EXISTS host_reminder_sent BOOLEAN DEFAULT false`);
+    await pool.query(`
+      CREATE TABLE IF NOT EXISTS event_registrations (
+        id                  SERIAL PRIMARY KEY,
+        name                VARCHAR(100) NOT NULL,
+        email               VARCHAR(255) NOT NULL UNIQUE,
+        phone               VARCHAR(20),
+        entry_type          VARCHAR(60),
+        attempts            INT,
+        prev_recommendation VARCHAR(60),
+        registered_at       TIMESTAMPTZ DEFAULT NOW()
+      )
+    `);
+    await pool.query(`ALTER TABLE event_registrations ADD COLUMN IF NOT EXISTS entry_type          VARCHAR(60)`);
+    await pool.query(`ALTER TABLE event_registrations ADD COLUMN IF NOT EXISTS attempts            INT`);
+    await pool.query(`ALTER TABLE event_registrations ADD COLUMN IF NOT EXISTS prev_recommendation VARCHAR(60)`);
 
     await pool.query(`
       CREATE TABLE IF NOT EXISTS user_reports (
