@@ -1,9 +1,8 @@
 import { useEffect, useRef, useState, lazy, Suspense } from 'react';
 import { useNavigate, Link, useSearchParams } from 'react-router-dom';
-import { MENTORS } from '../data/mentors';
 import { getActiveRooms, closeRoom, getSessions, toggleInterest, cancelSession, startSession, getFeatured, getPastSessions } from '../services/api';
 import { useAuth } from '../context/AuthContext';
-import { Mic, Timer, FileText, CheckSquare, Radio, ArrowRight, Trash2, Zap, Lightbulb, Users, Presentation, Target, Headphones, RefreshCw, X, Calendar, Heart, PlayCircle, Share2, Check, Sparkles, ChevronDown, Shield, Star, Lock, BookOpen, Video, Award, ChevronRight, GraduationCap, ExternalLink, AlertTriangle, HeartHandshake } from 'lucide-react';
+import { Mic, Timer, FileText, CheckSquare, Radio, ArrowRight, Trash2, Zap, Lightbulb, Users, Presentation, Target, Headphones, RefreshCw, X, Calendar, Heart, PlayCircle, Share2, Check, Sparkles, ChevronDown, Shield, Star, Lock, BookOpen, Video, GraduationCap, ExternalLink, AlertTriangle, HeartHandshake } from 'lucide-react';
 
 // Lazy-loaded — keeps react-simple-maps out of the main bundle
 const HeroMapAnimation = lazy(() => import('./HeroMapAnimation'));
@@ -235,127 +234,6 @@ function timeAgo(dateStr) {
   return `${Math.floor(diff / 3600)}h ago`;
 }
 
-// ── Mentor credential card ────────────────────────────────────────────────────
-// Split layout: navy left panel (identity) + white right panel (content).
-// Clicking anywhere navigates to the full /mentor/:slug page.
-
-function MentorCard({ mentor }) {
-  const navigate = useNavigate();
-  return (
-    <div
-      onClick={() => navigate(`/mentor/${mentor.slug}`)}
-      className="flex rounded-2xl overflow-hidden border border-gray-200 hover:border-brand-600/25 hover:shadow-lg transition-all duration-200 cursor-pointer group"
-    >
-      {/* ── Left panel — navy credential strip ── */}
-      <div className="relative w-[96px] sm:w-[108px] shrink-0 bg-gradient-to-b from-brand-600 to-brand-700 flex flex-col items-center justify-center gap-3 py-6 overflow-hidden">
-        {/* Subtle dot texture */}
-        <div className="absolute inset-0 opacity-[0.07] pointer-events-none"
-          style={{ backgroundImage: 'radial-gradient(circle, #fff 1px, transparent 1px)', backgroundSize: '12px 12px' }} />
-
-        {/* Avatar */}
-        <div className="relative z-10 w-14 h-14 rounded-full bg-white/15 border-2 border-white/30 flex items-center justify-center text-white text-xl font-bold select-none group-hover:border-white/50 transition-all">
-          {mentor.avatarInitials}
-        </div>
-
-        {/* Branch label */}
-        <div className="relative z-10 text-center">
-          <p className="text-[9px] font-bold text-white/90 tracking-widest uppercase leading-tight">
-            {mentor.branch.replace('Indian ', '')}
-          </p>
-          <p className="text-[8px] text-white/50 tracking-wider uppercase mt-0.5">{mentor.dept}</p>
-        </div>
-
-        {/* Active indicator */}
-        {mentor.isActive && (
-          <div className="relative z-10 flex items-center gap-1">
-            <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
-            <span className="text-[9px] text-emerald-300 font-semibold">Active</span>
-          </div>
-        )}
-      </div>
-
-      {/* ── Right panel — white content ── */}
-      <div className="flex-1 min-w-0 bg-white p-4 sm:p-5 flex flex-col gap-2.5">
-
-        {/* Name + verified badge */}
-        <div className="flex items-start justify-between gap-2">
-          <div className="min-w-0">
-            <h3 className="text-sm sm:text-base font-bold text-gray-900 leading-snug group-hover:text-brand-600 transition-colors">
-              {mentor.name}
-            </h3>
-            <p className="text-[11px] text-gray-400 mt-0.5">{mentor.rank}</p>
-          </div>
-          <span className="shrink-0 flex items-center gap-1 text-[9px] font-bold text-sky-700 bg-sky-50 border border-sky-100 px-2 py-1 rounded-lg">
-            <Shield className="w-2.5 h-2.5" /> Verified
-          </span>
-        </div>
-
-        {/* Bio */}
-        <p className="text-xs text-gray-400 leading-relaxed line-clamp-2 flex-1">{mentor.bio}</p>
-
-        {/* Specialty chips */}
-        <div className="flex flex-wrap gap-1">
-          {mentor.specialties.slice(0, 3).map(tag => (
-            <span key={tag} className="text-[9px] font-semibold text-brand-600 bg-brand-50 px-2 py-0.5 rounded-full border border-brand-100">
-              {tag}
-            </span>
-          ))}
-        </div>
-
-        {/* Footer */}
-        <div className="flex items-center justify-between gap-2 pt-2 border-t border-gray-50 mt-auto">
-          <span className="flex items-center gap-1 text-[10px] text-gray-300">
-            <Award className="w-3 h-3 text-sky-300" /> {mentor.yearsOfService} service
-          </span>
-          <span className="flex items-center gap-0.5 text-[11px] font-semibold text-brand-600 group-hover:gap-1 transition-all">
-            View Profile <ChevronRight className="w-3 h-3" />
-          </span>
-        </div>
-      </div>
-    </div>
-  );
-}
-
-function MentorsSection() {
-  return (
-    <section className="border-t border-gray-100 bg-white py-10 sm:py-14 px-4 sm:px-6">
-      <div className="max-w-5xl mx-auto">
-
-        <div className="flex items-center justify-between mb-6">
-          <div>
-            <h2 className="text-xl sm:text-2xl font-bold text-gray-900">Mentors</h2>
-            <p className="text-sm text-gray-400 mt-0.5">Verified officers guiding SSB aspirants — hand-picked, limited seats</p>
-          </div>
-          <div className="flex items-center gap-1.5 text-[11px] font-semibold text-sky-700 bg-sky-50 border border-sky-100 px-3 py-1.5 rounded-full shrink-0">
-            <Shield className="w-3.5 h-3.5" /> Verified Service
-          </div>
-        </div>
-
-        {/* 2-column grid — credential cards are wider than article cards */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-3 sm:gap-4">
-          {MENTORS.map(mentor => (
-            <MentorCard key={mentor.id} mentor={mentor} />
-          ))}
-
-          {/* Placeholder card — same split layout, greyed out */}
-          <div className="flex rounded-2xl overflow-hidden border-2 border-dashed border-gray-100">
-            <div className="w-[96px] sm:w-[108px] shrink-0 bg-gray-50 flex flex-col items-center justify-center gap-2 py-6">
-              <div className="w-10 h-10 rounded-full bg-gray-100 flex items-center justify-center">
-                <Users className="w-4 h-4 text-gray-300" />
-              </div>
-              <p className="text-[8px] font-bold text-gray-300 uppercase tracking-widest text-center leading-tight">Soon</p>
-            </div>
-            <div className="flex-1 p-4 sm:p-5 flex flex-col justify-center gap-1">
-              <p className="text-sm font-semibold text-gray-300 leading-snug">More mentors joining</p>
-              <p className="text-xs text-gray-200 leading-relaxed">Army · Navy · Air Force<br />By invitation only</p>
-            </div>
-          </div>
-        </div>
-
-      </div>
-    </section>
-  );
-}
 
 // ── Ways to serve before the uniform ──────────────────────────────────────────
 // Real, verified organizations — every link checked against its official site.
@@ -1432,9 +1310,6 @@ export default function LandingPage() {
           </Suspense>
           <p className="text-xs text-gray-400 font-medium text-center px-4">Connecting aspirants across India</p>
         </div>
-
-        {/* ── Mentors ── */}
-        <MentorsSection />
 
         {/* ── Ways to serve before the uniform ── */}
         <ContributeSection />
