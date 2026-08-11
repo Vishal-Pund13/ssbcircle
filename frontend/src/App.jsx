@@ -25,6 +25,7 @@ const CurrentAffairs      = lazy(() => import('./components/CurrentAffairs'));
 const ReadPage            = lazy(() => import('./components/SwipeReader/ReadPage'));
 const WomenSeriesPage     = lazy(() => import('./components/WomenSeriesPage'));
 const SessionPage         = lazy(() => import('./components/SessionPage'));
+const MentorPage          = lazy(() => import('./components/MentorPage'));
 
 function PageLoader() {
   return (
@@ -53,6 +54,7 @@ export default function App() {
             <Route path="/read/:articleId"        element={<ReadPage />} />
             <Route path="/series/women-india"     element={<WomenSeriesPage />} />
             <Route path="/session"               element={<SessionPage />} />
+            <Route path="/mentor/:slug"          element={<MentorPage />} />
             <Route path="/sa"           element={<SuperAdminLogin />} />
             <Route path="/sa/dashboard" element={<SuperAdminDashboard />} />
             <Route path="/sa/export"    element={<ExportCards />} />
