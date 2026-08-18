@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Link, useParams, useNavigate, Navigate } from 'react-router-dom';
-import { Shield, Award, GraduationCap, ArrowLeft, ExternalLink, Calendar, ChevronRight, Star, Users, MessageCircle, Quote } from 'lucide-react';
+import { Shield, Award, GraduationCap, ArrowLeft, ExternalLink, Calendar, ChevronRight, ChevronLeft, Star, Users, MessageCircle, Quote, X } from 'lucide-react';
 import { MENTORS } from '../data/mentors';
 import MentorConnectModal from './MentorConnectModal';
 
@@ -30,6 +30,7 @@ export default function MentorPage() {
   const navigate = useNavigate();
   const mentor = MENTORS.find(m => m.slug === slug);
   const [showConnect, setShowConnect] = useState(false);
+  const [lightboxIndex, setLightboxIndex] = useState(null);
 
   if (!mentor) return <Navigate to="/" replace />;
 
@@ -138,13 +139,16 @@ export default function MentorPage() {
         {/* ── Testimonials ── */}
         {mentor.testimonialScreenshots?.length > 0 && (
           <section className="mb-8">
-            <h2 className="text-lg font-bold text-gray-900 mb-4">What Aspirants Say</h2>
-            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
+            <div className="flex items-center justify-between mb-4">
+              <h2 className="text-lg font-bold text-gray-900">What Aspirants Say</h2>
+              <span className="text-[11px] text-gray-300">Scroll for more →</span>
+            </div>
+            <div className="flex gap-3 overflow-x-auto pb-2 scrollbar-hide -mx-1 px-1">
               {mentor.testimonialScreenshots.map((src, i) => (
-                <a key={src} href={src} target="_blank" rel="noopener noreferrer"
-                  className="rounded-xl overflow-hidden border border-gray-100 hover:border-brand-200 transition-colors">
-                  <img src={src} alt={`Feedback screenshot ${i + 1}`} className="w-full h-auto block" />
-                </a>
+                <button key={src} type="button" onClick={() => setLightboxIndex(i)}
+                  className="shrink-0 w-32 sm:w-36 rounded-xl overflow-hidden border border-gray-100 hover:border-brand-200 transition-colors cursor-pointer">
+                  <img src={src} alt={`Feedback screenshot ${i + 1}`} className="w-full h-44 sm:h-48 object-cover" />
+                </button>
               ))}
             </div>
           </section>
@@ -242,6 +246,40 @@ export default function MentorPage() {
       </div>
 
       {showConnect && <MentorConnectModal mentor={mentor} onClose={() => setShowConnect(false)} />}
+
+      {lightboxIndex !== null && mentor.testimonialScreenshots && (
+        <div className="fixed inset-0 z-[200] flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm"
+          onClick={() => setLightboxIndex(null)}>
+          <button onClick={() => setLightboxIndex(null)}
+            className="absolute top-4 right-4 text-white/70 hover:text-white transition-colors cursor-pointer">
+            <X className="w-7 h-7" />
+          </button>
+
+          {mentor.testimonialScreenshots.length > 1 && (
+            <button
+              onClick={e => { e.stopPropagation(); setLightboxIndex(i => (i - 1 + mentor.testimonialScreenshots.length) % mentor.testimonialScreenshots.length); }}
+              className="absolute left-2 sm:left-6 text-white/70 hover:text-white transition-colors cursor-pointer p-2">
+              <ChevronLeft className="w-8 h-8" />
+            </button>
+          )}
+
+          <img src={mentor.testimonialScreenshots[lightboxIndex]} alt={`Feedback screenshot ${lightboxIndex + 1}`}
+            onClick={e => e.stopPropagation()}
+            className="max-w-full max-h-[85vh] rounded-xl object-contain" />
+
+          {mentor.testimonialScreenshots.length > 1 && (
+            <button
+              onClick={e => { e.stopPropagation(); setLightboxIndex(i => (i + 1) % mentor.testimonialScreenshots.length); }}
+              className="absolute right-2 sm:right-6 text-white/70 hover:text-white transition-colors cursor-pointer p-2">
+              <ChevronRight className="w-8 h-8" />
+            </button>
+          )}
+
+          <span className="absolute bottom-4 text-white/50 text-xs">
+            {lightboxIndex + 1} / {mentor.testimonialScreenshots.length}
+          </span>
+        </div>
+      )}
     </div>
   );
 }
