@@ -267,7 +267,6 @@ function MentorCard({ mentor }) {
           <p className="text-[9px] font-bold text-white/90 tracking-widest uppercase leading-tight">
             {mentor.branch.replace('Indian ', '')}
           </p>
-          <p className="text-[8px] text-white/50 tracking-wider uppercase mt-0.5">{mentor.dept}</p>
         </div>
 
         {/* Active indicator */}
@@ -924,7 +923,7 @@ function MentorAnnouncementBanner() {
               <span className="text-brand-600">{mentor.name}</span> joins SSBCircle as a Mentor
             </h2>
             <p className="text-gray-500 text-xs sm:text-sm mb-4">
-              {mentor.rank} · {mentor.dept} · {mentor.yearsOfService} of service
+              {mentor.rank} · {mentor.yearsOfService} of service
             </p>
 
             {/* Specialty badges */}

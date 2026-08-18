@@ -83,8 +83,7 @@ export default function MentorPage() {
 
           {/* Info strip */}
           <div className="bg-white p-5 sm:p-8">
-            <div className="flex items-start justify-between gap-3 mb-4">
-              <p className="text-sm text-gray-500">{mentor.dept}</p>
+            <div className="flex items-start justify-end gap-3 mb-4">
               <div className="shrink-0 flex items-center gap-1.5 text-[11px] font-semibold text-sky-700 bg-sky-50 border border-sky-100 px-3 py-1.5 rounded-full">
                 <Shield className="w-3.5 h-3.5" /> Verified Officer
               </div>
