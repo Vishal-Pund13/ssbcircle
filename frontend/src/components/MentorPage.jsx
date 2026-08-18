@@ -136,40 +136,17 @@ export default function MentorPage() {
         )}
 
         {/* ── Testimonials ── */}
-        {mentor.testimonials?.length > 0 && (
+        {mentor.testimonialScreenshots?.length > 0 && (
           <section className="mb-8">
             <h2 className="text-lg font-bold text-gray-900 mb-4">What Aspirants Say</h2>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
-              {mentor.testimonials.map((t, i) => {
-                const initials = t.name.split(' ').map(w => w[0]).join('').toUpperCase().slice(0, 2);
-                return (
-                  <div key={i} className="rounded-2xl border border-gray-100 bg-gray-50 p-5 flex flex-col gap-3">
-                    <Quote className="w-5 h-5 text-brand-300 shrink-0" fill="currentColor" strokeWidth={0} />
-                    <p className="text-sm text-gray-600 leading-relaxed flex-1">"{t.quote}"</p>
-                    <div className="flex items-center gap-2 pt-2 border-t border-gray-100">
-                      <div className="w-7 h-7 rounded-full bg-brand-100 flex items-center justify-center text-[10px] font-bold text-brand-600 shrink-0">
-                        {initials}
-                      </div>
-                      <div className="min-w-0">
-                        <p className="text-xs font-semibold text-gray-800 truncate">{t.name}</p>
-                        {t.context && <p className="text-[10px] text-gray-400 truncate">{t.context}</p>}
-                      </div>
-                    </div>
-                  </div>
-                );
-              })}
+            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
+              {mentor.testimonialScreenshots.map((src, i) => (
+                <a key={src} href={src} target="_blank" rel="noopener noreferrer"
+                  className="rounded-xl overflow-hidden border border-gray-100 hover:border-brand-200 transition-colors">
+                  <img src={src} alt={`Feedback screenshot ${i + 1}`} className="w-full h-auto block" />
+                </a>
+              ))}
             </div>
-
-            {mentor.testimonialScreenshots?.length > 0 && (
-              <div className="flex gap-3 overflow-x-auto pb-2 scrollbar-hide -mx-1 px-1">
-                {mentor.testimonialScreenshots.map((src, i) => (
-                  <a key={src} href={src} target="_blank" rel="noopener noreferrer"
-                    className="shrink-0 w-24 sm:w-28 rounded-xl overflow-hidden border border-gray-100 hover:border-brand-200 transition-colors">
-                    <img src={src} alt={`Feedback screenshot ${i + 1}`} className="w-full h-32 sm:h-36 object-cover" />
-                  </a>
-                ))}
-              </div>
-            )}
           </section>
         )}
 
