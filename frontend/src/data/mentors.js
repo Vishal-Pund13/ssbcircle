@@ -3,10 +3,12 @@ export const MENTORS = [
     id: 1,
     slug: 'priyanka-oswal',
     name: 'Sqn Ldr Priyanka Oswal (Retd.)',
+    tagline: 'Ex-Indian Air Force Officer',
     rank: 'Squadron Leader (Retd.)',
     branch: 'Indian Air Force',
     dept: 'Fighter Controller, Air Defence',
     yearsOfService: '10 years',
+    roleTags: ['SSB Mentor', 'Motivational Speaker'],
     bio: 'Ex-IAF Fighter Controller (Air Defence), 10 years of service — now a Mentor, Facilitator and Leadership Trainer helping aspirants build self-awareness, confidence and officer-like qualities for SSB.',
     fullBio: `Squadron Leader Priyanka Oswal (Retd.) is an ex-Indian Air Force officer with 10 years of experience in Air Defence, where she served as a Fighter Controller. Her service gave her first-hand experience of leadership, decision-making, teamwork, communication and staying composed under pressure.
 
@@ -23,7 +25,6 @@ She believes SSB is not about trying to become someone you are not; it is about 
     whatsapp: '919420125440',
     availableFrom: '2026-09-01',
     avatarInitials: 'PO',
-    serviceTag: 'IAF · Air Defence',
     isActive: true,
   },
 ];

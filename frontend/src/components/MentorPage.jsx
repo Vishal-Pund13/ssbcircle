@@ -76,11 +76,8 @@ export default function MentorPage() {
             )}
 
             <div className="absolute bottom-0 left-0 right-0 p-5 sm:p-8">
-              <span className="inline-flex items-center gap-1.5 text-[10px] font-bold text-white bg-sky-600/90 backdrop-blur-sm px-2.5 py-1 rounded-full tracking-wide mb-2.5">
-                {mentor.serviceTag}
-              </span>
               <h1 className="text-2xl sm:text-4xl font-bold text-white leading-tight drop-shadow-sm">{mentor.name}</h1>
-              <p className="text-sm sm:text-base text-white/80 mt-1">{mentor.rank} · {mentor.branch}</p>
+              <p className="text-sm sm:text-base text-white/80 mt-1">{mentor.tagline}</p>
             </div>
           </div>
 
@@ -98,12 +95,11 @@ export default function MentorPage() {
               <span className="flex items-center gap-1.5 text-xs text-gray-500 bg-gray-50 border border-gray-100 px-3 py-1.5 rounded-full">
                 <Award className="w-3.5 h-3.5 text-sky-400" /> {mentor.yearsOfService} of service
               </span>
-              <span className="flex items-center gap-1.5 text-xs text-gray-500 bg-gray-50 border border-gray-100 px-3 py-1.5 rounded-full">
-                <Shield className="w-3.5 h-3.5 text-brand-400" /> Ex-Commissioned Officer
-              </span>
-              <span className="flex items-center gap-1.5 text-xs text-gray-500 bg-gray-50 border border-gray-100 px-3 py-1.5 rounded-full">
-                <GraduationCap className="w-3.5 h-3.5 text-purple-400" /> SSB Specialist
-              </span>
+              {mentor.roleTags?.map(tag => (
+                <span key={tag} className="flex items-center gap-1.5 text-xs text-gray-500 bg-gray-50 border border-gray-100 px-3 py-1.5 rounded-full">
+                  <GraduationCap className="w-3.5 h-3.5 text-purple-400" /> {tag}
+                </span>
+              ))}
             </div>
 
             {/* Specialty chips */}

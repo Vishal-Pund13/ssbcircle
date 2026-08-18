@@ -1,34 +1,30 @@
 import { useState } from 'react';
 import { X, MessageCircle, ArrowRight } from 'lucide-react';
 
-const STAGE_OPTIONS = [
-  'Preparing for my first SSB',
-  'Repeating / been screened out before',
-  'Recommended — refining before next stage',
-  'Just exploring, new to SSB',
-];
+const ENTRY_OPTIONS = ['NDA', 'CDS', 'AFCAT', 'Other'];
 
 // Turns the aspirant's answers into a pre-filled WhatsApp message, so the
 // mentor opens the chat with real context instead of a bare "Hi ma'am".
-function buildMessage(mentor, { name, stage, topics, note }) {
-  const lines = [`Hi, I'm ${name.trim()} — connecting with you via SSBCircle.`, '', `Stage: ${stage}`];
-  if (topics.length) lines.push(`Looking for guidance on: ${topics.join(', ')}`);
-  if (note.trim()) lines.push('', note.trim());
+function buildMessage(mentor, { name, entry, ssbDate, challenge, goal }) {
+  const lines = [`Hi, I'm ${name.trim()} — connecting with you via SSBCircle.`, '', `Entry: ${entry}`];
+  if (ssbDate.trim()) lines.push(`SSB date (if upcoming): ${ssbDate.trim()}`);
+  if (challenge.trim()) lines.push(`Biggest challenge currently: ${challenge.trim()}`);
+  if (goal.trim()) lines.push(`What I'd like to achieve through mentoring: ${goal.trim()}`);
   return lines.join('\n');
 }
 
 export default function MentorConnectModal({ mentor, onClose }) {
   const [name, setName] = useState('');
-  const [stage, setStage] = useState('');
-  const [topics, setTopics] = useState([]);
-  const [note, setNote] = useState('');
+  const [entry, setEntry] = useState('');
+  const [ssbDate, setSsbDate] = useState('');
+  const [challenge, setChallenge] = useState('');
+  const [goal, setGoal] = useState('');
 
-  const toggleTopic = (t) => setTopics(prev => prev.includes(t) ? prev.filter(x => x !== t) : [...prev, t]);
-  const canSubmit = name.trim().length > 0 && stage.length > 0;
+  const canSubmit = name.trim().length > 0 && entry.length > 0;
 
   const handleSubmit = () => {
     if (!canSubmit) return;
-    const message = buildMessage(mentor, { name, stage, topics, note });
+    const message = buildMessage(mentor, { name, entry, ssbDate, challenge, goal });
     window.open(`https://wa.me/${mentor.whatsapp}?text=${encodeURIComponent(message)}`, '_blank', 'noopener,noreferrer');
     onClose();
   };
@@ -52,7 +48,7 @@ export default function MentorConnectModal({ mentor, onClose }) {
         </p>
 
         {/* Name */}
-        <label className="block text-xs font-semibold text-gray-600 mb-1.5">Your name</label>
+        <label className="block text-xs font-semibold text-gray-600 mb-1.5">Name</label>
         <input
           value={name}
           onChange={e => setName(e.target.value)}
@@ -61,40 +57,44 @@ export default function MentorConnectModal({ mentor, onClose }) {
           className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm text-gray-700 focus:outline-none focus:border-brand-400 mb-4"
         />
 
-        {/* Stage */}
-        <label className="block text-xs font-semibold text-gray-600 mb-1.5">Where are you in your SSB journey?</label>
-        <div className="flex flex-col gap-1.5 mb-4">
-          {STAGE_OPTIONS.map(s => (
-            <button key={s} type="button" onClick={() => setStage(s)}
-              className={`px-3 py-2 rounded-lg text-sm text-left border transition-all cursor-pointer ${stage === s ? 'bg-brand-50 border-brand-300 text-brand-700 font-semibold' : 'border-gray-200 text-gray-600 hover:bg-gray-50'}`}>
-              {s}
+        {/* Entry */}
+        <label className="block text-xs font-semibold text-gray-600 mb-1.5">Entry</label>
+        <div className="flex flex-wrap gap-1.5 mb-4">
+          {ENTRY_OPTIONS.map(e => (
+            <button key={e} type="button" onClick={() => setEntry(e)}
+              className={`text-xs font-semibold px-3 py-1.5 rounded-full border transition-all cursor-pointer ${entry === e ? 'bg-brand-600 border-brand-600 text-white' : 'bg-white border-gray-200 text-gray-500 hover:border-brand-200'}`}>
+              {e}
             </button>
           ))}
         </div>
 
-        {/* Topics */}
-        {mentor.specialties?.length > 0 && (
-          <>
-            <label className="block text-xs font-semibold text-gray-600 mb-1.5">What would you like guidance on? <span className="font-normal text-gray-300">(optional)</span></label>
-            <div className="flex flex-wrap gap-1.5 mb-4">
-              {mentor.specialties.map(t => (
-                <button key={t} type="button" onClick={() => toggleTopic(t)}
-                  className={`text-xs font-semibold px-3 py-1.5 rounded-full border transition-all cursor-pointer ${topics.includes(t) ? 'bg-brand-600 border-brand-600 text-white' : 'bg-white border-gray-200 text-gray-500 hover:border-brand-200'}`}>
-                  {t}
-                </button>
-              ))}
-            </div>
-          </>
-        )}
+        {/* SSB date */}
+        <label className="block text-xs font-semibold text-gray-600 mb-1.5">SSB date <span className="font-normal text-gray-300">(if upcoming)</span></label>
+        <input
+          value={ssbDate}
+          onChange={e => setSsbDate(e.target.value)}
+          placeholder="e.g. 12 Sept 2026, or not yet allotted"
+          maxLength={60}
+          className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm text-gray-700 focus:outline-none focus:border-brand-400 mb-4"
+        />
 
-        {/* Note */}
-        <label className="block text-xs font-semibold text-gray-600 mb-1.5">Anything else? <span className="font-normal text-gray-300">(optional)</span></label>
+        {/* Biggest challenge */}
+        <label className="block text-xs font-semibold text-gray-600 mb-1.5">Biggest challenge currently</label>
         <textarea
-          value={note}
-          onChange={e => setNote(e.target.value)}
-          placeholder="Your background, upcoming batch, a specific concern..."
-          rows={3}
-          maxLength={400}
+          value={challenge}
+          onChange={e => setChallenge(e.target.value)}
+          rows={2}
+          maxLength={300}
+          className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm text-gray-700 resize-none focus:outline-none focus:border-brand-400 mb-4"
+        />
+
+        {/* Goal */}
+        <label className="block text-xs font-semibold text-gray-600 mb-1.5">What would you like to achieve through mentoring?</label>
+        <textarea
+          value={goal}
+          onChange={e => setGoal(e.target.value)}
+          rows={2}
+          maxLength={300}
           className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm text-gray-700 resize-none focus:outline-none focus:border-brand-400 mb-5"
         />
 
