@@ -909,7 +909,6 @@ function MentorAnnouncementBanner() {
             )}
             <div className="sm:hidden">
               <p className="text-sm font-bold text-gray-900">{mentor.name}</p>
-              <p className="text-xs text-gray-500">{mentor.rank}</p>
             </div>
           </div>
 
@@ -919,12 +918,9 @@ function MentorAnnouncementBanner() {
               <span className="w-1.5 h-1.5 rounded-full bg-brand-600 animate-pulse shrink-0" />
               New Mentor
             </div>
-            <h2 className="text-gray-900 text-base sm:text-lg font-bold leading-snug mb-0.5">
+            <h2 className="text-gray-900 text-base sm:text-lg font-bold leading-snug mb-3">
               <span className="text-brand-600">{mentor.name}</span> joins SSBCircle as a Mentor
             </h2>
-            <p className="text-gray-500 text-xs sm:text-sm mb-4">
-              {mentor.rank} · {mentor.yearsOfService} of service
-            </p>
 
             {/* Specialty badges */}
             <div className="flex items-center gap-2 mb-4 flex-wrap">
