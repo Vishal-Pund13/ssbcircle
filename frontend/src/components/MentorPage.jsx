@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Link, useParams, useNavigate, Navigate } from 'react-router-dom';
-import { Shield, Award, GraduationCap, ArrowLeft, ExternalLink, Calendar, ChevronRight, ChevronLeft, Star, Users, MessageCircle, Quote, X } from 'lucide-react';
+import { Shield, GraduationCap, ArrowLeft, ExternalLink, Calendar, ChevronRight, ChevronLeft, Star, Users, MessageCircle, Quote, X } from 'lucide-react';
 import { MENTORS } from '../data/mentors';
 import MentorConnectModal from './MentorConnectModal';
 
@@ -92,9 +92,6 @@ export default function MentorPage() {
 
             {/* Service stats row */}
             <div className="flex flex-wrap gap-3 mb-4">
-              <span className="flex items-center gap-1.5 text-xs text-gray-500 bg-gray-50 border border-gray-100 px-3 py-1.5 rounded-full">
-                <Award className="w-3.5 h-3.5 text-sky-400" /> {mentor.yearsOfService} of service
-              </span>
               {mentor.roleTags?.map(tag => (
                 <span key={tag} className="flex items-center gap-1.5 text-xs text-gray-500 bg-gray-50 border border-gray-100 px-3 py-1.5 rounded-full">
                   <GraduationCap className="w-3.5 h-3.5 text-purple-400" /> {tag}
