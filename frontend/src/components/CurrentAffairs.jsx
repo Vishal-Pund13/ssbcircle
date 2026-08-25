@@ -1,7 +1,8 @@
 import { useState, useEffect } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate, useParams } from 'react-router-dom';
 import { Shield, TrendingUp, Landmark, Map, Users, ArrowLeft, Calendar, Tag, ChevronRight, BookOpen, Clock, BarChart2, ArrowRight, CheckCircle } from 'lucide-react';
 import { getArticles, getArticle } from '../services/api';
+import { SWIPE_SLUGS } from '../data/swipeArticles';
 import ArticleRenderer from './ArticleRenderer';
 
 const PILLARS = [
@@ -305,24 +306,11 @@ function PillarBadge({ id }) {
   );
 }
 
-// Swipe reader slug map — matches data/articles filenames
-const SWIPE_ARTICLES = {
-  'rupee-depreciation':         true,
-  'super-el-nino':              true,
-  'women-workforce-paradox':    true,
-  'women-proxy-representation': true,
-  'women-glass-ceiling':        true,
-  'women-gender-pay-gap':       true,
-  'women-safety-economy':       true,
-  'women-education-gap':        true,
-  'women-health-india':         true,
-};
-
 // Article card — clicking goes to SwipeReader if available, otherwise blog detail
 function ArticleCard({ article, onClick }) {
   const navigate = useNavigate();
   const swipeKey = article.slug || article.id;
-  const hasSwipe = SWIPE_ARTICLES[swipeKey];
+  const hasSwipe = SWIPE_SLUGS.has(swipeKey);
   const handleClick = hasSwipe ? () => navigate(`/read/${swipeKey}`) : onClick;
   return (
     <div onClick={handleClick}
@@ -461,10 +449,11 @@ function Skeleton() {
 }
 
 export default function CurrentAffairs() {
+  const { slug: routeSlug } = useParams();
+  const navigate            = useNavigate();
   const [pillar,      setPillar]      = useState('all');
   const [articles,    setArticles]    = useState([]);
   const [loading,     setLoading]     = useState(true);
-  const [selected,    setSelected]    = useState(null);
   const [fullArticle, setFullArticle] = useState(null);
   const [loadingFull, setLoadingFull] = useState(false);
 
@@ -476,17 +465,21 @@ export default function CurrentAffairs() {
       .finally(() => setLoading(false));
   }, [pillar]);
 
-  async function openArticle(article) {
-    setSelected(article);
-    setFullArticle(null);
+  // Load the article named in the URL (/article/:slug) so blog posts are
+  // linkable, shareable and indexable rather than living in local state only.
+  useEffect(() => {
+    if (!routeSlug) { setFullArticle(null); return; }
     setLoadingFull(true);
-    window.scrollTo({ top: 0, behavior: 'smooth' });
-    try { setFullArticle(await getArticle(article.id)); }
-    catch { setFullArticle(article); }
-    finally { setLoadingFull(false); }
-  }
+    setFullArticle(null);
+    window.scrollTo({ top: 0 });
+    getArticle(routeSlug)
+      .then(a => setFullArticle(a))
+      .catch(() => setFullArticle(null))
+      .finally(() => setLoadingFull(false));
+  }, [routeSlug]);
 
-  function closeArticle() { setSelected(null); setFullArticle(null); }
+  function openArticle(article) { navigate(`/article/${article.slug || article.id}`); }
+  function closeArticle() { navigate('/current-affairs'); }
 
   return (
     <div className="min-h-screen bg-white">
@@ -502,13 +495,19 @@ export default function CurrentAffairs() {
         </div>
       </header>
 
-      {selected ? (
+      {routeSlug ? (
         loadingFull ? (
           <div className="flex items-center justify-center py-32">
             <div className="w-7 h-7 border-2 border-brand-600 border-t-transparent rounded-full animate-spin" />
           </div>
+        ) : fullArticle ? (
+          <ArticleDetail article={fullArticle} onBack={closeArticle} />
         ) : (
-          <ArticleDetail article={fullArticle || selected} onBack={closeArticle} />
+          <div className="max-w-3xl mx-auto px-4 py-24 text-center">
+            <p className="text-sm font-medium text-gray-700 mb-1">Article not found</p>
+            <p className="text-xs text-gray-400 mb-4">"{routeSlug}" doesn't exist or isn't published yet.</p>
+            <Link to="/current-affairs" className="btn-primary text-sm px-4 py-2">Browse articles</Link>
+          </div>
         )
       ) : (
         <>

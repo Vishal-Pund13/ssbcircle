@@ -51,6 +51,7 @@ export default function App() {
             <Route path="/join/:code" element={<JoinRoom />} />
             <Route path="/room/:code" element={<ProtectedRoute><RoomView /></ProtectedRoute>} />
             <Route path="/current-affairs"       element={<CurrentAffairs />} />
+            <Route path="/article/:slug"          element={<CurrentAffairs />} />
             <Route path="/read/:articleId"        element={<ReadPage />} />
             <Route path="/series/women-india"     element={<WomenSeriesPage />} />
             <Route path="/session"               element={<SessionPage />} />

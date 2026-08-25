@@ -452,6 +452,131 @@ REER|Rupee's value adjusted for inflation — the real exchange rate
       console.log('✓ Seeded article: Super El Niño');
     }
 
+    // Seed INS Sudarshini / Lokayan 26 article. Upserts on slug so edits to the
+    // content below actually propagate on restart instead of being skipped.
+    {
+      const sudarshiniContent = `## An unarmed ship just did more for India's image than a warship could
+
+[IMAGE:/Blog_Images/Lokayan_3.jpeg|INS Sudarshini docked in Lisbon, flying the Tricolour — 22 August 2026]
+
+INS Sudarshini sailed into Lisbon on 22 August 2026 — her 15th port call in seven months, no weapons on board. She's a training ship, not a warship, and that's the whole story: an unarmed vessel gets invited to dinner where a destroyer would get pointed questions.
+
+There's a real naval term for this: **"showing the flag."** Park a ship somewhere friendly, let people see the uniform up close, and let goodwill do the work a treaty table can't.
+
+[IMAGE:/Blog_Images/Lokayan_1.jpeg|Indian Navy crew during the flag ceremony ashore in Lisbon]
+
+## The concept: hard power vs soft power
+
+This is the idea the whole story rests on, and it's one of the most reliably useful concepts in the entire SSB syllabus.
+
+Every country has exactly **three ways** to get another country to do what it wants. It can **threaten** — sanctions, troops, missile tests. It can **pay** — aid, trade deals, investment. Or it can **attract** — make the other side actually *want* the same outcome.
+
+The first two are **hard power**: coercion and payment, the carrot and the stick. The third is **soft power**, and it's the one most people never think of as power at all.
+
+The scholar who coined the term, Harvard's **Joseph Nye**, defined it in his 1990 book *Bound to Lead*:
+
+[QUOTE]Soft power is the ability to obtain preferred outcomes by attraction rather than coercion or payment.|Joseph Nye, who coined the term in Bound to Lead (1990)[/QUOTE]
+
+Nye's sharpest observation was about cost. When others are attracted to your goals, **carrots and sticks become less necessary** — you spend less to get the same result, because the other side sees your position as legitimate rather than imposed.
+
+[COMPARE:Hard Power|Soft Power]
+Carriers, missiles, sanctions, troops | Training ships, scholarships, cinema, yoga, diaspora
+Works by threat or payment | Works by attraction
+Fast, visible, very expensive | Slow, cumulative, remarkably cheap
+Produces compliance — they obey | Produces preference — they agree
+Can create resentment | Builds durable goodwill
+Deters an enemy | Wins a friend
+[/COMPARE]
+
+INS Sudarshini sits entirely in the right-hand column. She has no capability in the left-hand one — and that isn't a weakness, it's the design.
+
+[CALLOUT]Nye's own warning is worth remembering in a GD: soft power alone is not a strategy. He argued the real skill is "smart power" — knowing when to use attraction and when to use force. A country that only has one column is not powerful, it's predictable.[/CALLOUT]
+
+[KEY-TERMS]
+Hard power|Getting your way through coercion or payment — force, sanctions, aid
+Soft power|Getting your way through attraction — culture, values, credibility
+Smart power|Combining both, and knowing which situation calls for which
+Showing the flag|Peacetime ship visits used to build goodwill, not threaten anyone
+Gunboat diplomacy|The opposite — using force, or the threat of it, to pressure a country
+Public diplomacy|A state engaging foreign publics directly, not just their governments
+[/KEY-TERMS]
+
+## Why this topic matters
+
+Three reasons this is worth more than a passing glance.
+
+**It's a lens, not a fact.** Most current affairs you memorise expire in months. Hard vs soft power is a *framework* — once you have it, you can analyse Operation Sindoor, India's vaccine diplomacy during Covid, G20 hosting, Bollywood's reach, or an aircraft carrier commissioning with the same tool. One concept, dozens of possible topics.
+
+**It's where India is genuinely competitive.** India can't outspend larger militaries on hard power. But yoga, cinema, a 32-million-strong diaspora, democratic credibility, and being the country that shipped vaccines to 100+ nations — that's a soft power base most countries can't buy. Understanding this is understanding India's actual strategic position, not the one people assume.
+
+**It's why this ship is in the news at all.** A rival navy is steadily racking up port visits across the Indo-Pacific and beyond, building exactly this kind of familiarity for itself. In that contest, every country that recognises India's flag on sight is worth more than it was a decade ago. Sudarshini isn't a photo-op — she's a cheap, slow, deliberate move in a long game.
+
+[SSB-PI]**If asked:** "Give a recent example of India using soft power in its foreign policy."
+
+**Say:** "Sir, INS Sudarshini, the Navy's sail training ship, reached Lisbon on 22 August 2026 — her fifteenth port call in seven months. She's unarmed and crewed largely by officer cadets, so her purpose isn't deterrence — it's soft power, what Joseph Nye described as getting preferred outcomes through attraction rather than coercion or payment. Navies call it 'showing the flag.' It reflects India using more than one instrument in its foreign policy toolkit, which I'd argue is a sign of strategic maturity rather than weakness."[/SSB-PI]
+
+[SSB-GD]Don't argue whether this "matters" or not — that's the wrong fight. The sharper point is sequencing: soft power builds the trust that makes harder, costlier cooperation possible later.[/SSB-GD]
+
+[DETAILS:Go deeper — the full picture]
+## Two toolkits, one navy
+
+Every navy runs two playbooks. One threatens — destroyers, submarines, missile tests. The other is built to be liked — training ships, disaster relief, a band playing on a foreign quay. Sudarshini belongs entirely to the second kind: a barque, an old wind-powered design the Navy keeps around for exactly one reason — she can't fight.
+
+[IMAGE:/Blog_Images/Lokayan_2.jpeg|Sailing up the Tagus River into Lisbon]
+
+### Why India bothers with a 300-year-old ship design
+
+- **It gets a "yes" where a warship gets a polite "no thanks."** Smaller nations wary of picking sides in a rivalry don't hesitate to host an unarmed training ship.
+- **The cadets on board are the actual product.** They're learning celestial navigation and seamanship while getting a crash course in representing India to people who've never met an Indian sailor.
+- **It reaches people warships never get near.** Cross-deck visits, a cultural evening, a stop to meet the local Indian diaspora.
+- **It buys presence without buying enemies.** Every extra port on the map is a cheap, low-friction claim to India being a familiar name.
+
+[CALLOUT]Sudarshini isn't the first of her kind to do this — her sister ship, INS Tarangini, has circled the globe on similar training cruises before her. This is a Navy tradition, not a one-off gesture.[/CALLOUT]
+
+### Where the sailing stops being enough
+
+- **Deterrence** — nobody redraws a war plan because a sail ship dropped by.
+- **Crisis response** — if citizens need evacuating tomorrow, this isn't the ship coming to get them.
+- **Hard bargaining power** — you don't renegotiate a trade deal on the strength of one friendly port call.
+
+[QUOTE]Soft power doesn't replace hard power. It buys the meeting where hard power gets discussed.[/QUOTE]
+
+[SSB-LECTURETTE]**Suggested structure (under 3 minutes):**
+1. Open with the image — an unarmed Navy ship sailing up a European river, cadets on the rigging, nothing but a warm welcome waiting
+2. Name the concept — naval or soft diplomacy, presence built on trust rather than threat
+3. Give it a term worth remembering — "showing the flag"
+4. Balance it — soft power buys access and goodwill, but can't deter, evacuate, or force a negotiation
+5. Land it — a country using both toolkits together is running a mature foreign policy[/SSB-LECTURETTE]
+
+Nobody makes a friend by sailing in with the guns pointed at the horizon. Sudarshini doesn't carry any — and that's exactly why Lisbon rolled out the welcome.
+[/DETAILS]`;
+
+      await pool.query(`
+        INSERT INTO articles (title, category, summary, content, tags, is_published, published_at, reading_time, difficulty, ssb_relevance, slug)
+        VALUES ($1, $2, $3, $4, $5, true, NOW(), $6, $7, $8, $9)
+        ON CONFLICT (slug) WHERE slug IS NOT NULL DO UPDATE SET
+          title         = EXCLUDED.title,
+          category      = EXCLUDED.category,
+          summary       = EXCLUDED.summary,
+          content       = EXCLUDED.content,
+          tags          = EXCLUDED.tags,
+          reading_time  = EXCLUDED.reading_time,
+          difficulty    = EXCLUDED.difficulty,
+          ssb_relevance = EXCLUDED.ssb_relevance
+      `, [
+        "INS Sudarshini's Voyage of Soft Power",
+        'polity',
+        "An unarmed Navy training ship just made her 15th goodwill port call in seven months. Hard power vs soft power — the one framework that unlocks a dozen GD topics.",
+        sudarshiniContent,
+        ['geopolitics', 'soft-power', 'hard-power', 'naval-diplomacy', 'indian-navy', 'lokayan', 'foreign-policy'],
+        '4 min',
+        'Beginner',
+        ['GD Topics', 'Lecturette', 'PI'],
+        'ins-sudarshini-lokayan-2026',
+      ]);
+      console.log('✓ Seeded article: INS Sudarshini\'s Voyage of Soft Power');
+    }
+
     // Seed Women in India series (4 cards)
     const womenSeries = [
       {

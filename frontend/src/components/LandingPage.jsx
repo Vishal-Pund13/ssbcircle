@@ -1,8 +1,9 @@
 import { useEffect, useRef, useState, lazy, Suspense } from 'react';
 import { useNavigate, Link, useSearchParams } from 'react-router-dom';
-import { getActiveRooms, closeRoom, getSessions, toggleInterest, cancelSession, startSession, getFeatured, getPastSessions } from '../services/api';
+import { getActiveRooms, closeRoom, getSessions, toggleInterest, cancelSession, startSession, getFeatured, getPastSessions, getArticles } from '../services/api';
 import { useAuth } from '../context/AuthContext';
 import { MENTORS } from '../data/mentors';
+import { articleHref } from '../data/swipeArticles';
 import { Mic, Timer, FileText, CheckSquare, Radio, ArrowRight, Trash2, Zap, Lightbulb, Users, Presentation, Target, Headphones, RefreshCw, X, Calendar, Heart, PlayCircle, Share2, Check, Sparkles, ChevronDown, Shield, Star, Lock, BookOpen, Video, Award, ChevronRight, GraduationCap, ExternalLink, AlertTriangle, HeartHandshake } from 'lucide-react';
 
 // Lazy-loaded — keeps react-simple-maps out of the main bundle
@@ -168,6 +169,138 @@ const CATEGORY_COLORS = {
   'IO Practice': 'bg-emerald-50 text-emerald-700 border-emerald-100',
 };
 
+
+// ── Latest Reads — real articles pulled from the API ────────────────────────
+const PILLAR_LABELS = {
+  defence:         'Defence & Security',
+  economic:        'Economic',
+  polity:          'Polity',
+  geographic:      'Geographic',
+  'socio-cultural': 'Society',
+};
+
+// Published within the last 10 days counts as new
+function isFresh(dateStr) {
+  if (!dateStr) return false;
+  return (Date.now() - new Date(dateStr).getTime()) < 10 * 24 * 60 * 60 * 1000;
+}
+
+function LatestReadsSection() {
+  const [articles, setArticles] = useState([]);
+  const [loading,  setLoading]  = useState(true);
+
+  useEffect(() => {
+    getArticles()
+      .then(d => setArticles((d || []).slice(0, 3)))
+      .catch(() => setArticles([]))
+      .finally(() => setLoading(false));
+  }, []);
+
+  // Nothing to show and nothing loading — don't render an empty shell
+  if (!loading && articles.length === 0) return null;
+
+  const hasNew = articles.some(a => isFresh(a.published_at));
+
+  return (
+    <section className="bg-gray-50 px-4 sm:px-6 py-10 sm:py-14">
+      <div className="max-w-5xl mx-auto">
+
+        {/* Header */}
+        <div className="flex items-end justify-between gap-4 mb-4">
+          <div>
+            <div className="flex items-center gap-2 mb-1.5">
+              <BookOpen className="w-4 h-4 text-brand-600 shrink-0" />
+              <h2 className="text-xl sm:text-2xl font-bold text-gray-900">Latest Reads</h2>
+              {hasNew && (
+                <span className="flex items-center gap-1 text-[9px] font-bold text-emerald-700 bg-emerald-50 border border-emerald-200 px-2 py-0.5 rounded-full uppercase tracking-widest">
+                  <span className="w-1.5 h-1.5 bg-emerald-500 rounded-full animate-pulse" /> New
+                </span>
+              )}
+            </div>
+            <p className="text-xs sm:text-sm text-gray-400">
+              Current affairs explained for GD, Lecturette &amp; PI — a new one every few days.
+            </p>
+          </div>
+          <Link to="/current-affairs"
+            className="hidden sm:flex items-center gap-1 text-xs font-semibold text-brand-600 hover:text-brand-700 shrink-0 whitespace-nowrap">
+            View all <ChevronRight className="w-3.5 h-3.5" />
+          </Link>
+        </div>
+
+        {/* Value prop — read, understand, then speak it in a live room */}
+        <div className="flex flex-wrap items-center gap-x-5 gap-y-2 mb-5">
+          {['Read in 2–5 minutes', 'Data, examples & key terms', 'Then practice it in a live GD'].map((s, i) => (
+            <div key={i} className="flex items-center gap-1.5 text-[11px] sm:text-xs text-gray-500">
+              <span className="w-4 h-4 rounded-full bg-brand-600 flex items-center justify-center shrink-0">
+                <svg className="w-2 h-2 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3.5">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+                </svg>
+              </span>
+              {s}
+            </div>
+          ))}
+        </div>
+
+        {/* Cards */}
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4">
+          {loading
+            ? [1, 2, 3].map(i => (
+                <div key={i} className="bg-white border border-gray-100 rounded-xl p-4 animate-pulse">
+                  <div className="h-2.5 bg-gray-100 rounded w-20 mb-3" />
+                  <div className="h-4 bg-gray-100 rounded w-full mb-2" />
+                  <div className="h-4 bg-gray-100 rounded w-3/5 mb-3" />
+                  <div className="h-3 bg-gray-100 rounded w-4/5" />
+                </div>
+              ))
+            : articles.map(a => {
+                const slug  = a.slug || a.id;
+                const fresh = isFresh(a.published_at);
+                return (
+                  <Link key={a.id} to={articleHref(slug)}
+                    className="group bg-white border border-gray-200 rounded-xl overflow-hidden flex flex-col hover:border-brand-600/30 hover:shadow-md transition-all">
+                    <div className="h-0.5 bg-brand-600" />
+                    <div className="p-4 flex flex-col gap-2 flex-1">
+
+                      {/* Pillar + new badge */}
+                      <div className="flex items-center justify-between gap-2">
+                        <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-brand-50 text-brand-600 border border-brand-100 truncate">
+                          {PILLAR_LABELS[a.category] || a.category}
+                        </span>
+                        {fresh && (
+                          <span className="text-[9px] font-bold text-emerald-700 bg-emerald-50 border border-emerald-200 px-1.5 py-0.5 rounded-full uppercase tracking-wide shrink-0">
+                            New
+                          </span>
+                        )}
+                      </div>
+
+                      {/* Title + summary */}
+                      <h3 className="text-sm font-semibold text-gray-800 leading-snug group-hover:text-brand-600 transition-colors">
+                        {a.title}
+                      </h3>
+                      <p className="text-xs text-gray-400 leading-relaxed line-clamp-2 flex-1">{a.summary}</p>
+
+                      {/* Footer */}
+                      <div className="flex items-center justify-between gap-2 pt-2 mt-auto border-t border-gray-100">
+                        <span className="text-[10px] text-gray-400">{a.reading_time || 'Quick read'}</span>
+                        <span className="flex items-center gap-0.5 text-[11px] font-semibold text-brand-600 shrink-0">
+                          Read <ChevronRight className="w-3 h-3" />
+                        </span>
+                      </div>
+                    </div>
+                  </Link>
+                );
+              })}
+        </div>
+
+        {/* Mobile view-all */}
+        <Link to="/current-affairs"
+          className="sm:hidden mt-4 flex items-center justify-center gap-1 text-xs font-semibold text-brand-600 py-2">
+          View all news cards <ChevronRight className="w-3.5 h-3.5" />
+        </Link>
+      </div>
+    </section>
+  );
+}
 
 function Logo() {
   return (
@@ -450,9 +583,42 @@ function ContributeCard({ way }) {
   );
 }
 
-function ContributeSection() {
+// Active aspirants — horizontal avatar strip, sits in the "who's here" zone
+function ActiveAspirantsSection({ aspirants }) {
+  const real      = aspirants.map((a, i) => ({ ...a, color: AVATAR_COLORS[i % AVATAR_COLORS.length] }));
+  const displayed = real.length >= 4 ? real : [...real, ...MOCK_ASPIRANTS.slice(real.length)];
+
   return (
     <section className="border-t border-gray-100 bg-gray-50 py-10 sm:py-14 px-4 sm:px-6">
+      <div className="max-w-5xl mx-auto">
+        <div className="flex items-center gap-2 mb-1">
+          <h2 className="text-xl sm:text-2xl font-bold text-gray-900">Active Aspirants</h2>
+          <span className="text-[10px] font-semibold text-emerald-700 bg-emerald-50 border border-emerald-100 px-2 py-0.5 rounded-full">On SSBCircle</span>
+        </div>
+        <p className="text-sm text-gray-400 mb-6">Students consistently practising and leading sessions on the platform.</p>
+        <div className="flex gap-3 overflow-x-auto pb-2 scrollbar-hide -mx-1 px-1">
+          {displayed.map(a => {
+            const initials = a.display_name?.split(' ').map(w => w[0]).join('').toUpperCase().slice(0, 2) || '?';
+            return (
+              <div key={a.id} className="shrink-0 flex flex-col items-center gap-2 p-3 bg-white border border-gray-100 rounded-xl w-[72px] hover:border-brand-200 hover:shadow-sm transition-all">
+                {a.avatar_url
+                  ? <img src={a.avatar_url} alt={a.display_name} className="w-10 h-10 rounded-full object-cover border-2 border-white shadow-sm" />
+                  : <div className={`w-10 h-10 rounded-full ${a.color || 'bg-brand-600'} flex items-center justify-center text-xs font-bold text-white shadow-sm`}>{initials}</div>
+                }
+                <p className="text-[10px] font-semibold text-gray-700 text-center truncate w-full leading-tight">{a.display_name?.split(' ')[0]}</p>
+                <p className="text-[9px] text-gray-400 tabular-nums">{a.rooms_hosted} {a.rooms_hosted === 1 ? 'room' : 'rooms'}</p>
+              </div>
+            );
+          })}
+        </div>
+      </div>
+    </section>
+  );
+}
+
+function ContributeSection() {
+  return (
+    <section className="border-t border-gray-100 bg-white py-10 sm:py-14 px-4 sm:px-6">
       <div className="max-w-5xl mx-auto">
 
         <div className="mb-8">
@@ -1252,8 +1418,12 @@ export default function LandingPage() {
           </div>
         </section>
 
+        {/* ── Latest Reads — real articles, keeps aspirants coming back ── */}
+        <LatestReadsSection />
+
         {/* ── Live / Upcoming tabs ── */}
-        <section ref={tabsSectionRef} className="max-w-5xl mx-auto px-4 sm:px-6 py-10 sm:py-14">
+        <section ref={tabsSectionRef} className="border-t border-gray-100 bg-white px-4 sm:px-6 py-10 sm:py-14">
+          <div className="max-w-5xl mx-auto">
 
           {/* Tab switcher */}
           <div className="flex items-center gap-1 bg-gray-100 p-1 rounded-xl w-full sm:w-fit mb-6">
@@ -1428,19 +1598,18 @@ export default function LandingPage() {
             </>
           )}
           </>)}
-        </section>
 
-        {/* ── Host caution notice ── */}
-        <div className="max-w-5xl mx-auto px-4 sm:px-6 pb-4">
-          <div className="flex items-start gap-2.5 bg-amber-50 border border-amber-200 rounded-xl px-4 py-3">
+          {/* Host caution — belongs with the rooms it refers to */}
+          <div className="mt-6 flex items-start gap-2.5 bg-amber-50 border border-amber-200 rounded-xl px-4 py-3">
             <span className="shrink-0 text-base mt-0.5">⚠️</span>
             <p className="text-xs text-amber-800 leading-relaxed">
               <span className="font-bold">Hosts — once your session is over, please delete your room</span> using the <span className="font-semibold">"End & Delete Room"</span> button inside the room. This keeps the platform open for others to practise.
             </p>
           </div>
-        </div>
+          </div>
+        </section>
 
-        {/* ── India map — mobile only, below host caution ── */}
+        {/* ── India map — mobile only ── */}
         <div className="lg:hidden border-t border-gray-100 py-6 flex flex-col items-center gap-2 bg-white">
           <Suspense fallback={<div className="w-[300px] h-[320px] bg-gray-50 rounded-xl animate-pulse" />}>
             <HeroMapAnimation />
@@ -1448,15 +1617,9 @@ export default function LandingPage() {
           <p className="text-xs text-gray-400 font-medium text-center px-4">Connecting aspirants across India</p>
         </div>
 
-        {/* ── Mentors ── */}
-        <MentorsSection />
-
-        {/* ── Ways to serve before the uniform ── */}
-        <ContributeSection />
-
-        {/* ── Recent Discussions ── */}
+        {/* ── Notable Sessions — social proof, sits with the rooms zone ── */}
         {pastSessions.length > 0 && (
-          <section className="border-t border-gray-100 bg-white py-10 sm:py-14 px-4 sm:px-6">
+          <section className="border-t border-gray-100 bg-gray-50 py-10 sm:py-14 px-4 sm:px-6">
             <div className="max-w-5xl mx-auto">
               <div className="flex items-center justify-between mb-6">
                 <div>
@@ -1498,43 +1661,17 @@ export default function LandingPage() {
           </section>
         )}
 
-        {/* ── News Cards feature showcase ── */}
-        <section className="border-t border-gray-100 bg-gray-50 px-4 sm:px-6 py-10 sm:py-14">
-          <div className="max-w-5xl mx-auto flex flex-col sm:flex-row items-center gap-8 sm:gap-12">
+        {/* ── Mentors ── */}
+        <MentorsSection />
 
-            {/* Left: text */}
-            <div className="flex-1 min-w-0">
-              <p className="text-[10px] font-bold text-brand-600 uppercase tracking-widest mb-3">✦ Latest Addition</p>
-              <h2 className="text-2xl sm:text-3xl font-bold text-gray-900 leading-snug mb-3">News Cards</h2>
-              <p className="text-sm text-gray-500 leading-relaxed mb-6 max-w-sm">
-                No GD topic? Swipe through bite-sized cards on Defence, Economy, Polity, Geography & Society — then walk into any discussion ready to speak.
-              </p>
-              <div className="flex flex-col gap-2 mb-6">
-                {['Read a card in 5 minutes', 'Learn the issue with data & examples', 'Practice speaking it in a live GD room'].map((s, i) => (
-                  <div key={i} className="flex items-center gap-2.5 text-sm text-gray-600">
-                    <span className="w-5 h-5 rounded-full bg-brand-600 flex items-center justify-center shrink-0">
-                      <svg className="w-2.5 h-2.5 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3">
-                        <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
-                      </svg>
-                    </span>
-                    {s}
-                  </div>
-                ))}
-              </div>
-              <Link to="/current-affairs" className="btn-primary text-sm px-6 py-2.5 inline-flex">
-                Explore News Cards
-              </Link>
-            </div>
+        {/* ── Active Aspirants ── */}
+        <ActiveAspirantsSection aspirants={aspirants} />
 
-            {/* Right: spread cards */}
-            <div className="shrink-0">
-              <SpreadNewsCards small />
-            </div>
-          </div>
-        </section>
+        {/* ── Ways to serve before the uniform ── */}
+        <ContributeSection />
 
         {/* ── How it works ── */}
-        <section className="border-t border-gray-100 bg-white py-10 sm:py-14 px-4 sm:px-6">
+        <section className="border-t border-gray-100 bg-gray-50 py-10 sm:py-14 px-4 sm:px-6">
           <div className="max-w-5xl mx-auto">
             <h2 className="text-xl sm:text-2xl font-bold text-gray-900 mb-2">How SSBCircle Works for SSB Prep</h2>
             <p className="text-sm text-gray-400 mb-8">From knowing nothing about a topic to speaking confidently in a live GD — in four steps.</p>
@@ -1633,36 +1770,6 @@ export default function LandingPage() {
                   </div>
                 ))}
               </div>
-            </div>
-          </div>
-        </section>
-
-        {/* ── Active Aspirants ── */}
-        <section className="border-t border-gray-100 bg-gray-50 py-10 sm:py-14 px-4 sm:px-6">
-          <div className="max-w-5xl mx-auto">
-            <div className="flex items-center gap-2 mb-1">
-              <h2 className="text-xl sm:text-2xl font-bold text-gray-900">Active Aspirants</h2>
-              <span className="text-[10px] font-semibold text-emerald-700 bg-emerald-50 border border-emerald-100 px-2 py-0.5 rounded-full">On SSBCircle</span>
-            </div>
-            <p className="text-sm text-gray-400 mb-6">Students consistently practising and leading sessions on the platform.</p>
-            <div className="flex gap-3 overflow-x-auto pb-2 scrollbar-hide -mx-1 px-1">
-              {(() => {
-                const real = aspirants.map((a, i) => ({ ...a, color: AVATAR_COLORS[i % AVATAR_COLORS.length] }));
-                const displayed = real.length >= 4 ? real : [...real, ...MOCK_ASPIRANTS.slice(real.length)];
-                return displayed.map(a => {
-                  const initials = a.display_name?.split(' ').map(w => w[0]).join('').toUpperCase().slice(0, 2) || '?';
-                  return (
-                    <div key={a.id} className="shrink-0 flex flex-col items-center gap-2 p-3 bg-white border border-gray-100 rounded-xl w-[72px] hover:border-brand-200 hover:shadow-sm transition-all">
-                      {a.avatar_url
-                        ? <img src={a.avatar_url} alt={a.display_name} className="w-10 h-10 rounded-full object-cover border-2 border-white shadow-sm" />
-                        : <div className={`w-10 h-10 rounded-full ${a.color || 'bg-brand-600'} flex items-center justify-center text-xs font-bold text-white shadow-sm`}>{initials}</div>
-                      }
-                      <p className="text-[10px] font-semibold text-gray-700 text-center truncate w-full leading-tight">{a.display_name?.split(' ')[0]}</p>
-                      <p className="text-[9px] text-gray-400 tabular-nums">{a.rooms_hosted} {a.rooms_hosted === 1 ? 'room' : 'rooms'}</p>
-                    </div>
-                  );
-                });
-              })()}
             </div>
           </div>
         </section>
