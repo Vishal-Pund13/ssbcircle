@@ -577,6 +577,126 @@ Nobody makes a friend by sailing in with the guns pointed at the horizon. Sudars
       console.log('✓ Seeded article: INS Sudarshini\'s Voyage of Soft Power');
     }
 
+    // Seed Terrier Cyber Quest 2026 article. Upserts on slug like the others.
+    {
+      const tcqContent = `## The Army is asking for your code. Registration closes 31 August.
+
+The Territorial Army has opened **Terrier Cyber Quest 2026 (TCQ 3.0)** — a national-level hackathon, run with CyberPeace, hunting for indigenous solutions to real defence and cybersecurity problems. It is free to enter, open to students, and it closes on **31 August 2026**.
+
+If you are an SSB aspirant with any technical ability at all, read the next section carefully. This is not a coding competition you enter for a certificate.
+
+[CALLOUT]No registration fee. Open to Indian students, professionals, ethical hackers and researchers. Teams of up to 3–4 depending on the track.[/CALLOUT]
+
+[CTA:Register free — closes 31 August|https://www.cyberchallenge.in/tcq2026]
+
+## Why this matters for your SSB — more than you think
+
+Every aspirant has heard that the SSB rewards **Officer Like Qualities**. Almost everyone tries to demonstrate them by talking. This is a chance to demonstrate them by *doing*.
+
+**1. It puts real evidence on your PIQ.** Your Personal Information Questionnaire asks what you do outside academics. "Interested in technology" is a claim. "Competed in the Territorial Army's national cyber hackathon, built a deepfake-detection model, cleared the online qualifier" is **evidence**. The IO cannot cross-examine an interest. They can only explore an achievement — and that conversation runs in your favour.
+
+**2. It survives contact with the interview.** Interviewing Officers probe claims until they break. A hobby you listed but never acted on breaks in about ninety seconds. A project you actually built does not — you can explain the problem, your approach, what failed, what you learned. That is precisely the ground where **effective intelligence**, **reasoning ability** and **initiative** become visible instead of asserted.
+
+**3. It is defence-relevant, not generic.** Any hackathon shows technical skill. This one shows technical skill *pointed at national security*, run by the Army itself. It answers the question sitting underneath every SSB interview — "why the armed forces, and what do you actually bring?" — with something concrete.
+
+**4. The OLQs are structural, not incidental.** Look at what the format demands: **initiative** (nobody made you enter), **organising ability** (assembling and running a team), **determination** (a 36-hour finale), **responsibility** (a working deliverable, not an idea), and **courage** (competing nationally with no guarantee). Those are not adjectives you are borrowing. They are things you will have done.
+
+[QUOTE]An interest is something you can talk about. An achievement is something they can question you about — and questioning is where recommendations are won.[/QUOTE]
+
+## The three tracks — there's one for non-coders too
+
+[COMPARE:Track|What you actually do]
+Bug Hunting | Online Capture-the-Flag qualifier, then a 36-hour in-person finale finding and documenting vulnerabilities in simulated critical infrastructure
+AI Kavach | Build AI/ML solutions for deepfake detection, predictive threat intelligence and anomaly detection
+Creators Challenge | Make a 1–3 minute awareness video on deepfakes, phishing, online scams and misinformation
+[/COMPARE]
+
+That third track deserves a second look. **Creators Challenge needs no coding at all** — it is storytelling and communication, judged on impact. If you have ever edited a reel, written a script, or explained something clearly on camera, you are eligible. And communication under judgement is the exact skill the SSB screens for.
+
+[CALLOUT]Winners in each track receive medallions, certificates, national recognition — and the opportunity to collaborate with the Territorial Army. That last one is not a line for your PIQ. It is a line for your life.[/CALLOUT]
+
+## Dates you cannot miss
+
+- **31 August 2026** — registration closes. This is the hard deadline.
+- **1–10 September 2026** — online shortlisting phase
+- **6–8 October 2026** — Grand Finale, New Delhi
+- **9 October 2026** — award ceremony
+
+[DETAILS:Go deeper — context, eligibility and how to use this in SSB]
+### What is the Territorial Army?
+
+The Territorial Army is India's citizen-soldier force — professionals who keep their civilian careers while serving part-time in uniform. TCQ 3.0 runs under the banner of **75 Years of the Territorial Army**, and the concept behind this hackathon is the TA's own logic applied to the digital domain: civilians contributing real capability to national defence without leaving their day jobs.
+
+That framing is worth remembering. It is a clean, credible answer to "how can a civilian contribute to national security?" — and you would be answering it from experience rather than theory.
+
+### Who can enter
+
+- Indian citizens
+- Students, cybersecurity professionals, ethical hackers, Armed Forces personnel and researchers
+- Teams of up to 3–4 members, depending on the track
+- No registration fee
+- Minors need parental consent for the Creators Challenge
+
+### Why the Army is running a hackathon at all
+
+Modern conflict is not only kinetic. Deepfakes, phishing campaigns, misinformation and attacks on critical infrastructure are live threats to national security, and the talent to counter them sits largely outside uniform — in colleges, startups and research labs. Initiatives like TCQ are how a military reaches that talent, and the emphasis on **indigenous** solutions ties directly into Atmanirbhar Bharat in defence technology.
+
+This is also a genuinely good GD and lecturette topic in its own right: civil-military fusion, cyber warfare, indigenisation, the information domain as a battlefield.
+
+[SSB-PI]**If asked:** "What have you done outside academics?" or "How can a civilian contribute to national security?"
+
+**Say:** "Sir, I participated in Terrier Cyber Quest 2026, a national hackathon run by the Territorial Army with CyberPeace. I worked on the [track] challenge, where my team built [what you built]. What it taught me was [specific, honest lesson — including what went wrong]. It also showed me that contributing to national security isn't limited to those in uniform, which is part of why I want to serve formally."
+
+**Only say this if you actually enter.** A fabricated project collapses the moment the IO asks a follow-up question.[/SSB-PI]
+
+[SSB-GD]On topics like cyber warfare, AI in defence, or indigenisation, initiatives like TCQ are a strong concrete example — they show civil-military fusion in practice rather than as theory. Specific examples beat abstract argument in a GD, and this one is recent enough that most of the group won't have it.[/SSB-GD]
+
+[KEY-TERMS]
+Territorial Army|India's citizen-soldier force — civilians serving part-time in uniform
+CTF (Capture the Flag)|A cybersecurity contest format where you find hidden vulnerabilities
+Deepfake|AI-generated fake video or audio impersonating a real person
+Civil-military fusion|Channelling civilian talent and technology into defence capability
+Atmanirbhar Bharat|India's self-reliance push, including indigenous defence technology
+PIQ|Personal Information Questionnaire — the SSB form your interview is built from
+[/KEY-TERMS]
+[/DETAILS]
+
+## Put thoughts into action
+
+Most aspirants spend the year *preparing to be selected*. A smaller number spend it *becoming the kind of person who gets selected*. The difference is usually visible in what they have actually done.
+
+You have until 31 August. Registration is free and takes minutes.
+
+[CTA:Register on cyberchallenge.in|https://www.cyberchallenge.in/tcq2026]
+
+Then come back and tell us how it went — bring it into a GD room and practise talking about it. That is exactly the kind of thing an IO will ask you to explain.`;
+
+      await pool.query(`
+        INSERT INTO articles (title, category, summary, content, tags, is_published, published_at, reading_time, difficulty, ssb_relevance, slug)
+        VALUES ($1, $2, $3, $4, $5, true, NOW(), $6, $7, $8, $9)
+        ON CONFLICT (slug) WHERE slug IS NOT NULL DO UPDATE SET
+          title         = EXCLUDED.title,
+          category      = EXCLUDED.category,
+          summary       = EXCLUDED.summary,
+          content       = EXCLUDED.content,
+          tags          = EXCLUDED.tags,
+          reading_time  = EXCLUDED.reading_time,
+          difficulty    = EXCLUDED.difficulty,
+          ssb_relevance = EXCLUDED.ssb_relevance
+      `, [
+        'Terrier Cyber Quest 2026: The Army Wants Your Code',
+        'defence',
+        "The Territorial Army's national hackathon is free, open to students, and closes 31 August. Why entering gives you something for your PIQ that no amount of preparation can fake.",
+        tcqContent,
+        ['terrier-cyber-quest', 'territorial-army', 'cybersecurity', 'hackathon', 'AI', 'PIQ', 'OLQ', 'opportunity'],
+        '4 min',
+        'Beginner',
+        ['PIQ', 'PI', 'GD Topics'],
+        'terrier-cyber-quest-2026',
+      ]);
+      console.log('✓ Seeded article: Terrier Cyber Quest 2026');
+    }
+
     // Seed Women in India series (4 cards)
     const womenSeries = [
       {

@@ -1049,6 +1049,100 @@ const DEEPAK_BOOKS = [
   { title: 'The Liberators of Bangladesh', cover: 'https://rukminim2.flixcart.com/image/480/640/xif0q/book/h/3/i/the-liberators-of-bangladesh-original-imah2tms35yyt5bn.jpeg?q=20', link: 'https://www.flipkart.com/the-liberators-of-bangladesh/p/itm4c0424e14a733' },
 ];
 
+// ── Terrier Cyber Quest 2026 notice ─────────────────────────────────────────
+// Phase-aware: urgent countdown while registration is open, then a quieter
+// "in progress" note, then it removes itself entirely after the event.
+const TCQ = {
+  regCloses:   new Date('2026-09-01T00:00:00+05:30'), // end of 31 Aug IST
+  finaleEnds:  new Date('2026-10-10T00:00:00+05:30'), // after 9 Oct awards
+  articleUrl:  '/article/terrier-cyber-quest-2026',
+  registerUrl: 'https://www.cyberchallenge.in/tcq2026',
+};
+
+function TerrierCyberQuestBanner() {
+  const [dismissed, setDismissed] = useState(() => {
+    try { return localStorage.getItem('tcq2026_notice_dismissed') === '1'; } catch { return false; }
+  });
+
+  const now = Date.now();
+  if (now >= TCQ.finaleEnds.getTime()) return null;   // event over — retire the banner
+  if (dismissed) return null;
+
+  const open     = now < TCQ.regCloses.getTime();
+  const daysLeft = Math.max(0, Math.ceil((TCQ.regCloses.getTime() - now) / 86_400_000));
+
+  function dismiss(e) {
+    e.preventDefault(); e.stopPropagation();
+    try { localStorage.setItem('tcq2026_notice_dismissed', '1'); } catch {}
+    setDismissed(true);
+  }
+
+  return (
+    <div className="border-b border-gray-100 bg-white px-4 sm:px-6 pt-5 sm:pt-6">
+      <div className="max-w-5xl mx-auto">
+        <Link to={TCQ.articleUrl}
+          className={`relative block rounded-2xl border px-5 sm:px-6 py-4 sm:py-5 transition-colors group ${
+            open ? 'border-amber-200 bg-amber-50 hover:border-amber-300'
+                 : 'border-gray-200 bg-gray-50 hover:border-gray-300'}`}>
+
+          <button onClick={dismiss} aria-label="Dismiss notice"
+            className="absolute top-3 right-3 text-gray-400 hover:text-gray-600 cursor-pointer p-1">
+            <X className="w-3.5 h-3.5" />
+          </button>
+
+          <div className="flex flex-col sm:flex-row sm:items-center gap-4">
+
+            {/* Icon */}
+            <div className={`shrink-0 w-11 h-11 rounded-xl flex items-center justify-center border ${
+              open ? 'bg-amber-100 border-amber-200' : 'bg-gray-100 border-gray-200'}`}>
+              <Shield className={`w-5 h-5 ${open ? 'text-amber-700' : 'text-gray-500'}`} />
+            </div>
+
+            {/* Text */}
+            <div className="flex-1 min-w-0 pr-6">
+              <div className="flex flex-wrap items-center gap-2 mb-1">
+                <span className={`text-[9px] font-bold px-2 py-0.5 rounded-full uppercase tracking-widest border ${
+                  open ? 'text-amber-800 bg-amber-100 border-amber-200'
+                       : 'text-gray-600 bg-gray-100 border-gray-200'}`}>
+                  Opportunity · Indian Army
+                </span>
+                {open && (
+                  <span className="flex items-center gap-1 text-[9px] font-bold text-red-700 bg-red-50 border border-red-200 px-2 py-0.5 rounded-full uppercase tracking-widest">
+                    <span className="w-1.5 h-1.5 bg-red-500 rounded-full animate-pulse" />
+                    {daysLeft === 0 ? 'Closes today' : daysLeft === 1 ? '1 day left' : `${daysLeft} days left`}
+                  </span>
+                )}
+              </div>
+              <h3 className="text-sm sm:text-base font-bold text-gray-900 leading-snug">
+                Terrier Cyber Quest 2026 — the Territorial Army wants your code
+              </h3>
+              <p className="text-xs text-gray-600 mt-0.5 leading-relaxed">
+                {open
+                  ? 'Free national hackathon. Registration closes 31 August — and it gives you something real for your PIQ.'
+                  : 'Registration has closed. Shortlisting and the New Delhi finale are underway — read why it matters for your SSB.'}
+              </p>
+            </div>
+
+            {/* CTAs */}
+            <div className="flex items-center gap-2 shrink-0">
+              <span className="flex items-center gap-1 text-xs font-bold text-brand-600 group-hover:text-brand-700 whitespace-nowrap">
+                Read more <ChevronRight className="w-3.5 h-3.5" />
+              </span>
+              {open && (
+                <a href={TCQ.registerUrl} target="_blank" rel="noopener noreferrer"
+                  onClick={e => e.stopPropagation()}
+                  className="hidden sm:inline-flex items-center gap-1.5 bg-amber-600 hover:bg-amber-700 text-white text-xs font-bold px-4 py-2 rounded-xl transition-colors whitespace-nowrap">
+                  Register <ExternalLink className="w-3 h-3" />
+                </a>
+              )}
+            </div>
+          </div>
+        </Link>
+      </div>
+    </div>
+  );
+}
+
 function MentorAnnouncementBanner() {
   const mentor = MENTORS[0];
   if (!mentor) return null;
@@ -1331,6 +1425,9 @@ export default function LandingPage() {
       </header>
 
       <main>
+
+        {/* ── Terrier Cyber Quest 2026 notice — self-retires after the event ── */}
+        <TerrierCyberQuestBanner />
 
         {/* ── Special Event Banner ── */}
         <MentorAnnouncementBanner />

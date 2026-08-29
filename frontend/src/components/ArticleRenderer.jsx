@@ -1,9 +1,28 @@
 import { INFOGRAPHICS } from './ArticleInfographics';
 
-// Parse **bold** text inline
-function parseBold(text) {
-  const parts = text.split(/(\*\*[^*]+\*\*)/g);
-  return parts.map((p, i) =>
+// Parse **bold** and [label](url) links inline
+function parseInline(text) {
+  // Split on links first so bold inside a label still renders
+  const segments = text.split(/(\[[^\]]+\]\([^)]+\))/g);
+  return segments.map((seg, i) => {
+    const link = seg.match(/^\[([^\]]+)\]\(([^)]+)\)$/);
+    if (link) {
+      const [, label, href] = link;
+      const external = /^https?:\/\//.test(href);
+      return (
+        <a key={i} href={href}
+          {...(external ? { target: '_blank', rel: 'noopener noreferrer' } : {})}
+          className="text-brand-600 font-semibold underline decoration-brand-200 underline-offset-2 hover:decoration-brand-500">
+          {parseBoldOnly(label)}
+        </a>
+      );
+    }
+    return <span key={i}>{parseBoldOnly(seg)}</span>;
+  });
+}
+
+function parseBoldOnly(text) {
+  return text.split(/(\*\*[^*]+\*\*)/g).map((p, i) =>
     p.startsWith('**') && p.endsWith('**')
       ? <strong key={i} className="font-bold text-gray-900">{p.slice(2, -2)}</strong>
       : p
@@ -12,7 +31,7 @@ function parseBold(text) {
 
 // Render a single line as inline content
 function Inline({ text }) {
-  return <>{parseBold(text)}</>;
+  return <>{parseInline(text)}</>;
 }
 
 // Parse an array of content lines into rich React blocks. Used for the
@@ -30,7 +49,27 @@ function parseBlocks(lines, keyPrefix = '') {
       blocks.push(
         <div key={keyPrefix + i} className="my-6 flex items-start gap-3 bg-brand-50 border border-brand-100 rounded-xl px-4 py-4">
           <span className="text-brand-600 text-lg shrink-0 mt-0.5">💡</span>
-          <p className="text-sm text-brand-800 leading-relaxed italic">{inner}</p>
+          <p className="text-sm text-brand-800 leading-relaxed italic"><Inline text={inner} /></p>
+        </div>
+      );
+      i++; continue;
+    }
+
+    // ── [CTA:label|url] — prominent action button ─────────────────────────
+    const ctaMatch = line.match(/^\[CTA:([^|]+)\|(.+)\]$/);
+    if (ctaMatch) {
+      const href = ctaMatch[2].trim();
+      const external = /^https?:\/\//.test(href);
+      blocks.push(
+        <div key={keyPrefix + i} className="my-7 flex justify-center">
+          <a href={href}
+            {...(external ? { target: '_blank', rel: 'noopener noreferrer' } : {})}
+            className="inline-flex items-center gap-2 bg-brand-600 hover:bg-brand-700 text-white font-bold text-sm px-6 py-3 rounded-xl transition-colors shadow-sm">
+            {ctaMatch[1].trim()}
+            <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+              <path strokeLinecap="round" strokeLinejoin="round" d="M13 7l5 5m0 0l-5 5m5-5H6" />
+            </svg>
+          </a>
         </div>
       );
       i++; continue;
