@@ -697,6 +697,105 @@ Then come back and tell us how it went — bring it into a GD room and practise 
       console.log('✓ Seeded article: Terrier Cyber Quest 2026');
     }
 
+    // Seed "Cut the Noise" study-sources article. Upserts on slug like the others.
+    {
+      const cutNoiseContent = `## There are ten thousand SSB videos on YouTube. Maybe twenty hours of them are worth your time.
+
+Type "SSB interview" into YouTube and you are handed an infinite feed: day-by-day vlogs, "50 TAT stories with model answers", conference predictions, cut-off news, and a hundred people telling you exactly what to say in the interview.
+
+That feed is not built to get you recommended. It is built to keep you watching. And there is a quiet cost to it — an aspirant who has watched four hundred videos and practised nothing arrives at the board sounding rehearsed, which is the one thing an assessor is trained to spot.
+
+So here is our honest recommendation. **Two playlists. Finish both. Skip almost everything else.** One builds the personality the board is actually testing. The other teaches you the ground you will be standing on.
+
+[CALLOUT]Rule of thumb for any SSB video: if it tells you **what to say**, it is noise. If it tells you **how to think**, or shows you **what the ground actually looks like**, it is signal.[/CALLOUT]
+
+## Source 1 — 5BRCC by Col Yudhvir Singh
+
+[IMAGE:/Blog_Images/SSB_5BRCC_Lakshya.jpg|Col Yudhvir Singh on the 5BRCC approach — The Lakshya Academy]
+
+Col Yudhvir Singh served 27 years in the Indian Army, including Siachen and the Line of Control, and was a **Senior Group Testing Officer at SSB Bhopal and Bangalore**. He now runs The Lakshya Academy. That matters for one simple reason: he has sat on the assessing side of the table, which most of YouTube has not.
+
+**5BRCC** is his framework for personality development. The name unpacks into five habits:
+
+[COMPARE:The habit|What it actually trains]
+5-point perception | Seeing any picture, person or situation in five different ways before you settle on one. This is the raw material for PPDT and TAT — and for not being the candidate whose story is the obvious one.
+Brainstorming | Research, think, discuss, then conclude. In that order. This is the engine behind GD, Lecturette and GPE.
+Role play | Stepping into the other person's position before you judge it. Empathy of the practical kind — the sort that shows up in every "what would you do if" question.
+Connectivity | Linking people, events and ideas to each other. In a group discussion it makes you the one who joins the threads, instead of the one adding a sixth unrelated point.
+Curiosity | The engine under the other four. Without it, they become an exercise you perform for five days.
+[/COMPARE]
+
+Notice what is missing from that list: templates, model answers, lines to memorise. **5BRCC is not a script — it is a set of daily habits.** Watching the playlist end to end changes nothing by itself. Running these five habits on ordinary days is the entire point.
+
+[CTA:Watch the 5BRCC playlist — The Lakshya Academy|https://www.youtube.com/watch?v=w6Rr2YKkf2I&list=PLxZ3LilwEuSVSxNMTx2R4x62CqDBH29TK]
+
+## Source 2 — GTO structures, explained in 3D
+
+[IMAGE:/Blog_Images/SSB_GTO_Structures.jpg|GTO structures rendered in 3D — a full PGT ground laid out end to end, from the playlist]
+
+The second playlist is Ankur Kumar's breakdown of **GTO structure analysis using 3D structures**, covering the **PGT, HGT, Command Task and Final Group Task**.
+
+Here is why it earns a place next to a personality framework. The GTO ground is the one part of the SSB where candidates lose out through plain ignorance rather than personality. They have never seen a start line, a rule board, or how a structure is actually crossed — so the first twenty minutes go on working out what is happening. Twenty minutes is a large slice of what the GTO has to assess you on.
+
+Seeing the structures in 3D fixes exactly that, and nothing more. **It will not get you recommended.** The GTO is not scoring your obstacle knowledge; he is scoring the officer-like qualities you show while solving it. But you cannot show initiative, cooperation or reasoning while you are still working out which colour you are allowed to touch.
+
+[QUOTE]Knowing the rules earns you no marks. Not knowing them costs you the chance to earn any.|The point of the GTO playlist[/QUOTE]
+
+**How to watch it properly:** open a structure video, pause before the solution, solve it on paper yourself, and only then watch the explanation. Passive viewing here is close to worthless — the skill being tested is generating a solution under time pressure, and you cannot practise that by watching someone else do it.
+
+[CTA:Watch the GTO structures playlist — Ankur Kumar|https://www.youtube.com/watch?v=RL6MXcropl8&list=PLpcKHP5W45TNjFaAsvDvTJknfIlBciMA1]
+
+## What to cut, and why
+
+- **"50 TAT stories with best answers"** — memorised stories read as memorised. The psychologist compares your three tests against each other, and borrowed stories do not survive that comparison.
+- **OLQ lists learnt as vocabulary** — being able to name fifteen qualities is not the same as having any of them. Nobody is asked to recite the list.
+- **Endless day-by-day SSB vlogs** — watch two, to remove the fear of the unknown. The twentieth teaches you nothing further about yourself.
+- **Cut-off, date and notification channels** — worth ten minutes a month, not a daily habit disguised as preparation.
+- **Anything promising a trick, hack or guaranteed line** — these tests have been running since the 1940s. There is no line the board has not heard.
+
+## A four-week way to use both
+
+- **Week 1 —** Finish the 5BRCC playlist. Then pick one habit and run it daily: five perceptions on one news photograph every morning, written down.
+- **Week 2 —** Add brainstorming and connectivity. One current affairs issue a day — argue both sides on paper, then link it to two other events.
+- **Week 3 —** Start the GTO playlist. One structure a day, solved on paper first and the explanation watched second. Learn the rules cold, so they stop occupying your attention on the ground.
+- **Week 4 —** Stop watching. Talk. Group discussions, lecturettes out loud against a timer, and someone asking you hard questions about your own PIQ.
+
+That last week is the one most aspirants skip, and it is the one that decides things. Every habit in 5BRCC is finally measured in a room with other people in it.
+
+## Then close the laptop
+
+Two playlists. Perhaps twenty hours. After that the returns on watching drop close to zero, and what is left is practice — with people, out loud, being corrected.
+
+The board is not testing how many videos you have watched. It is testing how many thoughts you have actually had, and whether you can hold your own with other people in the room.
+
+[CTA:Practise in a live GD room|/join]`;
+
+      await pool.query(`
+        INSERT INTO articles (title, category, summary, content, tags, is_published, published_at, reading_time, difficulty, ssb_relevance, slug)
+        VALUES ($1, $2, $3, $4, $5, true, NOW(), $6, $7, $8, $9)
+        ON CONFLICT (slug) WHERE slug IS NOT NULL DO UPDATE SET
+          title         = EXCLUDED.title,
+          category      = EXCLUDED.category,
+          summary       = EXCLUDED.summary,
+          content       = EXCLUDED.content,
+          tags          = EXCLUDED.tags,
+          reading_time  = EXCLUDED.reading_time,
+          difficulty    = EXCLUDED.difficulty,
+          ssb_relevance = EXCLUDED.ssb_relevance
+      `, [
+        'Cut the Noise: The Only Two SSB Playlists You Need',
+        'defence',
+        "Ten thousand SSB videos, and maybe twenty hours worth watching. Col Yudhvir Singh's 5BRCC for personality, a 3D GTO structures playlist for the ground, and a four-week plan for using both.",
+        cutNoiseContent,
+        ['ssb-preparation', '5BRCC', 'Col Yudhvir Singh', 'GTO', 'PPDT', 'TAT', 'OLQ', 'resources'],
+        '5 min',
+        'Beginner',
+        ['GTO', 'Psychology', 'PI'],
+        'cut-the-noise-ssb-sources',
+      ]);
+      console.log('✓ Seeded article: Cut the Noise — two SSB playlists');
+    }
+
     // Seed Women in India series (4 cards)
     const womenSeries = [
       {
