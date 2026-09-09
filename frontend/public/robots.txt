@@ -3,6 +3,7 @@ Allow: /
 Disallow: /sa
 Disallow: /sa/dashboard
 Disallow: /room/
+Disallow: /profile
 
 User-agent: facebookexternalhit
 Allow: /
