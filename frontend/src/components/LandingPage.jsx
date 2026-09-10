@@ -387,7 +387,8 @@ function MentorCard({ mentor }) {
 
         {/* Avatar */}
         {mentor.photo ? (
-          <img src={mentor.photo} alt={mentor.name}
+          <img src={mentor.photoAvatar || mentor.photo} alt={mentor.name}
+            width="56" height="56" loading="lazy" decoding="async"
             className="relative z-10 w-14 h-14 rounded-full object-cover border-2 border-white/30 group-hover:border-white/50 transition-all" />
         ) : (
           <div className="relative z-10 w-14 h-14 rounded-full bg-white/15 border-2 border-white/30 flex items-center justify-center text-white text-xl font-bold select-none group-hover:border-white/50 transition-all">
@@ -1160,7 +1161,8 @@ function MentorAnnouncementBanner() {
           {/* Avatar */}
           <div className="shrink-0 flex flex-row sm:flex-col items-center gap-3 sm:gap-2 w-full sm:w-auto">
             {mentor.photo ? (
-              <img src={mentor.photo} alt={mentor.name}
+              <img src={mentor.photoAvatar || mentor.photo} alt={mentor.name}
+                width="64" height="64" loading="lazy" decoding="async"
                 className="w-14 h-14 sm:w-16 sm:h-16 rounded-full object-cover object-top shrink-0 ring-2 ring-brand-200" />
             ) : (
               <div className="w-14 h-14 sm:w-16 sm:h-16 rounded-full bg-brand-600 flex items-center justify-center shrink-0 ring-2 ring-brand-200">

@@ -62,6 +62,7 @@ export default function MentorPage() {
           <div className="relative w-full h-[320px] sm:h-[420px] bg-gray-100">
             {mentor.photo ? (
               <img src={mentor.photo} alt={mentor.name}
+                fetchPriority="high" decoding="async"
                 className="absolute inset-0 w-full h-full object-cover object-top" />
             ) : (
               <div className="absolute inset-0 flex items-center justify-center bg-brand-600 text-white text-6xl font-bold select-none">
@@ -144,7 +145,7 @@ export default function MentorPage() {
               {mentor.testimonialScreenshots.map((src, i) => (
                 <button key={src} type="button" onClick={() => setLightboxIndex(i)}
                   className="shrink-0 w-32 sm:w-36 rounded-xl overflow-hidden border border-gray-100 hover:border-brand-200 transition-colors cursor-pointer">
-                  <img src={src} alt={`Feedback screenshot ${i + 1}`} className="w-full h-44 sm:h-48 object-cover" />
+                  <img src={src} alt={`Feedback screenshot ${i + 1}`} loading="lazy" decoding="async" className="w-full h-44 sm:h-48 object-cover" />
                 </button>
               ))}
             </div>

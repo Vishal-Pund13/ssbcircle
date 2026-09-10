@@ -18,6 +18,7 @@ She believes SSB is not about trying to become someone you are not; it is about 
     quote: "SSB is not about trying to become someone you are not. It's about understanding yourself — your strengths, your areas of growth — and bringing your authentic self forward.",
     specialties: ['Self-Awareness & Mindset', 'Leadership Training', 'Communication', 'Officer-Like Qualities'],
     photo: '/sqnLdrPriyankaOswal.jpg',
+    photoAvatar: '/sqnLdrPriyankaOswal-avatar.jpg',
     videos: [
       { id: '5_Mw7FRSXa0', url: 'https://youtu.be/5_Mw7FRSXa0', label: 'Interview' },
       { id: 't-nsQVoiO00', url: 'https://youtu.be/t-nsQVoiO00', label: 'Podcast (Marathi)' },
