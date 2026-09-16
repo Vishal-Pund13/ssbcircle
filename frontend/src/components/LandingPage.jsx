@@ -4,6 +4,7 @@ import { getActiveRooms, closeRoom, getSessions, toggleInterest, cancelSession, 
 import { useAuth } from '../context/AuthContext';
 import { MENTORS } from '../data/mentors';
 import { articleHref } from '../data/swipeArticles';
+import ComingSoonBanner from './ComingSoonBanner';
 import { Mic, Timer, FileText, CheckSquare, Radio, ArrowRight, Trash2, Zap, Lightbulb, Users, Presentation, Target, Headphones, RefreshCw, X, Calendar, Heart, PlayCircle, Share2, Check, Sparkles, ChevronDown, Shield, Star, Lock, BookOpen, Video, Award, ChevronRight, GraduationCap, ExternalLink, AlertTriangle, HeartHandshake } from 'lucide-react';
 
 // Lazy-loaded — keeps react-simple-maps out of the main bundle
@@ -1516,6 +1517,9 @@ export default function LandingPage() {
             </div>
           </div>
         </section>
+
+        {/* ── Announcement: the 21-day challenge, ahead of the feature itself ── */}
+        <ComingSoonBanner />
 
         {/* ── Latest Reads — real articles, keeps aspirants coming back ── */}
         <LatestReadsSection />
