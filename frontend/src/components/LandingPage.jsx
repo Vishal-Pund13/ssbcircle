@@ -5,6 +5,7 @@ import { useAuth } from '../context/AuthContext';
 import { MENTORS } from '../data/mentors';
 import { articleHref } from '../data/swipeArticles';
 import ComingSoonBanner from './ComingSoonBanner';
+import DailyMeetsNote from './DailyMeetsNote';
 import { Mic, Timer, FileText, CheckSquare, Radio, ArrowRight, Trash2, Zap, Lightbulb, Users, Presentation, Target, Headphones, RefreshCw, X, Calendar, Heart, PlayCircle, Share2, Check, Sparkles, ChevronDown, Shield, Star, Lock, BookOpen, Video, Award, ChevronRight, GraduationCap, ExternalLink, AlertTriangle, HeartHandshake } from 'lucide-react';
 
 // Lazy-loaded — keeps react-simple-maps out of the main bundle
@@ -1297,6 +1298,11 @@ export default function LandingPage() {
   const displayedRooms = filteredRooms.slice(0, visibleCount);
   const hasMore = filteredRooms.length > visibleCount;
 
+  // "No other aspirants" means nobody is actually present — an open room with
+  // no one in it still counts as quiet. Deliberately ignores the category
+  // filter: people practising elsewhere on the site are still company.
+  const nobodyAround = rooms.every(r => (r.participant_count ?? 0) === 0);
+
   function handleJoin(code) {
     if (!user) { navigate('/login'); return; }
     navigate(`/room/${code}`);
@@ -1650,6 +1656,8 @@ export default function LandingPage() {
               </div>
             )}
           </div>
+
+          {!loading && nobodyAround && <DailyMeetsNote />}
 
           {loading ? (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4">
