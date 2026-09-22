@@ -260,14 +260,18 @@ function parseBlocks(lines, keyPrefix = '') {
 
 // Parse and render the article content string into rich React elements
 export default function ArticleRenderer({ content }) {
-  return <div className="article-body">{parseBlocks(content.split('\n'))}</div>;
+  // Split on either line ending. Article bodies are seeded from a CRLF source
+  // file, so every line arrived with a trailing \r — which made the $-anchored
+  // blocks below ([COMPARE:...], [CTA:...], [IMAGE:...], [INFOGRAPHIC:N],
+  // [DETAILS:...]) fail to match and render as raw text instead.
+  return <div className="article-body">{parseBlocks(content.split(/\r?\n/))}</div>;
 }
 
 // SSB Callout cards — all use the same brand-50 base, differentiated by label only
 function SSBCallout({ type, title, children }) {
   const labels = { gd: 'GD', lecturette: 'Lecturette', pi: 'PI' };
   const raw    = typeof children === 'string' ? children : '';
-  const paras  = raw.split('\n').filter(l => l.trim());
+  const paras  = raw.split(/\r?\n/).filter(l => l.trim());
 
   return (
     <div className="my-6 border border-brand-100 bg-brand-50 rounded-2xl overflow-hidden">
