@@ -4,7 +4,7 @@ const jwt = require('jsonwebtoken');
 const { OAuth2Client } = require('google-auth-library');
 const {
   createGoogleUser, linkGoogleToUser,
-  findByEmail, findByGoogleId, findById,
+  findByEmail, findByGoogleId, findById, saveOnboarding,
 } = require('../models/User');
 const authMiddleware = require('../middleware/auth');
 
@@ -55,6 +55,64 @@ router.get('/me', authMiddleware, async (req, res) => {
     res.json({ user });
   } catch (err) {
     res.status(500).json({ error: 'Failed to fetch user' });
+  }
+});
+
+// ── Onboarding ───────────────────────────────────────────────────────────────
+// Saved from the welcome screen shown once after the first Google sign-in, and
+// re-used by the profile page for later edits. Only the exam is required. Phone
+// is optional on purpose: it is the field most likely to lose a signup, and the
+// one that carries real obligations once held.
+// Keep these two lists in step with frontend/src/data/examTypes.js.
+const EXAM_TYPES = [
+  'NDA', 'CDS', 'AFCAT', 'SSC Tech (Army)', 'TGC (Army)',
+  'Navy (Tech)', 'Navy (Non-Tech)', 'Other',
+];
+
+const REFERRAL_SOURCES = [
+  'Instagram', 'YouTube', 'WhatsApp group', 'Telegram',
+  'A friend or coursemate', 'Google search', 'Coaching academy', 'Other',
+];
+
+// Accepts a 10-digit Indian mobile, with or without +91 and any spacing.
+// Returns a canonical +91XXXXXXXXXX, null when blank, false when unusable.
+function normalizePhone(input) {
+  const v = String(input == null ? '' : input).replace(/[\s()-]/g, '').trim();
+  if (!v) return null;
+  const m = v.match(/^(?:\+?91)?([6-9]\d{9})$/);
+  return m ? '+91' + m[1] : false;
+}
+
+router.post('/me/onboarding', authMiddleware, async (req, res) => {
+  try {
+    const body = req.body || {};
+
+    const name = String(body.display_name || '').trim();
+    if (name.length < 2 || name.length > 60)
+      return res.status(400).json({ error: 'Please enter your name.' });
+
+    const exam = String(body.exam_type || '').trim();
+    if (!EXAM_TYPES.includes(exam))
+      return res.status(400).json({ error: 'Please choose which exam you are preparing for.' });
+
+    const phone = normalizePhone(body.phone);
+    if (phone === false)
+      return res.status(400).json({ error: 'That does not look like an Indian mobile number. Enter 10 digits, or leave it blank.' });
+
+    const source = String(body.referral_source || '').trim();
+    if (source && !REFERRAL_SOURCES.includes(source))
+      return res.status(400).json({ error: 'Please pick one of the listed options.' });
+
+    const user = await saveOnboarding(req.userId, {
+      display_name:    name,
+      phone,
+      exam_type:       exam,
+      referral_source: source || null,
+    });
+    res.json({ user });
+  } catch (err) {
+    console.error('Onboarding error:', err);
+    res.status(500).json({ error: 'Could not save your details' });
   }
 });
 

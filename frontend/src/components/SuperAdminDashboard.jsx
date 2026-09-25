@@ -829,6 +829,8 @@ export default function SuperAdminDashboard() {
                 <thead>
                   <tr className="border-b border-gray-100 bg-gray-50 text-left">
                     <th className="px-4 py-3 text-[11px] font-semibold text-gray-500 uppercase tracking-wide">User</th>
+                    <th className="px-4 py-3 text-[11px] font-semibold text-gray-500 uppercase tracking-wide">Preparing for</th>
+                    <th className="px-4 py-3 text-[11px] font-semibold text-gray-500 uppercase tracking-wide">Phone</th>
                     <th className="px-4 py-3 text-[11px] font-semibold text-gray-500 uppercase tracking-wide hidden sm:table-cell">Email</th>
                     <th className="px-4 py-3 text-[11px] font-semibold text-gray-500 uppercase tracking-wide hidden sm:table-cell">Joined</th>
                     <th className="px-4 py-3 text-[11px] font-semibold text-gray-500 uppercase tracking-wide">Status</th>
@@ -840,6 +842,8 @@ export default function SuperAdminDashboard() {
                     Array.from({ length: 5 }).map((_, i) => (
                       <tr key={i} className="animate-pulse">
                         <td className="px-4 py-3"><div className="h-4 bg-gray-100 rounded w-32"/></td>
+                        <td className="px-4 py-3"><div className="h-4 bg-gray-100 rounded w-20"/></td>
+                        <td className="px-4 py-3"><div className="h-4 bg-gray-100 rounded w-24"/></td>
                         <td className="px-4 py-3 hidden sm:table-cell"><div className="h-4 bg-gray-100 rounded w-40"/></td>
                         <td className="px-4 py-3 hidden sm:table-cell"><div className="h-4 bg-gray-100 rounded w-16"/></td>
                         <td className="px-4 py-3"><div className="h-4 bg-gray-100 rounded w-14"/></td>
@@ -862,6 +866,18 @@ export default function SuperAdminDashboard() {
                             <span className="text-[10px] font-semibold px-1.5 py-0.5 rounded-full bg-blue-50 text-blue-700">Google</span>
                           </div>
                         </div>
+                      </td>
+                      {/* From the welcome screen. Both are blank until the user
+                          fills them in, so an em dash is the normal state here. */}
+                      <td className="px-4 py-3">
+                        {u.exam_type
+                          ? <span className="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-brand-50 text-brand-700 whitespace-nowrap">{u.exam_type}</span>
+                          : <span className="text-xs text-gray-300">—</span>}
+                      </td>
+                      <td className="px-4 py-3 text-xs">
+                        {u.phone
+                          ? <a href={`tel:${u.phone}`} className="font-medium text-brand-600 hover:underline whitespace-nowrap">{u.phone}</a>
+                          : <span className="text-gray-300">—</span>}
                       </td>
                       <td className="px-4 py-3 hidden sm:table-cell text-xs text-gray-500">{u.email || '—'}</td>
                       <td className="px-4 py-3 hidden sm:table-cell text-xs text-gray-400">{timeAgo(u.created_at)}</td>

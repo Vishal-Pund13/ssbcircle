@@ -77,7 +77,8 @@ router.get('/rooms', adminGuard, async (_req, res) => {
 router.get('/users', adminGuard, async (_req, res) => {
   try {
     const { rows } = await pool.query(`
-      SELECT id, display_name, email, avatar_url, is_banned, created_at
+      SELECT id, display_name, email, avatar_url, is_banned, created_at,
+             phone, exam_type, referral_source, onboarded_at
       FROM users
       ORDER BY created_at DESC
       LIMIT 200

@@ -208,6 +208,15 @@ async function start() {
     await pool.query(`ALTER TABLE rooms ADD COLUMN IF NOT EXISTS is_featured BOOLEAN DEFAULT false`);
     await pool.query(`ALTER TABLE rooms ADD COLUMN IF NOT EXISTS article_slug VARCHAR(200)`);
     await pool.query(`ALTER TABLE users ADD COLUMN IF NOT EXISTS is_banned BOOLEAN DEFAULT false`);
+    // Collected once, on the screen shown after the first Google sign-in, so the
+    // team can reach out during beta and pair aspirants preparing for the same
+    // exam. phone is optional and must never be returned by a public endpoint —
+    // /api/featured selects columns explicitly, so keep it that way rather than
+    // reaching for SELECT *.
+    await pool.query(`ALTER TABLE users ADD COLUMN IF NOT EXISTS phone           VARCHAR(20)`);
+    await pool.query(`ALTER TABLE users ADD COLUMN IF NOT EXISTS exam_type       VARCHAR(40)`);
+    await pool.query(`ALTER TABLE users ADD COLUMN IF NOT EXISTS referral_source VARCHAR(60)`);
+    await pool.query(`ALTER TABLE users ADD COLUMN IF NOT EXISTS onboarded_at    TIMESTAMPTZ`);
     await pool.query(`ALTER TABLE scheduled_sessions ADD COLUMN IF NOT EXISTS reminder_sent BOOLEAN DEFAULT false`);
     await pool.query(`ALTER TABLE scheduled_sessions ADD COLUMN IF NOT EXISTS host_reminder_sent BOOLEAN DEFAULT false`);
     await pool.query(`

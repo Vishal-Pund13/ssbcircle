@@ -62,6 +62,7 @@ async function findByGoogleId(googleId) {
 async function findById(id) {
   const { rows } = await pool.query(
     `SELECT u.id, u.username, u.display_name, u.email, u.avatar_url, u.created_at,
+            u.phone, u.exam_type, u.referral_source, u.onboarded_at,
             COUNT(r.id)::int AS rooms_created
      FROM users u
      LEFT JOIN rooms r ON r.created_by = u.id
@@ -72,6 +73,25 @@ async function findById(id) {
   return rows[0] || null;
 }
 
+// Saved from the welcome screen, and editable later from the profile page.
+// onboarded_at doubles as the "already asked" flag, so it is set once and then
+// preserved. Anything omitted is COALESCEd, so a partial save cannot wipe an
+// earlier answer — phone is the deliberate exception, because an empty value
+// is how someone removes their number.
+async function saveOnboarding(userId, { display_name, phone, exam_type, referral_source }) {
+  await pool.query(
+    `UPDATE users
+        SET display_name    = COALESCE($2, display_name),
+            phone           = $3,
+            exam_type       = COALESCE($4, exam_type),
+            referral_source = COALESCE($5, referral_source),
+            onboarded_at    = COALESCE(onboarded_at, NOW())
+      WHERE id = $1`,
+    [userId, display_name || null, phone || null, exam_type || null, referral_source || null]
+  );
+  return findById(userId);
+}
+
 async function verifyPassword(plaintext, hash) {
   if (!hash) return false;
   return bcrypt.compare(plaintext, hash);
@@ -80,5 +100,6 @@ async function verifyPassword(plaintext, hash) {
 module.exports = {
   createUser, createGoogleUser, linkGoogleToUser,
   findByUsername, findByEmail, findByGoogleId, findById,
+  saveOnboarding,
   verifyPassword,
 };

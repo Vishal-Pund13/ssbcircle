@@ -137,3 +137,9 @@ export const getArticleVotes = async (slug) => {
   const { data } = await api.get(`/api/articles/${slug}/vote`);
   return data;
 };
+
+// Profile
+export const saveOnboarding = async (payload) => {
+  const { data } = await api.post('/api/auth/me/onboarding', payload);
+  return data.user;
+};
