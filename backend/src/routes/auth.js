@@ -83,6 +83,27 @@ function normalizePhone(input) {
   return m ? '+91' + m[1] : false;
 }
 
+// The SSB date, as a plain YYYY-MM-DD from an <input type="date">.
+// Returns the string to store, '' to clear it, undefined to leave it untouched,
+// or false when it cannot be used. Bounded to a sane window so a typo like 2206
+// is rejected rather than stored.
+function normalizeSsbDate(input) {
+  if (input === undefined) return undefined;
+  const v = String(input == null ? '' : input).trim();
+  if (!v) return '';
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(v)) return false;
+
+  const d = new Date(v + 'T00:00:00Z');
+  if (Number.isNaN(d.getTime()) || d.toISOString().slice(0, 10) !== v) return false;
+
+  const today = new Date(Date.now() + 5.5 * 3600000).toISOString().slice(0, 10);
+  const floor = new Date(today + 'T00:00:00Z'); floor.setUTCFullYear(floor.getUTCFullYear() - 1);
+  const ceil  = new Date(today + 'T00:00:00Z'); ceil.setUTCFullYear(ceil.getUTCFullYear() + 3);
+  if (d < floor || d > ceil) return false;
+
+  return v;
+}
+
 router.post('/me/onboarding', authMiddleware, async (req, res) => {
   try {
     const body = req.body || {};
@@ -103,11 +124,16 @@ router.post('/me/onboarding', authMiddleware, async (req, res) => {
     if (source && !REFERRAL_SOURCES.includes(source))
       return res.status(400).json({ error: 'Please pick one of the listed options.' });
 
+    const ssbDate = normalizeSsbDate(body.ssb_date);
+    if (ssbDate === false)
+      return res.status(400).json({ error: 'That SSB date does not look right. Pick a date, or leave it blank.' });
+
     const user = await saveOnboarding(req.userId, {
       display_name:    name,
       phone,
       exam_type:       exam,
       referral_source: source || null,
+      ssb_date:        ssbDate,
     });
     res.json({ user });
   } catch (err) {

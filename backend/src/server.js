@@ -217,6 +217,10 @@ async function start() {
     await pool.query(`ALTER TABLE users ADD COLUMN IF NOT EXISTS exam_type       VARCHAR(40)`);
     await pool.query(`ALTER TABLE users ADD COLUMN IF NOT EXISTS referral_source VARCHAR(60)`);
     await pool.query(`ALTER TABLE users ADD COLUMN IF NOT EXISTS onboarded_at    TIMESTAMPTZ`);
+    // The aspirant's SSB date, used for the countdown on the home page. Stored as
+    // a plain DATE and always read back with a ::text cast — node-pg turns a DATE
+    // into a UTC-midnight JS Date, which renders as the previous day in IST.
+    await pool.query(`ALTER TABLE users ADD COLUMN IF NOT EXISTS ssb_date        DATE`);
     await pool.query(`ALTER TABLE scheduled_sessions ADD COLUMN IF NOT EXISTS reminder_sent BOOLEAN DEFAULT false`);
     await pool.query(`ALTER TABLE scheduled_sessions ADD COLUMN IF NOT EXISTS host_reminder_sent BOOLEAN DEFAULT false`);
     await pool.query(`

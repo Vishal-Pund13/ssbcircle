@@ -36,6 +36,7 @@ export default function OnboardingPage() {
   const [exam,   setExam]   = useState('');
   const [phone,  setPhone]  = useState('');
   const [source, setSource] = useState('');
+  const [ssbDate, setSsbDate] = useState('');
   const [saving, setSaving] = useState(false);
   const [error,  setError]  = useState('');
 
@@ -51,6 +52,7 @@ export default function OnboardingPage() {
         exam_type:       exam,
         phone:           phone.trim(),
         referral_source: source,
+        ssb_date:        ssbDate,
       });
       await refreshUser();
       navigate('/');
@@ -104,6 +106,23 @@ export default function OnboardingPage() {
                   onClick={() => { setExam(t); setError(''); }} />
               ))}
             </div>
+          </div>
+
+          {/* SSB date */}
+          <div>
+            <label className="block text-sm font-bold text-gray-900 mb-1">
+              Your SSB date <span className="font-medium text-gray-400">(optional)</span>
+            </label>
+            <p className="text-xs text-gray-400 mb-3 leading-relaxed">
+              If you already have a call-up letter, add the date and we will show you
+              a countdown on the home page. Leave it blank if you do not have one yet.
+            </p>
+            <input
+              type="date"
+              className="input-base text-sm w-full"
+              value={ssbDate}
+              onChange={e => { setSsbDate(e.target.value); setError(''); }}
+            />
           </div>
 
           {/* Phone */}

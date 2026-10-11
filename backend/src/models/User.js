@@ -63,6 +63,7 @@ async function findById(id) {
   const { rows } = await pool.query(
     `SELECT u.id, u.username, u.display_name, u.email, u.avatar_url, u.created_at,
             u.phone, u.exam_type, u.referral_source, u.onboarded_at,
+            u.ssb_date::text AS ssb_date,
             COUNT(r.id)::int AS rooms_created
      FROM users u
      LEFT JOIN rooms r ON r.created_by = u.id
@@ -78,16 +79,27 @@ async function findById(id) {
 // preserved. Anything omitted is COALESCEd, so a partial save cannot wipe an
 // earlier answer — phone is the deliberate exception, because an empty value
 // is how someone removes their number.
-async function saveOnboarding(userId, { display_name, phone, exam_type, referral_source }) {
+async function saveOnboarding(userId, { display_name, phone, exam_type, referral_source, ssb_date }) {
   await pool.query(
     `UPDATE users
         SET display_name    = COALESCE($2, display_name),
             phone           = $3,
             exam_type       = COALESCE($4, exam_type),
             referral_source = COALESCE($5, referral_source),
+            ssb_date        = CASE WHEN $6::text IS NULL THEN ssb_date
+                                   ELSE NULLIF($6::text, '')::date END,
             onboarded_at    = COALESCE(onboarded_at, NOW())
       WHERE id = $1`,
-    [userId, display_name || null, phone || null, exam_type || null, referral_source || null]
+    [
+      userId,
+      display_name || null,
+      phone || null,
+      exam_type || null,
+      referral_source || null,
+      // null means "leave it alone", '' means "clear it". Keeping those apart
+      // is what stops a save that omits the field from silently erasing a date.
+      ssb_date == null ? null : String(ssb_date),
+    ]
   );
   return findById(userId);
 }

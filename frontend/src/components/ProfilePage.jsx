@@ -23,6 +23,7 @@ export default function ProfilePage() {
   const [name,  setName]  = useState(user?.display_name || '');
   const [exam,  setExam]  = useState(user?.exam_type    || '');
   const [phone, setPhone] = useState(user?.phone        || '');
+  const [ssbDate, setSsbDate] = useState(user?.ssb_date || '');
   const [dSaving, setDSaving] = useState(false);
   const [dSaved,  setDSaved]  = useState(false);
   const [dError,  setDError]  = useState('');
@@ -38,7 +39,12 @@ export default function ProfilePage() {
 
     setDSaving(true); setDError(''); setDSaved(false);
     try {
-      await saveOnboarding({ display_name: name.trim(), exam_type: exam, phone: phone.trim() });
+      await saveOnboarding({
+        display_name: name.trim(),
+        exam_type:    exam,
+        phone:        phone.trim(),
+        ssb_date:     ssbDate,
+      });
       await refreshUser();
       setDSaved(true);
       setTimeout(() => setDSaved(false), 2500);
@@ -125,6 +131,20 @@ export default function ProfilePage() {
               </button>
             ))}
           </div>
+
+          <label className="block text-xs font-bold text-slate-700 mt-4 mb-1.5">
+            SSB date <span className="font-medium text-slate-400">(optional)</span>
+          </label>
+          <p className="text-[11px] text-slate-400 mb-2 leading-relaxed">
+            Add the date from your call-up letter and the home page will show how many days
+            are left. Clear the box and save to remove it.
+          </p>
+          <input
+            type="date"
+            className="input-base text-sm w-full"
+            value={ssbDate}
+            onChange={e => { setSsbDate(e.target.value); setDError(''); }}
+          />
 
           <label className="block text-xs font-bold text-slate-700 mt-4 mb-1.5">
             Phone number <span className="font-medium text-slate-400">(optional)</span>
