@@ -1,13 +1,11 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { ArrowRight, Check } from 'lucide-react';
+import { CalendarDays, Check } from 'lucide-react';
 import { updateSsbDate } from '../services/api';
 
-// "How long until my SSB?" — a tool anyone can use, signed in or not.
-//
-// Deliberately not gated behind an account. A first-time visitor should get an
-// answer immediately; saving it to an account is the reason to sign up, not the
-// price of entry.
+// "How long until my SSB?" — a small tool on the home page, usable signed in
+// or not. Deliberately compact: it sits inside the page rather than competing
+// with the hero, and a first-time visitor gets an answer without an account.
 //
 // Dates are plain YYYY-MM-DD strings. Never hand one to new Date() without an
 // explicit offset — a bare date string is local time in some browsers and UTC
@@ -50,31 +48,20 @@ export function monthsUntil(isoDate, from = istToday()) {
 
 // A bare number is pressure. What an aspirant needs is to know what today is for.
 function focusFor(days) {
-  if (days > 60)  return 'Plenty of time. Build the habit now — read daily and get your fitness up.';
-  if (days > 30)  return 'Good window. Practise GD and lecturette every week, out loud, with others.';
-  if (days > 7)   return 'Sharpen up. Do mock GDs, fix your PIQ answers, and keep running.';
-  if (days > 1)   return 'Final week. Revise your PIQ, sleep properly, and go in rested.';
-  if (days === 1) return 'Tomorrow. Pack your documents tonight and get an early night.';
+  if (days > 60)  return 'Plenty of time — read daily and build your fitness.';
+  if (days > 30)  return 'Practise GD and lecturette every week, out loud.';
+  if (days > 7)   return 'Mock GDs, fix your PIQ answers, keep running.';
+  if (days > 1)   return 'Final week. Revise your PIQ and sleep properly.';
+  if (days === 1) return 'Tomorrow. Pack your documents tonight.';
   return 'Go in calm, be yourself, and tell the truth.';
 }
 
 const prettyDate = iso =>
   new Date(iso + 'T00:00:00Z').toLocaleDateString('en-IN', {
-    timeZone: 'UTC', weekday: 'long', day: 'numeric', month: 'long', year: 'numeric',
+    timeZone: 'UTC', day: 'numeric', month: 'short', year: 'numeric',
   });
 
 const pad = n => String(n).padStart(2, '0');
-
-// One unit of the live clock. Deliberately quieter than the day count — the
-// day number is what an aspirant actually plans around.
-function ClockUnit({ value, label }) {
-  return (
-    <div className="text-center">
-      <p className="text-2xl sm:text-3xl font-bold text-white tabular-nums leading-none">{value}</p>
-      <p className="text-[9px] font-bold uppercase tracking-[0.2em] text-white/40 mt-1.5">{label}</p>
-    </div>
-  );
-}
 
 export default function SsbCountdown({ user }) {
   const [date,  setDate]  = useState('');
@@ -124,130 +111,113 @@ export default function SsbCountdown({ user }) {
   const clockHours = Math.floor((msLeft % DAY_MS) / HOUR_MS);
   const clockMins  = Math.floor((msLeft % HOUR_MS) / MIN_MS);
   const clockSecs  = Math.floor((msLeft % MIN_MS) / 1000);
-  const totalHours = Math.floor(msLeft / HOUR_MS);
   const weeks      = live ? Math.floor(days / 7) : 0;
   const months     = live ? monthsUntil(date) : 0;
 
   const today  = istToday();
   const maxDay = String(Number(today.slice(0, 4)) + 3) + today.slice(4);
 
+  const dateInput = (
+    <input
+      type="date"
+      className="input-base text-xs py-1.5 px-2.5 w-[9.5rem]"
+      value={date}
+      min={today}
+      max={maxDay}
+      onChange={e => choose(e.target.value)}
+      aria-label="Your SSB interview date"
+    />
+  );
+
   return (
-    <section className="border-t border-gray-100 bg-white px-4 sm:px-6 py-8 sm:py-10">
-      <div className="max-w-5xl mx-auto relative overflow-hidden rounded-2xl bg-brand-800 text-white">
-        <div className="absolute inset-0 opacity-[0.07] pointer-events-none"
-          style={{ backgroundImage: 'radial-gradient(circle, #fff 1px, transparent 1px)', backgroundSize: '16px 16px' }} />
+    <section className="bg-white px-4 sm:px-6 py-5">
+      <div className="max-w-5xl mx-auto border border-gray-200 rounded-xl px-4 sm:px-5 py-3.5">
 
-        <div className="relative px-5 sm:px-8 py-7 sm:py-9">
-          <p className="text-[10px] font-bold uppercase tracking-[0.3em] text-amber-300">
-            {live ? 'Countdown to your SSB' : 'SSB countdown'}
-          </p>
+        <div className="flex flex-wrap items-center gap-x-5 gap-y-3">
+          <div className="flex items-center gap-2 shrink-0">
+            <CalendarDays className="w-4 h-4 text-brand-600 shrink-0" />
+            <span className="text-[10px] font-bold uppercase tracking-[0.18em] text-gray-400">
+              SSB countdown
+            </span>
+          </div>
 
-          {/* Nothing entered yet — this is the hook, so it leads */}
+          {/* No date yet — the prompt is the whole widget */}
           {!valid && (
             <>
-              <h2 className="mt-3 text-2xl sm:text-4xl font-bold uppercase leading-[0.95] tracking-tighter">
-                How long until<br />your SSB?
-              </h2>
-              <p className="mt-4 max-w-md text-sm text-white/70 leading-relaxed">
-                Put in the date from your call-up letter and see exactly how long is left,
-                down to the second. No account needed.
+              <p className="text-sm text-gray-600 flex-1 min-w-[12rem]">
+                Add your SSB date to see exactly how long is left.
               </p>
+              {dateInput}
             </>
           )}
 
-          {/* The live countdown */}
+          {/* Counting down */}
           {live && (
-            <div className="mt-4 flex flex-col lg:flex-row lg:items-end gap-6 lg:gap-10">
-              <div className="shrink-0">
-                <p className="text-6xl sm:text-8xl font-bold tabular-nums leading-[0.85] tracking-tighter">
+            <>
+              <div className="flex items-baseline gap-1.5 shrink-0">
+                <span className="text-3xl sm:text-4xl font-bold text-brand-600 tabular-nums leading-none">
                   {days}
-                </p>
-                <p className="mt-2 text-xs font-bold uppercase tracking-[0.25em] text-amber-300">
-                  {days === 1 ? 'Day to go' : 'Days to go'}
-                </p>
+                </span>
+                <span className="text-xs font-semibold text-gray-500">
+                  {days === 1 ? 'day left' : 'days left'}
+                </span>
               </div>
 
-              <div className="flex items-start gap-4 sm:gap-6 lg:border-l lg:border-white/15 lg:pl-10 lg:pb-1">
-                <ClockUnit value={pad(clockHours)} label="Hours" />
-                <span className="text-2xl sm:text-3xl font-bold text-white/25 leading-none">:</span>
-                <ClockUnit value={pad(clockMins)} label="Mins" />
-                <span className="text-2xl sm:text-3xl font-bold text-white/25 leading-none">:</span>
-                <ClockUnit value={pad(clockSecs)} label="Secs" />
+              <div className="flex items-baseline gap-1 shrink-0 text-gray-700">
+                <span className="text-base sm:text-lg font-semibold tabular-nums">{pad(clockHours)}</span>
+                <span className="text-gray-300">:</span>
+                <span className="text-base sm:text-lg font-semibold tabular-nums">{pad(clockMins)}</span>
+                <span className="text-gray-300">:</span>
+                <span className="text-base sm:text-lg font-semibold tabular-nums">{pad(clockSecs)}</span>
               </div>
-            </div>
+
+              <div className="flex-1" />
+              {dateInput}
+            </>
           )}
 
           {/* The day itself */}
           {valid && !past && !live && (
-            <h2 className="mt-3 text-5xl sm:text-7xl font-bold uppercase leading-[0.9] tracking-tighter">
-              Today
-            </h2>
-          )}
-
-          {/* The date has gone by */}
-          {past && (
             <>
-              <h2 className="mt-3 text-2xl sm:text-3xl font-bold leading-tight">That date has passed</h2>
-              <p className="mt-2 text-sm text-white/70">
-                Hope it went well. Set your next date below, or keep practising while you wait.
-              </p>
+              <p className="text-base font-bold text-brand-600 shrink-0">Your SSB is today.</p>
+              <div className="flex-1" />
+              {dateInput}
             </>
           )}
 
-          {/* Supporting figures — same information, smaller voice */}
-          {live && (
-            <p className="mt-5 text-xs text-white/50">
-              That is roughly <span className="font-semibold text-white/80">{months} {months === 1 ? 'month' : 'months'}</span>
-              {' · '}<span className="font-semibold text-white/80">{weeks} {weeks === 1 ? 'week' : 'weeks'}</span>
-              {' · '}<span className="font-semibold text-white/80">{totalHours.toLocaleString('en-IN')} hours</span>
-            </p>
+          {/* Gone by */}
+          {past && (
+            <>
+              <p className="text-sm text-gray-600 flex-1 min-w-[12rem]">
+                That date has passed. Set your next one.
+              </p>
+              {dateInput}
+            </>
           )}
 
-          {valid && !past && (
-            <p className="mt-4 text-sm text-white/80 leading-relaxed max-w-xl">{focusFor(days)}</p>
-          )}
-          {valid && !past && (
-            <p className="mt-1.5 text-[11px] text-white/40">{prettyDate(date)}</p>
-          )}
-
-          {/* Date picker and actions */}
-          <div className="mt-6 flex flex-col sm:flex-row sm:items-center gap-3">
-            <input
-              type="date"
-              className="bg-white/10 border border-white/20 text-white text-sm rounded-xl px-4 py-2.5 w-full sm:w-auto focus:outline-none focus:border-amber-300 [color-scheme:dark]"
-              value={date}
-              min={today}
-              max={maxDay}
-              onChange={e => choose(e.target.value)}
-              aria-label="Your SSB interview date"
-            />
-
-            <Link to={user ? '/create' : '/register'}
-              className="inline-flex items-center justify-center gap-2 bg-white text-brand-800 text-xs font-bold uppercase tracking-[0.15em] px-6 py-3 rounded-xl hover:bg-amber-300 transition-colors">
-              {user ? 'Practise now' : 'Start practising free'}
-              <ArrowRight className="w-4 h-4" />
-            </Link>
-
-            {date && (
-              <button type="button" onClick={() => choose('')}
-                className="text-xs font-semibold text-white/40 hover:text-white/70 cursor-pointer self-start sm:self-auto">
-                Clear
-              </button>
-            )}
-            {saved && (
-              <span className="inline-flex items-center gap-1 text-xs font-semibold text-amber-300">
-                <Check className="w-3.5 h-3.5" /> Saved
-              </span>
-            )}
-          </div>
-
-          {!user && valid && !past && (
-            <p className="mt-3 text-[11px] text-white/40 max-w-md leading-relaxed">
-              Create a free account and we will keep this date on every device, and put you
-              with aspirants whose SSB is around the same time.
-            </p>
+          {saved && (
+            <span className="inline-flex items-center gap-1 text-[11px] font-semibold text-emerald-600 shrink-0">
+              <Check className="w-3 h-3" /> Saved
+            </span>
           )}
         </div>
+
+        {/* Second line: the same information, quietly */}
+        {live && (
+          <p className="mt-2 text-[11px] text-gray-400">
+            {months} {months === 1 ? 'month' : 'months'} · {weeks} {weeks === 1 ? 'week' : 'weeks'} · {prettyDate(date)}
+            <span className="text-gray-300"> — </span>
+            <span className="text-gray-500">{focusFor(days)}</span>
+            {!user && (
+              <>
+                <span className="text-gray-300"> · </span>
+                <Link to="/register" className="font-semibold text-brand-600 hover:underline">
+                  Save it to your profile
+                </Link>
+              </>
+            )}
+          </p>
+        )}
       </div>
     </section>
   );
