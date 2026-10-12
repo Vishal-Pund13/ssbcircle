@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { getPiq, savePiq, deletePiq } from '../services/api';
-import { Check, AlertCircle, Trash2, Lock, Plus, X } from 'lucide-react';
+import { getPiq, savePiq, deletePiq, analyzePiq } from '../services/api';
+import { Check, AlertCircle, Trash2, Lock, Plus, X, Sparkles } from 'lucide-react';
 
 // A working copy of the Personal Information Questionnaire (DIPR 107-A).
 //
@@ -117,15 +117,22 @@ export default function PiqPage() {
   const [error,   setError]   = useState('');
   const [updated, setUpdated] = useState(null);
 
+  const [analysis,  setAnalysis]  = useState(null);
+  const [analysedAt, setAnalysedAt] = useState(null);
+  const [analysing, setAnalysing] = useState(false);
+  const [aError,    setAError]    = useState('');
+
   useEffect(() => {
     let cancelled = false;
     getPiq()
-      .then(({ piq, updated_at }) => {
+      .then(({ piq, updated_at, analysis: saved, analysed_at }) => {
         if (cancelled) return;
         // Merge over a fresh blank so a form saved before a field existed still
         // opens cleanly instead of leaving undefined inputs.
         if (piq) setForm({ ...emptyForm(), ...piq });
         setUpdated(updated_at);
+        setAnalysis(saved || null);
+        setAnalysedAt(analysed_at || null);
       })
       .catch(() => { if (!cancelled) setError('Could not load your PIQ.'); })
       .finally(() => { if (!cancelled) setLoading(false); });
@@ -155,6 +162,22 @@ export default function PiqPage() {
       setError(err.message || 'Could not save your PIQ.');
     } finally {
       setSaving(false);
+    }
+  }
+
+  // Saves first, so the analysis always reflects what is on screen rather than
+  // whatever was last written to the database.
+  async function analyse() {
+    setAnalysing(true); setAError(''); setError('');
+    try {
+      await savePiq(form);
+      const { analysis: result, analysed_at } = await analyzePiq();
+      setAnalysis(result);
+      setAnalysedAt(analysed_at);
+    } catch (err) {
+      setAError(err.message || 'Could not analyse your PIQ.');
+    } finally {
+      setAnalysing(false);
     }
   }
 
@@ -410,15 +433,94 @@ export default function PiqPage() {
           </p>
         )}
 
-        <div className="flex flex-wrap items-center gap-3 pt-1 pb-10">
+        <div className="flex flex-wrap items-center gap-3 pt-1">
           <button type="submit" disabled={saving} className="btn-primary text-sm px-6 py-2.5">
             {saving ? 'Saving…' : saved ? 'Saved' : 'Save PIQ'}
+          </button>
+          <button type="button" onClick={analyse} disabled={analysing || saving}
+            className="inline-flex items-center gap-1.5 bg-brand-600 hover:bg-brand-700 disabled:opacity-60 text-white text-sm font-semibold px-5 py-2.5 rounded-xl transition-colors cursor-pointer">
+            <Sparkles className="w-4 h-4" />
+            {analysing ? 'Reading your PIQ…' : analysis ? 'Analyse again' : 'Analyse my PIQ'}
           </button>
           <button type="button" onClick={remove} disabled={saving}
             className="inline-flex items-center gap-1.5 text-xs font-semibold text-gray-400 hover:text-red-500 cursor-pointer">
             <Trash2 className="w-3.5 h-3.5" /> Delete my PIQ
           </button>
         </div>
+
+        {aError && (
+          <p className="text-xs text-red-600 flex items-start gap-1.5">
+            <AlertCircle className="w-3.5 h-3.5 shrink-0 mt-0.5" /> {aError}
+          </p>
+        )}
+
+        {analysis && (
+          <div className="bg-white border border-gray-200 rounded-2xl p-5 sm:p-6 space-y-5 mb-10">
+            <div>
+              <h2 className="text-sm font-bold text-gray-900">What an IO will see</h2>
+              {analysedAt && (
+                <p className="text-[11px] text-gray-400 mt-0.5">
+                  Analysed {new Date(analysedAt).toLocaleString('en-IN')}
+                </p>
+              )}
+            </div>
+
+            {analysis.summary && (
+              <p className="text-sm text-gray-700 leading-relaxed">{analysis.summary}</p>
+            )}
+
+            {analysis.strengths?.length > 0 && (
+              <div>
+                <p className="text-[11px] font-bold uppercase tracking-[0.15em] text-gray-400 mb-2">Your strong points</p>
+                <ul className="space-y-1.5">
+                  {analysis.strengths.map((s, i) => (
+                    <li key={i} className="flex items-start gap-2 text-sm text-gray-700 leading-relaxed">
+                      <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 shrink-0 mt-2" />{s}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            )}
+
+            {analysis.likely_questions?.length > 0 && (
+              <div>
+                <p className="text-[11px] font-bold uppercase tracking-[0.15em] text-gray-400 mb-2">Questions you are likely to get</p>
+                <div className="space-y-3">
+                  {analysis.likely_questions.map((group, i) => (
+                    <div key={i} className="border border-gray-100 rounded-xl px-4 py-3 bg-gray-50/60">
+                      <p className="text-xs font-bold text-brand-700">{group.area}</p>
+                      <ul className="mt-2 space-y-1.5">
+                        {(group.questions || []).map((q, j) => (
+                          <li key={j} className="text-sm text-gray-700 leading-relaxed">— {q}</li>
+                        ))}
+                      </ul>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {analysis.gaps?.length > 0 && (
+              <div>
+                <p className="text-[11px] font-bold uppercase tracking-[0.15em] text-gray-400 mb-2">Where you are thin</p>
+                <div className="space-y-3">
+                  {analysis.gaps.map((gap, i) => (
+                    <div key={i} className="border-l-2 border-amber-300 pl-3">
+                      <p className="text-sm font-semibold text-gray-800">{gap.issue}</p>
+                      {gap.why && <p className="text-xs text-gray-500 mt-0.5 leading-relaxed">{gap.why}</p>}
+                      {gap.fix && <p className="text-xs text-brand-700 mt-1 leading-relaxed">Do this: {gap.fix}</p>}
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            <p className="text-[11px] text-gray-400 leading-relaxed border-t border-gray-100 pt-4">
+              This is practice guidance generated from what you wrote, not a real assessment.
+              Your actual interview depends on how you answer on the day.
+            </p>
+          </div>
+        )}
       </form>
     </div>
   );

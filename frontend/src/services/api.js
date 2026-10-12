@@ -167,3 +167,10 @@ export const deletePiq = async () => {
   const { data } = await api.delete('/api/piq');
   return data;
 };
+
+// The model takes a while to read a whole PIQ, so this waits far longer than
+// the default 10s. Capped server-side at a few runs per day.
+export const analyzePiq = async () => {
+  const { data } = await api.post('/api/piq/analyze', {}, { timeout: 90000 });
+  return data;             // { analysis, analysed_at, used_today, daily_limit }
+};

@@ -14,8 +14,38 @@ const pool = require('../db');
 
 async function getForUser(userId) {
   const { rows } = await pool.query(
-    `SELECT data, updated_at FROM piq WHERE user_id = $1`,
+    `SELECT data, updated_at, analysis, analysed_at FROM piq WHERE user_id = $1`,
     [userId]
+  );
+  return rows[0] || null;
+}
+
+// The form plus how many analyses this aspirant has already run today. The
+// count resets on an IST day boundary, so it matches their midnight rather
+// than the server's.
+async function getWithUsage(userId) {
+  const { rows } = await pool.query(
+    `SELECT data,
+            CASE WHEN analysis_day = (NOW() AT TIME ZONE 'Asia/Kolkata')::date
+                 THEN analysis_count ELSE 0 END AS used_today
+       FROM piq
+      WHERE user_id = $1`,
+    [userId]
+  );
+  return rows[0] || null;
+}
+
+async function saveAnalysis(userId, analysis) {
+  const { rows } = await pool.query(
+    `UPDATE piq
+        SET analysis       = $2::jsonb,
+            analysed_at    = NOW(),
+            analysis_count = CASE WHEN analysis_day = (NOW() AT TIME ZONE 'Asia/Kolkata')::date
+                                  THEN analysis_count + 1 ELSE 1 END,
+            analysis_day   = (NOW() AT TIME ZONE 'Asia/Kolkata')::date
+      WHERE user_id = $1
+      RETURNING analysis, analysed_at`,
+    [userId, JSON.stringify(analysis)]
   );
   return rows[0] || null;
 }
@@ -39,4 +69,4 @@ async function removeForUser(userId) {
   return rowCount > 0;
 }
 
-module.exports = { getForUser, saveForUser, removeForUser };
+module.exports = { getForUser, getWithUsage, saveForUser, saveAnalysis, removeForUser };

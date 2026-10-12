@@ -243,6 +243,14 @@ async function start() {
         updated_at TIMESTAMPTZ DEFAULT NOW()
       )
     `);
+    // The last analysis, kept so an aspirant can re-read it without paying for
+    // another call. analysis_day and analysis_count cap spend per person per day
+    // — an uncapped button that costs money on every press is a bill waiting to
+    // happen. The day is taken in IST so the reset matches the user's midnight.
+    await pool.query(`ALTER TABLE piq ADD COLUMN IF NOT EXISTS analysis       JSONB`);
+    await pool.query(`ALTER TABLE piq ADD COLUMN IF NOT EXISTS analysed_at    TIMESTAMPTZ`);
+    await pool.query(`ALTER TABLE piq ADD COLUMN IF NOT EXISTS analysis_day   DATE`);
+    await pool.query(`ALTER TABLE piq ADD COLUMN IF NOT EXISTS analysis_count INT DEFAULT 0`);
     await pool.query(`ALTER TABLE scheduled_sessions ADD COLUMN IF NOT EXISTS reminder_sent BOOLEAN DEFAULT false`);
     await pool.query(`ALTER TABLE scheduled_sessions ADD COLUMN IF NOT EXISTS host_reminder_sent BOOLEAN DEFAULT false`);
     await pool.query(`
