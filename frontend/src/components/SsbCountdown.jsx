@@ -1,13 +1,13 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { CalendarDays, ArrowRight, Check } from 'lucide-react';
+import { ArrowRight, Check } from 'lucide-react';
 import { updateSsbDate } from '../services/api';
 
 // "How long until my SSB?" — a tool anyone can use, signed in or not.
 //
-// This is deliberately not gated behind an account. A first-time visitor should
-// be able to type their date and get an answer immediately; saving it to an
-// account is the reason to sign up, not the price of entry.
+// Deliberately not gated behind an account. A first-time visitor should get an
+// answer immediately; saving it to an account is the reason to sign up, not the
+// price of entry.
 //
 // Dates are plain YYYY-MM-DD strings. Never hand one to new Date() without an
 // explicit offset — a bare date string is local time in some browsers and UTC
@@ -16,6 +16,7 @@ import { updateSsbDate } from '../services/api';
 const STORAGE_KEY = 'ssbcircle:ssb-date';
 const DAY_MS  = 86400000;
 const HOUR_MS = 3600000;
+const MIN_MS  = 60000;
 
 // Today's date in India, regardless of where the browser is.
 export function istToday() {
@@ -31,8 +32,8 @@ export function daysUntil(isoDate, from = istToday()) {
   return Math.round((target - start) / DAY_MS);
 }
 
-// The exact instant the SSB date begins in India. Used for the hours figure so
-// it ticks down against real time rather than whole days.
+// The exact instant the SSB date begins in India, so the clock ticks against
+// real time rather than whole days.
 function istMidnightMs(isoDate) {
   return Date.parse(isoDate + 'T00:00:00+05:30');
 }
@@ -54,7 +55,7 @@ function focusFor(days) {
   if (days > 7)   return 'Sharpen up. Do mock GDs, fix your PIQ answers, and keep running.';
   if (days > 1)   return 'Final week. Revise your PIQ, sleep properly, and go in rested.';
   if (days === 1) return 'Tomorrow. Pack your documents tonight and get an early night.';
-  return 'Today is the day. Go in calm, be yourself, and tell the truth.';
+  return 'Go in calm, be yourself, and tell the truth.';
 }
 
 const prettyDate = iso =>
@@ -62,11 +63,15 @@ const prettyDate = iso =>
     timeZone: 'UTC', weekday: 'long', day: 'numeric', month: 'long', year: 'numeric',
   });
 
-function Stat({ value, label }) {
+const pad = n => String(n).padStart(2, '0');
+
+// One unit of the live clock. Deliberately quieter than the day count — the
+// day number is what an aspirant actually plans around.
+function ClockUnit({ value, label }) {
   return (
-    <div className="flex-1 min-w-[72px] bg-white border border-brand-100 rounded-xl px-3 py-3 text-center">
-      <p className="text-2xl sm:text-3xl font-bold text-brand-700 tabular-nums leading-none">{value}</p>
-      <p className="text-[10px] font-bold uppercase tracking-[0.15em] text-gray-400 mt-1.5">{label}</p>
+    <div className="text-center">
+      <p className="text-2xl sm:text-3xl font-bold text-white tabular-nums leading-none">{value}</p>
+      <p className="text-[9px] font-bold uppercase tracking-[0.2em] text-white/40 mt-1.5">{label}</p>
     </div>
   );
 }
@@ -86,12 +91,17 @@ export default function SsbCountdown({ user }) {
     } catch { /* private mode */ }
   }, [user?.ssb_date]);
 
-  // Only tick while a date is set — no point re-rendering an empty prompt.
+  const days  = daysUntil(date);
+  const valid = days !== null;
+  const past  = valid && days < 0;
+  const live  = valid && days > 0;
+
+  // Only run the timer when there is a clock on screen to move.
   useEffect(() => {
-    if (!date) return undefined;
+    if (!live) return undefined;
     const id = setInterval(() => setNow(Date.now()), 1000);
     return () => clearInterval(id);
-  }, [date]);
+  }, [live]);
 
   function choose(value) {
     setDate(value);
@@ -101,7 +111,7 @@ export default function SsbCountdown({ user }) {
     } catch { /* private mode */ }
 
     // Signed in? Keep it on the account too, so it follows them across devices.
-    // Failures are deliberately silent: the countdown still works from
+    // Failures are silent on purpose: the countdown still works from
     // localStorage, and this is not a form the user submitted.
     if (user && value) {
       updateSsbDate(value)
@@ -110,110 +120,134 @@ export default function SsbCountdown({ user }) {
     }
   }
 
-  const days   = daysUntil(date);
-  const valid  = days !== null;
-  const past   = valid && days < 0;
-  const hours  = valid ? Math.max(0, Math.floor((istMidnightMs(date) - now) / HOUR_MS)) : 0;
-  const weeks  = valid ? Math.floor(Math.max(0, days) / 7) : 0;
-  const months = valid ? monthsUntil(date) : 0;
+  const msLeft     = valid ? Math.max(0, istMidnightMs(date) - now) : 0;
+  const clockHours = Math.floor((msLeft % DAY_MS) / HOUR_MS);
+  const clockMins  = Math.floor((msLeft % HOUR_MS) / MIN_MS);
+  const clockSecs  = Math.floor((msLeft % MIN_MS) / 1000);
+  const totalHours = Math.floor(msLeft / HOUR_MS);
+  const weeks      = live ? Math.floor(days / 7) : 0;
+  const months     = live ? monthsUntil(date) : 0;
 
   const today  = istToday();
-  const maxDay = `${Number(today.slice(0, 4)) + 3}${today.slice(4)}`;
+  const maxDay = String(Number(today.slice(0, 4)) + 3) + today.slice(4);
 
   return (
     <section className="border-t border-gray-100 bg-white px-4 sm:px-6 py-8 sm:py-10">
-      <div className="max-w-5xl mx-auto bg-brand-50 border border-brand-100 rounded-2xl px-5 sm:px-7 py-6 sm:py-7">
+      <div className="max-w-5xl mx-auto relative overflow-hidden rounded-2xl bg-brand-800 text-white">
+        <div className="absolute inset-0 opacity-[0.07] pointer-events-none"
+          style={{ backgroundImage: 'radial-gradient(circle, #fff 1px, transparent 1px)', backgroundSize: '16px 16px' }} />
 
-        <div className="flex items-start gap-3">
-          <div className="w-10 h-10 rounded-xl bg-white border border-brand-100 flex items-center justify-center shrink-0">
-            <CalendarDays className="w-5 h-5 text-brand-600" />
-          </div>
-          <div className="min-w-0">
-            <h2 className="text-lg sm:text-xl font-bold text-gray-900 leading-tight">
-              How long until your SSB?
-            </h2>
-            <p className="text-xs sm:text-sm text-gray-500 mt-1">
-              Put in the date from your call-up letter. No account needed.
-            </p>
-          </div>
-        </div>
-
-        {/* The date picker is always visible — it is the point of the tool */}
-        <div className="mt-5 flex flex-col sm:flex-row sm:items-center gap-3">
-          <input
-            type="date"
-            className="input-base text-sm w-full sm:w-auto"
-            value={date}
-            min={today}
-            max={maxDay}
-            onChange={e => choose(e.target.value)}
-            aria-label="Your SSB interview date"
-          />
-          {date && (
-            <button type="button" onClick={() => choose('')}
-              className="text-xs font-semibold text-gray-400 hover:text-gray-600 cursor-pointer self-start sm:self-auto">
-              Clear
-            </button>
-          )}
-          {saved && (
-            <span className="inline-flex items-center gap-1 text-xs font-semibold text-emerald-600">
-              <Check className="w-3.5 h-3.5" /> Saved to your profile
-            </span>
-          )}
-        </div>
-
-        {/* Nothing entered yet */}
-        {!valid && (
-          <p className="mt-5 text-sm text-gray-500">
-            Pick your date above and we will show you exactly how long is left — in months,
-            weeks, days and hours.
+        <div className="relative px-5 sm:px-8 py-7 sm:py-9">
+          <p className="text-[10px] font-bold uppercase tracking-[0.3em] text-amber-300">
+            {live ? 'Countdown to your SSB' : 'SSB countdown'}
           </p>
-        )}
 
-        {/* The date has gone by */}
-        {past && (
-          <div className="mt-5">
-            <p className="text-sm font-semibold text-gray-800">That date has passed.</p>
-            <p className="text-xs text-gray-500 mt-1">
-              Hope it went well. Pick your next date above, or{' '}
-              <Link to="/create" className="font-semibold text-brand-600 hover:underline">
-                keep practising
-              </Link>{' '}
-              while you wait for the result.
-            </p>
-          </div>
-        )}
+          {/* Nothing entered yet — this is the hook, so it leads */}
+          {!valid && (
+            <>
+              <h2 className="mt-3 text-2xl sm:text-4xl font-bold uppercase leading-[0.95] tracking-tighter">
+                How long until<br />your SSB?
+              </h2>
+              <p className="mt-4 max-w-md text-sm text-white/70 leading-relaxed">
+                Put in the date from your call-up letter and see exactly how long is left,
+                down to the second. No account needed.
+              </p>
+            </>
+          )}
 
-        {/* The countdown itself */}
-        {valid && !past && (
-          <>
-            <div className="mt-5 flex flex-wrap gap-2.5">
-              <Stat value={months} label={months === 1 ? 'Month' : 'Months'} />
-              <Stat value={weeks}  label={weeks === 1 ? 'Week' : 'Weeks'} />
-              <Stat value={days}   label={days === 1 ? 'Day' : 'Days'} />
-              <Stat value={hours}  label={hours === 1 ? 'Hour' : 'Hours'} />
-            </div>
-
-            <p className="mt-4 text-sm text-gray-700 leading-relaxed">
-              {days === 0 ? 'Your SSB is today. ' : ''}{focusFor(days)}
-            </p>
-            <p className="text-[11px] text-gray-400 mt-1.5">{prettyDate(date)}</p>
-
-            <div className="mt-5 flex flex-col sm:flex-row gap-2.5">
-              <Link to={user ? '/create' : '/register'}
-                className="inline-flex items-center justify-center gap-1.5 bg-brand-600 hover:bg-brand-700 text-white text-xs font-bold px-5 py-2.5 rounded-xl transition-colors">
-                {user ? 'Practise now' : 'Start practising free'}
-                <ArrowRight className="w-3.5 h-3.5" />
-              </Link>
-              {!user && (
-                <p className="text-[11px] text-gray-500 sm:self-center leading-relaxed">
-                  Create a free account and we will keep this date on every device,
-                  and put you with aspirants whose SSB is around the same time.
+          {/* The live countdown */}
+          {live && (
+            <div className="mt-4 flex flex-col lg:flex-row lg:items-end gap-6 lg:gap-10">
+              <div className="shrink-0">
+                <p className="text-6xl sm:text-8xl font-bold tabular-nums leading-[0.85] tracking-tighter">
+                  {days}
                 </p>
-              )}
+                <p className="mt-2 text-xs font-bold uppercase tracking-[0.25em] text-amber-300">
+                  {days === 1 ? 'Day to go' : 'Days to go'}
+                </p>
+              </div>
+
+              <div className="flex items-start gap-4 sm:gap-6 lg:border-l lg:border-white/15 lg:pl-10 lg:pb-1">
+                <ClockUnit value={pad(clockHours)} label="Hours" />
+                <span className="text-2xl sm:text-3xl font-bold text-white/25 leading-none">:</span>
+                <ClockUnit value={pad(clockMins)} label="Mins" />
+                <span className="text-2xl sm:text-3xl font-bold text-white/25 leading-none">:</span>
+                <ClockUnit value={pad(clockSecs)} label="Secs" />
+              </div>
             </div>
-          </>
-        )}
+          )}
+
+          {/* The day itself */}
+          {valid && !past && !live && (
+            <h2 className="mt-3 text-5xl sm:text-7xl font-bold uppercase leading-[0.9] tracking-tighter">
+              Today
+            </h2>
+          )}
+
+          {/* The date has gone by */}
+          {past && (
+            <>
+              <h2 className="mt-3 text-2xl sm:text-3xl font-bold leading-tight">That date has passed</h2>
+              <p className="mt-2 text-sm text-white/70">
+                Hope it went well. Set your next date below, or keep practising while you wait.
+              </p>
+            </>
+          )}
+
+          {/* Supporting figures — same information, smaller voice */}
+          {live && (
+            <p className="mt-5 text-xs text-white/50">
+              That is roughly <span className="font-semibold text-white/80">{months} {months === 1 ? 'month' : 'months'}</span>
+              {' · '}<span className="font-semibold text-white/80">{weeks} {weeks === 1 ? 'week' : 'weeks'}</span>
+              {' · '}<span className="font-semibold text-white/80">{totalHours.toLocaleString('en-IN')} hours</span>
+            </p>
+          )}
+
+          {valid && !past && (
+            <p className="mt-4 text-sm text-white/80 leading-relaxed max-w-xl">{focusFor(days)}</p>
+          )}
+          {valid && !past && (
+            <p className="mt-1.5 text-[11px] text-white/40">{prettyDate(date)}</p>
+          )}
+
+          {/* Date picker and actions */}
+          <div className="mt-6 flex flex-col sm:flex-row sm:items-center gap-3">
+            <input
+              type="date"
+              className="bg-white/10 border border-white/20 text-white text-sm rounded-xl px-4 py-2.5 w-full sm:w-auto focus:outline-none focus:border-amber-300 [color-scheme:dark]"
+              value={date}
+              min={today}
+              max={maxDay}
+              onChange={e => choose(e.target.value)}
+              aria-label="Your SSB interview date"
+            />
+
+            <Link to={user ? '/create' : '/register'}
+              className="inline-flex items-center justify-center gap-2 bg-white text-brand-800 text-xs font-bold uppercase tracking-[0.15em] px-6 py-3 rounded-xl hover:bg-amber-300 transition-colors">
+              {user ? 'Practise now' : 'Start practising free'}
+              <ArrowRight className="w-4 h-4" />
+            </Link>
+
+            {date && (
+              <button type="button" onClick={() => choose('')}
+                className="text-xs font-semibold text-white/40 hover:text-white/70 cursor-pointer self-start sm:self-auto">
+                Clear
+              </button>
+            )}
+            {saved && (
+              <span className="inline-flex items-center gap-1 text-xs font-semibold text-amber-300">
+                <Check className="w-3.5 h-3.5" /> Saved
+              </span>
+            )}
+          </div>
+
+          {!user && valid && !past && (
+            <p className="mt-3 text-[11px] text-white/40 max-w-md leading-relaxed">
+              Create a free account and we will keep this date on every device, and put you
+              with aspirants whose SSB is around the same time.
+            </p>
+          )}
+        </div>
       </div>
     </section>
   );
