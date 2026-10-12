@@ -82,9 +82,14 @@ router.get('/users', adminGuard, async (_req, res) => {
              ssb_date::text AS ssb_date
       FROM users
       ORDER BY created_at DESC
-      LIMIT 200
+      LIMIT 1000
     `);
-    res.json({ users: rows });
+    // The stats card counts every row while this list was capped at 200, so the
+    // tab read "200" against a total of 218 and the 18 oldest accounts were not
+    // reachable at all. Raised rather than paginated — revisit with real paging
+    // when this list approaches the new cap.
+    const { rows: [{ total }] } = await pool.query('SELECT count(*)::int AS total FROM users');
+    res.json({ users: rows, total });
   } catch (err) {
     console.error('Admin users error:', err);
     res.status(500).json({ error: 'Failed to fetch users' });
