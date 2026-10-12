@@ -4,9 +4,10 @@ const jwt = require('jsonwebtoken');
 const { OAuth2Client } = require('google-auth-library');
 const {
   createGoogleUser, linkGoogleToUser,
-  findByEmail, findByGoogleId, findById, saveOnboarding,
+  findByEmail, findByGoogleId, findById, saveOnboarding, updateSsbDate,
 } = require('../models/User');
 const authMiddleware = require('../middleware/auth');
+const { authLimiter } = require('../middleware/rateLimit');
 
 const googleClient = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
 
@@ -19,7 +20,9 @@ function signToken(user) {
 }
 
 // ── Google OAuth (only sign-in method) ───────────────────────────────────────
-router.post('/google', async (req, res) => {
+// The strict limiter belongs here, on the actual sign-in attempt, rather than
+// on every route in this file.
+router.post('/google', authLimiter, async (req, res) => {
   try {
     const { credential } = req.body;
     if (!credential) return res.status(400).json({ error: 'Missing Google credential' });
@@ -139,6 +142,26 @@ router.post('/me/onboarding', authMiddleware, async (req, res) => {
   } catch (err) {
     console.error('Onboarding error:', err);
     res.status(500).json({ error: 'Could not save your details' });
+  }
+});
+
+// ── SSB date on its own ──────────────────────────────────────────────────────
+// Used by the home page countdown, which saves a date without any of the other
+// onboarding answers. Kept separate from POST /me/onboarding because that route
+// demands a valid exam type and rewrites the phone field, so reusing it here
+// would reject visitors who have not onboarded and wipe numbers for those who
+// have. An empty value clears the date.
+router.patch('/me/ssb-date', authMiddleware, async (req, res) => {
+  try {
+    const value = normalizeSsbDate((req.body || {}).ssb_date);
+    if (value === false || value === undefined)
+      return res.status(400).json({ error: 'That SSB date does not look right. Pick a date, or leave it blank.' });
+
+    const user = await updateSsbDate(req.userId, value);
+    res.json({ user });
+  } catch (err) {
+    console.error('SSB date update error:', err);
+    res.status(500).json({ error: 'Could not save your SSB date' });
   }
 });
 

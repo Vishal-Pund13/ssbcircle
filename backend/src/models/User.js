@@ -104,6 +104,20 @@ async function saveOnboarding(userId, { display_name, phone, exam_type, referral
   return findById(userId);
 }
 
+// Narrow update for the home page countdown, which saves a date on its own.
+//
+// Deliberately NOT routed through saveOnboarding. That function assigns phone
+// directly, so calling it with only a date would blank a stored number, and it
+// also insists on a valid exam_type the visitor may never have chosen. Touching
+// one column is the only safe way to do a one-field save.
+async function updateSsbDate(userId, ssbDate) {
+  await pool.query(
+    `UPDATE users SET ssb_date = NULLIF($2::text, '')::date WHERE id = $1`,
+    [userId, ssbDate == null ? '' : String(ssbDate)]
+  );
+  return findById(userId);
+}
+
 async function verifyPassword(plaintext, hash) {
   if (!hash) return false;
   return bcrypt.compare(plaintext, hash);
@@ -112,6 +126,6 @@ async function verifyPassword(plaintext, hash) {
 module.exports = {
   createUser, createGoogleUser, linkGoogleToUser,
   findByUsername, findByEmail, findByGoogleId, findById,
-  saveOnboarding,
+  saveOnboarding, updateSsbDate,
   verifyPassword,
 };

@@ -143,3 +143,10 @@ export const saveOnboarding = async (payload) => {
   const { data } = await api.post('/api/auth/me/onboarding', payload);
   return data.user;
 };
+
+// One-field save used by the home page countdown. Separate from saveOnboarding
+// on purpose — that endpoint requires an exam type and rewrites the phone field.
+export const updateSsbDate = async (ssb_date) => {
+  const { data } = await api.patch('/api/auth/me/ssb-date', { ssb_date });
+  return data.user;
+};

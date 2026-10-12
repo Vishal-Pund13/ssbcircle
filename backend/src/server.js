@@ -39,8 +39,12 @@ app.use(cors({
 app.use(express.json({ limit: '16kb' })); // Reject suspiciously large bodies
 
 // ── Routes with targeted rate limits ─────────────────────────────────────────
-// Auth: strict — protects against brute force & account spam
-app.use('/api/auth', authLimiter, authRouter);
+// Auth: the strict limiter now sits on the sign-in call inside auth.js, not on
+// the whole router. It allows 10 requests per 15 min per IP and counts
+// successful ones, while GET /me runs on every page load — so ten page loads
+// locked a user out of authentication, and on a shared IP (hostel wifi, carrier
+// NAT) ten different people locked out each other. Same split as /api/admin.
+app.use('/api/auth', generalLimiter, authRouter);
 
 // Rooms: general guard on all room endpoints
 // createRoomLimiter is applied inside rooms.js on POST / only
