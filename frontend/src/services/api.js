@@ -150,3 +150,20 @@ export const updateSsbDate = async (ssb_date) => {
   const { data } = await api.patch('/api/auth/me/ssb-date', { ssb_date });
   return data.user;
 };
+
+// PIQ — the aspirant's own form. Holds sensitive personal detail, so it is
+// readable only by its owner and there is no endpoint that lists other people's.
+export const getPiq = async () => {
+  const { data } = await api.get('/api/piq');
+  return data;              // { piq, updated_at }
+};
+
+export const savePiq = async (piq) => {
+  const { data } = await api.put('/api/piq', { data: piq }, { timeout: 20000 });
+  return data;              // { piq, updated_at }
+};
+
+export const deletePiq = async () => {
+  const { data } = await api.delete('/api/piq');
+  return data;
+};

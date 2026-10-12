@@ -11,6 +11,7 @@ const adminRouter    = require('./routes/admin');
 const sessionsRouter = require('./routes/sessions');
 const articlesRouter = require('./routes/articles');
 const eventRouter    = require('./routes/event');
+const piqRouter      = require('./routes/piq');
 const { startCleanup, runCleanup } = require('./cleanup');
 const { sendReminder, sendHostStartReminder } = require('./email');
 
@@ -35,6 +36,12 @@ app.use(cors({
   methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE'],
   credentials: true,
 }));
+
+// A PIQ is one JSON document covering fourteen sections and four repeating
+// tables, so it needs more room than the 16kb global default. Mounted before
+// that parser, otherwise a long form would be rejected here before the router's
+// own size check could return a useful message.
+app.use('/api/piq', generalLimiter, express.json({ limit: '64kb' }), piqRouter);
 
 app.use(express.json({ limit: '16kb' })); // Reject suspiciously large bodies
 
@@ -225,6 +232,17 @@ async function start() {
     // a plain DATE and always read back with a ::text cast — node-pg turns a DATE
     // into a UTC-midnight JS Date, which renders as the previous day in IST.
     await pool.query(`ALTER TABLE users ADD COLUMN IF NOT EXISTS ssb_date        DATE`);
+    // One Personal Information Questionnaire per aspirant, stored whole as JSON.
+    // Holds sensitive detail — religion, category, date of birth, family income,
+    // addresses — so it lives in its own table rather than on users, is only ever
+    // read by its owner, and goes when the account goes.
+    await pool.query(`
+      CREATE TABLE IF NOT EXISTS piq (
+        user_id    UUID PRIMARY KEY REFERENCES users(id) ON DELETE CASCADE,
+        data       JSONB NOT NULL DEFAULT '{}'::jsonb,
+        updated_at TIMESTAMPTZ DEFAULT NOW()
+      )
+    `);
     await pool.query(`ALTER TABLE scheduled_sessions ADD COLUMN IF NOT EXISTS reminder_sent BOOLEAN DEFAULT false`);
     await pool.query(`ALTER TABLE scheduled_sessions ADD COLUMN IF NOT EXISTS host_reminder_sent BOOLEAN DEFAULT false`);
     await pool.query(`

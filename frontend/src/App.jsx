@@ -49,6 +49,7 @@ const WomenSeriesPage     = lazy(() => import('./components/WomenSeriesPage'));
 const SessionPage         = lazy(() => import('./components/SessionPage'));
 const MentorPage          = lazy(() => import('./components/MentorPage'));
 const OnboardingPage      = lazy(() => import('./components/OnboardingPage'));
+const PiqPage             = lazy(() => import('./components/PiqPage'));
 
 function PageLoader() {
   return (
@@ -81,6 +82,7 @@ export default function App() {
             <Route path="/session"               element={<SessionPage />} />
             <Route path="/mentor/:slug"          element={<MentorPage />} />
             <Route path="/welcome"               element={<ProtectedRoute><OnboardingPage /></ProtectedRoute>} />
+            <Route path="/piq"                   element={<ProtectedRoute><PiqPage /></ProtectedRoute>} />
             <Route path="/sa"           element={<SuperAdminLogin />} />
             <Route path="/sa/dashboard" element={<SuperAdminDashboard />} />
             <Route path="/sa/export"    element={<ExportCards />} />
