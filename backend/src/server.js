@@ -12,6 +12,7 @@ const sessionsRouter = require('./routes/sessions');
 const articlesRouter = require('./routes/articles');
 const eventRouter    = require('./routes/event');
 const piqRouter      = require('./routes/piq');
+const communityRouter = require('./routes/community');
 const { startCleanup, runCleanup } = require('./cleanup');
 const { sendReminder, sendHostStartReminder } = require('./email');
 
@@ -42,6 +43,10 @@ app.use(cors({
 // that parser, otherwise a long form would be rejected here before the router's
 // own size check could return a useful message.
 app.use('/api/piq', generalLimiter, express.json({ limit: '64kb' }), piqRouter);
+
+// Community posts carry long bodies, so they get the same larger limit and the
+// same placement ahead of the global parser.
+app.use('/api/community', generalLimiter, express.json({ limit: '64kb' }), communityRouter);
 
 app.use(express.json({ limit: '16kb' })); // Reject suspiciously large bodies
 
@@ -251,6 +256,61 @@ async function start() {
     await pool.query(`ALTER TABLE piq ADD COLUMN IF NOT EXISTS analysed_at    TIMESTAMPTZ`);
     await pool.query(`ALTER TABLE piq ADD COLUMN IF NOT EXISTS analysis_day   DATE`);
     await pool.query(`ALTER TABLE piq ADD COLUMN IF NOT EXISTS analysis_count INT DEFAULT 0`);
+
+    // ── Community ────────────────────────────────────────────────────────────
+    // Simple key/value settings, so things like "who may post" can be changed
+    // from the admin dashboard without a deploy.
+    await pool.query(`
+      CREATE TABLE IF NOT EXISTS app_settings (
+        key        TEXT PRIMARY KEY,
+        value      JSONB NOT NULL,
+        updated_at TIMESTAMPTZ DEFAULT NOW()
+      )
+    `);
+    // author_id is nullable because an official post has no user behind it —
+    // the admin signs in with a separate superadmin token, not a user account.
+    // In that case author_label carries the name to show.
+    await pool.query(`
+      CREATE TABLE IF NOT EXISTS posts (
+        id           UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+        author_id    UUID REFERENCES users(id) ON DELETE SET NULL,
+        author_label VARCHAR(60),
+        is_official  BOOLEAN DEFAULT false,
+        category     VARCHAR(30) NOT NULL DEFAULT 'discussion',
+        title        VARCHAR(200) NOT NULL,
+        body         TEXT NOT NULL DEFAULT '',
+        is_pinned    BOOLEAN DEFAULT false,
+        is_locked    BOOLEAN DEFAULT false,
+        created_at   TIMESTAMPTZ DEFAULT NOW(),
+        updated_at   TIMESTAMPTZ DEFAULT NOW(),
+        deleted_at   TIMESTAMPTZ
+      )
+    `);
+    await pool.query(`CREATE INDEX IF NOT EXISTS idx_posts_feed ON posts(is_pinned DESC, created_at DESC) WHERE deleted_at IS NULL`);
+    await pool.query(`
+      CREATE TABLE IF NOT EXISTS post_comments (
+        id           UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+        post_id      UUID NOT NULL REFERENCES posts(id) ON DELETE CASCADE,
+        author_id    UUID REFERENCES users(id) ON DELETE SET NULL,
+        author_label VARCHAR(60),
+        is_official  BOOLEAN DEFAULT false,
+        body         TEXT NOT NULL,
+        created_at   TIMESTAMPTZ DEFAULT NOW(),
+        deleted_at   TIMESTAMPTZ
+      )
+    `);
+    await pool.query(`CREATE INDEX IF NOT EXISTS idx_comments_post ON post_comments(post_id, created_at) WHERE deleted_at IS NULL`);
+    // Upvotes only. A row is an upvote; removing it takes the vote back. No
+    // downvotes on purpose — at this size a downvote is one identifiable person
+    // telling a nervous teenager their question was stupid.
+    await pool.query(`
+      CREATE TABLE IF NOT EXISTS post_votes (
+        post_id    UUID NOT NULL REFERENCES posts(id) ON DELETE CASCADE,
+        user_id    UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+        created_at TIMESTAMPTZ DEFAULT NOW(),
+        PRIMARY KEY (post_id, user_id)
+      )
+    `);
     await pool.query(`ALTER TABLE scheduled_sessions ADD COLUMN IF NOT EXISTS reminder_sent BOOLEAN DEFAULT false`);
     await pool.query(`ALTER TABLE scheduled_sessions ADD COLUMN IF NOT EXISTS host_reminder_sent BOOLEAN DEFAULT false`);
     await pool.query(`

@@ -3,6 +3,8 @@ const router  = express.Router();
 const jwt     = require('jsonwebtoken');
 const pool    = require('../db');
 const { closeRoom } = require('../models/Room');
+const Community = require('../models/Community');
+const Settings  = require('../models/Settings');
 
 function adminGuard(req, res, next) {
   const auth = req.headers.authorization;
@@ -341,6 +343,71 @@ router.get('/event-registrations', adminGuard, async (_req, res) => {
     res.json({ registrations: rows });
   } catch (err) {
     res.status(500).json({ error: 'Failed to fetch registrations' });
+  }
+});
+
+// ── Community ────────────────────────────────────────────────────────────────
+// Posting is restricted to the team until this switch is flipped. Keeping it in
+// settings rather than an env var means it changes without a deploy — and can
+// go straight back to 'admin' if moderation ever gets away from you.
+const WHO_CAN_POST = 'community.who_can_post';
+const CATEGORIES   = ['announcement', 'session', 'doubt', 'discussion'];
+
+router.get('/community/settings', adminGuard, async (_req, res) => {
+  try {
+    res.json({ who_can_post: await Settings.get(WHO_CAN_POST, 'admin') });
+  } catch (err) {
+    console.error('Community settings read error:', err);
+    res.status(500).json({ error: 'Failed to read community settings' });
+  }
+});
+
+router.put('/community/settings', adminGuard, async (req, res) => {
+  try {
+    const value = req.body?.who_can_post;
+    if (value !== 'admin' && value !== 'everyone')
+      return res.status(400).json({ error: "who_can_post must be 'admin' or 'everyone'" });
+    await Settings.set(WHO_CAN_POST, value);
+    res.json({ who_can_post: value });
+  } catch (err) {
+    console.error('Community settings write error:', err);
+    res.status(500).json({ error: 'Failed to save community settings' });
+  }
+});
+
+// An official post has no author_id — the admin holds a superadmin token, not a
+// user account — so the label carries the name readers see.
+router.post('/community/posts', adminGuard, async (req, res) => {
+  try {
+    const title = String(req.body?.title || '').trim().slice(0, 200);
+    const body  = String(req.body?.body  || '').trim().slice(0, 8000);
+    if (title.length < 5) return res.status(400).json({ error: 'Give the post a title of at least five characters.' });
+    if (!body)            return res.status(400).json({ error: 'Write something in the post.' });
+
+    const category = CATEGORIES.includes(req.body?.category) ? req.body.category : 'announcement';
+    const label    = String(req.body?.author_label || 'SSBCircle Team').trim().slice(0, 60);
+
+    const post = await Community.createPost({
+      authorLabel: label, isOfficial: true, title, body, category,
+    });
+    res.status(201).json({ post });
+  } catch (err) {
+    console.error('Community admin post error:', err);
+    res.status(500).json({ error: 'Failed to publish the post' });
+  }
+});
+
+router.patch('/community/posts/:id', adminGuard, async (req, res) => {
+  try {
+    const ok = await Community.setFlags(req.params.id, {
+      isPinned: req.body?.is_pinned,
+      isLocked: req.body?.is_locked,
+    });
+    if (!ok) return res.status(404).json({ error: 'Post not found' });
+    res.json({ updated: true });
+  } catch (err) {
+    console.error('Community flags error:', err);
+    res.status(500).json({ error: 'Failed to update the post' });
   }
 });
 
