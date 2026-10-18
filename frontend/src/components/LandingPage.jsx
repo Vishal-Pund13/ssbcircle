@@ -7,6 +7,7 @@ import { articleHref } from '../data/swipeArticles';
 import ComingSoonBanner from './ComingSoonBanner';
 import DailyMeetsNote from './DailyMeetsNote';
 import SsbCountdown from './SsbCountdown';
+import CommunityHighlights from './CommunityHighlights';
 import { Mic, Timer, FileText, CheckSquare, Radio, ArrowRight, Trash2, Zap, Lightbulb, Users, Presentation, Target, Headphones, RefreshCw, X, Calendar, Heart, PlayCircle, Share2, Check, Sparkles, ChevronDown, Shield, Star, Lock, BookOpen, Video, Award, ChevronRight, GraduationCap, ExternalLink, AlertTriangle, HeartHandshake } from 'lucide-react';
 
 // Lazy-loaded — keeps react-simple-maps out of the main bundle
@@ -1552,6 +1553,9 @@ export default function LandingPage() {
             </div>
           </div>
         </section>
+
+        {/* ── From the community — renders nothing when there are no posts ── */}
+        <CommunityHighlights />
 
         {/* ── Days to your SSB — renders nothing unless a date is saved ── */}
         <SsbCountdown user={user} />

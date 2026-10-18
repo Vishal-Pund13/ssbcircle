@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { getCommunityFeed, createCommunityPost, voteCommunityPost } from '../services/api';
-import { ArrowBigUp, MessageSquare, Pin, Plus, AlertCircle, Lock } from 'lucide-react';
+import { ArrowBigUp, MessageSquare, Pin, Plus, AlertCircle, Lock, BadgeCheck } from 'lucide-react';
 import CategoryChip, { timeAgo } from './community/CategoryChip';
 
 // The community feed.
@@ -16,45 +16,85 @@ const OPEN_CATEGORIES = [
   { value: 'discussion', label: 'Discussion' },
 ];
 
-function PostRow({ post, onVote, busy }) {
+// A post with only a title reads as an empty row. Showing the first couple of
+// lines is most of what makes a board look like a board.
+const excerpt = (body, max = 180) => {
+  const flat = String(body || '').replace(/\s+/g, ' ').trim();
+  return flat.length > max ? flat.slice(0, max).trimEnd() + '…' : flat;
+};
+
+function Avatar({ name, url, official }) {
+  if (official) {
+    return (
+      <div className="w-8 h-8 rounded-full bg-brand-600 flex items-center justify-center shrink-0">
+        <BadgeCheck className="w-4 h-4 text-white" />
+      </div>
+    );
+  }
+  if (url) return <img src={url} alt="" className="w-8 h-8 rounded-full object-cover shrink-0" />;
   return (
-    <article className="bg-white border border-gray-200 rounded-xl px-4 py-3.5 hover:border-brand-200 transition-colors">
-      <div className="flex gap-3">
-        <button
-          onClick={() => onVote(post)}
-          disabled={busy}
-          title={post.voted ? 'Remove your upvote' : 'Upvote'}
-          className={`shrink-0 w-11 flex flex-col items-center justify-start pt-0.5 cursor-pointer rounded-lg py-1 transition-colors ${
-            post.voted ? 'text-brand-600 bg-brand-50' : 'text-gray-300 hover:text-brand-600 hover:bg-gray-50'
-          }`}>
-          <ArrowBigUp className={`w-5 h-5 ${post.voted ? 'fill-brand-600' : ''}`} />
-          <span className="text-xs font-bold tabular-nums text-gray-600">{post.upvotes}</span>
-        </button>
+    <div className="w-8 h-8 rounded-full bg-gray-200 flex items-center justify-center text-[11px] font-bold text-gray-500 shrink-0">
+      {(name || '?').split(' ').map(w => w[0]).join('').toUpperCase().slice(0, 2)}
+    </div>
+  );
+}
 
+function PostCard({ post, onVote, busy }) {
+  const navigate = useNavigate();
+  const open = () => navigate(`/community/${post.id}`);
+
+  return (
+    <article
+      onClick={open}
+      className="group bg-white border border-gray-200 rounded-xl px-4 sm:px-5 py-4 cursor-pointer hover:border-brand-300 hover:shadow-sm transition-all">
+
+      {/* Who and when */}
+      <div className="flex items-center gap-2.5">
+        <Avatar name={post.author_name} url={post.author_avatar} official={post.is_official} />
         <div className="min-w-0 flex-1">
-          <div className="flex flex-wrap items-center gap-2">
-            {post.is_pinned && <Pin className="w-3.5 h-3.5 text-amber-500" />}
-            <CategoryChip category={post.category} />
-            {post.is_locked && <Lock className="w-3 h-3 text-gray-300" />}
-          </div>
-
-          <Link to={`/community/${post.id}`} className="block mt-1.5">
-            <h2 className="text-sm sm:text-base font-bold text-gray-900 leading-snug hover:text-brand-700">
-              {post.title}
-            </h2>
-          </Link>
-
-          <p className="mt-1 text-xs text-gray-400">
+          <p className="text-xs font-semibold text-gray-700 truncate">
             {post.is_official
-              ? <span className="font-semibold text-brand-600">{post.author_name}</span>
+              ? <span className="text-brand-700">{post.author_name}</span>
               : (post.author_name || 'Someone')}
-            {' · '}{timeAgo(post.created_at)}
-            {' · '}
-            <Link to={`/community/${post.id}`} className="inline-flex items-center gap-1 hover:text-gray-600">
-              <MessageSquare className="w-3 h-3" />{post.comment_count}
-            </Link>
+            <span className="font-normal text-gray-400"> · {timeAgo(post.created_at)}</span>
           </p>
         </div>
+        <div className="flex items-center gap-1.5 shrink-0">
+          {post.is_pinned && <Pin className="w-3.5 h-3.5 text-amber-500" />}
+          {post.is_locked && <Lock className="w-3 h-3 text-gray-300" />}
+          <CategoryChip category={post.category} />
+        </div>
+      </div>
+
+      {/* What */}
+      <h2 className="mt-3 text-[15px] sm:text-base font-bold text-gray-900 leading-snug group-hover:text-brand-700 transition-colors">
+        {post.title}
+      </h2>
+      {post.body && (
+        <p className="mt-1.5 text-sm text-gray-500 leading-relaxed line-clamp-2">
+          {excerpt(post.body)}
+        </p>
+      )}
+
+      {/* Actions — stopPropagation so voting does not open the post */}
+      <div className="mt-3.5 flex items-center gap-2 border-t border-gray-100 pt-3">
+        <button
+          onClick={e => { e.stopPropagation(); onVote(post); }}
+          disabled={busy}
+          title={post.voted ? 'Remove your upvote' : 'Upvote'}
+          className={`inline-flex items-center gap-1.5 text-xs font-bold px-2.5 py-1.5 rounded-lg cursor-pointer transition-colors ${
+            post.voted
+              ? 'text-brand-700 bg-brand-50'
+              : 'text-gray-400 hover:text-brand-600 hover:bg-gray-50'
+          }`}>
+          <ArrowBigUp className={`w-4 h-4 ${post.voted ? 'fill-brand-700' : ''}`} />
+          <span className="tabular-nums">{post.upvotes}</span>
+        </button>
+
+        <span className="inline-flex items-center gap-1.5 text-xs font-semibold text-gray-400 px-2.5 py-1.5">
+          <MessageSquare className="w-3.5 h-3.5" />
+          {post.comment_count} {post.comment_count === 1 ? 'reply' : 'replies'}
+        </span>
       </div>
     </article>
   );
@@ -124,7 +164,7 @@ export default function CommunityPage() {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <header className="bg-white border-b border-gray-100 px-4 sm:px-6 py-3.5">
+      <header className="bg-white border-b border-gray-100 px-4 sm:px-6 py-3.5 sticky top-0 z-10">
         <div className="max-w-3xl mx-auto flex items-center justify-between">
           <Link to="/" className="text-brand-600 font-bold">SSBCircle</Link>
           {user
@@ -194,16 +234,16 @@ export default function CommunityPage() {
         )}
 
         <div className="mt-6 space-y-3">
-          {loading && (
-            <>
-              {[0, 1, 2].map(i => (
-                <div key={i} className="bg-white border border-gray-200 rounded-xl px-4 py-5 animate-pulse">
-                  <div className="h-3 bg-gray-100 rounded w-24 mb-3" />
-                  <div className="h-4 bg-gray-100 rounded w-2/3" />
-                </div>
-              ))}
-            </>
-          )}
+          {loading && [0, 1, 2].map(i => (
+            <div key={i} className="bg-white border border-gray-200 rounded-xl px-5 py-4 animate-pulse">
+              <div className="flex items-center gap-2.5">
+                <div className="w-8 h-8 rounded-full bg-gray-100" />
+                <div className="h-3 bg-gray-100 rounded w-28" />
+              </div>
+              <div className="h-4 bg-gray-100 rounded w-2/3 mt-3.5" />
+              <div className="h-3 bg-gray-100 rounded w-full mt-2.5" />
+            </div>
+          ))}
 
           {!loading && posts.length === 0 && (
             <div className="border border-dashed border-gray-200 rounded-xl py-14 text-center px-6">
@@ -216,7 +256,7 @@ export default function CommunityPage() {
           )}
 
           {!loading && posts.map(post => (
-            <PostRow key={post.id} post={post} onVote={vote} busy={busy} />
+            <PostCard key={post.id} post={post} onVote={vote} busy={busy} />
           ))}
         </div>
       </div>

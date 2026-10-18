@@ -20,11 +20,18 @@ export default {
       },
       animation: {
         'bounce-slow': 'bounceSlow 2.4s ease-in-out infinite',
+        // The track renders its posts twice, so sliding exactly half its width
+        // lands back on an identical frame and the loop is seamless.
+        'marquee': 'marquee 45s linear infinite',
       },
       keyframes: {
         bounceSlow: {
           '0%, 100%': { transform: 'translateY(0)' },
           '50%':      { transform: 'translateY(-4px)' },
+        },
+        marquee: {
+          '0%':   { transform: 'translateX(0)' },
+          '100%': { transform: 'translateX(-50%)' },
         },
       },
     },
