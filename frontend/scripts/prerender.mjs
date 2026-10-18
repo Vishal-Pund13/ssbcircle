@@ -64,6 +64,14 @@ const STATIC_ROUTES = [
     blurb: 'Scheduled GD, PPDT, Lecturette and IO mock interview sessions you can join free with other NDA, CDS and AFCAT aspirants.',
   },
   {
+    path: '/community',
+    title: 'SSB Community — Ask Doubts & Find Practice Sessions | SSBCircle',
+    description: 'Ask your SSB doubts and get answers from other defence aspirants. Announcements, upcoming live practice sessions, and discussion for NDA, CDS, AFCAT and TGC candidates.',
+    priority: '0.8', changefreq: 'daily',
+    heading: 'SSB community',
+    blurb: 'Ask a doubt, read announcements, and find upcoming live practice sessions. Open to every NDA, CDS, AFCAT, TGC and Navy aspirant preparing for the Services Selection Board.',
+  },
+  {
     path: '/register',
     title: 'Create a Free SSBCircle Account — Start SSB Practice | SSBCircle',
     description: 'Sign up free with Google and start practising SSB Group Discussion, PPDT, Lecturette and IO mock interviews in live voice rooms with real defence aspirants.',

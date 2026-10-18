@@ -174,3 +174,39 @@ export const analyzePiq = async () => {
   const { data } = await api.post('/api/piq/analyze', {}, { timeout: 90000 });
   return data;             // { analysis, analysed_at, used_today, daily_limit }
 };
+
+// Community — reading works signed out, writing does not.
+export const getCommunityFeed = async ({ limit = 30, offset = 0 } = {}) => {
+  const { data } = await api.get(`/api/community?limit=${limit}&offset=${offset}`);
+  return data;             // { posts, can_post }
+};
+
+export const getCommunityPost = async (id) => {
+  const { data } = await api.get(`/api/community/${id}`);
+  return data;             // { post, comments }
+};
+
+export const createCommunityPost = async (payload) => {
+  const { data } = await api.post('/api/community', payload);
+  return data.post;
+};
+
+export const addCommunityComment = async (id, body) => {
+  const { data } = await api.post(`/api/community/${id}/comments`, { body });
+  return data.comments;
+};
+
+export const voteCommunityPost = async (id) => {
+  const { data } = await api.post(`/api/community/${id}/vote`);
+  return data;             // { voted, upvotes }
+};
+
+export const deleteCommunityPost = async (id) => {
+  const { data } = await api.delete(`/api/community/${id}`);
+  return data;
+};
+
+export const deleteCommunityComment = async (id) => {
+  const { data } = await api.delete(`/api/community/comments/${id}`);
+  return data;
+};

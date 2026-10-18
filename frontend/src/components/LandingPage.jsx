@@ -1328,6 +1328,7 @@ export default function LandingPage() {
           <nav className="hidden sm:flex items-center gap-2">
             <Link to="/current-affairs" className="text-sm text-gray-500 hover:text-gray-900 px-3 py-2 font-medium">News Cards</Link>
             <Link to="/piq" className="text-sm text-gray-500 hover:text-gray-900 px-3 py-2 font-medium">PIQ</Link>
+            <Link to="/community" className="text-sm text-gray-500 hover:text-gray-900 px-3 py-2 font-medium">Community</Link>
             {user ? (
               <>
                 <Link to="/profile" className="flex items-center gap-1.5 px-2 py-1.5 rounded-lg hover:bg-gray-50 transition-colors">
@@ -1399,6 +1400,19 @@ export default function LandingPage() {
                 <div>
                   <p className="text-sm font-semibold text-gray-800">PIQ Analyzer</p>
                   <p className="text-[11px] text-gray-400">Fill your PIQ · See what you will be asked</p>
+                </div>
+              </Link>
+
+              {/* Community row */}
+              <Link to="/community"
+                onClick={() => setMenuOpen(false)}
+                className="flex items-center gap-3 px-3 py-3 rounded-xl hover:bg-brand-50 transition-colors group">
+                <div className="w-8 h-8 rounded-lg bg-brand-50 border border-brand-100 flex items-center justify-center shrink-0 group-hover:bg-brand-100 transition-colors">
+                  <Users className="w-4 h-4 text-brand-600" />
+                </div>
+                <div>
+                  <p className="text-sm font-semibold text-gray-800">Community</p>
+                  <p className="text-[11px] text-gray-400">Sessions · Announcements · Doubts</p>
                 </div>
               </Link>
 

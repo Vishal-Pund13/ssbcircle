@@ -2,6 +2,8 @@ import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Users, Radio, FolderOpen, CalendarDays, Trash2, LogOut, RefreshCw, Calendar, Bell, PlayCircle, Ban, ShieldCheck, Flag, CheckCircle, Edit3, Check, Star, BookOpen, Plus, Eye, EyeOff } from 'lucide-react';
 
+import CommunityAdmin from './community/CommunityAdmin';
+
 const API = import.meta.env.VITE_API_URL || 'http://localhost:4000';
 
 function authHeaders() {
@@ -402,6 +404,9 @@ export default function SuperAdminDashboard() {
     { id: 'rooms',         label: 'Rooms',         count: rooms.length },
     { id: 'sessions',      label: 'Sessions',      count: sessions.length },
     { id: 'users',         label: 'Users',         count: users.length },
+    // No count: the panel loads its own posts, and an undefined count renders
+    // as nothing rather than the word "undefined".
+    { id: 'community',     label: 'Community' },
   ];
 
   const STAT_CARDS = [
@@ -819,6 +824,11 @@ export default function SuperAdminDashboard() {
               )}
             </div>
           </div>
+        )}
+
+        {/* ── Community ── */}
+        {tab === 'community' && (
+          <CommunityAdmin api={API} authHeaders={authHeaders} />
         )}
 
         {/* ── Users ── */}

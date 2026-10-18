@@ -50,6 +50,8 @@ const SessionPage         = lazy(() => import('./components/SessionPage'));
 const MentorPage          = lazy(() => import('./components/MentorPage'));
 const OnboardingPage      = lazy(() => import('./components/OnboardingPage'));
 const PiqPage             = lazy(() => import('./components/PiqPage'));
+const CommunityPage       = lazy(() => import('./components/CommunityPage'));
+const PostPage            = lazy(() => import('./components/PostPage'));
 
 function PageLoader() {
   return (
@@ -83,6 +85,8 @@ export default function App() {
             <Route path="/mentor/:slug"          element={<MentorPage />} />
             <Route path="/welcome"               element={<ProtectedRoute><OnboardingPage /></ProtectedRoute>} />
             <Route path="/piq"                   element={<ProtectedRoute><PiqPage /></ProtectedRoute>} />
+            <Route path="/community"             element={<CommunityPage />} />
+            <Route path="/community/:id"         element={<PostPage />} />
             <Route path="/sa"           element={<SuperAdminLogin />} />
             <Route path="/sa/dashboard" element={<SuperAdminDashboard />} />
             <Route path="/sa/export"    element={<ExportCards />} />
