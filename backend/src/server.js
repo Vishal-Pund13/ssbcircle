@@ -290,6 +290,29 @@ async function start() {
     await pool.query(`CREATE UNIQUE INDEX IF NOT EXISTS idx_article_votes_user ON article_votes(article_slug, user_id) WHERE user_id IS NOT NULL`);
     await pool.query(`CREATE INDEX IF NOT EXISTS idx_article_votes_slug ON article_votes(article_slug)`);
 
+    // ── Article likes and comments ───────────────────────────────────────────
+    // Keyed by slug like article_votes, so a re-seeded article keeps its likes.
+    await pool.query(`
+      CREATE TABLE IF NOT EXISTS article_likes (
+        article_slug VARCHAR(200) NOT NULL,
+        user_id      UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+        created_at   TIMESTAMPTZ DEFAULT NOW(),
+        PRIMARY KEY (article_slug, user_id)
+      )
+    `);
+    // Soft delete, same reason as post_comments: a moderator can see what went.
+    await pool.query(`
+      CREATE TABLE IF NOT EXISTS article_comments (
+        id           UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+        article_slug VARCHAR(200) NOT NULL,
+        author_id    UUID REFERENCES users(id) ON DELETE SET NULL,
+        body         TEXT NOT NULL,
+        created_at   TIMESTAMPTZ DEFAULT NOW(),
+        deleted_at   TIMESTAMPTZ
+      )
+    `);
+    await pool.query(`CREATE INDEX IF NOT EXISTS idx_article_comments_slug ON article_comments(article_slug, created_at) WHERE deleted_at IS NULL`);
+
     // Backfill slug for the first seeded article
     await pool.query(`UPDATE articles SET slug = 'rupee-depreciation' WHERE slug IS NULL AND title LIKE '%Rupee Story%'`);
 
@@ -803,6 +826,135 @@ The board is not testing how many videos you have watched. It is testing how man
         'cut-the-noise-ssb-sources',
       ]);
       console.log('✓ Seeded article: Cut the Noise — two SSB playlists');
+    }
+
+    // Seed IAF / Threye Mirage 2000 simulator article. Upserts on slug like the others.
+    {
+      const mirageSimContent = `## A startup will now help train India's Mirage 2000 pilots
+
+[IMAGE:/Blog_Images/IAF_Mirage_Simulator.jpg|Illustration: a part task simulator lets Mirage 2000 pilots practise radar, targeting and threat response on the ground]
+
+The Indian Air Force has signed a **₹135 crore (about $14 million)** deal with **Threye Interactive**, an Indian startup. Threye will build **part task simulators** for the IAF's Mirage 2000 fighter jets.
+
+In money terms, this is a small deal for the Air Force. But it is a big step in one way: the IAF is trusting a young Indian company to help train pilots of a frontline fighter. That is the real news.
+
+[CALLOUT]Threye Interactive is a part of NewSpace Research & Technologies. NewSpace was founded by Sameer Joshi, a former IAF fighter pilot who flew the Mirage 2000 himself.[/CALLOUT]
+
+## What is a part task simulator?
+
+A normal flight simulator copies a full flight, from takeoff to landing. A **part task simulator** focuses on just one part of the pilot's job.
+
+For example, a pilot can practise only these tasks, again and again:
+
+- using the radar
+- finding and identifying a target
+- choosing the right weapon
+- reacting when a threat appears
+
+The pilot makes a mistake, sees it, and tries again. No jet leaves the ground. No fuel is burnt. No flying hours are used up.
+
+[COMPARE:Training in the air|Training in a part task simulator]
+Costs fuel, flying hours and wear on the jet | Costs almost nothing per try
+Some dangerous situations are hard to set up | Any situation can be created on demand
+One attempt per sortie | Repeat the same task many times
+Mistakes can be costly | Mistakes are safe and easy to review
+[/COMPARE]
+
+## Why "large force" training matters
+
+The IAF especially wants these simulators for **large force combat training** — when many aircraft fly a mission together.
+
+In a big air operation, flying your own jet well is not enough. A pilot must also:
+
+- keep track of friendly fighters around them
+- react to enemy aircraft and ground defences
+- take quick decisions as the mission changes
+
+Setting this up in real life needs dozens of aircraft and a lot of planning. In a simulator, it can be practised as often as needed.
+
+## About the Mirage 2000
+
+The Mirage 2000 is a French-built delta-wing fighter made by Dassault. India brought it in during the 1980s, so it has served the IAF for about **four decades**.
+
+- It played a key role in the **1999 Kargil conflict**.
+- It was used in the **2019 Balakot air strike**.
+- It has been **upgraded** by Dassault Aviation, Thales and HAL to keep it modern.
+
+## From a video game to real training
+
+Threye did not start with military training. Its story is a good example of how skills grow step by step.
+
+- **2013 —** It made a PC game, *Operation Morning Glory*, where players flew a Mirage 2000 on a made-up mission.
+- **2019 —** It built *Indian Air Force: A Cut Above*, the IAF's official mobile game. It helped young people learn about joining the Air Force.
+- **2025 —** It showed a fighter jet and an unmanned combat aircraft working together on one mission.
+- **2026 —** It won the contract to train real Mirage 2000 pilots.
+
+The same team that once put the Mirage on a computer screen for fun is now helping pilots prepare for real combat.
+
+[QUOTE]Start small, keep building, and the big chance comes to those who are ready for it.[/QUOTE]
+
+## The bigger picture: startups and defence
+
+This deal is part of a larger change. Indian startups are moving into defence work that was once done only by big government companies or foreign firms.
+
+Threye's parent company, NewSpace, is also working on:
+
+- a **collaborative combat aircraft (CCA)** for the Indian Navy — a drone that flies along with piloted fighters
+- the **Sheshnaag** attack drone
+- other systems for the armed forces
+
+This links to **Atmanirbhar Bharat** — India's push to make its own defence equipment instead of buying it from abroad.
+
+## Why this topic matters for your SSB
+
+**It is a ready-made GD example.** Topics like "Role of startups in defence", "Atmanirbhar Bharat in defence" or "Technology in modern warfare" come up often. Most people speak in general terms. A real, recent example like this one makes your point stand out.
+
+**It is useful for AFSB candidates.** If you are going for the Air Force, you should know the main aircraft in service and why training methods are changing. Knowing what a part task simulator is shows real interest, not just a wish to fly.
+
+**It teaches a simple idea: cheap practice makes costly practice better.** Simulators do not replace real flying. They make each real flight count more, because the pilot arrives already practised.
+
+[SSB-GD]**Point you can make:** "Defence startups bring speed and new ideas, but the armed forces must still test them strictly. The IAF giving Threye a training contract — not a weapons contract — is a smart way to build trust step by step."
+
+**Balance it:** Startups are small and may struggle to deliver at large scale. Trust has to be earned with results, not given because a company is Indian.[/SSB-GD]
+
+[KEY-TERMS]
+Part task simulator|A trainer that lets a pilot practise one part of the job, like radar use or weapon selection
+Large force training|Training where many aircraft fly one mission together
+Mirage 2000|French-built IAF fighter, used in Kargil (1999) and Balakot (2019)
+CCA (Collaborative Combat Aircraft)|An unmanned aircraft that flies and fights alongside a piloted fighter
+Atmanirbhar Bharat|India's self-reliance push, including making defence equipment at home
+[/KEY-TERMS]
+
+## In one line
+
+A small deal with a big message: the IAF is ready to trust Indian startups with serious work, and India's defence future will be built by many more players than before.
+
+*Source: Livefist, 29 September 2026.*`;
+
+      await pool.query(`
+        INSERT INTO articles (title, category, summary, content, tags, is_published, published_at, reading_time, difficulty, ssb_relevance, slug)
+        VALUES ($1, $2, $3, $4, $5, true, NOW(), $6, $7, $8, $9)
+        ON CONFLICT (slug) WHERE slug IS NOT NULL DO UPDATE SET
+          title         = EXCLUDED.title,
+          category      = EXCLUDED.category,
+          summary       = EXCLUDED.summary,
+          content       = EXCLUDED.content,
+          tags          = EXCLUDED.tags,
+          reading_time  = EXCLUDED.reading_time,
+          difficulty    = EXCLUDED.difficulty,
+          ssb_relevance = EXCLUDED.ssb_relevance
+      `, [
+        'Indian Startup Wins IAF Deal to Train Mirage 2000 Pilots',
+        'defence',
+        "The IAF has signed a ₹135 crore deal with Indian startup Threye Interactive for Mirage 2000 part task simulators. What these simulators do, and why startups in defence is a strong GD topic.",
+        mirageSimContent,
+        ['IAF', 'mirage-2000', 'simulators', 'defence-startups', 'threye', 'newspace', 'atmanirbhar-bharat', 'AFSB'],
+        '4 min',
+        'Beginner',
+        ['GD Topics', 'Lecturette', 'PI'],
+        'iaf-mirage-simulator-startup-deal',
+      ]);
+      console.log('✓ Seeded article: IAF Mirage 2000 simulator deal');
     }
 
     // Seed Women in India series (4 cards)

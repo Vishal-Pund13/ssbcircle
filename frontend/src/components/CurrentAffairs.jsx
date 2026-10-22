@@ -4,6 +4,7 @@ import { Shield, TrendingUp, Landmark, Map, Users, ArrowLeft, Calendar, Tag, Che
 import { getArticles, getArticle } from '../services/api';
 import { SWIPE_SLUGS } from '../data/swipeArticles';
 import ArticleRenderer from './ArticleRenderer';
+import { useArticleEngagement, EngagementBar, CommentsSection, useScrollToComments } from './ArticleEngagement';
 
 const PILLARS = [
   { id: 'all',            label: 'All',                icon: null },
@@ -363,6 +364,8 @@ function ArticleCard({ article, onClick }) {
 }
 
 function ArticleDetail({ article, onBack }) {
+  const engagement = useArticleEngagement(article.slug);
+  const { inputRef, scrollToComments } = useScrollToComments();
   return (
     <div className="max-w-3xl mx-auto px-4 sm:px-6 py-8 sm:py-10">
       <button onClick={onBack}
@@ -404,11 +407,14 @@ function ArticleDetail({ article, onBack }) {
           </div>
         )}
 
-        <div className="flex items-center gap-1.5 text-xs text-gray-400 pb-6 border-b border-gray-100">
-          <Calendar className="w-3.5 h-3.5" />
-          {new Date(article.published_at).toLocaleDateString('en-IN', {
-            weekday: 'long', day: 'numeric', month: 'long', year: 'numeric'
-          })}
+        <div className="flex flex-wrap items-center justify-between gap-3 pb-6 border-b border-gray-100">
+          <div className="flex items-center gap-1.5 text-xs text-gray-400">
+            <Calendar className="w-3.5 h-3.5" />
+            {new Date(article.published_at).toLocaleDateString('en-IN', {
+              weekday: 'long', day: 'numeric', month: 'long', year: 'numeric'
+            })}
+          </div>
+          {article.slug && <EngagementBar engagement={engagement} onCommentClick={scrollToComments} />}
         </div>
       </div>
 
@@ -426,6 +432,8 @@ function ArticleDetail({ article, onBack }) {
           ))}
         </div>
       )}
+
+      {article.slug && <CommentsSection engagement={engagement} inputRef={inputRef} />}
 
       <p className="text-[11px] text-gray-400 mt-6 pt-4 border-t border-gray-100">
         SSBCircle · For SSB GD · Lecturette · PI Prep

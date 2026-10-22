@@ -138,6 +138,27 @@ export const getArticleVotes = async (slug) => {
   return data;
 };
 
+// Article likes and comments — reading works signed out, writing does not.
+export const getArticleEngagement = async (slug) => {
+  const { data } = await api.get(`/api/articles/${slug}/engagement`);
+  return data;             // { likes, liked, comments }
+};
+
+export const likeArticle = async (slug) => {
+  const { data } = await api.post(`/api/articles/${slug}/like`);
+  return data;             // { likes, liked }
+};
+
+export const addArticleComment = async (slug, body) => {
+  const { data } = await api.post(`/api/articles/${slug}/comments`, { body });
+  return data.comments;
+};
+
+export const deleteArticleComment = async (id) => {
+  const { data } = await api.delete(`/api/articles/comments/${id}`);
+  return data;
+};
+
 // Profile
 export const saveOnboarding = async (payload) => {
   const { data } = await api.post('/api/auth/me/onboarding', payload);
