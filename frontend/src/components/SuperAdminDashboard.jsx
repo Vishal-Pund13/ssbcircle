@@ -591,6 +591,11 @@ export default function SuperAdminDashboard() {
                           <th className="px-4 py-3 text-[11px] font-semibold text-gray-500 uppercase tracking-wide">Title</th>
                           <th className="px-4 py-3 text-[11px] font-semibold text-gray-500 uppercase tracking-wide hidden sm:table-cell">Category</th>
                           <th className="px-4 py-3 text-[11px] font-semibold text-gray-500 uppercase tracking-wide">Status</th>
+                          <th className="px-3 py-3 text-[11px] font-semibold text-gray-500 uppercase tracking-wide text-right" title="Total opens (last 7 days below)">Views</th>
+                          <th className="px-3 py-3 text-[11px] font-semibold text-gray-500 uppercase tracking-wide text-right hidden md:table-cell" title="Unique browsers that opened it">Readers</th>
+                          <th className="px-3 py-3 text-[11px] font-semibold text-gray-500 uppercase tracking-wide text-right hidden md:table-cell" title="Readers who scrolled to the end">Finished</th>
+                          <th className="px-3 py-3 text-[11px] font-semibold text-gray-500 uppercase tracking-wide text-right hidden md:table-cell">Likes</th>
+                          <th className="px-3 py-3 text-[11px] font-semibold text-gray-500 uppercase tracking-wide text-right hidden md:table-cell">Comments</th>
                           <th className="px-4 py-3 text-[11px] font-semibold text-gray-500 uppercase tracking-wide hidden sm:table-cell">Date</th>
                           <th className="px-4 py-3" />
                         </tr>
@@ -610,6 +615,19 @@ export default function SuperAdminDashboard() {
                                 {a.is_published ? 'Published' : 'Draft'}
                               </span>
                             </td>
+                            <td className="px-3 py-3 text-right tabular-nums">
+                              <p className="font-semibold text-gray-900">{a.views ?? 0}</p>
+                              <p className="text-[10px] text-gray-400">{a.views_7d ?? 0} this week</p>
+                            </td>
+                            <td className="px-3 py-3 text-right tabular-nums text-gray-700 hidden md:table-cell">{a.readers ?? 0}</td>
+                            <td className="px-3 py-3 text-right tabular-nums text-gray-700 hidden md:table-cell">
+                              {a.finished ?? 0}
+                              {a.readers > 0 && (
+                                <span className="block text-[10px] text-gray-400">{Math.round((a.finished / a.readers) * 100)}%</span>
+                              )}
+                            </td>
+                            <td className="px-3 py-3 text-right tabular-nums text-gray-700 hidden md:table-cell">{a.likes ?? 0}</td>
+                            <td className="px-3 py-3 text-right tabular-nums text-gray-700 hidden md:table-cell">{a.comments ?? 0}</td>
                             <td className="px-4 py-3 hidden sm:table-cell text-xs text-gray-400">
                               {a.published_at ? fmtDate(a.published_at) : '—'}
                             </td>

@@ -4,7 +4,7 @@ import { Shield, TrendingUp, Landmark, Map, Users, ArrowLeft, Calendar, Tag, Che
 import { getArticles, getArticle } from '../services/api';
 import { SWIPE_SLUGS } from '../data/swipeArticles';
 import ArticleRenderer from './ArticleRenderer';
-import { useArticleEngagement, EngagementBar, CommentsSection, useScrollToComments } from './ArticleEngagement';
+import { useArticleEngagement, EngagementBar, CommentsSection, useScrollToComments, useArticleTracking } from './ArticleEngagement';
 
 const PILLARS = [
   { id: 'all',            label: 'All',                icon: null },
@@ -366,6 +366,7 @@ function ArticleCard({ article, onClick }) {
 function ArticleDetail({ article, onBack }) {
   const engagement = useArticleEngagement(article.slug);
   const { inputRef, scrollToComments } = useScrollToComments();
+  const endRef = useArticleTracking(article.slug);
   return (
     <div className="max-w-3xl mx-auto px-4 sm:px-6 py-8 sm:py-10">
       <button onClick={onBack}
@@ -420,6 +421,8 @@ function ArticleDetail({ article, onBack }) {
 
       {/* Article body */}
       <ArticleRenderer content={article.content} />
+      {/* Reaching this marker counts as reading the article to the end. */}
+      <div ref={endRef} aria-hidden="true" />
 
       {/* Tags */}
       {article.tags?.length > 0 && (

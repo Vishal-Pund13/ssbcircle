@@ -250,9 +250,25 @@ router.delete('/rooms/:code', adminGuard, async (req, res) => {
 // List all articles
 router.get('/articles', adminGuard, async (_req, res) => {
   try {
+    // Reading metrics come from article_views / likes / comments, all keyed by slug.
     const { rows } = await pool.query(
-      `SELECT id, title, category, summary, tags, is_published, published_at, created_at
-       FROM articles ORDER BY created_at DESC`
+      `SELECT a.id, a.slug, a.title, a.category, a.summary, a.tags, a.is_published, a.published_at, a.created_at,
+              COALESCE(v.views, 0)    AS views,
+              COALESCE(v.readers, 0)  AS readers,
+              COALESCE(v.finished, 0) AS finished,
+              COALESCE(v.views_7d, 0) AS views_7d,
+              (SELECT count(*)::int FROM article_likes l WHERE l.article_slug = a.slug) AS likes,
+              (SELECT count(*)::int FROM article_comments c WHERE c.article_slug = a.slug AND c.deleted_at IS NULL) AS comments
+         FROM articles a
+         LEFT JOIN (
+           SELECT article_slug,
+                  count(*)::int                                                      AS views,
+                  count(DISTINCT visitor_id)::int                                    AS readers,
+                  count(DISTINCT visitor_id) FILTER (WHERE completed_at IS NOT NULL)::int AS finished,
+                  count(*) FILTER (WHERE viewed_at > NOW() - INTERVAL '7 days')::int AS views_7d
+             FROM article_views GROUP BY article_slug
+         ) v ON v.article_slug = a.slug
+        ORDER BY a.created_at DESC`
     );
     res.json({ articles: rows });
   } catch (err) {

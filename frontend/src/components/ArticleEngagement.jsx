@@ -2,7 +2,10 @@ import { useState, useEffect, useRef } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Heart, MessageCircle, Trash2, AlertCircle } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
-import { getArticleEngagement, likeArticle, addArticleComment, deleteArticleComment } from '../services/api';
+import {
+  getArticleEngagement, likeArticle, addArticleComment, deleteArticleComment,
+  trackArticleView, trackArticleRead,
+} from '../services/api';
 
 // Likes and comments for one blog article. The bar sits under the article
 // header; the comment list sits at the end. Both share the state from
@@ -165,6 +168,61 @@ export function CommentsSection({ engagement, inputRef }) {
       </div>
     </section>
   );
+}
+
+// ── Reading metrics ─────────────────────────────────────────────────────────
+// A random id kept in this browser, so a signed-out reader is counted once
+// without us storing anything about who they are. Storage can be blocked
+// (private mode), so every access is guarded and tracking just skips.
+
+function visitorId() {
+  try {
+    let id = localStorage.getItem('ssbc_visitor');
+    if (!id) {
+      id = crypto.randomUUID?.() || `${Date.now()}-${Math.random().toString(36).slice(2, 12)}`;
+      localStorage.setItem('ssbc_visitor', id);
+    }
+    return id;
+  } catch {
+    return null;
+  }
+}
+
+// Each flag is set once per browser tab, so a refresh or StrictMode's double
+// effect does not count the same visit twice.
+function onceThisTab(key) {
+  try {
+    if (sessionStorage.getItem(key)) return false;
+    sessionStorage.setItem(key, '1');
+    return true;
+  } catch {
+    return false;
+  }
+}
+
+// Records a view when the article opens, and a "read to the end" when the
+// element behind endRef scrolls into sight. Attach endRef after the body.
+export function useArticleTracking(slug) {
+  const endRef = useRef(null);
+
+  useEffect(() => {
+    const id = slug && visitorId();
+    if (!id) return;
+    // The read is recorded against the view row, so it waits for the view.
+    const viewed = onceThisTab(`viewed:${slug}`) ? trackArticleView(slug, id) : Promise.resolve();
+
+    const el = endRef.current;
+    if (!el || !('IntersectionObserver' in window)) return;
+    const observer = new IntersectionObserver(entries => {
+      if (!entries.some(e => e.isIntersecting)) return;
+      observer.disconnect();
+      if (onceThisTab(`read:${slug}`)) viewed.then(() => trackArticleRead(slug, id));
+    });
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, [slug]);
+
+  return endRef;
 }
 
 // Scrolls to the comment box and puts the cursor in it.

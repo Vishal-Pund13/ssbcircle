@@ -243,6 +243,53 @@ router.delete('/comments/:id', async (req, res) => {
   }
 });
 
+// ── Reading metrics ──────────────────────────────────────────────────────────
+// Counts are only shown in the admin dashboard, never to readers.
+
+const cleanVisitor = v => {
+  const s = String(v ?? '').trim();
+  return /^[A-Za-z0-9-]{8,64}$/.test(s) ? s : null;
+};
+
+router.post('/:slug/view', async (req, res) => {
+  try {
+    const { slug } = req.params;
+    const visitorId = cleanVisitor(req.body?.visitor_id);
+    if (!visitorId) return res.status(400).json({ error: 'visitor_id required' });
+    if (!(await articleExists(slug))) return res.status(404).json({ error: 'Article not found' });
+
+    await pool.query(
+      'INSERT INTO article_views (article_slug, visitor_id, user_id) VALUES ($1, $2, $3)',
+      [slug, visitorId, readViewer(req)]
+    );
+    res.status(204).end();
+  } catch (err) {
+    console.error('Article view error:', err);
+    res.status(500).json({ error: 'Could not record the view' });
+  }
+});
+
+// Marks this visitor's latest open of the article as read to the end.
+router.post('/:slug/read', async (req, res) => {
+  try {
+    const visitorId = cleanVisitor(req.body?.visitor_id);
+    if (!visitorId) return res.status(400).json({ error: 'visitor_id required' });
+
+    await pool.query(
+      `UPDATE article_views SET completed_at = NOW()
+        WHERE id = (SELECT id FROM article_views
+                     WHERE article_slug = $1 AND visitor_id = $2
+                     ORDER BY viewed_at DESC LIMIT 1)
+          AND completed_at IS NULL`,
+      [req.params.slug, visitorId]
+    );
+    res.status(204).end();
+  } catch (err) {
+    console.error('Article read error:', err);
+    res.status(500).json({ error: 'Could not record the read' });
+  }
+});
+
 // Get vote stats for a card — public
 router.get('/:slug/vote', async (req, res) => {
   try {

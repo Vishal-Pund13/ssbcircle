@@ -154,6 +154,13 @@ export const addArticleComment = async (slug, body) => {
   return data.comments;
 };
 
+// Reading metrics. Fire-and-forget: a failed count must never break reading.
+export const trackArticleView = (slug, visitorId) =>
+  api.post(`/api/articles/${slug}/view`, { visitor_id: visitorId }).catch(() => {});
+
+export const trackArticleRead = (slug, visitorId) =>
+  api.post(`/api/articles/${slug}/read`, { visitor_id: visitorId }).catch(() => {});
+
 export const deleteArticleComment = async (id) => {
   const { data } = await api.delete(`/api/articles/comments/${id}`);
   return data;
