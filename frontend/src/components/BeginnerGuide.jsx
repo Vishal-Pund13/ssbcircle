@@ -493,10 +493,10 @@ export default function BeginnerGuide() {
           <p className="inline-flex items-center gap-2 text-sm font-semibold text-brand-700 bg-white border border-brand-100 px-3 py-1.5 rounded-full">
             <Shield className="w-4 h-4" /> Indian Army · Indian Navy · Indian Air Force
           </p>
-          <h1 className="mt-4 text-3xl sm:text-5xl font-bold text-gray-900 leading-[1.1] tracking-tight max-w-3xl">
+          <h1 className="mt-4 text-[1.75rem] sm:text-5xl font-bold text-gray-900 leading-[1.1] tracking-tight max-w-3xl">
             How to become an officer in the Indian Armed Forces
           </h1>
-          <p className="mt-4 text-lg text-gray-600 leading-relaxed max-w-2xl">
+          <p className="mt-4 text-base sm:text-lg text-gray-600 leading-relaxed max-w-2xl">
             Dream of the uniform? Here is what you can become, how to join after 12th or after graduation,
             and how selection works — in simple words. Read in any order.
           </p>

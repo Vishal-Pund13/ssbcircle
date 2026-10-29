@@ -11,6 +11,14 @@
   }
 }
 
+/* Phones: the whole type scale (and rem spacing) one notch smaller. Desktop
+   sizes read as oversized on a 6-inch screen; scaling the root keeps every
+   heading, body and button size in proportion instead of overriding classes
+   one by one. 90% of 16px: body 14.4px, small text 13.5px. */
+@media (max-width: 639px) {
+  html { font-size: 90%; }
+}
+
 /* iOS Safari zooms the page into any field under 16px when it is tapped, and
    the page stays zoomed after. Phones get 16px fields whatever the class. */
 @media (max-width: 639px) {

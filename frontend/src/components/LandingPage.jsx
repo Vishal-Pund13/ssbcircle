@@ -1398,7 +1398,7 @@ export default function LandingPage() {
                 <Shield className="w-3.5 h-3.5" /> Free SSB preparation for every entry
               </p>
 
-              <h1 className="text-[2rem] sm:text-5xl font-bold text-gray-900 leading-[1.1] tracking-tight mb-4">
+              <h1 className="text-[1.75rem] sm:text-5xl font-bold text-gray-900 leading-[1.1] tracking-tight mb-4">
                 {user ? <>Welcome back, {user.display_name?.split(' ')[0]}.<br /><span className="text-brand-600">Let's keep going.</span></>
                       : <>Start your SSB prep<br /><span className="text-brand-600">the right way.</span></>}
               </h1>
