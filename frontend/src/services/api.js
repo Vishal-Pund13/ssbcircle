@@ -138,6 +138,34 @@ export const getArticleVotes = async (slug) => {
   return data;
 };
 
+// Article likes and comments — reading works signed out, writing does not.
+export const getArticleEngagement = async (slug) => {
+  const { data } = await api.get(`/api/articles/${slug}/engagement`);
+  return data;             // { likes, liked, comments }
+};
+
+export const likeArticle = async (slug) => {
+  const { data } = await api.post(`/api/articles/${slug}/like`);
+  return data;             // { likes, liked }
+};
+
+export const addArticleComment = async (slug, body) => {
+  const { data } = await api.post(`/api/articles/${slug}/comments`, { body });
+  return data.comments;
+};
+
+// Reading metrics. Fire-and-forget: a failed count must never break reading.
+export const trackArticleView = (slug, visitorId) =>
+  api.post(`/api/articles/${slug}/view`, { visitor_id: visitorId }).catch(() => {});
+
+export const trackArticleRead = (slug, visitorId) =>
+  api.post(`/api/articles/${slug}/read`, { visitor_id: visitorId }).catch(() => {});
+
+export const deleteArticleComment = async (id) => {
+  const { data } = await api.delete(`/api/articles/comments/${id}`);
+  return data;
+};
+
 // Profile
 export const saveOnboarding = async (payload) => {
   const { data } = await api.post('/api/auth/me/onboarding', payload);
@@ -173,6 +201,75 @@ export const deletePiq = async () => {
 export const analyzePiq = async () => {
   const { data } = await api.post('/api/piq/analyze', {}, { timeout: 90000 });
   return data;             // { analysis, analysed_at, used_today, daily_limit }
+};
+
+// Moderator programme
+export const getModeratorStatus = async () => (await api.get('/api/moderators/me')).data;
+export const applyModerator = async (payload) => (await api.post('/api/moderators/apply', payload)).data;
+export const withdrawModerator = async () => (await api.post('/api/moderators/withdraw')).data;
+
+// "Report a problem or idea" — also counts towards the moderator score
+export const sendPlatformFeedback = async (payload) => (await api.post('/api/moderators/platform-feedback', payload)).data;
+
+// "Was this useful?" on AI reports
+export const sendAiFeedback = async (payload) => {
+  const { data } = await api.post('/api/track/feedback', payload);
+  return data;
+};
+
+// Admin v2 dashboard: usage, features, AI calls and feedback for the last N days
+export const getAdminAnalytics = async (days = 14) => {
+  const token = localStorage.getItem('sa_token');
+  const { data } = await api.get(`/api/admin/analytics?days=${days}`, { headers: { Authorization: `Bearer ${token}` } });
+  return data;
+};
+
+// TAT practice — the aspirant's own attempts and feedback. Analysis can take
+// close to a minute on the free model, so it gets a long timeout.
+export const getTat = async () => {
+  const { data } = await api.get('/api/tat');
+  return data;             // { used_today, daily_limit, attempts }
+};
+
+export const analyzeTat = async (pictureId, story) => {
+  const { data } = await api.post('/api/tat/analyze', { picture_id: pictureId, story }, { timeout: 90000 });
+  return data;             // { attempt, used_today, daily_limit }
+};
+
+// Prep sheet — the sheet is static content in data/prepSheet.js; these only
+// read and write the signed-in aspirant's own progress through it.
+export const getPrepProgress = async () => {
+  const { data } = await api.get('/api/prep');
+  return data;             // { progress: [...], activity: [{ day, actions }] }
+};
+
+// patch: any of { status: 0|1|2, starred: bool, note: string }
+export const savePrepTopic = async (topicId, patch) => {
+  const { data } = await api.put(`/api/prep/${topicId}`, patch);
+  return data.progress;
+};
+
+// A spoken answer, already turned into text by the browser. The model takes a
+// while, so this waits far longer than the default 10s.
+export const speakPrepTopic = async (topicId, payload) => {
+  const { data } = await api.post(`/api/prep/${topicId}/speak`, payload, { timeout: 90000 });
+  return data;             // { progress, feedback, used_today, daily_limit }
+};
+
+// One piece (under 30s) of a spoken answer, as recorded audio. terms are
+// names from the topic for the recogniser to expect.
+export const transcribeAudio = async (blob, terms = []) => {
+  const { data } = await api.post('/api/prep/transcribe', blob, {
+    headers: { 'Content-Type': (blob.type || 'audio/webm').split(';')[0] },
+    params: { terms: JSON.stringify(terms) },
+    timeout: 40000,
+  });
+  return data.text;
+};
+
+export const reviewPrepTopic = async (topicId, recalled) => {
+  const { data } = await api.post(`/api/prep/${topicId}/review`, { recalled });
+  return data.progress;
 };
 
 // Community — reading works signed out, writing does not.

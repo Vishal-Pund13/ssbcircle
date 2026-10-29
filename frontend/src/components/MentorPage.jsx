@@ -3,27 +3,12 @@ import { Link, useParams, useNavigate, Navigate } from 'react-router-dom';
 import { Shield, GraduationCap, ArrowLeft, ExternalLink, Calendar, ChevronRight, ChevronLeft, Star, Users, MessageCircle, Quote, X } from 'lucide-react';
 import { MENTORS } from '../data/mentors';
 import MentorConnectModal from './MentorConnectModal';
+import SiteNav from './SiteNav';
 
 function formatDate(dateStr) {
   return new Date(dateStr).toLocaleDateString('en-IN', { day: 'numeric', month: 'long', year: 'numeric' });
 }
 
-function Logo() {
-  return (
-    <div className="flex items-center gap-2">
-      <svg viewBox="0 0 48 48" fill="none" className="w-7 h-7 shrink-0">
-        <circle cx="24" cy="24" r="22" stroke="#1e3a5f" strokeWidth="3" />
-        <circle cx="14" cy="20" r="3.5" fill="#1e3a5f" />
-        <circle cx="24" cy="14" r="3.5" fill="#1e3a5f" />
-        <circle cx="34" cy="20" r="3.5" fill="#1e3a5f" />
-        <circle cx="30" cy="31" r="3.5" fill="#1e3a5f" />
-        <circle cx="18" cy="31" r="3.5" fill="#1e3a5f" />
-        <path d="M14 20 L24 14 L34 20 L30 31 L18 31 Z" stroke="#1e3a5f" strokeWidth="1.5" fill="none" />
-      </svg>
-      <span className="font-bold text-gray-900 text-[15px] tracking-tight">SSBCircle</span>
-    </div>
-  );
-}
 
 export default function MentorPage() {
   const { slug } = useParams();
@@ -37,17 +22,7 @@ export default function MentorPage() {
   return (
     <div className="min-h-screen bg-white">
 
-      {/* ── Navbar ── */}
-      <header className="border-b border-gray-100 sticky top-0 z-50 bg-white/95 backdrop-blur-md">
-        <div className="max-w-5xl mx-auto px-4 sm:px-6 h-14 flex items-center justify-between gap-3">
-          <Link to="/"><Logo /></Link>
-          <nav className="flex items-center gap-2">
-            <Link to="/" className="text-sm text-gray-500 hover:text-gray-900 px-3 py-2 font-medium hidden sm:block">Home</Link>
-            <Link to="/current-affairs" className="text-sm text-gray-500 hover:text-gray-900 px-3 py-2 font-medium hidden sm:block">News Cards</Link>
-            <Link to="/register" className="btn-primary py-1.5 px-3 text-xs sm:px-4 sm:text-sm">Get started</Link>
-          </nav>
-        </div>
-      </header>
+      <SiteNav />
 
       <div className="max-w-3xl mx-auto px-4 sm:px-6 py-8 sm:py-12">
 
@@ -72,7 +47,7 @@ export default function MentorPage() {
             <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/10 to-transparent" />
 
             {mentor.isActive && (
-              <span className="absolute top-4 right-4 flex items-center gap-1.5 text-[11px] font-semibold text-white bg-emerald-600/90 backdrop-blur-sm px-3 py-1.5 rounded-full">
+              <span className="absolute top-4 right-4 flex items-center gap-1.5 text-[12px] font-semibold text-white bg-emerald-600/90 backdrop-blur-sm px-3 py-1.5 rounded-full">
                 <span className="w-1.5 h-1.5 rounded-full bg-white animate-pulse" /> Active Mentor
               </span>
             )}
@@ -86,7 +61,7 @@ export default function MentorPage() {
           {/* Info strip */}
           <div className="bg-white p-5 sm:p-8">
             <div className="flex items-start justify-end gap-3 mb-4">
-              <div className="shrink-0 flex items-center gap-1.5 text-[11px] font-semibold text-sky-700 bg-sky-50 border border-sky-100 px-3 py-1.5 rounded-full">
+              <div className="shrink-0 flex items-center gap-1.5 text-[12px] font-semibold text-sky-700 bg-sky-50 border border-sky-100 px-3 py-1.5 rounded-full">
                 <Shield className="w-3.5 h-3.5" /> Verified Officer
               </div>
             </div>
@@ -103,7 +78,7 @@ export default function MentorPage() {
             {/* Specialty chips */}
             <div className="flex flex-wrap gap-1.5">
               {mentor.specialties.map(tag => (
-                <span key={tag} className="text-[11px] font-semibold text-brand-600 bg-brand-50 border border-brand-100 px-2.5 py-1 rounded-full">
+                <span key={tag} className="text-[12px] font-semibold text-brand-600 bg-brand-50 border border-brand-100 px-2.5 py-1 rounded-full">
                   {tag}
                 </span>
               ))}
@@ -139,7 +114,7 @@ export default function MentorPage() {
           <section className="mb-8">
             <div className="flex items-center justify-between mb-4">
               <h2 className="text-lg font-bold text-gray-900">What Aspirants Say</h2>
-              <span className="text-[11px] text-gray-300">Scroll for more →</span>
+              <span className="text-[12px] text-gray-300">Scroll for more →</span>
             </div>
             <div className="flex gap-3 overflow-x-auto pb-2 scrollbar-hide -mx-1 px-1">
               {mentor.testimonialScreenshots.map((src, i) => (
@@ -162,7 +137,7 @@ export default function MentorPage() {
                   <div className="flex items-center justify-between mb-2">
                     <span className="text-xs font-semibold text-gray-600">{video.label}</span>
                     <a href={video.url} target="_blank" rel="noopener noreferrer"
-                      className="flex items-center gap-1 text-[11px] text-gray-400 hover:text-brand-600 transition-colors">
+                      className="flex items-center gap-1 text-[12px] text-gray-400 hover:text-brand-600 transition-colors">
                       YouTube <ExternalLink className="w-3 h-3" />
                     </a>
                   </div>
@@ -194,7 +169,7 @@ export default function MentorPage() {
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2 mb-2">
                       <MessageCircle className="w-4 h-4 text-amber-300" />
-                      <span className="text-[11px] font-bold text-brand-100 uppercase tracking-widest">WhatsApp · 1:1 Mentoring</span>
+                      <span className="text-[12px] font-bold text-brand-100 uppercase tracking-widest">WhatsApp · 1:1 Mentoring</span>
                     </div>
                     <p className="text-white font-bold text-base sm:text-lg leading-snug mb-1">
                       Message {mentor.name} directly
@@ -238,7 +213,7 @@ export default function MentorPage() {
         </section>
 
         {/* ── Footer note ── */}
-        <p className="text-[11px] text-gray-300 text-center pb-4">
+        <p className="text-[12px] text-gray-300 text-center pb-4">
           SSBCircle · Mentors Programme · Verified serving &amp; retired officers
         </p>
       </div>

@@ -33,7 +33,7 @@ export default function ContextScene({ scene }) {
     <div className="px-5 py-5 flex flex-col gap-5">
       <div>
         <h2 className="text-lg font-bold text-gray-900 leading-snug">{title}</h2>
-        <p className="text-sm text-gray-600 leading-relaxed mt-2">{body}</p>
+        <p className="text-[14px] text-gray-600 leading-relaxed mt-2">{body}</p>
       </div>
 
       {/* Key numbers — 2-col grid */}
@@ -68,7 +68,7 @@ export default function ContextScene({ scene }) {
                 <span className={`absolute -left-5 top-1 w-3.5 h-3.5 rounded-full border-2 border-white shadow-sm ${dotColor[t.type] || 'bg-gray-300'}`} />
                 <div>
                   <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">{t.year}</p>
-                  <p className="text-sm text-gray-700 leading-relaxed mt-0.5">{t.event}</p>
+                  <p className="text-[14px] text-gray-700 leading-relaxed mt-0.5">{t.event}</p>
                 </div>
               </div>
             ))}

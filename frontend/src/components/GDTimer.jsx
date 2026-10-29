@@ -168,10 +168,10 @@ export default function GDTimer({ onClose, isAdmin, onBroadcast, syncEvent }) {
       {/* Preset bar — admin only, before starting */}
       {isAdmin && !started && (
         <div className="flex items-center gap-1.5 bg-white border border-gray-200 rounded-full px-3 py-1.5 shadow-lg">
-          <span className="text-[10px] text-gray-400 font-medium mr-1">Duration</span>
+          <span className="text-[11px] text-gray-400 font-medium mr-1">Duration</span>
           {PRESETS.map(({ label, value }) => (
             <button key={value} onClick={() => handlePreset(value)}
-              className={`px-2.5 py-1 rounded-full text-[11px] font-semibold transition-all cursor-pointer ${
+              className={`px-2.5 py-1 rounded-full text-[12px] font-semibold transition-all cursor-pointer ${
                 total === value ? 'bg-brand-600 text-white' : 'text-gray-500 hover:text-gray-800 hover:bg-gray-100'
               }`}>
               {label}
@@ -199,7 +199,7 @@ export default function GDTimer({ onClose, isAdmin, onBroadcast, syncEvent }) {
               strokeLinecap="round" strokeDasharray={circumference} strokeDashoffset={dashOffset}
               style={{ transition: 'stroke-dashoffset 0.8s linear, stroke 0.4s' }}/>
           </svg>
-          <span className="text-[10px] font-bold text-gray-500 tabular-nums">{pad(minutes)}</span>
+          <span className="text-[11px] font-bold text-gray-500 tabular-nums">{pad(minutes)}</span>
         </div>
 
         {/* Time */}
@@ -240,7 +240,7 @@ export default function GDTimer({ onClose, isAdmin, onBroadcast, syncEvent }) {
             </button>
           </div>
         ) : (
-          <span className="text-[10px] text-gray-400 font-medium pr-1">Host timer</span>
+          <span className="text-[11px] text-gray-400 font-medium pr-1">Host timer</span>
         )}
       </div>
     </div>

@@ -136,7 +136,7 @@ export default function SsbCountdown({ user }) {
         <div className="flex flex-wrap items-center gap-x-5 gap-y-3">
           <div className="flex items-center gap-2 shrink-0">
             <CalendarDays className="w-4 h-4 text-brand-600 shrink-0" />
-            <span className="text-[10px] font-bold uppercase tracking-[0.18em] text-gray-400">
+            <span className="text-[11px] font-bold uppercase tracking-[0.18em] text-gray-400">
               SSB countdown
             </span>
           </div>
@@ -196,7 +196,7 @@ export default function SsbCountdown({ user }) {
           )}
 
           {saved && (
-            <span className="inline-flex items-center gap-1 text-[11px] font-semibold text-emerald-600 shrink-0">
+            <span className="inline-flex items-center gap-1 text-[12px] font-semibold text-emerald-600 shrink-0">
               <Check className="w-3 h-3" /> Saved
             </span>
           )}
@@ -204,7 +204,7 @@ export default function SsbCountdown({ user }) {
 
         {/* Second line: the same information, quietly */}
         {live && (
-          <p className="mt-2 text-[11px] text-gray-400">
+          <p className="mt-2 text-[12px] text-gray-400">
             {months} {months === 1 ? 'month' : 'months'} · {weeks} {weeks === 1 ? 'week' : 'weeks'} · {prettyDate(date)}
             <span className="text-gray-300"> — </span>
             <span className="text-gray-500">{focusFor(days)}</span>

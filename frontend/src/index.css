@@ -7,8 +7,32 @@
   body {
     @apply bg-white text-gray-900 antialiased;
     font-family: 'Inter', system-ui, sans-serif;
+    -webkit-tap-highlight-color: transparent;
   }
 }
+
+/* iOS Safari zooms the page into any field under 16px when it is tapped, and
+   the page stays zoomed after. Phones get 16px fields whatever the class. */
+@media (max-width: 639px) {
+  input:not([type="checkbox"]):not([type="radio"]):not([type="range"]), select, textarea {
+    font-size: 16px !important;
+  }
+}
+
+/* Horizontal rows that scroll with a finger: no scrollbar track on desktop */
+.scrollbar-hide { scrollbar-width: none; -ms-overflow-style: none; }
+.scrollbar-hide::-webkit-scrollbar { display: none; }
+
+/* A grid on wider screens, a swipeable row of cards on phones — so a section
+   of six cards costs one screen height instead of six. Children should take
+   a width (e.g. w-[80%]) below sm. */
+.m-rail {
+  @apply flex gap-3 overflow-x-auto snap-x snap-mandatory -mx-4 px-4 pb-2
+         sm:grid sm:mx-0 sm:px-0 sm:pb-0 sm:overflow-visible sm:gap-4;
+  scrollbar-width: none;
+}
+.m-rail::-webkit-scrollbar { display: none; }
+.m-rail > * { @apply shrink-0 snap-start w-[80%] sm:w-auto; }
 
 @layer components {
   .btn-primary {

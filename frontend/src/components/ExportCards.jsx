@@ -165,16 +165,16 @@ export default function ExportCards() {
       {/* Header */}
       <header className="bg-white border-b border-gray-200 px-4 sm:px-6 py-3 flex items-center justify-between">
         <div className="flex items-center gap-3">
-          <Link to="/sa/dashboard" className="text-xs text-gray-400 hover:text-gray-700 transition-colors">
+          <Link to="/sa/dashboard" className="text-[12px] text-gray-400 hover:text-gray-700 transition-colors">
             ← Dashboard
           </Link>
-          <span className="text-gray-200 text-xs">/</span>
-          <span className="text-xs font-semibold text-gray-800">Export Cards</span>
+          <span className="text-gray-200 text-[12px]">/</span>
+          <span className="text-[12px] font-semibold text-gray-800">Export Cards</span>
         </div>
         <button
           onClick={exportAll}
           disabled={busy}
-          className="text-xs font-semibold text-white bg-brand-600 hover:bg-brand-700 disabled:opacity-50 px-4 py-1.5 rounded-lg transition-colors cursor-pointer disabled:cursor-not-allowed"
+          className="text-[12px] font-semibold text-white bg-brand-600 hover:bg-brand-700 disabled:opacity-50 px-4 py-1.5 rounded-lg transition-colors cursor-pointer disabled:cursor-not-allowed"
         >
           {busy ? '…' : 'Export all articles'}
         </button>
@@ -183,9 +183,9 @@ export default function ExportCards() {
       <main className="max-w-4xl mx-auto px-4 sm:px-6 py-8">
         <div className="mb-6">
           <h1 className="text-xl font-bold text-gray-900 mb-1">Export Card Decks</h1>
-          <p className="text-sm text-gray-500">
+          <p className="text-[14px] text-gray-500">
             Downloads each scene as a 780×1688 PNG — exactly as it appears in the app.
-            One file per scene, named <code className="text-xs bg-gray-100 px-1 rounded">article-01-introduction.png</code> etc.
+            One file per scene, named <code className="text-[12px] bg-gray-100 px-1 rounded">article-01-introduction.png</code> etc.
           </p>
         </div>
 
@@ -194,7 +194,7 @@ export default function ExportCards() {
             <div key={article.id} className="bg-white border border-gray-200 rounded-xl p-4 flex flex-col gap-3">
               <div className="flex items-start justify-between gap-2">
                 <div>
-                  <p className="text-sm font-semibold text-gray-900 leading-snug">{article.title}</p>
+                  <p className="text-[14px] font-semibold text-gray-900 leading-snug">{article.title}</p>
                   <p className="text-[10px] text-gray-400 mt-0.5">
                     {article.category} · {article.scenes.length} scenes
                   </p>
@@ -216,7 +216,7 @@ export default function ExportCards() {
               <button
                 onClick={() => exportArticle(article)}
                 disabled={busy}
-                className="w-full text-xs font-semibold text-brand-600 border border-brand-200 hover:bg-brand-50 disabled:opacity-40 py-2 rounded-lg transition-colors cursor-pointer disabled:cursor-not-allowed"
+                className="w-full text-[12px] font-semibold text-brand-600 border border-brand-200 hover:bg-brand-50 disabled:opacity-40 py-2 rounded-lg transition-colors cursor-pointer disabled:cursor-not-allowed"
               >
                 {busy && status.startsWith(article.title)
                   ? status
@@ -229,7 +229,7 @@ export default function ExportCards() {
 
       {/* Floating status */}
       {busy && (
-        <div className="fixed bottom-6 left-1/2 -translate-x-1/2 bg-gray-900 text-white text-xs font-semibold px-5 py-2.5 rounded-full shadow-xl flex items-center gap-2 whitespace-nowrap">
+        <div className="fixed bottom-6 left-1/2 -translate-x-1/2 bg-gray-900 text-white text-[12px] font-semibold px-5 py-2.5 rounded-full shadow-xl flex items-center gap-2 whitespace-nowrap">
           <svg className="w-3.5 h-3.5 animate-spin shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
             <path strokeLinecap="round" strokeLinejoin="round" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
           </svg>

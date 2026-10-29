@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const authMiddleware = require('../middleware/auth');
-const { getForUser, getWithUsage, saveForUser, saveAnalysis, removeForUser } = require('../models/Piq');
+const { getForUser, getWithUsage, saveForUser, saveAnalysis, removeForUser, describe } = require('../models/Piq');
 const { complete, configured } = require('../llm');
 
 // A filled PIQ is only ever read by the person who wrote it. Every route here
@@ -63,56 +63,58 @@ router.delete('/', authMiddleware, async (req, res) => {
 // Each call costs money, so it is capped per aspirant per day.
 const DAILY_LIMIT = 3;
 
-// Religion, category and date of birth are stored because the paper form has
-// them, but they say nothing about how someone will interview, and there is no
-// reason to hand special-category data to a third party. Place names stay —
-// an IO genuinely asks about your home district.
-const OMIT = new Set(['religion', 'category', 'dob']);
+// How the analysis reads a PIQ. The lens is our mentors' view of leadership:
+// an officer is someone who understands a situation fully, cares enough about
+// the people in it to feel its urgency, and then brings their own solution to
+// change it. SSB is only a small test of that, so the report coaches the
+// person, not tricks for the test.
+const SYSTEM = `You are an experienced SSB mentor helping an Indian defence aspirant understand themselves through their Personal Information Questionnaire (PIQ). The Interviewing Officer (IO) reads this form before the interview, and most questions come straight out of it.
 
-const title = k => k.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase());
+How to look at the candidate:
+- SSB checks leadership potential, not exam answers. Leadership here means three things working together:
+  1. Understanding: seeing a situation fully, from about five sides, not just one or two. People who think narrowly give one-point answers ("the biggest problem is unemployment").
+  2. Character: caring about other people, not only about oneself. Understanding plus caring creates a sense of urgency: the feeling that something must change.
+  3. Solutions: acting on that urgency with their own ideas to change the situation for the better (a "status change"). Borrowed or rehearsed ideas do not count.
+- Truth makes a leader. A candidate who answers honestly has nothing to remember. Never coach the candidate to make things up or to give "safe" textbook answers.
+- Nobody is perfect. Candidates get selected with weaknesses when they keep improving. Your job is to show where to improve, kindly and clearly.
+- Think in five parts. Any topic (home town, college, a sport, family) can be understood through about five main parts. Teach this habit through your examples.
 
-// Flatten the form into labelled lines. Empty fields are dropped rather than
-// sent as blanks, so the model sees what was actually filled in.
-function describe(data) {
-  const lines = [];
-  for (const [key, value] of Object.entries(data)) {
-    if (OMIT.has(key) || value == null || value === '') continue;
+Writing rules:
+- Simple, plain English. Short sentences. Everyday words. The reader is often not a native English speaker.
+- Speak to the candidate as "you".
+- Work only from what the form says. Do not invent facts. Do not flatter. Every judgment must point to something in the form ("evidence").
+- If an important section is blank or thin, say so instead of guessing.
 
-    if (Array.isArray(value)) {
-      const rows = value
-        .map(row => Object.entries(row || {})
-          .filter(([, v]) => v != null && String(v).trim() !== '')
-          .map(([k, v]) => `${title(k)}: ${v}`)
-          .join('; '))
-        .filter(Boolean);
-      if (rows.length) lines.push(`${title(key)}:\n` + rows.map(r => `  - ${r}`).join('\n'));
-    } else if (typeof value !== 'object') {
-      lines.push(`${title(key)}: ${value}`);
-    }
-  }
-  return lines.join('\n');
-}
+What to produce (as JSON in the given schema):
+- summary: 2 or 3 sentences on how an IO will likely see this candidate on first reading.
+- leadership: for understanding, character and solutions, write what the PIQ already shows (with evidence) and one clear way to grow it.
+- strengths: 3 to 5 strong points, each with the evidence from the form.
+- likely_questions: exactly 5 areas, chosen from this PIQ (for example Family, Education, Friends and activities, Sports and NCC, Home region, Why the forces, Previous attempts). 4 or 5 questions in each, the way an IO asks them in a quick round. Add a short tip for each area on how to answer it honestly and fully.
+- gaps: 3 to 6 things an IO will press on: what is thin or unclear, why the IO will ask, and what to do before the interview.
+- practice: 3 to 5 short daily exercises built on this candidate's own life. Include at least one five-part exercise (for example "list 5 problems of your home district and 2 solutions for each") and one "change you made" exercise (recall or plan a time you saw a problem around you and fixed it).`;
 
-const SYSTEM = `You help Indian defence aspirants prepare for the SSB interview.
+// Structured output keeps the report in a shape the page can always render.
+// Counts live in the prompt; schema-level array limits are not supported by
+// every provider.
+const str = { type: 'string' };
+const obj = (properties) => ({
+  type: 'object', additionalProperties: false,
+  properties, required: Object.keys(properties),
+});
+const arr = (items) => ({ type: 'array', items });
 
-The Personal Information Questionnaire below is what the Interviewing Officer reads before calling a candidate in. Most interview questions come straight out of it.
-
-Write in simple, plain English. Short sentences. Everyday words. The reader is a student, often not a native English speaker, so do not use literary or clever phrasing.
-
-Work only from what the form says. Do not invent facts, do not flatter, and do not guess at things the candidate did not write.
-
-Reply with JSON only. No markdown fence, no text before or after. Use exactly this shape:
-{
-  "summary": "two or three sentences on what this PIQ says about the candidate",
-  "strengths": ["things an IO will likely probe in a good way"],
-  "likely_questions": [{"area": "Family", "questions": ["...", "..."]}],
-  "gaps": [{"issue": "what is thin or vague", "why": "why an IO will press on it", "fix": "what to do before the interview"}]
-}
-
-Rules:
-- 4 to 6 areas in likely_questions, 3 to 5 questions in each.
-- 3 to 6 gaps.
-- If an important section is blank, say so in gaps rather than inventing an answer.`;
+const SCHEMA = obj({
+  summary: str,
+  leadership: obj({
+    understanding: obj({ seen: str, grow: str }),
+    character:     obj({ seen: str, grow: str }),
+    solutions:     obj({ seen: str, grow: str }),
+  }),
+  strengths:        arr(obj({ point: str, evidence: str })),
+  likely_questions: arr(obj({ area: str, questions: arr(str), tip: str })),
+  gaps:             arr(obj({ issue: str, why: str, fix: str })),
+  practice:         arr(obj({ title: str, task: str })),
+});
 
 router.post('/analyze', authMiddleware, async (req, res) => {
   try {
@@ -130,7 +132,8 @@ router.post('/analyze', authMiddleware, async (req, res) => {
     if (described.trim().length < 80)
       return res.status(400).json({ error: 'There is not enough filled in yet to analyse. Add more and save.' });
 
-    const text = await complete({ system: SYSTEM, user: described, maxTokens: 2500 });
+    // Thinking counts against max_tokens, so leave room or the JSON gets cut off
+    const text = await complete({ system: SYSTEM, user: described, maxTokens: 8000, schema: SCHEMA, feature: 'piq', userId: req.userId });
 
     // A model that ignores the format should degrade to readable text rather
     // than throwing away a call the aspirant has already spent.
@@ -152,6 +155,9 @@ router.post('/analyze', authMiddleware, async (req, res) => {
     if (err.code === 'NO_KEY')  return res.status(503).json({ error: err.message });
     if (err.code === 'TIMEOUT') return res.status(504).json({ error: err.message });
     if (err.code === 'BUSY')    return res.status(503).json({ error: 'The analysis service is busy. Try again shortly.' });
+    // llm.js has already logged the provider's reason; the aspirant gets a plain one
+    if (err.code === 'UPSTREAM') return res.status(503).json({ error: err.message });
+    if (err.code === 'REFUSED')  return res.status(422).json({ error: 'The analysis could not be run on this PIQ. Try editing it and analysing again.' });
     console.error('PIQ analyse error:', err);
     res.status(500).json({ error: 'Could not analyse your PIQ' });
   }

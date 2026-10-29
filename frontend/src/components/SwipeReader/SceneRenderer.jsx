@@ -21,7 +21,7 @@ export default function SceneRenderer({ scene, article, onClose }) {
   if (!Component) {
     return (
       <div className="flex items-center justify-center h-full px-6 text-center">
-        <p className="text-sm text-gray-400">Unknown scene type: {scene.type}</p>
+        <p className="text-[14px] text-gray-400">Unknown scene type: {scene.type}</p>
       </div>
     );
   }

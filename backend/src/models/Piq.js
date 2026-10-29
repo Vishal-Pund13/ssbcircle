@@ -69,4 +69,37 @@ async function removeForUser(userId) {
   return rowCount > 0;
 }
 
-module.exports = { getForUser, getWithUsage, saveForUser, saveAnalysis, removeForUser };
+// ── Text form for the LLM ────────────────────────────────────────────────────
+// Shared by PIQ analysis and TAT feedback, so both send the same filtered view.
+// Religion, category and date of birth are stored because the paper form has
+// them, but they say nothing about how someone will interview, and there is no
+// reason to hand special-category data to a third party. Place names stay —
+// an IO genuinely asks about your home district.
+const OMIT = new Set(['religion', 'category', 'dob']);
+
+const title = k => k.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase());
+
+// Flatten the form into labelled lines. Empty fields are dropped rather than
+// sent as blanks, so the model sees what was actually filled in.
+function describe(data) {
+  const lines = [];
+  for (const [key, value] of Object.entries(data)) {
+    if (OMIT.has(key) || value == null || value === '') continue;
+
+    if (Array.isArray(value)) {
+      const rows = value
+        .map(row => Object.entries(row || {})
+          .filter(([, v]) => v != null && String(v).trim() !== '')
+          .map(([k, v]) => `${title(k)}: ${v}`)
+          .join('; '))
+        .filter(Boolean);
+      if (rows.length) lines.push(`${title(key)}:\n` + rows.map(r => `  - ${r}`).join('\n'));
+    } else if (typeof value !== 'object') {
+      lines.push(`${title(key)}: ${value}`);
+    }
+  }
+  return lines.join('\n');
+}
+
+module.exports = { getForUser, getWithUsage, saveForUser, saveAnalysis, removeForUser, describe };
+

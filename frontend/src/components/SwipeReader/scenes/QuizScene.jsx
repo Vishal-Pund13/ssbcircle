@@ -41,7 +41,7 @@ function StarRating({ articleId }) {
 
   return (
     <div className="flex flex-col items-center gap-3 w-full">
-      <p className="text-xs font-semibold text-gray-500">
+      <p className="text-[12px] font-semibold text-gray-500">
         {submitted ? 'Your rating' : 'Rate this card'}
       </p>
 
@@ -69,7 +69,7 @@ function StarRating({ articleId }) {
       {/* Feedback */}
       {submitted && (
         <div className="flex flex-col items-center gap-1">
-          <p className="text-xs font-bold text-brand-600">
+          <p className="text-[12px] font-bold text-brand-600">
             {selected >= 4 ? 'Thanks! Glad it helped.' : selected === 3 ? 'Thanks for the feedback.' : 'Thanks — we\'ll improve it.'}
           </p>
           {voteCount && voteCount > 1 && (
@@ -108,9 +108,9 @@ export default function QuizScene({ scene, article, onClose }) {
           </svg>
         </div>
         <div>
-          <p className="text-xs text-gray-400 uppercase tracking-widest mb-1">You got</p>
+          <p className="text-[12px] text-gray-400 uppercase tracking-widest mb-1">You got</p>
           <p className="text-4xl font-extrabold text-gray-900">{correct}/{questions.length}</p>
-          <p className="text-sm font-semibold text-brand-600 mt-2">
+          <p className="text-[14px] font-semibold text-brand-600 mt-2">
             {correct === questions.length ? 'Perfect! SSB-ready on this topic.' : 'Good effort — review and retry.'}
           </p>
         </div>
@@ -122,7 +122,7 @@ export default function QuizScene({ scene, article, onClose }) {
 
         {/* CTA */}
         <div className="bg-brand-50 border border-brand-100 rounded-xl px-4 py-3 w-full max-w-xs">
-          <p className="text-xs text-gray-500 leading-relaxed">
+          <p className="text-[12px] text-gray-500 leading-relaxed">
             Now practice using this in a live GD room on SSBCircle to build fluency under pressure.
           </p>
         </div>
@@ -131,7 +131,7 @@ export default function QuizScene({ scene, article, onClose }) {
         {onClose && (
           <button
             onClick={onClose}
-            className="flex items-center gap-2 px-5 py-2.5 rounded-full border border-gray-200 bg-white text-sm font-semibold text-gray-600 hover:border-brand-300 hover:text-brand-600 hover:bg-brand-50 transition-all cursor-pointer shadow-sm"
+            className="flex items-center gap-2 px-5 py-2.5 rounded-full border border-gray-200 bg-white text-[14px] font-semibold text-gray-600 hover:border-brand-300 hover:text-brand-600 hover:bg-brand-50 transition-all cursor-pointer shadow-sm"
           >
             <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
               <path strokeLinecap="round" strokeLinejoin="round" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
@@ -151,7 +151,7 @@ export default function QuizScene({ scene, article, onClose }) {
           <path strokeLinecap="round" strokeLinejoin="round" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
         </svg>
         <div>
-          <p className="text-xs font-bold text-brand-700 mb-0.5">Quick self-check</p>
+          <p className="text-[12px] font-bold text-brand-700 mb-0.5">Quick self-check</p>
           <p className="text-[11px] text-brand-600 leading-relaxed">We suggest trying these 2 questions — takes 30 seconds and helps things stick. No pressure though.</p>
         </div>
       </div>
@@ -164,7 +164,7 @@ export default function QuizScene({ scene, article, onClose }) {
         const answered = answers[qi] !== undefined;
         return (
           <div key={qi} className="flex flex-col gap-2.5">
-            <p className="text-sm font-semibold text-gray-900 leading-snug">{q.q}</p>
+            <p className="text-[14px] font-semibold text-gray-900 leading-snug">{q.q}</p>
             <div className="flex flex-col gap-2">
               {q.options.map((opt, oi) => {
                 let cls = 'border-gray-200 bg-white text-gray-700 hover:border-brand-600/30 hover:bg-brand-50';
@@ -175,7 +175,7 @@ export default function QuizScene({ scene, article, onClose }) {
                 }
                 return (
                   <button key={oi} onClick={() => pick(qi, oi)}
-                    className={`w-full text-left text-sm px-4 py-3 rounded-xl border transition-all ${cls} ${answered ? 'cursor-default' : 'cursor-pointer'}`}>
+                    className={`w-full text-left text-[14px] px-4 py-3 rounded-xl border transition-all ${cls} ${answered ? 'cursor-default' : 'cursor-pointer'}`}>
                     {opt}
                   </button>
                 );
@@ -183,7 +183,7 @@ export default function QuizScene({ scene, article, onClose }) {
             </div>
             {answered && (
               <div className="bg-gray-50 rounded-xl px-4 py-3 border border-gray-100">
-                <p className="text-xs text-gray-500 leading-relaxed">{q.explanation}</p>
+                <p className="text-[12px] text-gray-500 leading-relaxed">{q.explanation}</p>
               </div>
             )}
           </div>

@@ -4,6 +4,8 @@ import { Shield, TrendingUp, Landmark, Map, Users, ArrowLeft, Calendar, Tag, Che
 import { getArticles, getArticle } from '../services/api';
 import { SWIPE_SLUGS } from '../data/swipeArticles';
 import ArticleRenderer from './ArticleRenderer';
+import SiteNav from './SiteNav';
+import { useArticleEngagement, EngagementBar, CommentsSection, useScrollToComments, useArticleTracking } from './ArticleEngagement';
 
 const PILLARS = [
   { id: 'all',            label: 'All',                icon: null },
@@ -50,10 +52,10 @@ function WomenSeriesBanner() {
         {/* Text */}
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-2 mb-1.5">
-            <span className="text-[9px] font-bold text-brand-100 bg-white/15 border border-white/20 px-2 py-0.5 rounded-full uppercase tracking-widest">
+            <span className="text-[10.5px] font-bold text-brand-100 bg-white/15 border border-white/20 px-2 py-0.5 rounded-full uppercase tracking-widest">
               Society · Women
             </span>
-            <span className="text-[9px] font-bold text-brand-100 bg-white/15 border border-white/20 px-2 py-0.5 rounded-full uppercase tracking-widest">
+            <span className="text-[10.5px] font-bold text-brand-100 bg-white/15 border border-white/20 px-2 py-0.5 rounded-full uppercase tracking-widest">
               7-Card Series
             </span>
           </div>
@@ -68,7 +70,7 @@ function WomenSeriesBanner() {
               <div className="h-1.5 w-24 bg-white/20 rounded-full overflow-hidden">
                 <div className="h-full bg-white rounded-full" style={{ width: `${(read / 7) * 100}%` }} />
               </div>
-              <span className="text-[10px] text-brand-100 font-semibold">{read}/7 read</span>
+              <span className="text-[11px] text-brand-100 font-semibold">{read}/7 read</span>
             </div>
           )}
         </div>
@@ -139,11 +141,11 @@ function _SessionBannerRemoved() {
           {/* Text */}
           <div className="flex-1 min-w-0">
             <div className="flex items-center gap-2 mb-1.5 flex-wrap">
-              <span className="flex items-center gap-1 text-[9px] font-bold text-emerald-300 bg-emerald-500/20 border border-emerald-500/30 px-2 py-0.5 rounded-full uppercase tracking-widest">
+              <span className="flex items-center gap-1 text-[10.5px] font-bold text-emerald-300 bg-emerald-500/20 border border-emerald-500/30 px-2 py-0.5 rounded-full uppercase tracking-widest">
                 <span className="w-1.5 h-1.5 bg-emerald-400 rounded-full animate-pulse" /> Live · 23 May
               </span>
-              <span className="text-[9px] font-bold text-white/50 bg-white/10 border border-white/15 px-2 py-0.5 rounded-full uppercase tracking-widest">🪖 Army</span>
-              <span className="text-[9px] font-bold text-white/50 bg-white/10 border border-white/15 px-2 py-0.5 rounded-full uppercase tracking-widest">✈️ Air Force</span>
+              <span className="text-[10.5px] font-bold text-white/50 bg-white/10 border border-white/15 px-2 py-0.5 rounded-full uppercase tracking-widest">🪖 Army</span>
+              <span className="text-[10.5px] font-bold text-white/50 bg-white/10 border border-white/15 px-2 py-0.5 rounded-full uppercase tracking-widest">✈️ Air Force</span>
             </div>
             <h3 className="text-base sm:text-lg font-bold text-white leading-snug mb-0.5">
               Session by a Recommended Candidate
@@ -163,7 +165,7 @@ function _SessionBannerRemoved() {
 
       {/* Modal */}
       {open && (
-        <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-4"
+        <div className="fixed inset-0 z-[60] flex items-end sm:items-center justify-center p-4"
           onClick={() => { if (status !== 'loading') setOpen(false); }}>
           <div className="absolute inset-0 bg-black/50 backdrop-blur-sm" />
           <div className="relative bg-white rounded-2xl shadow-2xl w-full max-w-md overflow-hidden"
@@ -173,7 +175,7 @@ function _SessionBannerRemoved() {
             <div className="bg-[#0f2340] px-6 py-5">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-white/50 text-[10px] font-semibold uppercase tracking-widest mb-0.5">SSBCircle · 23 May 2026</p>
+                  <p className="text-white/50 text-[11px] font-semibold uppercase tracking-widest mb-0.5">SSBCircle · 23 May 2026</p>
                   <p className="text-white font-bold text-base">Session by a Recommended Candidate</p>
                 </div>
                 <button onClick={() => setOpen(false)} className="text-white/40 hover:text-white cursor-pointer transition-colors">
@@ -207,7 +209,7 @@ function _SessionBannerRemoved() {
                 <form onSubmit={handleSubmit} className="space-y-4">
                   {/* Pre-filled read-only fields */}
                   <div className="bg-gray-50 border border-gray-100 rounded-xl p-3 space-y-2">
-                    <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-2">Your Details (from Google)</p>
+                    <p className="text-[11px] font-bold text-gray-400 uppercase tracking-widest mb-2">Your Details (from Google)</p>
                     <div className="flex items-center gap-2">
                       {user.avatar_url && <img src={user.avatar_url} className="w-7 h-7 rounded-full" alt="" />}
                       <div>
@@ -261,7 +263,7 @@ function _SessionBannerRemoved() {
                     {status === 'loading' ? 'Registering…' : 'Confirm Registration →'}
                   </button>
 
-                  <p className="text-[10px] text-gray-400 text-center">🔔 You'll receive a confirmation email + reminder 30 min before the session</p>
+                  <p className="text-[11px] text-gray-400 text-center">🔔 You'll receive a confirmation email + reminder 30 min before the session</p>
                 </form>
               )}
             </div>
@@ -277,22 +279,6 @@ function fmtDate(d) {
   return new Date(d).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' });
 }
 
-function Logo() {
-  return (
-    <div className="flex items-center gap-2">
-      <svg viewBox="0 0 48 48" fill="none" className="w-7 h-7 shrink-0">
-        <circle cx="24" cy="24" r="22" stroke="#1e3a5f" strokeWidth="3" />
-        <circle cx="14" cy="20" r="3.5" fill="#1e3a5f" />
-        <circle cx="24" cy="14" r="3.5" fill="#1e3a5f" />
-        <circle cx="34" cy="20" r="3.5" fill="#1e3a5f" />
-        <circle cx="30" cy="31" r="3.5" fill="#1e3a5f" />
-        <circle cx="18" cy="31" r="3.5" fill="#1e3a5f" />
-        <path d="M14 20 L24 14 L34 20 L30 31 L18 31 Z" stroke="#1e3a5f" strokeWidth="1.5" fill="none" />
-      </svg>
-      <span className="font-bold text-gray-900 text-[15px] tracking-tight">SSBCircle</span>
-    </div>
-  );
-}
 
 // Same pill badge style as existing category badges in LandingPage
 function PillarBadge({ id }) {
@@ -300,7 +286,7 @@ function PillarBadge({ id }) {
   if (!p || !p.icon) return null;
   const Icon = p.icon;
   return (
-    <span className="inline-flex items-center gap-1.5 text-[10px] font-bold px-2.5 py-0.5 rounded-full bg-brand-50 text-brand-600 border border-brand-100">
+    <span className="inline-flex items-center gap-1.5 text-[11px] font-bold px-2.5 py-0.5 rounded-full bg-brand-50 text-brand-600 border border-brand-100">
       <Icon className="w-3 h-3" /> {p.label}
     </span>
   );
@@ -320,7 +306,7 @@ function ArticleCard({ article, onClick }) {
         {/* Badge + date */}
         <div className="flex items-center justify-between gap-2">
           <PillarBadge id={article.category} />
-          <span className="text-[11px] text-gray-400 shrink-0">{fmtDate(article.published_at)}</span>
+          <span className="text-[12px] text-gray-400 shrink-0">{fmtDate(article.published_at)}</span>
         </div>
         {/* Title + summary */}
         <div className="flex-1">
@@ -333,7 +319,7 @@ function ArticleCard({ article, onClick }) {
         {article.ssb_relevance?.length > 0 && (
           <div className="flex flex-wrap gap-1">
             {article.ssb_relevance.map(r => (
-              <span key={r} className="text-[9px] font-semibold text-brand-600 bg-brand-50 px-2 py-0.5 rounded-full border border-brand-100">
+              <span key={r} className="text-[10.5px] font-semibold text-brand-600 bg-brand-50 px-2 py-0.5 rounded-full border border-brand-100">
                 {r}
               </span>
             ))}
@@ -343,17 +329,17 @@ function ArticleCard({ article, onClick }) {
         <div className="flex items-center justify-between gap-2 pt-2 border-t border-gray-100">
           <div className="flex items-center gap-2">
             {article.reading_time && (
-              <span className="flex items-center gap-1 text-[10px] text-gray-400">
+              <span className="flex items-center gap-1 text-[11px] text-gray-400">
                 <Clock className="w-3 h-3" /> {article.reading_time}
               </span>
             )}
             {article.difficulty && (
-              <span className="flex items-center gap-1 text-[10px] text-gray-400">
+              <span className="flex items-center gap-1 text-[11px] text-gray-400">
                 <BarChart2 className="w-3 h-3" /> {article.difficulty}
               </span>
             )}
           </div>
-          <span className="flex items-center gap-0.5 text-[11px] font-semibold text-brand-600 shrink-0">
+          <span className="flex items-center gap-0.5 text-[12px] font-semibold text-brand-600 shrink-0">
             {hasSwipe ? 'Read cards' : 'Read'} <ChevronRight className="w-3 h-3" />
           </span>
         </div>
@@ -363,6 +349,9 @@ function ArticleCard({ article, onClick }) {
 }
 
 function ArticleDetail({ article, onBack }) {
+  const engagement = useArticleEngagement(article.slug);
+  const { inputRef, scrollToComments } = useScrollToComments();
+  const endRef = useArticleTracking(article.slug);
   return (
     <div className="max-w-3xl mx-auto px-4 sm:px-6 py-8 sm:py-10">
       <button onClick={onBack}
@@ -375,12 +364,12 @@ function ArticleDetail({ article, onBack }) {
         <div className="flex flex-wrap items-center gap-2 mb-4">
           <PillarBadge id={article.category} size="md" />
           {article.difficulty && (
-            <span className="inline-flex items-center gap-1 text-[10px] font-semibold px-2.5 py-0.5 rounded-full bg-gray-100 text-gray-600 border border-gray-200">
+            <span className="inline-flex items-center gap-1 text-[11px] font-semibold px-2.5 py-0.5 rounded-full bg-gray-100 text-gray-600 border border-gray-200">
               <BarChart2 className="w-2.5 h-2.5" /> {article.difficulty}
             </span>
           )}
           {article.reading_time && (
-            <span className="inline-flex items-center gap-1 text-[10px] font-semibold px-2.5 py-0.5 rounded-full bg-gray-100 text-gray-600 border border-gray-200">
+            <span className="inline-flex items-center gap-1 text-[11px] font-semibold px-2.5 py-0.5 rounded-full bg-gray-100 text-gray-600 border border-gray-200">
               <Clock className="w-2.5 h-2.5" /> {article.reading_time}
             </span>
           )}
@@ -395,7 +384,7 @@ function ArticleDetail({ article, onBack }) {
         {/* SSB relevance pills */}
         {article.ssb_relevance?.length > 0 && (
           <div className="flex flex-wrap items-center gap-2 mb-4">
-            <span className="text-[10px] font-semibold text-gray-400 uppercase tracking-widest">SSB Relevance:</span>
+            <span className="text-[11px] font-semibold text-gray-400 uppercase tracking-widest">SSB Relevance:</span>
             {article.ssb_relevance.map(r => (
               <span key={r} className="text-xs font-bold text-brand-600 bg-brand-50 px-3 py-1 rounded-full border border-brand-100">
                 {r}
@@ -404,30 +393,37 @@ function ArticleDetail({ article, onBack }) {
           </div>
         )}
 
-        <div className="flex items-center gap-1.5 text-xs text-gray-400 pb-6 border-b border-gray-100">
-          <Calendar className="w-3.5 h-3.5" />
-          {new Date(article.published_at).toLocaleDateString('en-IN', {
-            weekday: 'long', day: 'numeric', month: 'long', year: 'numeric'
-          })}
+        <div className="flex flex-wrap items-center justify-between gap-3 pb-6 border-b border-gray-100">
+          <div className="flex items-center gap-1.5 text-xs text-gray-400">
+            <Calendar className="w-3.5 h-3.5" />
+            {new Date(article.published_at).toLocaleDateString('en-IN', {
+              weekday: 'long', day: 'numeric', month: 'long', year: 'numeric'
+            })}
+          </div>
+          {article.slug && <EngagementBar engagement={engagement} onCommentClick={scrollToComments} />}
         </div>
       </div>
 
       {/* Article body */}
       <ArticleRenderer content={article.content} />
+      {/* Reaching this marker counts as reading the article to the end. */}
+      <div ref={endRef} aria-hidden="true" />
 
       {/* Tags */}
       {article.tags?.length > 0 && (
         <div className="flex items-center gap-2 flex-wrap mt-10 pt-6 border-t border-gray-100">
           <Tag className="w-3.5 h-3.5 text-gray-300 shrink-0" />
           {article.tags.map(tag => (
-            <span key={tag} className="text-[11px] text-gray-500 bg-gray-100 px-2.5 py-1 rounded-full">
+            <span key={tag} className="text-[12px] text-gray-500 bg-gray-100 px-2.5 py-1 rounded-full">
               #{tag}
             </span>
           ))}
         </div>
       )}
 
-      <p className="text-[11px] text-gray-400 mt-6 pt-4 border-t border-gray-100">
+      {article.slug && <CommentsSection engagement={engagement} inputRef={inputRef} />}
+
+      <p className="text-[12px] text-gray-400 mt-6 pt-4 border-t border-gray-100">
         SSBCircle · For SSB GD · Lecturette · PI Prep
       </p>
     </div>
@@ -484,16 +480,7 @@ export default function CurrentAffairs() {
   return (
     <div className="min-h-screen bg-white">
 
-      {/* Navbar */}
-      <header className="border-b border-gray-100 sticky top-0 z-50 bg-white/90 backdrop-blur-md">
-        <div className="max-w-5xl mx-auto px-4 sm:px-6 h-14 flex items-center justify-between gap-3">
-          <Link to="/"><Logo /></Link>
-          <nav className="flex items-center gap-2">
-            <Link to="/" className="text-sm text-gray-500 hover:text-gray-900 px-3 py-2 font-medium hidden sm:block">Home</Link>
-            <Link to="/register" className="btn-primary py-1.5 px-3 text-xs sm:px-4 sm:text-sm">Get started</Link>
-          </nav>
-        </div>
-      </header>
+      <SiteNav />
 
       {routeSlug ? (
         loadingFull ? (
@@ -514,7 +501,7 @@ export default function CurrentAffairs() {
           {/* Page header */}
           <section className="border-b border-gray-100 px-4 sm:px-6 py-8 sm:py-10">
             <div className="max-w-5xl mx-auto">
-              <div className="inline-flex items-center gap-2 bg-brand-50 text-brand-600 text-[11px] font-bold px-3 py-1 rounded-full mb-4 border border-brand-100 uppercase tracking-widest">
+              <div className="inline-flex items-center gap-2 bg-brand-50 text-brand-600 text-[12px] font-bold px-3 py-1 rounded-full mb-4 border border-brand-100 uppercase tracking-widest">
                 <BookOpen className="w-3.5 h-3.5" /> News Cards
               </div>
               <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-2">News Cards</h1>
@@ -585,7 +572,7 @@ export default function CurrentAffairs() {
                           <span className="text-xs font-bold text-brand-600 uppercase tracking-widest">Society</span>
                         </div>
                         <div className="h-px flex-1 bg-gray-100" />
-                        <span className="text-[10px] text-gray-400 font-medium">Women · 7 cards</span>
+                        <span className="text-[11px] text-gray-400 font-medium">Women · 7 cards</span>
                       </div>
                       <div className="grid grid-cols-1 gap-4">
                         <WomenSeriesBanner />

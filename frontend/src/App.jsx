@@ -32,6 +32,7 @@ function OnboardingGate() {
 import { AuthProvider, useAuth } from './context/AuthContext';
 import ProtectedRoute from './components/ProtectedRoute';
 import LandingPage from './components/LandingPage';
+import MobileTabBar from './components/MobileTabBar';
 
 // Heavy routes loaded on demand — keeps initial bundle small
 const LoginPage           = lazy(() => import('./components/LoginPage'));
@@ -50,8 +51,13 @@ const SessionPage         = lazy(() => import('./components/SessionPage'));
 const MentorPage          = lazy(() => import('./components/MentorPage'));
 const OnboardingPage      = lazy(() => import('./components/OnboardingPage'));
 const PiqPage             = lazy(() => import('./components/PiqPage'));
+const TatPage             = lazy(() => import('./components/TatPage'));
+const ExamCalendarPage    = lazy(() => import('./components/ExamCalendar'));
+const BeginnerGuide       = lazy(() => import('./components/BeginnerGuide'));
+const ModeratorProgram    = lazy(() => import('./components/ModeratorProgram'));
 const CommunityPage       = lazy(() => import('./components/CommunityPage'));
 const PostPage            = lazy(() => import('./components/PostPage'));
+const PrepPage            = lazy(() => import('./components/prep/PrepPage'));
 
 function PageLoader() {
   return (
@@ -85,6 +91,12 @@ export default function App() {
             <Route path="/mentor/:slug"          element={<MentorPage />} />
             <Route path="/welcome"               element={<ProtectedRoute><OnboardingPage /></ProtectedRoute>} />
             <Route path="/piq"                   element={<ProtectedRoute><PiqPage /></ProtectedRoute>} />
+            <Route path="/tat"                   element={<ProtectedRoute><TatPage /></ProtectedRoute>} />
+            <Route path="/exams"                 element={<ExamCalendarPage />} />
+            <Route path="/become-an-officer"     element={<BeginnerGuide />} />
+            <Route path="/start"                 element={<Navigate to="/become-an-officer" replace />} />
+            <Route path="/moderators"            element={<ModeratorProgram />} />
+            <Route path="/prep"                  element={<PrepPage />} />
             <Route path="/community"             element={<CommunityPage />} />
             <Route path="/community/:id"         element={<PostPage />} />
             <Route path="/sa"           element={<SuperAdminLogin />} />
@@ -92,6 +104,7 @@ export default function App() {
             <Route path="/sa/export"    element={<ExportCards />} />
             <Route path="*" element={<Navigate to="/" replace />} />
           </Routes>
+          <MobileTabBar />
         </Suspense>
       </BrowserRouter>
     </AuthProvider>

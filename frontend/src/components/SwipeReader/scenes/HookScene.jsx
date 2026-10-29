@@ -44,17 +44,17 @@ export default function HookScene({ scene, article }) {
               </svg>
             )}
           </div>
-          <p className="text-sm text-gray-400 font-medium">{stat.label}</p>
+          <p className="text-[14px] text-gray-400 font-medium">{stat.label}</p>
         </div>
       )}
 
       {/* Headline */}
       <div className="max-w-sm">
         <h1 className="text-2xl font-bold text-gray-900 leading-snug">{headline}</h1>
-        <p className="text-sm text-gray-500 mt-2 leading-relaxed">{subtext}</p>
+        <p className="text-[14px] text-gray-500 mt-2 leading-relaxed">{subtext}</p>
       </div>
 
-      <span className="text-xs font-semibold px-3 py-1.5 rounded-full border border-gray-200 text-gray-400 bg-gray-50">
+      <span className="text-[12px] font-semibold px-3 py-1.5 rounded-full border border-gray-200 text-gray-400 bg-gray-50">
         {article.category} · {article.last_updated}
       </span>
 

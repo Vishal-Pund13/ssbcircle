@@ -24,7 +24,7 @@ export function FlfprChart() {
               <div className="flex items-center justify-between mb-0.5">
                 <span className="text-[10px] font-semibold text-gray-600 w-16 shrink-0">{b.year}</span>
                 <span className="text-[9px] text-gray-400 hidden sm:block">{b.note}</span>
-                <span className="text-xs font-bold shrink-0" style={{ color }}>{b.pct}%</span>
+                <span className="text-[12px] font-bold shrink-0" style={{ color }}>{b.pct}%</span>
               </div>
               <div className="h-2 bg-gray-200 rounded-full overflow-hidden">
                 <div className="h-full rounded-full transition-all" style={{ width: w, background: color }} />
@@ -95,7 +95,7 @@ export function PayGapChart() {
           <div key={d.label}>
             <div className="flex items-center justify-between mb-1">
               <span className="text-[10px] font-semibold text-gray-600">{d.label}</span>
-              <span className="text-sm font-bold" style={{ color: d.color }}>₹{d.amount.toLocaleString('en-IN')}</span>
+              <span className="text-[14px] font-bold" style={{ color: d.color }}>₹{d.amount.toLocaleString('en-IN')}</span>
             </div>
             <div className="h-3 bg-gray-200 rounded-full overflow-hidden">
               <div className="h-full rounded-full" style={{ width: `${d.bar}%`, background: d.color }} />
@@ -105,7 +105,7 @@ export function PayGapChart() {
       </div>
       <div className="mt-3 flex items-center justify-between bg-red-50 border border-red-100 rounded-lg px-3 py-2">
         <span className="text-[10px] text-red-700 font-semibold">Monthly gap</span>
-        <span className="text-sm font-extrabold text-red-600">−₹6,226</span>
+        <span className="text-[14px] font-extrabold text-red-600">−₹6,226</span>
       </div>
       <p className="text-[10px] text-gray-400 mt-2">
         IIT Kharagpur 2025: 30.51% unexplained gap even in same role, same firm
@@ -131,7 +131,7 @@ export function SafetyBarriersChart() {
           <div key={b.label}>
             <div className="flex items-center justify-between mb-0.5">
               <span className="text-[10px] font-semibold text-gray-600">{b.label}</span>
-              <span className="text-xs font-bold" style={{ color: b.color }}>{b.pct}%</span>
+              <span className="text-[12px] font-bold" style={{ color: b.color }}>{b.pct}%</span>
             </div>
             <div className="h-2 bg-gray-200 rounded-full overflow-hidden">
               <div className="h-full rounded-full" style={{ width: `${b.pct}%`, background: b.color }} />

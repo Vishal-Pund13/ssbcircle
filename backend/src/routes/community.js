@@ -9,7 +9,8 @@ const Settings = require('../models/Settings');
 // visitor who lands on an empty page leaves. Writing needs an account.
 
 const WHO_CAN_POST = 'community.who_can_post';   // 'admin' | 'everyone'
-const CATEGORIES = ['announcement', 'session', 'doubt', 'discussion'];
+// experience: a past SSB · ssb_date: an upcoming SSB, to find batchmates
+const CATEGORIES = ['announcement', 'session', 'experience', 'ssb_date', 'doubt', 'discussion'];
 
 const MAX_TITLE = 200;
 const MAX_BODY  = 8000;

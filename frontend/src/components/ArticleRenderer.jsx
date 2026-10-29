@@ -233,7 +233,7 @@ function parseBlocks(lines, keyPrefix = '') {
       blocks.push(
         <ul key={keyPrefix + i} className="my-4 space-y-2 pl-1">
           {items.map((item, j) => (
-            <li key={j} className="flex items-start gap-2.5 text-sm text-gray-700 leading-relaxed">
+            <li key={j} className="flex items-start gap-2.5 text-base text-gray-700 leading-relaxed">
               <span className="w-1.5 h-1.5 rounded-full bg-brand-600 shrink-0 mt-2" />
               <Inline text={item} />
             </li>
@@ -248,7 +248,7 @@ function parseBlocks(lines, keyPrefix = '') {
 
     // ── Regular paragraph ──────────────────────────────────────────────────
     blocks.push(
-      <p key={keyPrefix + i} className="text-sm sm:text-[15px] text-gray-700 leading-relaxed my-3">
+      <p key={keyPrefix + i} className="text-base text-gray-700 leading-relaxed my-3">
         <Inline text={line} />
       </p>
     );
@@ -276,7 +276,7 @@ function SSBCallout({ type, title, children }) {
   return (
     <div className="my-6 border border-brand-100 bg-brand-50 rounded-2xl overflow-hidden">
       <div className="flex items-center gap-2.5 px-4 py-3 border-b border-brand-100 bg-white">
-        <span className="text-[10px] font-bold text-brand-600 bg-brand-100 px-2.5 py-0.5 rounded-full uppercase tracking-widest">
+        <span className="text-[11px] font-bold text-brand-600 bg-brand-100 px-2.5 py-0.5 rounded-full uppercase tracking-widest">
           {labels[type] || type}
         </span>
         <span className="text-xs font-bold text-gray-800">{title}</span>
@@ -287,15 +287,15 @@ function SSBCallout({ type, title, children }) {
           if (numMatch) {
             return (
               <div key={i} className="flex items-start gap-2.5">
-                <span className="w-5 h-5 rounded-full bg-brand-600 text-white flex items-center justify-center text-[10px] font-bold shrink-0 mt-0.5">
+                <span className="w-5 h-5 rounded-full bg-brand-600 text-white flex items-center justify-center text-[11px] font-bold shrink-0 mt-0.5">
                   {numMatch[1]}
                 </span>
-                <p className="text-sm text-gray-700 leading-relaxed"><Inline text={numMatch[2]} /></p>
+                <p className="text-base text-gray-700 leading-relaxed"><Inline text={numMatch[2]} /></p>
               </div>
             );
           }
           return (
-            <p key={i} className="text-sm text-gray-700 leading-relaxed">
+            <p key={i} className="text-base text-gray-700 leading-relaxed">
               <Inline text={line} />
             </p>
           );
@@ -314,12 +314,12 @@ function KeyTermsBlock({ terms }) {
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
         {terms.map((t, i) => (
           <div key={i} className="flex items-start gap-3 bg-white border border-gray-100 rounded-xl px-4 py-3 hover:border-brand-100 transition-colors">
-            <span className="text-[10px] font-bold text-brand-600 bg-brand-50 border border-brand-100 px-2 py-0.5 rounded-full shrink-0 mt-0.5 whitespace-nowrap">
+            <span className="text-[11px] font-bold text-brand-600 bg-brand-50 border border-brand-100 px-2 py-0.5 rounded-full shrink-0 mt-0.5 whitespace-nowrap">
               {String(i + 1).padStart(2, '0')}
             </span>
             <div>
               <p className="text-xs font-bold text-gray-900">{t.term}</p>
-              <p className="text-[11px] text-gray-500 leading-snug mt-0.5">{t.def}</p>
+              <p className="text-[12px] text-gray-500 leading-snug mt-0.5">{t.def}</p>
             </div>
           </div>
         ))}
@@ -362,10 +362,10 @@ function CompareBlock({ leftTitle, rightTitle, rows }) {
       {/* Header */}
       <div className="grid grid-cols-2 divide-x divide-gray-200 border-b border-gray-200">
         <div className="bg-gray-100 px-3 sm:px-4 py-3">
-          <p className="text-[11px] sm:text-xs font-bold text-gray-700 uppercase tracking-wide">{leftTitle}</p>
+          <p className="text-[12px] sm:text-xs font-bold text-gray-700 uppercase tracking-wide">{leftTitle}</p>
         </div>
         <div className="bg-brand-50 px-3 sm:px-4 py-3">
-          <p className="text-[11px] sm:text-xs font-bold text-brand-700 uppercase tracking-wide">{rightTitle}</p>
+          <p className="text-[12px] sm:text-xs font-bold text-brand-700 uppercase tracking-wide">{rightTitle}</p>
         </div>
       </div>
       {/* Rows */}
@@ -373,10 +373,10 @@ function CompareBlock({ leftTitle, rightTitle, rows }) {
         {rows.map((r, i) => (
           <div key={i} className="grid grid-cols-2 divide-x divide-gray-100">
             <div className="px-3 sm:px-4 py-3 bg-white">
-              <p className="text-[11px] sm:text-xs text-gray-600 leading-relaxed">{r.left}</p>
+              <p className="text-[12px] sm:text-xs text-gray-600 leading-relaxed">{r.left}</p>
             </div>
             <div className="px-3 sm:px-4 py-3 bg-brand-50/30">
-              <p className="text-[11px] sm:text-xs text-gray-700 leading-relaxed font-medium">{r.right}</p>
+              <p className="text-[12px] sm:text-xs text-gray-700 leading-relaxed font-medium">{r.right}</p>
             </div>
           </div>
         ))}

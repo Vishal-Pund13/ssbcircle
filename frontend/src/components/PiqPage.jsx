@@ -1,7 +1,11 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { getPiq, savePiq, deletePiq, analyzePiq } from '../services/api';
-import { Check, AlertCircle, Trash2, Lock, Plus, X, Sparkles } from 'lucide-react';
+import { SAMPLE_PIQ } from '../data/samplePiq';
+import { Check, AlertCircle, Trash2, Lock, Plus, X, Sparkles, Download, ChevronDown, Lightbulb, Eye, Heart } from 'lucide-react';
+import { downloadPiqReport } from './piqReportPdf';
+import { trackEvent } from '../analytics';
+import AiFeedback from './AiFeedback';
 
 // A working copy of the Personal Information Questionnaire (DIPR 107-A).
 //
@@ -69,10 +73,10 @@ function Section({ no, title, children }) {
 function Field({ label, value, onChange, type = 'text', hint, className = '' }) {
   return (
     <label className={`block ${className}`}>
-      <span className="block text-[11px] font-bold text-gray-600 mb-1">{label}</span>
+      <span className="block text-[12px] font-bold text-gray-600 mb-1">{label}</span>
       <input type={type} className="input-base text-sm w-full" value={value || ''}
         onChange={e => onChange(e.target.value)} />
-      {hint && <span className="block text-[10px] text-gray-400 mt-1">{hint}</span>}
+      {hint && <span className="block text-[11px] text-gray-400 mt-1">{hint}</span>}
     </label>
   );
 }
@@ -105,6 +109,230 @@ function RowList({ rows, columns, onChange, onAdd, onRemove, addLabel }) {
         className="mt-3 inline-flex items-center gap-1.5 text-xs font-semibold text-brand-600 hover:text-brand-700 cursor-pointer">
         <Plus className="w-3.5 h-3.5" /> {addLabel}
       </button>
+    </div>
+  );
+}
+
+// ── The report ──────────────────────────────────────────────────────────────
+// Reports saved before the leadership lens existed have plain-string strengths
+// and no leadership or practice sections, so every part renders only if present.
+// Each part is its own numbered card so a long report scans in order.
+
+const LEADERSHIP = [
+  { key: 'understanding', label: 'Understanding', hint: 'Seeing a situation fully, from all sides', icon: Eye },
+  { key: 'character',     label: 'Character',     hint: 'Caring about people, not only yourself',   icon: Heart },
+  { key: 'solutions',     label: 'Solutions',     hint: 'Bringing your own ideas to change things', icon: Lightbulb },
+];
+
+function ReportCard({ id, n, title, intro, children }) {
+  return (
+    <section id={id} className="scroll-mt-20 bg-white border border-gray-200 rounded-2xl p-5 sm:p-6">
+      <div className="flex items-start gap-3 mb-4">
+        <span className="w-7 h-7 rounded-full bg-brand-600 text-white text-xs font-bold flex items-center justify-center shrink-0">{n}</span>
+        <div>
+          <h3 className="text-base font-bold text-gray-900 leading-tight">{title}</h3>
+          {intro && <p className="text-xs text-gray-500 mt-1 leading-relaxed">{intro}</p>}
+        </div>
+      </div>
+      {children}
+    </section>
+  );
+}
+
+// Ticks are a per-device convenience, so they live in localStorage and are
+// keyed to this report: a fresh analysis starts a fresh checklist.
+function usePracticeTicks(key) {
+  const storageKey = `piq-practice:${key}`;
+  const [ticks, setTicks] = useState(() => {
+    try { return JSON.parse(localStorage.getItem(storageKey) || '{}'); } catch { return {}; }
+  });
+  function toggle(i) {
+    setTicks(t => {
+      const next = { ...t, [i]: !t[i] };
+      try { localStorage.setItem(storageKey, JSON.stringify(next)); } catch {}
+      return next;
+    });
+  }
+  return [ticks, toggle];
+}
+
+function AnalysisReport({ analysis, analysedAt, name }) {
+  const lead = analysis.leadership;
+  const [openQ, setOpenQ] = useState(0);
+  const [ticks, toggleTick] = usePracticeTicks(analysedAt || 'latest');
+
+  const sections = [
+    analysis.summary                  && { id: 'r-summary',   title: 'First impression' },
+    lead                              && { id: 'r-lead',      title: 'Leadership check' },
+    analysis.strengths?.length        && { id: 'r-strengths', title: 'Strong points' },
+    analysis.likely_questions?.length && { id: 'r-questions', title: 'Likely questions' },
+    analysis.gaps?.length             && { id: 'r-gaps',      title: 'Where the IO will press' },
+    analysis.practice?.length         && { id: 'r-practice',  title: 'Practice plan' },
+  ].filter(Boolean);
+  const num = id => sections.findIndex(s => s.id === id) + 1;
+  const jump = id => document.getElementById(id)?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+
+  return (
+    <div className="space-y-4 mb-10">
+      {/* Header */}
+      <div className="bg-brand-600 rounded-2xl p-5 sm:p-6 text-white">
+        <div className="flex items-start justify-between gap-3">
+          <div>
+            <p className="text-[11px] font-bold uppercase tracking-[0.25em] text-brand-100">Your PIQ report</p>
+            <h2 className="mt-1 text-xl font-bold leading-tight">{name ? `${name}, here is how your PIQ reads` : 'Here is how your PIQ reads'}</h2>
+            {analysedAt && <p className="text-xs text-brand-100 mt-1">Analysed {new Date(analysedAt).toLocaleString('en-IN')}</p>}
+          </div>
+          <button type="button" onClick={() => { downloadPiqReport(analysis, { name, analysedAt }); trackEvent('piq_pdf'); }}
+            className="shrink-0 inline-flex items-center gap-1.5 text-xs font-semibold text-brand-700 bg-white hover:bg-brand-50 px-3 py-2 rounded-lg cursor-pointer transition-colors">
+            <Download className="w-3.5 h-3.5" /> PDF
+          </button>
+        </div>
+        <div className="mt-4 flex flex-wrap gap-1.5">
+          {sections.map((s, i) => (
+            <button key={s.id} type="button" onClick={() => jump(s.id)}
+              className="text-[12px] font-semibold bg-white/10 hover:bg-white/20 border border-white/20 px-2.5 py-1 rounded-full cursor-pointer transition-colors">
+              {i + 1}. {s.title}
+            </button>
+          ))}
+        </div>
+      </div>
+
+      {analysis.summary && (
+        <ReportCard id="r-summary" n={num('r-summary')} title="First impression" intro="How an Interviewing Officer is likely to see you after reading your form.">
+          <p className="text-base text-gray-800 leading-relaxed">{analysis.summary}</p>
+        </ReportCard>
+      )}
+
+      {lead && (
+        <ReportCard id="r-lead" n={num('r-lead')} title="Leadership check"
+          intro="A leader understands a situation, cares enough to feel it must change, and brings a solution.">
+          <div className="divide-y divide-gray-100">
+            {LEADERSHIP.map(({ key, label, hint, icon: Icon }) => lead[key] && (
+              <div key={key} className="py-3.5 first:pt-0 last:pb-0">
+                <div className="flex items-center gap-2 mb-2">
+                  <Icon className="w-4 h-4 text-brand-600" />
+                  <p className="text-sm font-bold text-gray-900">{label}</p>
+                  <p className="text-[12px] text-gray-400 hidden sm:block">· {hint}</p>
+                </div>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                  <div className="bg-gray-50 rounded-xl px-3.5 py-2.5">
+                    <p className="text-[11px] font-bold uppercase tracking-wider text-gray-400 mb-0.5">What your PIQ shows</p>
+                    <p className="text-sm text-gray-700 leading-relaxed">{lead[key].seen}</p>
+                  </div>
+                  <div className="bg-brand-50 rounded-xl px-3.5 py-2.5">
+                    <p className="text-[11px] font-bold uppercase tracking-wider text-brand-600 mb-0.5">How to grow</p>
+                    <p className="text-sm text-gray-700 leading-relaxed">{lead[key].grow}</p>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </ReportCard>
+      )}
+
+      {analysis.strengths?.length > 0 && (
+        <ReportCard id="r-strengths" n={num('r-strengths')} title="Strong points" intro="Things the IO is likely to notice in a good way. Be ready to talk about each.">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+            {analysis.strengths.map((s, i) => (
+              <div key={i} className="flex items-start gap-2.5 border border-emerald-100 bg-emerald-50/50 rounded-xl px-3.5 py-3">
+                <Check className="w-4 h-4 text-emerald-600 shrink-0 mt-0.5" />
+                {typeof s === 'string' ? <p className="text-sm text-gray-700 leading-relaxed">{s}</p> : (
+                  <div>
+                    <p className="text-sm font-semibold text-gray-900">{s.point}</p>
+                    {s.evidence && <p className="text-xs text-gray-500 mt-1 leading-relaxed">{s.evidence}</p>}
+                  </div>
+                )}
+              </div>
+            ))}
+          </div>
+        </ReportCard>
+      )}
+
+      {analysis.likely_questions?.length > 0 && (
+        <ReportCard id="r-questions" n={num('r-questions')} title="Likely questions"
+          intro="The IO often asks several questions in one go. They usually fall into groups like these. Open one group at a time and practise answering out loud.">
+          <div className="space-y-2">
+            {analysis.likely_questions.map((group, i) => {
+              const open = openQ === i;
+              return (
+                <div key={i} className={`border rounded-xl overflow-hidden ${open ? 'border-brand-200' : 'border-gray-200'}`}>
+                  <button type="button" onClick={() => setOpenQ(open ? -1 : i)} aria-expanded={open}
+                    className={`w-full flex items-center justify-between gap-3 px-4 py-3 text-left cursor-pointer ${open ? 'bg-brand-50' : 'bg-white hover:bg-gray-50'}`}>
+                    <span className="text-sm font-semibold text-gray-900">{group.area}</span>
+                    <span className="flex items-center gap-2 shrink-0">
+                      <span className="text-[12px] text-gray-400">{(group.questions || []).length} questions</span>
+                      <ChevronDown className={`w-4 h-4 text-gray-400 transition-transform ${open ? 'rotate-180' : ''}`} />
+                    </span>
+                  </button>
+                  {open && (
+                    <div className="px-4 pb-4 pt-2 bg-white">
+                      <ol className="space-y-2">
+                        {(group.questions || []).map((q, j) => (
+                          <li key={j} className="flex items-start gap-2.5 text-sm text-gray-800 leading-relaxed">
+                            <span className="text-xs font-bold text-brand-600 w-4 shrink-0 mt-0.5">{j + 1}.</span>{q}
+                          </li>
+                        ))}
+                      </ol>
+                      {group.tip && (
+                        <div className="mt-3 flex items-start gap-2 bg-amber-50 border border-amber-100 rounded-lg px-3 py-2.5">
+                          <Lightbulb className="w-4 h-4 text-amber-600 shrink-0 mt-0.5" />
+                          <p className="text-xs text-gray-700 leading-relaxed"><span className="font-semibold">How to answer: </span>{group.tip}</p>
+                        </div>
+                      )}
+                    </div>
+                  )}
+                </div>
+              );
+            })}
+          </div>
+        </ReportCard>
+      )}
+
+      {analysis.gaps?.length > 0 && (
+        <ReportCard id="r-gaps" n={num('r-gaps')} title="Where the IO will press you"
+          intro="Thin or unclear parts of your form. Prepare an honest answer for each before the interview.">
+          <div className="space-y-2.5">
+            {analysis.gaps.map((gap, i) => (
+              <div key={i} className="border border-gray-200 rounded-xl px-4 py-3">
+                <p className="text-sm font-semibold text-gray-900 flex items-start gap-2">
+                  <AlertCircle className="w-4 h-4 text-amber-500 shrink-0 mt-0.5" />{gap.issue}
+                </p>
+                <div className="mt-2 pl-6 space-y-1.5">
+                  {gap.why && <p className="text-xs text-gray-600 leading-relaxed"><span className="font-semibold text-gray-700">Why it matters: </span>{gap.why}</p>}
+                  {gap.fix && <p className="text-xs text-gray-600 leading-relaxed"><span className="font-semibold text-brand-700">Before your interview: </span>{gap.fix}</p>}
+                </div>
+              </div>
+            ))}
+          </div>
+        </ReportCard>
+      )}
+
+      {analysis.practice?.length > 0 && (
+        <ReportCard id="r-practice" n={num('r-practice')} title="Practice plan"
+          intro="Small exercises built on your own life. Tick them off as you do them — they improve how you think, not only how you answer.">
+          <div className="space-y-2">
+            {analysis.practice.map((p, i) => (
+              <label key={i} className={`flex items-start gap-3 border rounded-xl px-4 py-3 cursor-pointer transition-colors ${ticks[i] ? 'border-emerald-200 bg-emerald-50/50' : 'border-gray-200 hover:bg-gray-50'}`}>
+                <input type="checkbox" checked={!!ticks[i]} onChange={() => toggleTick(i)} className="mt-1 w-4 h-4 accent-emerald-600 shrink-0" />
+                <div>
+                  <p className={`text-sm font-semibold ${ticks[i] ? 'text-gray-500 line-through' : 'text-gray-900'}`}>{p.title}</p>
+                  <p className="text-xs text-gray-600 mt-0.5 leading-relaxed">{p.task}</p>
+                </div>
+              </label>
+            ))}
+          </div>
+          <p className="text-[12px] text-gray-400 mt-3">
+            {Object.values(ticks).filter(Boolean).length} of {analysis.practice.length} done
+          </p>
+        </ReportCard>
+      )}
+
+      <AiFeedback feature="piq" refId={analysedAt} prompt="Was this PIQ report useful?" />
+
+      <p className="text-[12px] text-gray-400 leading-relaxed px-1">
+        This is practice guidance based on what you wrote, not a real assessment. Be honest on the day:
+        the truth needs no remembering. Nobody is perfect; keep improving.
+      </p>
     </div>
   );
 }
@@ -157,6 +385,7 @@ export default function PiqPage() {
       const { updated_at } = await savePiq(form);
       setUpdated(updated_at);
       setSaved(true);
+      trackEvent('piq_save');
       setTimeout(() => setSaved(false), 3000);
     } catch (err) {
       setError(err.message || 'Could not save your PIQ.');
@@ -174,8 +403,12 @@ export default function PiqPage() {
       const { analysis: result, analysed_at } = await analyzePiq();
       setAnalysis(result);
       setAnalysedAt(analysed_at);
+      trackEvent('piq_analyse');
+      // Bring the fresh report into view once it has rendered
+      setTimeout(() => jumpTo('piq-report'), 100);
     } catch (err) {
       setAError(err.message || 'Could not analyse your PIQ.');
+      trackEvent('piq_error');
     } finally {
       setAnalysing(false);
     }
@@ -194,6 +427,8 @@ export default function PiqPage() {
       setSaving(false);
     }
   }
+
+  const jumpTo = id => document.getElementById(id)?.scrollIntoView({ behavior: 'smooth', block: 'start' });
 
   if (loading) {
     return (
@@ -225,7 +460,7 @@ export default function PiqPage() {
       <form onSubmit={save} className="max-w-3xl mx-auto px-4 sm:px-6 py-7 space-y-4">
 
         <div>
-          <p className="text-[10px] font-bold uppercase tracking-[0.3em] text-brand-600">PIQ Analyzer</p>
+          <p className="text-[11px] font-bold uppercase tracking-[0.3em] text-brand-600">PIQ Analyzer</p>
           <h1 className="mt-2 text-2xl sm:text-3xl font-bold text-gray-900 leading-tight">
             Your Personal Information Questionnaire
           </h1>
@@ -234,8 +469,16 @@ export default function PiqPage() {
             reads before calling you in. Fill it as you would on the day — the questions you get
             asked come straight out of it.
           </p>
+          {/* Local testing only — stripped from production builds */}
+          {import.meta.env.DEV && (
+            <button type="button"
+              onClick={() => { setForm({ ...emptyForm(), ...structuredClone(SAMPLE_PIQ) }); setSaved(false); setError(''); }}
+              className="mt-3 text-[12px] font-semibold text-amber-700 bg-amber-50 border border-amber-200 px-3 py-1.5 rounded-lg cursor-pointer hover:bg-amber-100">
+              Dev: fill sample PIQ
+            </button>
+          )}
           {updated && (
-            <p className="mt-2 text-[11px] text-gray-400">
+            <p className="mt-2 text-[12px] text-gray-400">
               Last saved {new Date(updated).toLocaleString('en-IN')}
             </p>
           )}
@@ -243,13 +486,51 @@ export default function PiqPage() {
 
         <div className="flex items-start gap-3 bg-brand-50 border border-brand-100 rounded-xl px-4 py-3.5">
           <Lock className="w-4 h-4 text-brand-600 shrink-0 mt-0.5" />
-          <p className="text-[11px] text-gray-600 leading-relaxed">
+          <p className="text-[12px] text-gray-600 leading-relaxed">
             <span className="font-bold text-gray-800">Only you can see this.</span>{' '}
             Your PIQ is never shown to other members and never appears on your public profile.
             Delete it whenever you like and it is removed from our database, not just hidden.
           </p>
         </div>
 
+        {/* A finished report lives at the bottom of a long form, so point to it from the top */}
+        {analysis && (
+          <div className="bg-white border border-emerald-200 rounded-2xl p-4 sm:p-5">
+            <div className="flex items-start gap-3">
+              <div className="w-9 h-9 rounded-xl bg-emerald-500 flex items-center justify-center shrink-0">
+                <Check className="w-4 h-4 text-white" />
+              </div>
+              <div className="min-w-0 flex-1">
+                <p className="text-sm font-bold text-gray-900">Your PIQ report is ready</p>
+                <p className="text-xs text-gray-500 mt-0.5">
+                  {analysedAt && <>Analysed {new Date(analysedAt).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' })}</>}
+                  {analysis.likely_questions?.length > 0 && <> · {analysis.likely_questions.length} question groups</>}
+                  {analysis.gaps?.length > 0 && <> · {analysis.gaps.length} points the IO may press</>}
+                </p>
+                {updated && analysedAt && new Date(updated) > new Date(analysedAt) && (
+                  <p className="text-xs text-amber-700 mt-1.5">
+                    You have changed your PIQ since this report. Analyse again to see an updated one.
+                  </p>
+                )}
+              </div>
+            </div>
+            <div className="flex flex-wrap gap-2 mt-3.5 sm:pl-12">
+              <button type="button" onClick={() => jumpTo('piq-report')}
+                className="btn-primary text-xs px-4 py-2 inline-flex items-center gap-1.5">
+                View my report
+              </button>
+              <button type="button" onClick={() => jumpTo('piq-form')}
+                className="btn-secondary text-xs px-4 py-2">
+                Edit and re-analyse
+              </button>
+            </div>
+            <p className="text-[12px] text-gray-400 mt-2.5 sm:pl-12">
+              To update: change anything in the form below, then press <span className="font-semibold">Analyse again</span> at the end.
+            </p>
+          </div>
+        )}
+
+        <div id="piq-form" className="scroll-mt-20" />
         <Section no="1" title="Selection Board">
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             <Field label="Selection Board (No. & Place)" value={form.selection_board} onChange={v => set('selection_board', v)} />
@@ -307,7 +588,7 @@ export default function PiqPage() {
           <div className="space-y-3">
             {form.family.map((row, i) => (
               <div key={i} className="border border-gray-100 rounded-xl p-3 bg-gray-50/60">
-                <p className="text-[11px] font-bold text-gray-700 mb-2">{row.relation}</p>
+                <p className="text-[12px] font-bold text-gray-700 mb-2">{row.relation}</p>
                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
                   <Field label="Education" value={row.education} onChange={v => setRow('family', i, 'education', v)} />
                   <Field label="Occupation" value={row.occupation} onChange={v => setRow('family', i, 'occupation', v)} />
@@ -322,7 +603,7 @@ export default function PiqPage() {
           <div className="space-y-3">
             {form.education.map((row, i) => (
               <div key={i} className="border border-gray-100 rounded-xl p-3 bg-gray-50/60">
-                <p className="text-[11px] font-bold text-gray-700 mb-2">{row.level}</p>
+                <p className="text-[12px] font-bold text-gray-700 mb-2">{row.level}</p>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                   <Field label="Qualification acquired" value={row.qualification} onChange={v => setRow('education', i, 'qualification', v)} />
                   <Field label="Institution" value={row.institution} onChange={v => setRow('education', i, 'institution', v)} />
@@ -364,7 +645,7 @@ export default function PiqPage() {
         </Section>
 
         <Section no="11" title="Games, hobbies and activities">
-          <p className="text-[11px] font-bold text-gray-600 mb-2">Games and sports</p>
+          <p className="text-[12px] font-bold text-gray-600 mb-2">Games and sports</p>
           <RowList
             rows={form.sports}
             columns={[
@@ -383,7 +664,7 @@ export default function PiqPage() {
             <Field label="Hobbies / interests" value={form.hobbies} onChange={v => set('hobbies', v)} />
           </div>
 
-          <p className="text-[11px] font-bold text-gray-600 mt-5 mb-2">Extra-curricular activities</p>
+          <p className="text-[12px] font-bold text-gray-600 mt-5 mb-2">Extra-curricular activities</p>
           <RowList
             rows={form.extracurricular}
             columns={[
@@ -455,70 +736,8 @@ export default function PiqPage() {
         )}
 
         {analysis && (
-          <div className="bg-white border border-gray-200 rounded-2xl p-5 sm:p-6 space-y-5 mb-10">
-            <div>
-              <h2 className="text-sm font-bold text-gray-900">What an IO will see</h2>
-              {analysedAt && (
-                <p className="text-[11px] text-gray-400 mt-0.5">
-                  Analysed {new Date(analysedAt).toLocaleString('en-IN')}
-                </p>
-              )}
-            </div>
-
-            {analysis.summary && (
-              <p className="text-sm text-gray-700 leading-relaxed">{analysis.summary}</p>
-            )}
-
-            {analysis.strengths?.length > 0 && (
-              <div>
-                <p className="text-[11px] font-bold uppercase tracking-[0.15em] text-gray-400 mb-2">Your strong points</p>
-                <ul className="space-y-1.5">
-                  {analysis.strengths.map((s, i) => (
-                    <li key={i} className="flex items-start gap-2 text-sm text-gray-700 leading-relaxed">
-                      <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 shrink-0 mt-2" />{s}
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            )}
-
-            {analysis.likely_questions?.length > 0 && (
-              <div>
-                <p className="text-[11px] font-bold uppercase tracking-[0.15em] text-gray-400 mb-2">Questions you are likely to get</p>
-                <div className="space-y-3">
-                  {analysis.likely_questions.map((group, i) => (
-                    <div key={i} className="border border-gray-100 rounded-xl px-4 py-3 bg-gray-50/60">
-                      <p className="text-xs font-bold text-brand-700">{group.area}</p>
-                      <ul className="mt-2 space-y-1.5">
-                        {(group.questions || []).map((q, j) => (
-                          <li key={j} className="text-sm text-gray-700 leading-relaxed">— {q}</li>
-                        ))}
-                      </ul>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            )}
-
-            {analysis.gaps?.length > 0 && (
-              <div>
-                <p className="text-[11px] font-bold uppercase tracking-[0.15em] text-gray-400 mb-2">Where you are thin</p>
-                <div className="space-y-3">
-                  {analysis.gaps.map((gap, i) => (
-                    <div key={i} className="border-l-2 border-amber-300 pl-3">
-                      <p className="text-sm font-semibold text-gray-800">{gap.issue}</p>
-                      {gap.why && <p className="text-xs text-gray-500 mt-0.5 leading-relaxed">{gap.why}</p>}
-                      {gap.fix && <p className="text-xs text-brand-700 mt-1 leading-relaxed">Do this: {gap.fix}</p>}
-                    </div>
-                  ))}
-                </div>
-              </div>
-            )}
-
-            <p className="text-[11px] text-gray-400 leading-relaxed border-t border-gray-100 pt-4">
-              This is practice guidance generated from what you wrote, not a real assessment.
-              Your actual interview depends on how you answer on the day.
-            </p>
+          <div id="piq-report" className="scroll-mt-20">
+            <AnalysisReport analysis={analysis} analysedAt={analysedAt} name={form.name} />
           </div>
         )}
       </form>

@@ -78,7 +78,7 @@ export default function SessionPage() {
               <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75" />
               <span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-emerald-500" />
             </span>
-            <span className="text-[10px] font-bold text-emerald-600 uppercase tracking-widest">Live Session</span>
+            <span className="text-[11px] font-bold text-emerald-600 uppercase tracking-widest">Live Session</span>
           </div>
 
           <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 leading-tight mb-2">
@@ -98,10 +98,10 @@ export default function SessionPage() {
           </div>
 
           <div className="flex gap-2 mt-3">
-            <span className="flex items-center gap-1 text-[10px] font-bold text-brand-600 bg-brand-50 border border-brand-100 px-2 py-1 rounded-full uppercase tracking-widest">
+            <span className="flex items-center gap-1 text-[11px] font-bold text-brand-600 bg-brand-50 border border-brand-100 px-2 py-1 rounded-full uppercase tracking-widest">
               <Shield className="w-3 h-3" /> Indian Army
             </span>
-            <span className="flex items-center gap-1 text-[10px] font-bold text-brand-600 bg-brand-50 border border-brand-100 px-2 py-1 rounded-full uppercase tracking-widest">
+            <span className="flex items-center gap-1 text-[11px] font-bold text-brand-600 bg-brand-50 border border-brand-100 px-2 py-1 rounded-full uppercase tracking-widest">
               <Shield className="w-3 h-3" /> Indian Air Force
             </span>
           </div>

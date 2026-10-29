@@ -44,7 +44,7 @@ export default function SuperAdminLogin() {
             <circle cx="18" cy="31" r="3.5" fill="#1e3a5f"/>
           </svg>
           <span className="font-bold text-gray-900 text-sm tracking-tight">SSBCircle</span>
-          <span className="ml-auto text-[10px] font-semibold text-gray-400 uppercase tracking-widest border border-gray-200 px-2 py-0.5 rounded-full">Admin</span>
+          <span className="ml-auto text-[11px] font-semibold text-gray-400 uppercase tracking-widest border border-gray-200 px-2 py-0.5 rounded-full">Admin</span>
         </div>
 
         <h1 className="text-lg font-bold text-gray-900 mb-1">Admin Access</h1>

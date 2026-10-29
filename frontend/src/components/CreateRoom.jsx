@@ -48,10 +48,12 @@ export default function CreateRoom() {
   const location  = useLocation();
   const { user }  = useAuth();
 
-  const [title,           setTitle]           = useState('');
-  const [description,     setDescription]     = useState('');
-  const [category,        setCategory]        = useState('GD');
-  const [subcategory,     setSubcategory]     = useState('');
+  // The prep sheet's "Practise in a room" sends a topic along in route state.
+  const prefill = location.state?.prefill || {};
+  const [title,           setTitle]           = useState(prefill.title || '');
+  const [description,     setDescription]     = useState(prefill.description || '');
+  const [category,        setCategory]        = useState(CATEGORIES.includes(prefill.category) ? prefill.category : 'GD');
+  const [subcategory,     setSubcategory]     = useState(GD_SUBCATEGORIES.includes(prefill.subcategory) ? prefill.subcategory : '');
   const [maxParticipants, setMaxParticipants] = useState(10);
   const [platformLimit,   setPlatformLimit]   = useState(false);
   const [sessionLimit,    setSessionLimit]    = useState(false);
@@ -322,7 +324,7 @@ export default function CreateRoom() {
                     }`}
                   >
                     <span className="block font-semibold">{cat}</span>
-                    <span className="block text-[10px] mt-0.5 opacity-70">{CATEGORY_META[cat].desc}</span>
+                    <span className="block text-[11px] mt-0.5 opacity-70">{CATEGORY_META[cat].desc}</span>
                   </button>
                 ))}
               </div>
@@ -361,7 +363,7 @@ export default function CreateRoom() {
                       key={sub}
                       type="button"
                       onClick={() => setSubcategory(p => p === sub ? '' : sub)}
-                      className={`px-2.5 py-1 rounded-full border text-[11px] font-medium transition-all cursor-pointer ${
+                      className={`px-2.5 py-1 rounded-full border text-[12px] font-medium transition-all cursor-pointer ${
                         subcategory === sub
                           ? 'border-brand-600 bg-brand-600 text-white'
                           : 'border-gray-200 text-gray-500 hover:border-gray-300 hover:bg-gray-50'
@@ -405,11 +407,11 @@ export default function CreateRoom() {
                       >
                         <div className="h-0.5 bg-brand-600" />
                         <div className="p-3">
-                          <span className="text-[9px] font-bold text-brand-600 bg-brand-50 px-1.5 py-0.5 rounded-full border border-brand-100 uppercase tracking-widest">
+                          <span className="text-[10.5px] font-bold text-brand-600 bg-brand-50 px-1.5 py-0.5 rounded-full border border-brand-100 uppercase tracking-widest">
                             {article.category}
                           </span>
                           <p className="text-xs font-semibold text-gray-800 mt-2 leading-snug">{article.title}</p>
-                          <p className="text-[10px] text-brand-600 font-semibold mt-2.5 opacity-0 group-hover:opacity-100 transition-opacity flex items-center gap-0.5">
+                          <p className="text-[11px] text-brand-600 font-semibold mt-2.5 opacity-0 group-hover:opacity-100 transition-opacity flex items-center gap-0.5">
                             Use this
                             <svg className="w-2.5 h-2.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
                               <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
@@ -429,7 +431,7 @@ export default function CreateRoom() {
                 <label className="text-xs font-semibold text-gray-600">
                   Room Title <span className="text-red-400">*</span>
                 </label>
-                <span className={`text-[10px] font-medium ${
+                <span className={`text-[11px] font-medium ${
                   title.length < 5 ? 'text-gray-300' :
                   title.length > 90 ? 'text-red-400' : 'text-gray-400'
                 }`}>
@@ -450,7 +452,7 @@ export default function CreateRoom() {
                   <AlertCircle className="w-3 h-3 shrink-0" /> {errors.title}
                 </p>
               ) : (
-                <p className="text-[11px] text-gray-400 mt-1.5 flex items-center gap-1">
+                <p className="text-[12px] text-gray-400 mt-1.5 flex items-center gap-1">
                   <Info className="w-3 h-3 shrink-0" /> Minimum 5 characters · shown on room card
                 </p>
               )}
@@ -462,7 +464,7 @@ export default function CreateRoom() {
                 <label className="text-xs font-semibold text-gray-600">
                   Description <span className="text-red-400">*</span>
                 </label>
-                <span className={`text-[10px] font-medium ${
+                <span className={`text-[11px] font-medium ${
                   description.length < 10 ? 'text-gray-300' :
                   description.length > 450 ? 'text-red-400' : 'text-gray-400'
                 }`}>
@@ -483,7 +485,7 @@ export default function CreateRoom() {
                   <AlertCircle className="w-3 h-3 shrink-0" /> {errors.description}
                 </p>
               ) : (
-                <p className="text-[11px] text-gray-400 mt-1.5 flex items-center gap-1">
+                <p className="text-[12px] text-gray-400 mt-1.5 flex items-center gap-1">
                   <Info className="w-3 h-3 shrink-0" /> Minimum 10 characters · helps others understand the room's purpose
                 </p>
               )}
@@ -504,7 +506,7 @@ export default function CreateRoom() {
                     </button>
                   ))}
                 </div>
-                <p className="text-[11px] text-gray-400 mt-1.5">SSB GD panels: 5–8 · Batch sessions: up to 20</p>
+                <p className="text-[12px] text-gray-400 mt-1.5">SSB GD panels: 5–8 · Batch sessions: up to 20</p>
               </div>
             )}
 
@@ -521,7 +523,7 @@ export default function CreateRoom() {
                   <Icon className={`w-4 h-4 shrink-0 ${mode === id ? 'text-brand-600' : 'text-gray-400'}`} />
                   <div>
                     <p className={`text-xs font-semibold ${mode === id ? 'text-brand-600' : 'text-gray-600'}`}>{label}</p>
-                    <p className="text-[10px] text-gray-400">{sub}</p>
+                    <p className="text-[11px] text-gray-400">{sub}</p>
                   </div>
                 </button>
               ))}

@@ -50,7 +50,7 @@ function CloseBtn({ onClick, mobile }) {
       className={`flex items-center gap-1.5 rounded-full border transition-all cursor-pointer font-semibold ${
         mobile
           ? 'px-2.5 py-1 text-[11px] bg-white border-gray-200 text-gray-500 hover:border-gray-300 hover:text-gray-700'
-          : 'px-3 py-1.5 text-xs bg-gray-100 border-gray-200 text-gray-600 hover:bg-brand-50 hover:border-brand-200 hover:text-brand-600'
+          : 'px-3 py-1.5 text-[12px] bg-gray-100 border-gray-200 text-gray-600 hover:bg-brand-50 hover:border-brand-200 hover:text-brand-600'
       }`}
     >
       <svg className={mobile ? 'w-3 h-3' : 'w-3.5 h-3.5'} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
@@ -185,7 +185,7 @@ export default function SwipeReader({ article, onClose }) {
           <div className="shrink-0 border-t border-gray-100 px-4 py-2.5 flex items-center justify-between bg-white"
             style={{ paddingBottom: 'max(env(safe-area-inset-bottom, 0px) + 10px, 10px)' }}>
             <button onClick={prev} disabled={scene === 0}
-              className="flex items-center gap-1 text-xs font-semibold disabled:opacity-30 cursor-pointer disabled:cursor-not-allowed text-brand-600">
+              className="flex items-center gap-1 text-[12px] font-semibold disabled:opacity-30 cursor-pointer disabled:cursor-not-allowed text-brand-600">
               <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
                 <path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" />
               </svg>
@@ -193,7 +193,7 @@ export default function SwipeReader({ article, onClose }) {
             </button>
             <p className="text-[10px] text-gray-400 text-center truncate px-2">{article.title}</p>
             <button onClick={next} disabled={scene === total - 1}
-              className="flex items-center gap-1 text-xs font-semibold disabled:opacity-30 cursor-pointer disabled:cursor-not-allowed text-brand-600">
+              className="flex items-center gap-1 text-[12px] font-semibold disabled:opacity-30 cursor-pointer disabled:cursor-not-allowed text-brand-600">
               Next
               <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
                 <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
@@ -211,7 +211,7 @@ export default function SwipeReader({ article, onClose }) {
         {/* Top bar */}
         <div className="shrink-0 h-12 bg-white border-b border-gray-100 px-8 flex items-center justify-between">
           <button onClick={onClose}
-            className="flex items-center gap-2 text-sm font-semibold text-gray-500 hover:text-brand-600 transition-colors cursor-pointer group">
+            className="flex items-center gap-2 text-[14px] font-semibold text-gray-500 hover:text-brand-600 transition-colors cursor-pointer group">
             <svg className="w-4 h-4 group-hover:-translate-x-0.5 transition-transform" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
               <path strokeLinecap="round" strokeLinejoin="round" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
             </svg>
@@ -293,12 +293,12 @@ export default function SwipeReader({ article, onClose }) {
             {/* Bottom nav */}
             <div className="shrink-0 border-t border-gray-100 px-5 py-3 flex items-center justify-between bg-white">
               <button onClick={prev} disabled={scene === 0}
-                className="text-xs font-semibold text-brand-600 hover:text-brand-700 disabled:opacity-30 disabled:cursor-not-allowed cursor-pointer transition-colors">
+                className="text-[12px] font-semibold text-brand-600 hover:text-brand-700 disabled:opacity-30 disabled:cursor-not-allowed cursor-pointer transition-colors">
                 ← {scene > 0 ? SCENE_LABELS[article.scenes[scene - 1]?.type] : 'Prev'}
               </button>
               <p className="text-[10px] text-gray-400 truncate px-3 max-w-[180px] text-center">{article.title}</p>
               <button onClick={next} disabled={scene === total - 1}
-                className="text-xs font-semibold text-brand-600 hover:text-brand-700 disabled:opacity-30 disabled:cursor-not-allowed cursor-pointer transition-colors">
+                className="text-[12px] font-semibold text-brand-600 hover:text-brand-700 disabled:opacity-30 disabled:cursor-not-allowed cursor-pointer transition-colors">
                 {scene < total - 1 ? SCENE_LABELS[article.scenes[scene + 1]?.type] : 'Done'} →
               </button>
             </div>

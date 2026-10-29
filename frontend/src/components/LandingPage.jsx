@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState, lazy, Suspense } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useNavigate, Link, useSearchParams } from 'react-router-dom';
 import { getActiveRooms, closeRoom, getSessions, toggleInterest, cancelSession, startSession, getFeatured, getPastSessions, getArticles } from '../services/api';
 import { useAuth } from '../context/AuthContext';
@@ -8,10 +8,12 @@ import ComingSoonBanner from './ComingSoonBanner';
 import DailyMeetsNote from './DailyMeetsNote';
 import SsbCountdown from './SsbCountdown';
 import CommunityHighlights from './CommunityHighlights';
-import { Mic, Timer, FileText, CheckSquare, Radio, ArrowRight, Trash2, Zap, Lightbulb, Users, Presentation, Target, Headphones, RefreshCw, X, Calendar, Heart, PlayCircle, Share2, Check, Sparkles, ChevronDown, Shield, Star, Lock, BookOpen, Video, Award, ChevronRight, GraduationCap, ExternalLink, AlertTriangle, HeartHandshake } from 'lucide-react';
+import SiteNav from './SiteNav';
+import { trackEvent } from '../analytics';
+import { PrepPath, SsbStages } from './HomePrep';
+import { ExamTicker } from './ExamCalendar';
+import { Mic, Timer, FileText, CheckSquare, Radio, ArrowRight, Trash2, Zap, Lightbulb, Users, Presentation, Target, Headphones, RefreshCw, X, Calendar, Heart, PlayCircle, Share2, Check, Sparkles, ChevronDown, Shield, Star, Lock, BookOpen, Video, Award, ChevronRight, GraduationCap, ExternalLink, AlertTriangle, HeartHandshake, PenLine } from 'lucide-react';
 
-// Lazy-loaded — keeps react-simple-maps out of the main bundle
-const HeroMapAnimation = lazy(() => import('./HeroMapAnimation'));
 
 const HERO_CARDS = [
   {
@@ -122,11 +124,11 @@ function SpreadNewsCards({ small = false }) {
                     {card.stat}
                   </p>
                   <p className="text-xs font-bold text-gray-800 leading-snug mb-1.5">{card.title}</p>
-                  <p className="text-[10px] text-gray-400 leading-relaxed">{card.hint}</p>
+                  <p className="text-[11px] text-gray-400 leading-relaxed">{card.hint}</p>
 
                   {/* Read CTA — fades in on hover */}
                   {!card.ghost && (
-                    <div className={`mt-3 pt-2.5 border-t border-gray-100 flex items-center gap-1 text-[10px] font-bold text-brand-600 transition-opacity duration-200 ${isHov ? 'opacity-100' : 'opacity-0'}`}>
+                    <div className={`mt-3 pt-2.5 border-t border-gray-100 flex items-center gap-1 text-[11px] font-bold text-brand-600 transition-opacity duration-200 ${isHov ? 'opacity-100' : 'opacity-0'}`}>
                       Read card
                       <svg className="w-3 h-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
                         <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
@@ -142,7 +144,7 @@ function SpreadNewsCards({ small = false }) {
       </div>
 
       {/* Caption */}
-      <p className="text-[11px] text-gray-400 font-medium text-center">
+      <p className="text-[12px] text-gray-400 font-medium text-center">
         Click any card to read · <Link to="/current-affairs" className="text-brand-600 hover:underline font-semibold">Browse all News Cards</Link>
       </p>
     </div>
@@ -152,6 +154,8 @@ function SpreadNewsCards({ small = false }) {
 const CATEGORIES = ['All', 'GD', 'PPDT', 'Lecturette', 'IO Practice'];
 const GD_SUBCATEGORIES = ['Defence', 'International Relations', 'Society', 'Economy', 'Science & Tech', 'Environment', 'Sports & Awards'];
 const PAGE_SIZE = 6;
+// On a phone each room card is a full screen-width block; three is a screenful
+const pageSize = typeof window !== 'undefined' && window.innerWidth < 640 ? 3 : PAGE_SIZE;
 
 // Shown until enough real users are active on the platform
 const MOCK_ASPIRANTS = [
@@ -189,117 +193,150 @@ function isFresh(dateStr) {
   return (Date.now() - new Date(dateStr).getTime()) < 10 * 24 * 60 * 60 * 1000;
 }
 
-function LatestReadsSection() {
-  const [articles, setArticles] = useState([]);
-  const [loading,  setLoading]  = useState(true);
+// Readers only shown once the number helps rather than hurts
+function readersLabel(n) {
+  return n >= 20 ? `${n.toLocaleString('en-IN')} aspirants read this` : null;
+}
 
-  useEffect(() => {
-    getArticles()
-      .then(d => setArticles((d || []).slice(0, 3)))
-      .catch(() => setArticles([]))
-      .finally(() => setLoading(false));
-  }, []);
+function PillarTag({ category, light = false }) {
+  return (
+    <span className={`text-[11px] font-bold px-2 py-0.5 rounded-full border truncate ${light
+      ? 'bg-white/15 text-white border-white/25'
+      : 'bg-brand-50 text-brand-600 border-brand-100'}`}>
+      {PILLAR_LABELS[category] || category}
+    </span>
+  );
+}
 
+function NewTag({ light = false }) {
+  return (
+    <span className={`text-[10.5px] font-bold px-1.5 py-0.5 rounded-full uppercase tracking-wide shrink-0 border ${light
+      ? 'bg-emerald-500 text-white border-emerald-400'
+      : 'text-emerald-700 bg-emerald-50 border-emerald-200'}`}>
+      New
+    </span>
+  );
+}
+
+// The newest card — big, with its photo when the article has one
+function FeaturedRead({ a }) {
+  const fresh   = isFresh(a.published_at);
+  const readers = readersLabel(a.readers);
+  return (
+    <Link to={articleHref(a.slug || a.id)}
+      className="group relative rounded-2xl overflow-hidden flex flex-col justify-end h-full min-h-[300px] sm:min-h-[340px] bg-brand-600 shadow-sm hover:shadow-xl transition-shadow">
+      {a.cover_image ? (
+        <img src={a.cover_image} alt="" loading="eager"
+          className="absolute inset-0 w-full h-full object-cover group-hover:scale-[1.03] transition-transform duration-500" />
+      ) : (
+        <div className="absolute inset-0 opacity-10 pointer-events-none"
+          style={{ backgroundImage: 'radial-gradient(circle, rgba(255,255,255,0.9) 1px, transparent 1px)', backgroundSize: '20px 20px' }} />
+      )}
+      {/* Keeps the text readable on any photo */}
+      <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/45 to-black/5" />
+
+      <div className="relative p-5 sm:p-6 flex flex-col gap-2.5">
+        <div className="flex items-center gap-2">
+          <PillarTag category={a.category} light />
+          {fresh && <NewTag light />}
+        </div>
+        <h3 className="text-lg sm:text-2xl font-bold text-white leading-snug">{a.title}</h3>
+        <p className="text-xs sm:text-sm text-white/80 leading-relaxed line-clamp-2">{a.summary}</p>
+        <div className="flex flex-wrap items-center gap-x-3 gap-y-2 mt-1">
+          <span className="inline-flex items-center gap-1.5 bg-white text-brand-700 font-bold text-xs px-4 py-2 rounded-xl group-hover:bg-brand-50 transition-colors">
+            Read now <ArrowRight className="w-3.5 h-3.5" />
+          </span>
+          <span className="text-[12px] text-white/70">{a.reading_time || 'Quick read'}</span>
+          {readers && <span className="text-[12px] text-white/70">· {readers}</span>}
+        </div>
+      </div>
+    </Link>
+  );
+}
+
+function CompactRead({ a }) {
+  const fresh = isFresh(a.published_at);
+  return (
+    <Link to={articleHref(a.slug || a.id)}
+      className="group shrink-0 w-[78%] sm:w-auto lg:flex-1 snap-start bg-white border border-gray-200 rounded-xl overflow-hidden flex hover:border-brand-600/30 hover:shadow-md transition-all">
+      {a.cover_image && (
+        <img src={a.cover_image} alt="" loading="lazy" className="w-20 sm:w-24 object-cover shrink-0" />
+      )}
+      <div className="p-3.5 flex flex-col gap-1.5 flex-1 min-w-0">
+        <div className="flex items-center justify-between gap-2">
+          <PillarTag category={a.category} />
+          {fresh && <NewTag />}
+        </div>
+        <h3 className="text-sm font-semibold text-gray-800 leading-snug line-clamp-2 group-hover:text-brand-600 transition-colors">
+          {a.title}
+        </h3>
+        <div className="flex items-center justify-between gap-2 mt-auto">
+          <span className="text-[11px] text-gray-400">{a.reading_time || 'Quick read'}</span>
+          <span className="flex items-center gap-0.5 text-[12px] font-semibold text-brand-600 shrink-0">
+            Read <ChevronRight className="w-3 h-3" />
+          </span>
+        </div>
+      </div>
+    </Link>
+  );
+}
+
+function LatestReadsSection({ articles, loading }) {
   // Nothing to show and nothing loading — don't render an empty shell
   if (!loading && articles.length === 0) return null;
 
+  const [featured, ...rest] = articles;
   const hasNew = articles.some(a => isFresh(a.published_at));
 
   return (
-    <section className="bg-gray-50 px-4 sm:px-6 py-10 sm:py-14">
+    <section className="bg-gray-50 border-b border-gray-100 px-4 sm:px-6 py-8 sm:py-12">
       <div className="max-w-5xl mx-auto">
 
         {/* Header */}
-        <div className="flex items-end justify-between gap-4 mb-4">
+        <div className="flex items-end justify-between gap-4 mb-5">
           <div>
             <div className="flex items-center gap-2 mb-1.5">
               <BookOpen className="w-4 h-4 text-brand-600 shrink-0" />
-              <h2 className="text-xl sm:text-2xl font-bold text-gray-900">Latest Reads</h2>
+              <h2 className="text-xl sm:text-2xl font-bold text-gray-900">Read before your GD and interview</h2>
               {hasNew && (
-                <span className="flex items-center gap-1 text-[9px] font-bold text-emerald-700 bg-emerald-50 border border-emerald-200 px-2 py-0.5 rounded-full uppercase tracking-widest">
+                <span className="flex items-center gap-1 text-[10.5px] font-bold text-emerald-700 bg-emerald-50 border border-emerald-200 px-2 py-0.5 rounded-full uppercase tracking-widest">
                   <span className="w-1.5 h-1.5 bg-emerald-500 rounded-full animate-pulse" /> New
                 </span>
               )}
             </div>
-            <p className="text-xs sm:text-sm text-gray-400">
-              Current affairs explained for GD, Lecturette &amp; PI — a new one every few days.
+            <p className="text-xs sm:text-sm text-gray-500">
+              Current affairs made simple for GD, Lecturette and PI. 2–5 minutes each.
             </p>
           </div>
           <Link to="/current-affairs"
             className="hidden sm:flex items-center gap-1 text-xs font-semibold text-brand-600 hover:text-brand-700 shrink-0 whitespace-nowrap">
-            View all <ChevronRight className="w-3.5 h-3.5" />
+            All news cards <ChevronRight className="w-3.5 h-3.5" />
           </Link>
         </div>
 
-        {/* Value prop — read, understand, then speak it in a live room */}
-        <div className="flex flex-wrap items-center gap-x-5 gap-y-2 mb-5">
-          {['Read in 2–5 minutes', 'Data, examples & key terms', 'Then practice it in a live GD'].map((s, i) => (
-            <div key={i} className="flex items-center gap-1.5 text-[11px] sm:text-xs text-gray-500">
-              <span className="w-4 h-4 rounded-full bg-brand-600 flex items-center justify-center shrink-0">
-                <svg className="w-2 h-2 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3.5">
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
-                </svg>
-              </span>
-              {s}
+        {loading ? (
+          <div className="grid grid-cols-1 lg:grid-cols-5 gap-4">
+            <div className="lg:col-span-3 min-h-[300px] sm:min-h-[340px] bg-white border border-gray-100 rounded-2xl animate-pulse" />
+            <div className="lg:col-span-2 hidden lg:flex flex-col gap-3">
+              {[1, 2, 3, 4].map(i => <div key={i} className="flex-1 bg-white border border-gray-100 rounded-xl animate-pulse" />)}
             </div>
-          ))}
-        </div>
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 lg:grid-cols-5 gap-4">
+            <div className="lg:col-span-3"><FeaturedRead a={featured} /></div>
 
-        {/* Cards */}
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4">
-          {loading
-            ? [1, 2, 3].map(i => (
-                <div key={i} className="bg-white border border-gray-100 rounded-xl p-4 animate-pulse">
-                  <div className="h-2.5 bg-gray-100 rounded w-20 mb-3" />
-                  <div className="h-4 bg-gray-100 rounded w-full mb-2" />
-                  <div className="h-4 bg-gray-100 rounded w-3/5 mb-3" />
-                  <div className="h-3 bg-gray-100 rounded w-4/5" />
-                </div>
-              ))
-            : articles.map(a => {
-                const slug  = a.slug || a.id;
-                const fresh = isFresh(a.published_at);
-                return (
-                  <Link key={a.id} to={articleHref(slug)}
-                    className="group bg-white border border-gray-200 rounded-xl overflow-hidden flex flex-col hover:border-brand-600/30 hover:shadow-md transition-all">
-                    <div className="h-0.5 bg-brand-600" />
-                    <div className="p-4 flex flex-col gap-2 flex-1">
+            {rest.length > 0 && (
+              /* Phone: swipe sideways. Tablet: 2-up grid. Desktop: a list beside the featured card */
+              <div className="lg:col-span-2 -mx-4 px-4 sm:mx-0 sm:px-0 flex sm:grid sm:grid-cols-2 lg:flex lg:flex-col gap-3 overflow-x-auto sm:overflow-visible snap-x snap-mandatory pb-1 sm:pb-0">
+                {rest.map(a => <CompactRead key={a.id} a={a} />)}
+              </div>
+            )}
+          </div>
+        )}
 
-                      {/* Pillar + new badge */}
-                      <div className="flex items-center justify-between gap-2">
-                        <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-brand-50 text-brand-600 border border-brand-100 truncate">
-                          {PILLAR_LABELS[a.category] || a.category}
-                        </span>
-                        {fresh && (
-                          <span className="text-[9px] font-bold text-emerald-700 bg-emerald-50 border border-emerald-200 px-1.5 py-0.5 rounded-full uppercase tracking-wide shrink-0">
-                            New
-                          </span>
-                        )}
-                      </div>
-
-                      {/* Title + summary */}
-                      <h3 className="text-sm font-semibold text-gray-800 leading-snug group-hover:text-brand-600 transition-colors">
-                        {a.title}
-                      </h3>
-                      <p className="text-xs text-gray-400 leading-relaxed line-clamp-2 flex-1">{a.summary}</p>
-
-                      {/* Footer */}
-                      <div className="flex items-center justify-between gap-2 pt-2 mt-auto border-t border-gray-100">
-                        <span className="text-[10px] text-gray-400">{a.reading_time || 'Quick read'}</span>
-                        <span className="flex items-center gap-0.5 text-[11px] font-semibold text-brand-600 shrink-0">
-                          Read <ChevronRight className="w-3 h-3" />
-                        </span>
-                      </div>
-                    </div>
-                  </Link>
-                );
-              })}
-        </div>
-
-        {/* Mobile view-all */}
         <Link to="/current-affairs"
           className="sm:hidden mt-4 flex items-center justify-center gap-1 text-xs font-semibold text-brand-600 py-2">
-          View all news cards <ChevronRight className="w-3.5 h-3.5" />
+          See all news cards <ChevronRight className="w-3.5 h-3.5" />
         </Link>
       </div>
     </section>
@@ -327,7 +364,7 @@ function Avatar({ name, avatarUrl }) {
   const initials = name?.split(' ').map(w => w[0]).join('').toUpperCase().slice(0, 2) || '?';
   if (avatarUrl) return <img src={avatarUrl} alt={name} className="w-7 h-7 rounded-full object-cover" />;
   return (
-    <div className="w-7 h-7 rounded-full bg-brand-600 flex items-center justify-center text-[10px] font-bold text-white shrink-0">
+    <div className="w-7 h-7 rounded-full bg-brand-600 flex items-center justify-center text-[11px] font-bold text-white shrink-0">
       {initials}
     </div>
   );
@@ -402,7 +439,7 @@ function MentorCard({ mentor }) {
 
         {/* Branch label */}
         <div className="relative z-10 text-center">
-          <p className="text-[9px] font-bold text-white/90 tracking-widest uppercase leading-tight">
+          <p className="text-[10.5px] font-bold text-white/90 tracking-widest uppercase leading-tight">
             {mentor.branch.replace('Indian ', '')}
           </p>
         </div>
@@ -411,7 +448,7 @@ function MentorCard({ mentor }) {
         {mentor.isActive && (
           <div className="relative z-10 flex items-center gap-1">
             <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
-            <span className="text-[9px] text-emerald-300 font-semibold">Active</span>
+            <span className="text-[10.5px] text-emerald-300 font-semibold">Active</span>
           </div>
         )}
       </div>
@@ -425,9 +462,9 @@ function MentorCard({ mentor }) {
             <h3 className="text-sm sm:text-base font-bold text-gray-900 leading-snug group-hover:text-brand-600 transition-colors">
               {mentor.name}
             </h3>
-            <p className="text-[11px] text-gray-400 mt-0.5">{mentor.rank}</p>
+            <p className="text-[12px] text-gray-400 mt-0.5">{mentor.rank}</p>
           </div>
-          <span className="shrink-0 flex items-center gap-1 text-[9px] font-bold text-sky-700 bg-sky-50 border border-sky-100 px-2 py-1 rounded-lg">
+          <span className="shrink-0 flex items-center gap-1 text-[10.5px] font-bold text-sky-700 bg-sky-50 border border-sky-100 px-2 py-1 rounded-lg">
             <Shield className="w-2.5 h-2.5" /> Verified
           </span>
         </div>
@@ -438,7 +475,7 @@ function MentorCard({ mentor }) {
         {/* Specialty chips */}
         <div className="flex flex-wrap gap-1">
           {mentor.specialties.slice(0, 3).map(tag => (
-            <span key={tag} className="text-[9px] font-semibold text-brand-600 bg-brand-50 px-2 py-0.5 rounded-full border border-brand-100">
+            <span key={tag} className="text-[10.5px] font-semibold text-brand-600 bg-brand-50 px-2 py-0.5 rounded-full border border-brand-100">
               {tag}
             </span>
           ))}
@@ -446,10 +483,10 @@ function MentorCard({ mentor }) {
 
         {/* Footer */}
         <div className="flex items-center justify-between gap-2 pt-2 border-t border-gray-50 mt-auto">
-          <span className="flex items-center gap-1 text-[10px] text-gray-300">
+          <span className="flex items-center gap-1 text-[11px] text-gray-300">
             <Award className="w-3 h-3 text-sky-300" /> {mentor.yearsOfService} service
           </span>
-          <span className="flex items-center gap-0.5 text-[11px] font-semibold text-brand-600 group-hover:gap-1 transition-all">
+          <span className="flex items-center gap-0.5 text-[12px] font-semibold text-brand-600 group-hover:gap-1 transition-all">
             View Profile <ChevronRight className="w-3 h-3" />
           </span>
         </div>
@@ -468,7 +505,7 @@ function MentorsSection() {
             <h2 className="text-xl sm:text-2xl font-bold text-gray-900">Mentors</h2>
             <p className="text-sm text-gray-400 mt-0.5">Verified officers guiding SSB aspirants — hand-picked, limited seats</p>
           </div>
-          <div className="flex items-center gap-1.5 text-[11px] font-semibold text-sky-700 bg-sky-50 border border-sky-100 px-3 py-1.5 rounded-full shrink-0">
+          <div className="flex items-center gap-1.5 text-[12px] font-semibold text-sky-700 bg-sky-50 border border-sky-100 px-3 py-1.5 rounded-full shrink-0">
             <Shield className="w-3.5 h-3.5" /> Verified Service
           </div>
         </div>
@@ -578,10 +615,10 @@ function ContributeCard({ way }) {
       </div>
       <div>
         <h3 className="text-sm font-bold text-gray-900">{way.title}</h3>
-        <p className="text-[11px] text-gray-400">{way.org}</p>
+        <p className="text-[12px] text-gray-400">{way.org}</p>
       </div>
       <p className="text-xs text-gray-500 leading-relaxed flex-1">{way.desc}</p>
-      <span className="text-[11px] font-semibold text-brand-600 flex items-center gap-1">
+      <span className="text-[12px] font-semibold text-brand-600 flex items-center gap-1">
         Learn how <ArrowRight className="w-3 h-3 group-hover:translate-x-0.5 transition-transform" />
       </span>
     </a>
@@ -598,7 +635,7 @@ function ActiveAspirantsSection({ aspirants }) {
       <div className="max-w-5xl mx-auto">
         <div className="flex items-center gap-2 mb-1">
           <h2 className="text-xl sm:text-2xl font-bold text-gray-900">Active Aspirants</h2>
-          <span className="text-[10px] font-semibold text-emerald-700 bg-emerald-50 border border-emerald-100 px-2 py-0.5 rounded-full">On SSBCircle</span>
+          <span className="text-[11px] font-semibold text-emerald-700 bg-emerald-50 border border-emerald-100 px-2 py-0.5 rounded-full">On SSBCircle</span>
         </div>
         <p className="text-sm text-gray-400 mb-6">Students consistently practising and leading sessions on the platform.</p>
         <div className="flex gap-3 overflow-x-auto pb-2 scrollbar-hide -mx-1 px-1">
@@ -610,8 +647,8 @@ function ActiveAspirantsSection({ aspirants }) {
                   ? <img src={a.avatar_url} alt={a.display_name} className="w-10 h-10 rounded-full object-cover border-2 border-white shadow-sm" />
                   : <div className={`w-10 h-10 rounded-full ${a.color || 'bg-brand-600'} flex items-center justify-center text-xs font-bold text-white shadow-sm`}>{initials}</div>
                 }
-                <p className="text-[10px] font-semibold text-gray-700 text-center truncate w-full leading-tight">{a.display_name?.split(' ')[0]}</p>
-                <p className="text-[9px] text-gray-400 tabular-nums">{a.rooms_hosted} {a.rooms_hosted === 1 ? 'room' : 'rooms'}</p>
+                <p className="text-[11px] font-semibold text-gray-700 text-center truncate w-full leading-tight">{a.display_name?.split(' ')[0]}</p>
+                <p className="text-[10.5px] text-gray-400 tabular-nums">{a.rooms_hosted} {a.rooms_hosted === 1 ? 'room' : 'rooms'}</p>
               </div>
             );
           })}
@@ -637,11 +674,11 @@ function ContributeSection() {
           </p>
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4">
+        <div className="m-rail sm:grid-cols-2 lg:grid-cols-3">
           {CONTRIBUTE_WAYS.map(way => <ContributeCard key={way.title} way={way} />)}
         </div>
 
-        <p className="text-[10px] text-gray-300 mt-4">
+        <p className="text-[11px] text-gray-300 mt-4">
           Emblems via Wikimedia Commons — NCC (Bharata-indstar) & Goonj (Cyyanide) logos under{' '}
           <a href="https://creativecommons.org/licenses/by-sa/4.0/" target="_blank" rel="noopener noreferrer" className="underline hover:text-gray-400">CC BY-SA 4.0</a>;
           {' '}Territorial Army crest & NSS logo are public domain. Civil Defence emblem is the official Ministry of Home Affairs / DGFSCDHG mark, shown for identification only — SSBCircle is not affiliated with or endorsed by the Government of India.
@@ -680,13 +717,13 @@ function RoomCard({ room, user, onJoin, onDelete }) {
               <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75" />
               <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500" />
             </span>
-            <span className="text-[11px] font-mono font-semibold text-gray-400 tracking-widest">{room.room_code}</span>
-            <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full border ${isFull ? 'bg-red-50 text-red-500 border-red-200' : 'bg-gray-50 text-gray-500 border-gray-200'}`}>
+            <span className="text-[12px] font-mono font-semibold text-gray-400 tracking-widest">{room.room_code}</span>
+            <span className={`text-[11px] font-bold px-2 py-0.5 rounded-full border ${isFull ? 'bg-red-50 text-red-500 border-red-200' : 'bg-gray-50 text-gray-500 border-gray-200'}`}>
               {isFull ? 'Full' : `${count}/${maxP}`}
             </span>
           </div>
           <div className="flex items-center gap-1.5">
-            <span className="text-[11px] text-gray-300 hidden sm:inline">{timeAgo(room.created_at)}</span>
+            <span className="text-[12px] text-gray-300 hidden sm:inline">{timeAgo(room.created_at)}</span>
             <ShareButton
               title={room.topic}
               text={`Join "${room.topic}" on SSBCircle — use code ${room.room_code}`}
@@ -704,12 +741,12 @@ function RoomCard({ room, user, onJoin, onDelete }) {
         {/* Category badges */}
         <div className="flex items-center gap-1.5">
           {room.category && (
-            <span className={`text-[10px] font-semibold px-2 py-0.5 rounded-full border ${colorClass}`}>
+            <span className={`text-[11px] font-semibold px-2 py-0.5 rounded-full border ${colorClass}`}>
               {room.category}
             </span>
           )}
           {room.subcategory && (
-            <span className="text-[10px] font-medium px-2 py-0.5 rounded-full bg-gray-50 text-gray-400 border border-gray-100">
+            <span className="text-[11px] font-medium px-2 py-0.5 rounded-full bg-gray-50 text-gray-400 border border-gray-100">
               {room.subcategory}
             </span>
           )}
@@ -734,7 +771,7 @@ function RoomCard({ room, user, onJoin, onDelete }) {
                       className="w-7 h-7 rounded-full border-2 border-white object-cover"
                       title={p.name} />
                   : <div key={i}
-                      className="w-7 h-7 rounded-full bg-brand-600 border-2 border-white flex items-center justify-center text-[10px] font-bold text-white shrink-0"
+                      className="w-7 h-7 rounded-full bg-brand-600 border-2 border-white flex items-center justify-center text-[11px] font-bold text-white shrink-0"
                       title={p.name}>
                       {p.name?.split(' ').map(w => w[0]).join('').toUpperCase().slice(0, 2) || '?'}
                     </div>
@@ -845,12 +882,12 @@ function UpcomingTab({ sessions, loading, user, onRefresh, navigate, onInterest,
                 <div className={`h-0.5 ${isLive ? 'bg-emerald-500' : 'bg-brand-600'}`} />
                 <div className="p-4 flex flex-col gap-3 flex-1">
                   <div className="flex items-center justify-between">
-                    <span className={`text-[10px] font-semibold px-2 py-0.5 rounded-full border ${COLORS[s.category] || 'bg-gray-50 text-gray-500 border-gray-100'}`}>
+                    <span className={`text-[11px] font-semibold px-2 py-0.5 rounded-full border ${COLORS[s.category] || 'bg-gray-50 text-gray-500 border-gray-100'}`}>
                       {s.category}
                     </span>
                     <div className="flex items-center gap-1.5">
                       {isLive ? (
-                        <span className="flex items-center gap-1 text-[11px] font-semibold text-emerald-600">
+                        <span className="flex items-center gap-1 text-[12px] font-semibold text-emerald-600">
                           <span className="relative flex h-1.5 w-1.5">
                             <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75" />
                             <span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-emerald-500" />
@@ -858,7 +895,7 @@ function UpcomingTab({ sessions, loading, user, onRefresh, navigate, onInterest,
                           Live Now
                         </span>
                       ) : (
-                        <span className="text-[11px] font-semibold text-brand-600">{countdown(s.scheduled_at)}</span>
+                        <span className="text-[12px] font-semibold text-brand-600">{countdown(s.scheduled_at)}</span>
                       )}
                       <ShareButton
                         title={s.topic}
@@ -908,7 +945,7 @@ function UpcomingTab({ sessions, loading, user, onRefresh, navigate, onInterest,
                         <div key={i} className="w-4 h-4 rounded-full bg-brand-600 border border-white" style={{ opacity: 1 - i * 0.15 }} />
                       ))}
                     </div>
-                    <p className="text-[11px] text-gray-400">
+                    <p className="text-[12px] text-gray-400">
                       {s.interest_count === 0
                         ? 'No notifications yet — be the first'
                         : `${s.interest_count} aspirant${s.interest_count > 1 ? 's' : ''} getting notified`}
@@ -927,7 +964,7 @@ function UpcomingTab({ sessions, loading, user, onRefresh, navigate, onInterest,
 const FAQ_ITEMS = [
   {
     q: 'What is SSBCircle and what can I practice on it?',
-    a: 'SSBCircle is a free platform built exclusively for SSB interview preparation. Read News Cards to get GD-ready on current affairs, then jump into live voice rooms to practice Group Discussion, PPDT, Lecturette, and IO mock interviews with real defence aspirants — no download, no subscription.',
+    a: 'SSBCircle is a free platform for every stage of the SSB. Fill your PIQ to see what your Interviewing Officer is likely to ask, practise TAT stories and get honest feedback, read News Cards to stay ready for GD and interview, and join live voice rooms for GD, PPDT, Lecturette and mock interviews with other aspirants. No download, no subscription.',
   },
   {
     q: 'What are News Cards on SSBCircle?',
@@ -999,7 +1036,7 @@ function StepFlow({ steps }) {
       {steps.map((step, i) => (
         <div key={i} className="flex items-center gap-1.5">
           <div className="flex items-center gap-1.5 bg-brand-50 border border-brand-100 rounded-lg px-2.5 py-1.5">
-            <span className="w-4 h-4 rounded-full bg-brand-600 text-white text-[10px] font-bold flex items-center justify-center shrink-0">{i + 1}</span>
+            <span className="w-4 h-4 rounded-full bg-brand-600 text-white text-[11px] font-bold flex items-center justify-center shrink-0">{i + 1}</span>
             <span className="text-xs text-gray-700 font-medium">{step}</span>
           </div>
           {i < steps.length - 1 && (
@@ -1106,13 +1143,13 @@ function TerrierCyberQuestBanner() {
             {/* Text */}
             <div className="flex-1 min-w-0 pr-6">
               <div className="flex flex-wrap items-center gap-2 mb-1">
-                <span className={`text-[9px] font-bold px-2 py-0.5 rounded-full uppercase tracking-widest border ${
+                <span className={`text-[10.5px] font-bold px-2 py-0.5 rounded-full uppercase tracking-widest border ${
                   open ? 'text-amber-800 bg-amber-100 border-amber-200'
                        : 'text-gray-600 bg-gray-100 border-gray-200'}`}>
                   Opportunity · Indian Army
                 </span>
                 {open && (
-                  <span className="flex items-center gap-1 text-[9px] font-bold text-red-700 bg-red-50 border border-red-200 px-2 py-0.5 rounded-full uppercase tracking-widest">
+                  <span className="flex items-center gap-1 text-[10.5px] font-bold text-red-700 bg-red-50 border border-red-200 px-2 py-0.5 rounded-full uppercase tracking-widest">
                     <span className="w-1.5 h-1.5 bg-red-500 rounded-full animate-pulse" />
                     {daysLeft === 0 ? 'Closes today' : daysLeft === 1 ? '1 day left' : `${daysLeft} days left`}
                   </span>
@@ -1157,7 +1194,20 @@ function MentorAnnouncementBanner() {
     : null;
 
   return (
-    <div className="border-b border-gray-100 bg-white px-4 sm:px-6 py-5 sm:py-6">
+    <>
+    {/* Phones: one slim row, so the first screen is the hero and not this */}
+    <Link to={`/mentor/${mentor.slug}`}
+      className="sm:hidden flex items-center gap-3 px-4 py-2.5 bg-brand-50 border-b border-brand-100">
+      {mentor.photo
+        ? <img src={mentor.photoAvatar || mentor.photo} alt="" width="36" height="36" className="w-9 h-9 rounded-full object-cover object-top shrink-0 ring-2 ring-brand-200" />
+        : <span className="w-9 h-9 rounded-full bg-brand-600 flex items-center justify-center shrink-0"><Star className="w-4 h-4 text-white" /></span>}
+      <span className="flex-1 min-w-0 text-sm leading-snug text-gray-800">
+        <span className="font-semibold text-brand-700">New mentor:</span> {mentor.name}
+      </span>
+      <ChevronRight className="w-4 h-4 text-brand-600 shrink-0" />
+    </Link>
+
+    <div className="hidden sm:block border-b border-gray-100 bg-white px-4 sm:px-6 py-5 sm:py-6">
       <div className="max-w-5xl mx-auto">
 
         <div className="rounded-2xl border border-brand-100 bg-brand-50 px-5 sm:px-7 py-5 sm:py-6 flex flex-col sm:flex-row items-start sm:items-center gap-5 sm:gap-8">
@@ -1180,7 +1230,7 @@ function MentorAnnouncementBanner() {
 
           {/* Info */}
           <div className="flex-1 min-w-0">
-            <div className="inline-flex items-center gap-1.5 bg-brand-100 text-brand-600 text-[10px] font-bold px-2.5 py-0.5 rounded-full mb-2 tracking-widest uppercase">
+            <div className="inline-flex items-center gap-1.5 bg-brand-100 text-brand-600 text-[11px] font-bold px-2.5 py-0.5 rounded-full mb-2 tracking-widest uppercase">
               <span className="w-1.5 h-1.5 rounded-full bg-brand-600 animate-pulse shrink-0" />
               New Mentor
             </div>
@@ -1191,7 +1241,7 @@ function MentorAnnouncementBanner() {
             {/* Specialty badges */}
             <div className="flex items-center gap-2 mb-4 flex-wrap">
               {mentor.specialties.slice(0, 2).map(tag => (
-                <span key={tag} className="flex items-center gap-1.5 text-[11px] font-semibold text-brand-700 bg-white border border-brand-100 px-3 py-1.5 rounded-lg">
+                <span key={tag} className="flex items-center gap-1.5 text-[12px] font-semibold text-brand-700 bg-white border border-brand-100 px-3 py-1.5 rounded-lg">
                   <Shield className="w-3.5 h-3.5 text-brand-500" /> {tag}
                 </span>
               ))}
@@ -1200,13 +1250,13 @@ function MentorAnnouncementBanner() {
             <div className="flex items-center gap-3 flex-wrap">
               {availableFromLabel && (
                 <>
-                  <span className="flex items-center gap-1.5 text-[11px] text-gray-500 font-medium">
+                  <span className="flex items-center gap-1.5 text-[12px] text-gray-500 font-medium">
                     <Calendar className="w-3 h-3" /> Appointments open {availableFromLabel}
                   </span>
                   <span className="w-1 h-1 rounded-full bg-gray-300" />
                 </>
               )}
-              <span className="flex items-center gap-1.5 text-[11px] text-gray-500 font-medium">
+              <span className="flex items-center gap-1.5 text-[12px] text-gray-500 font-medium">
                 <Shield className="w-3 h-3" /> Verified Officer
               </span>
             </div>
@@ -1217,12 +1267,13 @@ function MentorAnnouncementBanner() {
             <Link to={`/mentor/${mentor.slug}`} className="btn-primary text-sm px-5 py-2.5 w-full sm:w-auto text-center whitespace-nowrap flex items-center justify-center gap-2">
               View Profile <ArrowRight className="w-4 h-4" />
             </Link>
-            <p className="text-gray-400 text-[10px]">Meet your mentor</p>
+            <p className="text-gray-400 text-[11px]">Meet your mentor</p>
           </div>
 
         </div>
       </div>
     </div>
+    </>
   );
 }
 
@@ -1238,12 +1289,14 @@ export default function LandingPage() {
   const [loading,         setLoading]         = useState(true);
   const [catFilter,       setCatFilter]       = useState('All');
   const [subFilter,       setSubFilter]       = useState('');
-  const [visibleCount,    setVisibleCount]    = useState(PAGE_SIZE);
+  const [visibleCount,    setVisibleCount]    = useState(pageSize);
   const [tab,             setTab]             = useState(() => searchParams.get('tab') === 'upcoming' ? 'upcoming' : 'live');
   const [sessions,        setSessions]        = useState([]);
   const [sessionsLoading, setSessionsLoading] = useState(false);
   const [aspirants,       setAspirants]       = useState([]);
   const [pastSessions,    setPastSessions]    = useState([]);
+  const [articles,        setArticles]        = useState([]);
+  const [articlesLoading, setArticlesLoading] = useState(true);
 
   async function fetchRooms(showSkeleton = false) {
     if (showSkeleton) setLoading(true);
@@ -1267,6 +1320,10 @@ export default function LandingPage() {
     // Featured aspirants + past sessions — load once
     getFeatured().then(d => setAspirants(d.aspirants || [])).catch(() => {});
     getPastSessions().then(d => setPastSessions(d || [])).catch(() => {});
+    getArticles()
+      .then(d => setArticles((d || []).slice(0, 5)))
+      .catch(() => setArticles([]))
+      .finally(() => setArticlesLoading(false));
 
     // Scroll to tabs section if URL has ?tab= param
     if (searchParams.get('tab')) {
@@ -1285,11 +1342,11 @@ export default function LandingPage() {
   function handleCatFilter(cat) {
     setCatFilter(cat);
     setSubFilter('');
-    setVisibleCount(PAGE_SIZE);
+    setVisibleCount(pageSize);
   }
   function handleSubFilter(sub) {
     setSubFilter(p => p === sub ? '' : sub);
-    setVisibleCount(PAGE_SIZE);
+    setVisibleCount(pageSize);
   }
 
   const filteredRooms = rooms.filter(r => {
@@ -1320,148 +1377,10 @@ export default function LandingPage() {
   return (
     <div className="min-h-screen bg-white">
 
-      {/* ── Navbar ── */}
-      <header className="border-b border-gray-100 sticky top-0 z-50 bg-white/95 backdrop-blur-md">
-        <div className="max-w-5xl mx-auto px-4 sm:px-6 h-14 flex items-center justify-between gap-3">
-          <Link to="/"><Logo /></Link>
+      <SiteNav />
 
-          {/* ── Desktop nav ── */}
-          <nav className="hidden sm:flex items-center gap-2">
-            <Link to="/current-affairs" className="text-sm text-gray-500 hover:text-gray-900 px-3 py-2 font-medium">News Cards</Link>
-            <Link to="/piq" className="text-sm text-gray-500 hover:text-gray-900 px-3 py-2 font-medium">PIQ</Link>
-            <Link to="/community" className="text-sm text-gray-500 hover:text-gray-900 px-3 py-2 font-medium">Community</Link>
-            {user ? (
-              <>
-                <Link to="/profile" className="flex items-center gap-1.5 px-2 py-1.5 rounded-lg hover:bg-gray-50 transition-colors">
-                  <Avatar name={user.display_name} avatarUrl={user.avatar_url} />
-                  <span className="text-sm text-gray-600 font-medium">{user.display_name}</span>
-                </Link>
-                <button onClick={() => navigate('/join')} className="btn-secondary py-1.5 px-3 text-xs">Join</button>
-                <button onClick={() => navigate('/create')} className="btn-primary py-1.5 px-4 text-sm">Create Room</button>
-                <button onClick={logout} className="text-xs text-gray-400 hover:text-gray-600 px-2 cursor-pointer transition-colors">Sign out</button>
-              </>
-            ) : (
-              <>
-                <Link to="/login" className="text-sm text-gray-500 hover:text-gray-900 px-3 py-2 font-medium">Sign in</Link>
-                <Link to="/register" className="btn-primary py-1.5 px-4 text-sm">Get started</Link>
-              </>
-            )}
-          </nav>
-
-          {/* ── Mobile right: primary action + hamburger ── */}
-          <div className="sm:hidden flex items-center gap-2">
-            {user ? (
-              <button onClick={() => navigate('/create')} className="btn-primary py-1.5 px-3 text-xs">
-                + Create
-              </button>
-            ) : (
-              <Link to="/register" className="btn-primary py-1.5 px-3 text-xs">Get started</Link>
-            )}
-            <button
-              onClick={() => setMenuOpen(v => !v)}
-              className="flex items-center justify-center w-9 h-9 rounded-xl border border-gray-200 bg-white hover:bg-gray-50 transition-colors cursor-pointer"
-              aria-label="Menu"
-            >
-              {menuOpen ? (
-                <X className="w-4 h-4 text-gray-600" />
-              ) : (
-                <svg className="w-4 h-4 text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5">
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M4 6h16M4 12h16M4 18h9" />
-                </svg>
-              )}
-            </button>
-          </div>
-        </div>
-
-        {/* ── Mobile menu panel ── */}
-        {menuOpen && (
-          <div className="sm:hidden bg-white border-t border-gray-100 shadow-xl">
-            <div className="px-4 py-4 flex flex-col gap-1">
-
-              {/* News Cards row */}
-              <Link to="/current-affairs"
-                onClick={() => setMenuOpen(false)}
-                className="flex items-center gap-3 px-3 py-3 rounded-xl hover:bg-brand-50 transition-colors group">
-                <div className="w-8 h-8 rounded-lg bg-brand-50 border border-brand-100 flex items-center justify-center shrink-0 group-hover:bg-brand-100 transition-colors">
-                  <BookOpen className="w-4 h-4 text-brand-600" />
-                </div>
-                <div>
-                  <p className="text-sm font-semibold text-gray-800">News Cards</p>
-                  <p className="text-[11px] text-gray-400">GD topics · Lecturette prep</p>
-                </div>
-              </Link>
-
-              {/* PIQ row */}
-              <Link to="/piq"
-                onClick={() => setMenuOpen(false)}
-                className="flex items-center gap-3 px-3 py-3 rounded-xl hover:bg-brand-50 transition-colors group">
-                <div className="w-8 h-8 rounded-lg bg-brand-50 border border-brand-100 flex items-center justify-center shrink-0 group-hover:bg-brand-100 transition-colors">
-                  <FileText className="w-4 h-4 text-brand-600" />
-                </div>
-                <div>
-                  <p className="text-sm font-semibold text-gray-800">PIQ Analyzer</p>
-                  <p className="text-[11px] text-gray-400">Fill your PIQ · See what you will be asked</p>
-                </div>
-              </Link>
-
-              {/* Community row */}
-              <Link to="/community"
-                onClick={() => setMenuOpen(false)}
-                className="flex items-center gap-3 px-3 py-3 rounded-xl hover:bg-brand-50 transition-colors group">
-                <div className="w-8 h-8 rounded-lg bg-brand-50 border border-brand-100 flex items-center justify-center shrink-0 group-hover:bg-brand-100 transition-colors">
-                  <Users className="w-4 h-4 text-brand-600" />
-                </div>
-                <div>
-                  <p className="text-sm font-semibold text-gray-800">Community</p>
-                  <p className="text-[11px] text-gray-400">Sessions · Announcements · Doubts</p>
-                </div>
-              </Link>
-
-              <div className="h-px bg-gray-100 my-1" />
-
-              {user ? (
-                <>
-                  {/* Profile */}
-                  <Link to="/profile" onClick={() => setMenuOpen(false)}
-                    className="flex items-center gap-3 px-3 py-3 rounded-xl hover:bg-gray-50 transition-colors">
-                    <Avatar name={user.display_name} avatarUrl={user.avatar_url} />
-                    <div>
-                      <p className="text-sm font-semibold text-gray-800">{user.display_name}</p>
-                      <p className="text-[11px] text-gray-400">View profile</p>
-                    </div>
-                  </Link>
-
-                  <div className="h-px bg-gray-100 my-1" />
-
-                  {/* Room actions */}
-                  <div className="grid grid-cols-2 gap-2 px-1">
-                    <button onClick={() => { navigate('/join'); setMenuOpen(false); }}
-                      className="btn-secondary text-sm py-2.5 w-full">Join Room</button>
-                    <button onClick={() => { navigate('/create'); setMenuOpen(false); }}
-                      className="btn-primary text-sm py-2.5 w-full">Create Room</button>
-                  </div>
-
-                  <div className="h-px bg-gray-100 my-1" />
-
-                  <button onClick={() => { logout(); setMenuOpen(false); }}
-                    className="text-sm text-gray-400 hover:text-gray-600 text-left px-3 py-2.5 cursor-pointer transition-colors">
-                    Sign out
-                  </button>
-                </>
-              ) : (
-                <>
-                  <div className="grid grid-cols-2 gap-2 px-1 mt-1">
-                    <Link to="/login" onClick={() => setMenuOpen(false)}
-                      className="btn-secondary text-sm py-2.5 text-center">Sign in</Link>
-                    <Link to="/register" onClick={() => setMenuOpen(false)}
-                      className="btn-primary text-sm py-2.5 text-center">Get started</Link>
-                  </div>
-                </>
-              )}
-            </div>
-          </div>
-        )}
-      </header>
+      {/* Exam dates and results, scrolling under the navbar */}
+      <ExamTicker />
 
       <main>
 
@@ -1471,104 +1390,75 @@ export default function LandingPage() {
         {/* ── Special Event Banner ── */}
         <MentorAnnouncementBanner />
 
-        {/* ── Hero ── */}
-        <section className="border-b border-gray-100 py-10 sm:py-16 lg:py-20 px-4 sm:px-6">
-          <div className="max-w-5xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-10 items-center">
+        {/* ── Hero — what this is, one clear start, and (signed in) where you left off ── */}
+        <section className="border-b border-gray-100 bg-gradient-to-b from-brand-50/60 to-white py-10 sm:py-14 lg:py-16 px-4 sm:px-6">
+          <div className="max-w-5xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12 items-center">
             <div>
-              <div className="inline-flex items-center gap-2 bg-emerald-50 text-emerald-700 text-xs font-semibold px-3 py-1.5 rounded-full mb-6 border border-emerald-100">
-                <span className="relative flex h-2 w-2">
-                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75" />
-                  <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500" />
-                </span>
-                {!loading && rooms.length > 0
-                  ? `${rooms.length} discussion${rooms.length > 1 ? 's' : ''} happening right now`
-                  : 'Live voice rooms · Join any time'}
-              </div>
-
-              <h1 className="text-[2rem] sm:text-5xl lg:text-6xl font-bold text-gray-900 leading-[1.1] tracking-tight mb-3 sm:mb-4">
-                Practice SSB GD with<br />
-                <span className="text-brand-600">real aspirants.</span>
-              </h1>
-
-              {/* News Cards chip */}
-              <Link to="/current-affairs"
-                className="inline-flex items-center gap-2 text-xs font-semibold text-brand-600 bg-brand-50 border border-brand-100 px-3 py-1.5 rounded-full hover:bg-brand-100 transition-colors mb-4 sm:mb-5 select-none">
-                {/* Stacked cards icon */}
-                <svg viewBox="0 0 34 24" fill="none" className="w-7 h-5 shrink-0">
-                  {/* Back card */}
-                  <rect x="1" y="5" width="20" height="14" rx="2.5" fill="#e0e7ff"
-                    transform="rotate(-11 11 12)" />
-                  {/* Middle card */}
-                  <rect x="5" y="3" width="20" height="14" rx="2.5" fill="#eef2ff"
-                    transform="rotate(-5 15 10)" />
-                  {/* Front card */}
-                  <rect x="10" y="2" width="20" height="14" rx="2.5" fill="white"
-                    stroke="#c7d2fe" strokeWidth="1.2" />
-                  {/* Headline line */}
-                  <line x1="13.5" y1="8" x2="27" y2="8"
-                    stroke="#1e3a5f" strokeWidth="1.6" strokeLinecap="round" />
-                  {/* Body lines */}
-                  <line x1="13.5" y1="11.5" x2="25" y2="11.5"
-                    stroke="#c7d2fe" strokeWidth="1.3" strokeLinecap="round" />
-                  <line x1="13.5" y1="14.5" x2="22" y2="14.5"
-                    stroke="#c7d2fe" strokeWidth="1.3" strokeLinecap="round" />
-                </svg>
-                <span>News Cards</span>
-              </Link>
-
-              <p className="text-gray-500 text-sm sm:text-lg leading-relaxed mb-6 sm:mb-8">
-                India's free platform for SSB interview preparation. Practice Group Discussion (GD), PPDT, Lecturette and IO online with real defence aspirants — anywhere, anytime.
+              <p className="inline-flex items-center gap-2 text-xs font-semibold text-brand-700 bg-white border border-brand-100 px-3 py-1.5 rounded-full mb-5">
+                <Shield className="w-3.5 h-3.5" /> Free SSB preparation for every entry
               </p>
 
-              <div className="flex flex-col sm:flex-row gap-3 mb-8">
-                <button onClick={() => navigate(user ? '/create' : '/register')}
+              <h1 className="text-[2rem] sm:text-5xl font-bold text-gray-900 leading-[1.1] tracking-tight mb-4">
+                {user ? <>Welcome back, {user.display_name?.split(' ')[0]}.<br /><span className="text-brand-600">Let's keep going.</span></>
+                      : <>Start your SSB prep<br /><span className="text-brand-600">the right way.</span></>}
+              </h1>
+
+              <p className="text-gray-600 text-sm sm:text-lg leading-relaxed mb-6">
+                Know yourself through your PIQ, practise TAT stories with honest feedback, stay ready with
+                news cards, and speak in live GD and PPDT rooms with other aspirants. All free.
+              </p>
+
+              <div className="flex flex-col sm:flex-row gap-3 mb-6">
+                <button onClick={() => { trackEvent('home_cta', { which: user ? 'piq' : 'start_free' }); navigate(user ? '/piq' : '/register'); }}
                   className="btn-primary text-sm px-7 py-3 w-full sm:w-auto flex items-center justify-center gap-2">
-                  {user ? 'Create a Room' : 'Get started free'}
-                  <ArrowRight className="w-4 h-4" />
+                  {user ? 'Open my PIQ' : 'Start free'} <ArrowRight className="w-4 h-4" />
                 </button>
-                <button onClick={() => navigate(user ? '/join' : '/login')}
+                <button onClick={() => { trackEvent('home_cta', { which: 'tat' }); navigate('/tat'); }}
                   className="btn-secondary text-sm px-7 py-3 w-full sm:w-auto">
-                  Join a Room
+                  Try a TAT story
                 </button>
               </div>
 
-              <div className="flex items-center gap-3">
-                <div className="flex -space-x-2">
-                  {['A','V','R','S','P'].map((l, i) => (
-                    <div key={i} className="w-7 h-7 rounded-full bg-brand-600 border-2 border-white flex items-center justify-center text-[9px] font-bold text-white" style={{ opacity: 1 - i * 0.12 }}>{l}</div>
-                  ))}
-                </div>
-                <p className="text-xs text-gray-500">
-                  <span className="font-semibold text-gray-700">100+</span> aspirants joined · <span className="font-semibold text-gray-700">Free</span>
-                </p>
+              {!user && (
+                <Link to="/become-an-officer" onClick={() => trackEvent('home_cta', { which: 'start_guide' })}
+                  className="mb-5 inline-flex items-center gap-1.5 text-sm font-semibold text-brand-700 hover:text-brand-900">
+                  Dream of the uniform? How to become an officer <ArrowRight className="w-4 h-4" />
+                </Link>
+              )}
+
+              <div className="flex flex-wrap items-center gap-x-4 gap-y-2 text-xs text-gray-500">
+                <span className="inline-flex items-center gap-1.5"><Check className="w-3.5 h-3.5 text-emerald-600" /> No fees, no download</span>
+                <span className="inline-flex items-center gap-1.5"><Check className="w-3.5 h-3.5 text-emerald-600" /> NDA, CDS, AFCAT, TES and more</span>
+                {!loading && rooms.length > 0 && (
+                  <span className="inline-flex items-center gap-1.5">
+                    <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" /> {rooms.length} room{rooms.length > 1 ? 's' : ''} live now
+                  </span>
+                )}
               </div>
-
             </div>
 
-            <div className="hidden lg:flex flex-col justify-center items-center gap-3">
-              <Suspense fallback={<div className="w-[340px] h-[360px] bg-gray-50 rounded-2xl animate-pulse" />}>
-                <HeroMapAnimation />
-              </Suspense>
-              <p className="text-xs text-gray-400 font-medium text-center">Connecting aspirants to learn and practice communication skills</p>
-            </div>
+            <PrepPath user={user} liveCount={rooms.length} />
           </div>
         </section>
 
-        {/* ── From the community — renders nothing when there are no posts ── */}
-        <CommunityHighlights />
-
-        {/* ── Days to your SSB — renders nothing unless a date is saved ── */}
+        {/* ── Days to your SSB — personal, so it leads; renders nothing unless a date is saved ── */}
         <SsbCountdown user={user} />
 
-        {/* ── Announcement: the 21-day challenge, ahead of the feature itself ── */}
-        <ComingSoonBanner />
+        {/* The page runs: where to start → every stage → read → practise live → discuss */}
+        <SsbStages />
 
-        {/* ── Latest Reads — real articles, keeps aspirants coming back ── */}
-        <LatestReadsSection />
+        {/* ── Latest Reads — right under the hero so every visitor sees them ── */}
+        <LatestReadsSection articles={articles} loading={articlesLoading} />
 
         {/* ── Live / Upcoming tabs ── */}
-        <section ref={tabsSectionRef} className="border-t border-gray-100 bg-white px-4 sm:px-6 py-10 sm:py-14">
+        <section id="rooms" ref={tabsSectionRef} className="scroll-mt-16 border-t border-gray-100 bg-white px-4 sm:px-6 py-10 sm:py-14">
           <div className="max-w-5xl mx-auto">
+
+          <div className="mb-5">
+            <p className="text-[11px] font-bold uppercase tracking-[0.25em] text-brand-600">Practise together</p>
+            <h2 className="mt-1.5 text-xl sm:text-2xl font-bold text-gray-900">Speak with other aspirants</h2>
+            <p className="text-sm text-gray-500 mt-1">GD, PPDT, Lecturette and mock interviews with other aspirants. Voice only, free, join from your phone.</p>
+          </div>
 
           {/* Tab switcher */}
           <div className="flex items-center gap-1 bg-gray-100 p-1 rounded-xl w-full sm:w-fit mb-6">
@@ -1586,8 +1476,8 @@ export default function LandingPage() {
             </button>
           </div>
 
-          {/* ── Early Access toggle ── */}
-          <div className="mb-6">
+          {/* ── Early Access toggle — desktop only; on a phone it pushes the rooms down ── */}
+          <div className="mb-6 hidden sm:block">
             <button
               onClick={() => setShowEarlyAccess(v => !v)}
               className="group flex items-center w-fit gap-2.5 px-4 py-2.5 bg-brand-600 hover:bg-brand-700 text-white rounded-xl text-sm font-semibold transition-all cursor-pointer shadow-sm"
@@ -1610,11 +1500,11 @@ export default function LandingPage() {
                   <div className="flex sm:flex-col gap-3 sm:gap-2 shrink-0">
                     <div className="flex-1 sm:flex-none bg-white/8 border border-white/10 rounded-xl px-4 py-2.5 text-center">
                       <p className="text-xl font-bold tabular-nums leading-none">{loading ? '—' : rooms.length}<span className="text-brand-100 text-sm font-medium">/8</span></p>
-                      <p className="text-[10px] text-brand-100 uppercase tracking-widest mt-0.5">Live Rooms</p>
+                      <p className="text-[11px] text-brand-100 uppercase tracking-widest mt-0.5">Live Rooms</p>
                     </div>
                     <div className="flex-1 sm:flex-none bg-white/8 border border-white/10 rounded-xl px-4 py-2.5 text-center">
                       <p className="text-xl font-bold tabular-nums leading-none">{sessionsLoading ? '—' : sessions.length}<span className="text-brand-100 text-sm font-medium">/4</span></p>
-                      <p className="text-[10px] text-brand-100 uppercase tracking-widest mt-0.5">Scheduled</p>
+                      <p className="text-[11px] text-brand-100 uppercase tracking-widest mt-0.5">Scheduled</p>
                     </div>
                   </div>
                 </div>
@@ -1683,7 +1573,7 @@ export default function LandingPage() {
               <div className="flex gap-1.5 flex-wrap mt-2.5">
                 {GD_SUBCATEGORIES.map(sub => (
                   <button key={sub} onClick={() => handleSubFilter(sub)}
-                    className={`px-2.5 py-1 rounded-full border text-[11px] font-medium transition-all cursor-pointer ${
+                    className={`px-2.5 py-1 rounded-full border text-[12px] font-medium transition-all cursor-pointer ${
                       subFilter === sub ? 'bg-blue-600 text-white border-blue-600' : 'bg-white text-gray-400 border-gray-200 hover:border-gray-300'
                     }`}>
                     {sub}
@@ -1725,8 +1615,8 @@ export default function LandingPage() {
               </div>
               {hasMore && (
                 <div className="mt-5 text-center">
-                  <button onClick={() => setVisibleCount(p => p + PAGE_SIZE)} className="btn-secondary text-xs py-2 px-6">
-                    Load more · {filteredRooms.length - visibleCount} remaining
+                  <button onClick={() => setVisibleCount(p => p + pageSize)} className="btn-secondary text-sm py-2.5 px-6 w-full sm:w-auto">
+                    Show {Math.min(pageSize, filteredRooms.length - visibleCount)} more · {filteredRooms.length - visibleCount} left
                   </button>
                 </div>
               )}
@@ -1746,23 +1636,21 @@ export default function LandingPage() {
           )}
           </>)}
 
-          {/* Host caution — belongs with the rooms it refers to */}
-          <div className="mt-6 flex items-start gap-2.5 bg-amber-50 border border-amber-200 rounded-xl px-4 py-3">
+          {/* Host caution — belongs with the rooms it refers to; only signed-in people host */}
+          {user && <div className="mt-6 flex items-start gap-2.5 bg-amber-50 border border-amber-200 rounded-xl px-4 py-3">
             <span className="shrink-0 text-base mt-0.5">⚠️</span>
             <p className="text-xs text-amber-800 leading-relaxed">
               <span className="font-bold">Hosts — once your session is over, please delete your room</span> using the <span className="font-semibold">"End & Delete Room"</span> button inside the room. This keeps the platform open for others to practise.
             </p>
-          </div>
+          </div>}
           </div>
         </section>
 
-        {/* ── India map — mobile only ── */}
-        <div className="lg:hidden border-t border-gray-100 py-6 flex flex-col items-center gap-2 bg-white">
-          <Suspense fallback={<div className="w-[300px] h-[320px] bg-gray-50 rounded-xl animate-pulse" />}>
-            <HeroMapAnimation />
-          </Suspense>
-          <p className="text-xs text-gray-400 font-medium text-center px-4">Connecting aspirants across India</p>
-        </div>
+        {/* ── Community — ask box + recent posts; renders nothing if empty and closed to posting ── */}
+        <CommunityHighlights />
+
+        {/* ── Announcement: the 21-day challenge, ahead of the feature itself ── */}
+        <ComingSoonBanner />
 
         {/* ── Notable Sessions — social proof, sits with the rooms zone ── */}
         {pastSessions.length > 0 && (
@@ -1774,7 +1662,7 @@ export default function LandingPage() {
                   <p className="text-sm text-gray-400 mt-0.5">Past discussions led by veterans, recommended candidates & domain experts</p>
                 </div>
               </div>
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4">
+              <div className="m-rail sm:grid-cols-2 lg:grid-cols-3">
                 {pastSessions.map(s => {
                   const colorClass = CATEGORY_COLORS[s.category] || 'bg-gray-100 text-gray-500 border-gray-200';
                   const initials = s.host_name?.split(' ').map(w => w[0]).join('').toUpperCase().slice(0, 2) || '?';
@@ -1782,10 +1670,10 @@ export default function LandingPage() {
                   return (
                     <div key={s.room_code} className="bg-white border border-gray-100 rounded-xl p-4 flex flex-col gap-3 hover:border-gray-200 hover:shadow-sm transition-all">
                       <div className="flex items-center justify-between">
-                        <span className={`text-[10px] font-semibold px-2 py-0.5 rounded-full border ${colorClass}`}>
+                        <span className={`text-[11px] font-semibold px-2 py-0.5 rounded-full border ${colorClass}`}>
                           {s.category}
                         </span>
-                        <span className="text-[11px] text-gray-300">
+                        <span className="text-[12px] text-gray-300">
                           {dt.toLocaleDateString('en-IN', { day: 'numeric', month: 'short' })}
                         </span>
                       </div>
@@ -1798,7 +1686,7 @@ export default function LandingPage() {
                           ? <img src={s.host_avatar} alt={s.host_name} className="w-5 h-5 rounded-full object-cover" />
                           : <div className="w-5 h-5 rounded-full bg-brand-600 flex items-center justify-center text-[8px] font-bold text-white shrink-0">{initials}</div>
                         }
-                        <span className="text-[11px] text-gray-400">by {s.host_name || 'Aspirant'}</span>
+                        <span className="text-[12px] text-gray-400">by {s.host_name || 'Aspirant'}</span>
                       </div>
                     </div>
                   );
@@ -1817,110 +1705,6 @@ export default function LandingPage() {
         {/* ── Ways to serve before the uniform ── */}
         <ContributeSection />
 
-        {/* ── How it works ── */}
-        <section className="border-t border-gray-100 bg-gray-50 py-10 sm:py-14 px-4 sm:px-6">
-          <div className="max-w-5xl mx-auto">
-            <h2 className="text-xl sm:text-2xl font-bold text-gray-900 mb-2">How SSBCircle Works for SSB Prep</h2>
-            <p className="text-sm text-gray-400 mb-8">From knowing nothing about a topic to speaking confidently in a live GD — in four steps.</p>
-            <div className="relative">
-              <div className="hidden sm:block absolute top-[15px] left-[3rem] right-[3rem]"
-                style={{ height: '1px', background: 'repeating-linear-gradient(to right,#bfdbfe 0,#bfdbfe 6px,transparent 6px,transparent 14px)' }} />
-              <div className="grid grid-cols-1 sm:grid-cols-4 gap-8 sm:gap-5">
-                {[
-                  {
-                    n: '01',
-                    title: 'Sign in with Google',
-                    desc: 'One tap with your Google account — no password, no forms, no friction.',
-                    badge: {
-                      label: 'Google',
-                      cls: 'text-gray-600 bg-white border-gray-200',
-                      icon: (
-                        <svg viewBox="0 0 18 18" className="w-3.5 h-3.5 shrink-0">
-                          <path fill="#4285F4" d="M17.64 9.2c0-.637-.057-1.251-.164-1.84H9v3.481h4.844c-.209 1.125-.843 2.078-1.796 2.717v2.258h2.908c1.702-1.567 2.684-3.875 2.684-6.615z"/>
-                          <path fill="#34A853" d="M9 18c2.43 0 4.467-.806 5.956-2.18l-2.908-2.259c-.806.54-1.837.86-3.048.86-2.344 0-4.328-1.584-5.036-3.711H.957v2.332C2.438 15.983 5.482 18 9 18z"/>
-                          <path fill="#FBBC05" d="M3.964 10.71c-.18-.54-.282-1.117-.282-1.71s.102-1.17.282-1.71V4.958H.957C.347 6.173 0 7.548 0 9s.348 2.827.957 4.042l3.007-2.332z"/>
-                          <path fill="#EA4335" d="M9 3.58c1.321 0 2.508.454 3.44 1.345l2.582-2.58C13.463.891 11.426 0 9 0 5.482 0 2.438 2.017.957 4.958L3.964 6.29C4.672 4.163 6.656 3.58 9 3.58z"/>
-                        </svg>
-                      ),
-                    },
-                  },
-                  {
-                    n: '02',
-                    title: 'Read a News Card',
-                    desc: 'Swipe through a bite-sized card on Defence, Economy, Polity or Geography — 5 minutes, GD-ready.',
-                    tag: 'News Cards',
-                    tagLink: '/current-affairs',
-                  },
-                  {
-                    n: '03',
-                    title: 'Open or join a room',
-                    desc: 'Host a session on the topic you just read, or enter a 6-letter code to join one.',
-                    badge: {
-                      label: 'Live Room',
-                      cls: 'text-emerald-700 bg-emerald-50 border-emerald-100',
-                      icon: (
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-3.5 h-3.5 shrink-0">
-                          <rect x="9" y="2" width="6" height="11" rx="3"/>
-                          <path d="M5 10a7 7 0 0 0 14 0"/>
-                          <line x1="12" y1="19" x2="12" y2="22"/>
-                          <line x1="8" y1="22" x2="16" y2="22"/>
-                        </svg>
-                      ),
-                    },
-                  },
-                  {
-                    n: '04',
-                    title: 'Practice and improve',
-                    desc: 'Use the timer, live transcript and checklist every session to track your growth.',
-                    badge: {
-                      label: 'Speak Up',
-                      cls: 'text-brand-600 bg-brand-50 border-brand-100',
-                      icon: (
-                        <svg viewBox="0 0 24 24" fill="none" className="w-3.5 h-3.5 shrink-0">
-                          <circle cx="8" cy="7" r="3" fill="currentColor" opacity="0.85"/>
-                          <path d="M2 21c0-3.314 2.686-6 6-6" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
-                          <path d="M15 9a3 3 0 0 1 0 6" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
-                          <path d="M18.5 6a7 7 0 0 1 0 12" stroke="currentColor" strokeWidth="2" strokeLinecap="round" opacity="0.5"/>
-                        </svg>
-                      ),
-                    },
-                  },
-                ].map(({ n, title, desc, tag, tagLink, badge }) => (
-                  <div key={n} className="flex sm:flex-col gap-4 sm:gap-0">
-                    <div className="shrink-0 z-10 w-8 h-8 rounded-full bg-brand-600 border-4 border-white ring-2 ring-blue-100 flex items-center justify-center shadow-sm">
-                      <span className="text-[10px] font-bold text-white">{n}</span>
-                    </div>
-                    <div className="sm:mt-5">
-                      {tag && (
-                        <Link to={tagLink}
-                          className="inline-flex items-center gap-1 text-[10px] font-bold text-brand-600 bg-brand-50 border border-brand-100 px-2 py-0.5 rounded-full mb-1.5 hover:bg-brand-100 transition-colors">
-                          <svg viewBox="0 0 34 24" fill="none" className="w-5 h-3.5 shrink-0">
-                            <rect x="1" y="5" width="20" height="14" rx="2.5" fill="#e0e7ff" transform="rotate(-11 11 12)" />
-                            <rect x="5" y="3" width="20" height="14" rx="2.5" fill="#eef2ff" transform="rotate(-5 15 10)" />
-                            <rect x="10" y="2" width="20" height="14" rx="2.5" fill="white" stroke="#c7d2fe" strokeWidth="1.2" />
-                            <line x1="13.5" y1="8" x2="27" y2="8" stroke="#1e3a5f" strokeWidth="1.6" strokeLinecap="round" />
-                            <line x1="13.5" y1="11.5" x2="25" y2="11.5" stroke="#c7d2fe" strokeWidth="1.3" strokeLinecap="round" />
-                            <line x1="13.5" y1="14.5" x2="22" y2="14.5" stroke="#c7d2fe" strokeWidth="1.3" strokeLinecap="round" />
-                          </svg>
-                          {tag}
-                        </Link>
-                      )}
-                      {badge && (
-                        <div className={`inline-flex items-center gap-1 text-[10px] font-bold px-2 py-0.5 rounded-full mb-1.5 border ${badge.cls}`}>
-                          {badge.icon}
-                          {badge.label}
-                        </div>
-                      )}
-                      <h3 className="text-sm font-bold text-gray-900 mb-1">{title}</h3>
-                      <p className="text-xs text-gray-400 leading-relaxed">{desc}</p>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-          </div>
-        </section>
-
         {/* ── Coming to SSBCircle ── */}
         <section className="border-t border-gray-100 bg-white py-10 sm:py-14 px-4 sm:px-6">
           <div className="max-w-5xl mx-auto">
@@ -1932,9 +1716,9 @@ export default function LandingPage() {
               <h2 className="text-xl sm:text-2xl font-bold text-gray-900">Coming to SSBCircle</h2>
               <p className="text-sm text-gray-400 mt-1">Built in the open — you shape what we build next.</p>
             </div>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div className="m-rail sm:grid-cols-2">
               <div className="relative rounded-2xl border border-brand-100 bg-brand-50 p-5 overflow-hidden">
-                <div className="absolute top-3 right-3 text-[10px] font-bold uppercase tracking-widest text-brand-600 bg-brand-100 px-2.5 py-0.5 rounded-full">Coming Soon</div>
+                <div className="absolute top-3 right-3 text-[11px] font-bold uppercase tracking-widest text-brand-600 bg-brand-100 px-2.5 py-0.5 rounded-full">Coming Soon</div>
                 <div className="w-10 h-10 rounded-xl bg-brand-600 flex items-center justify-center mb-3">
                   <Shield className="w-5 h-5 text-white" />
                 </div>
@@ -1942,10 +1726,10 @@ export default function LandingPage() {
                 <p className="text-xs text-gray-500 leading-relaxed">
                   Live guided sessions hosted by SSB-recommended aspirants and ex-servicemen. Get real feedback on your GD performance, body language, and communication style from those who have cleared the board themselves.
                 </p>
-                <p className="text-[11px] text-brand-600 font-semibold mt-3">Invite-only · Limited seats per session</p>
+                <p className="text-[12px] text-brand-600 font-semibold mt-3">Invite-only · Limited seats per session</p>
               </div>
               <div className="relative rounded-2xl border border-gray-200 bg-gray-50 p-5 overflow-hidden">
-                <div className="absolute top-3 right-3 text-[10px] font-bold uppercase tracking-widest text-gray-400 bg-gray-100 px-2.5 py-0.5 rounded-full">Planned</div>
+                <div className="absolute top-3 right-3 text-[11px] font-bold uppercase tracking-widest text-gray-400 bg-gray-100 px-2.5 py-0.5 rounded-full">Planned</div>
                 <div className="w-10 h-10 rounded-xl bg-gray-200 flex items-center justify-center mb-3">
                   <Star className="w-5 h-5 text-gray-500" />
                 </div>
@@ -1953,7 +1737,7 @@ export default function LandingPage() {
                 <p className="text-xs text-gray-500 leading-relaxed">
                   After each session, rate your peers on communication, leadership, and participation. Build a performance profile that speaks louder than words on your SSB prep journey.
                 </p>
-                <p className="text-[11px] text-gray-400 font-semibold mt-3">Anonymous · Merit-based</p>
+                <p className="text-[12px] text-gray-400 font-semibold mt-3">Anonymous · Merit-based</p>
               </div>
             </div>
           </div>

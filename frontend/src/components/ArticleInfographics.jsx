@@ -3,7 +3,7 @@
 function Label({ children, sub }) {
   return (
     <div className="text-center">
-      <p className="text-xs font-bold text-gray-900">{children}</p>
+      <p className="text-[12px] font-bold text-gray-900">{children}</p>
       {sub && <p className="text-[10px] text-gray-400 leading-tight mt-0.5">{sub}</p>}
     </div>
   );
@@ -48,7 +48,7 @@ export function Infographic1() {
         </div>
       </div>
       <div className="bg-white rounded-xl border border-brand-100 px-4 py-3 text-center">
-        <p className="text-xs text-gray-600 leading-relaxed">
+        <p className="text-[12px] text-gray-600 leading-relaxed">
           More people want <span className="font-bold text-brand-600">$</span> → dollar price rises → you need <span className="font-bold text-gray-900">more ₹</span> to buy the same dollar → <span className="font-bold text-gray-900">rupee depreciates</span>
         </p>
       </div>
@@ -70,14 +70,14 @@ export function Infographic2() {
         <div className="flex flex-col sm:flex-row gap-4 sm:gap-0 sm:justify-between relative z-10">
           {steps.map((s, i) => (
             <div key={i} className="flex sm:flex-col items-start sm:items-center gap-3 sm:gap-2 sm:flex-1">
-              <div className={`w-8 h-8 rounded-full flex items-center justify-center shrink-0 text-white text-xs font-bold shadow-sm ${
+              <div className={`w-8 h-8 rounded-full flex items-center justify-center shrink-0 text-white text-[12px] font-bold shadow-sm ${
                 i === 1 ? 'bg-gray-400' : 'bg-brand-600'
               }`}>
                 {i + 1}
               </div>
               <div className="sm:text-center sm:px-2">
                 <p className="text-[10px] font-bold text-gray-400 mb-0.5">{s.year}</p>
-                <p className="text-xs font-bold text-gray-900 mb-1">{s.title}</p>
+                <p className="text-[12px] font-bold text-gray-900 mb-1">{s.title}</p>
                 <p className="text-[10px] text-gray-500 leading-snug max-w-[130px]">{s.desc}</p>
               </div>
             </div>
@@ -98,7 +98,7 @@ export function Infographic3() {
           <div className="w-20 sm:w-28 bg-gray-200 rounded-t-xl flex items-end justify-center" style={{ height: '90px' }}>
             <div className="w-full bg-brand-200 rounded-t-xl flex items-center justify-center" style={{ height: '90px' }}>
               <div className="text-center">
-                <p className="text-sm sm:text-base font-bold text-brand-700">$800B+</p>
+                <p className="text-[14px] sm:text-base font-bold text-brand-700">$800B+</p>
                 <p className="text-[9px] text-brand-500">Oil · Gold · Electronics</p>
               </div>
             </div>
@@ -109,7 +109,7 @@ export function Infographic3() {
           <div className="w-20 sm:w-28 flex flex-col items-end">
             <div className="w-full bg-brand-600 rounded-t-xl flex items-center justify-center" style={{ height: '70px' }}>
               <div className="text-center">
-                <p className="text-sm sm:text-base font-bold text-white">$778B+</p>
+                <p className="text-[14px] sm:text-base font-bold text-white">$778B+</p>
                 <p className="text-[9px] text-brand-200">IT · Textiles · Pharma</p>
               </div>
             </div>
@@ -118,7 +118,7 @@ export function Infographic3() {
         </div>
       </div>
       <div className="bg-white rounded-xl border border-brand-100 px-4 py-2.5 text-center">
-        <p className="text-xs font-bold text-gray-700">Gap = Trade Deficit → More dollars leaving India than entering → <span className="text-brand-600">Rupee under pressure</span></p>
+        <p className="text-[12px] font-bold text-gray-700">Gap = Trade Deficit → More dollars leaving India than entering → <span className="text-brand-600">Rupee under pressure</span></p>
       </div>
     </InfographicWrapper>
   );
@@ -139,7 +139,7 @@ export function Infographic4() {
           <div key={i} className="flex items-center gap-1.5">
             <div className="flex items-center gap-1.5 bg-white border border-brand-100 rounded-lg px-2.5 py-1.5">
               <span className="w-4 h-4 rounded-full bg-brand-600 text-white text-[9px] font-bold flex items-center justify-center shrink-0">{i + 1}</span>
-              <span className="text-xs text-gray-700 font-medium">{step}</span>
+              <span className="text-[12px] text-gray-700 font-medium">{step}</span>
             </div>
             {i < steps.length - 1 && (
               <svg className="w-3 h-3 text-gray-300 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7"/></svg>
@@ -216,13 +216,13 @@ export function Infographic6() {
         {tools.map((t, i) => (
           <div key={i} className="bg-white rounded-xl border border-brand-100 p-4">
             <span className="text-[10px] font-bold text-brand-600 font-mono">{t.num}</span>
-            <p className="text-xs font-bold text-gray-900 mt-1 mb-1.5">{t.title}</p>
+            <p className="text-[12px] font-bold text-gray-900 mt-1 mb-1.5">{t.title}</p>
             <p className="text-[10px] text-gray-500 leading-relaxed">{t.desc}</p>
           </div>
         ))}
       </div>
       <div className="bg-brand-600 rounded-xl px-4 py-2.5 text-center">
-        <p className="text-xs text-white font-semibold">Goal: prevent a blowout — not stop the tyre from deflating</p>
+        <p className="text-[12px] text-white font-semibold">Goal: prevent a blowout — not stop the tyre from deflating</p>
       </div>
     </InfographicWrapper>
   );

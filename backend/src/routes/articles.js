@@ -1,6 +1,8 @@
 const express = require('express');
 const router  = express.Router();
 const pool    = require('../db');
+const jwt     = require('jsonwebtoken');
+const authMiddleware = require('../middleware/auth');
 const { authenticateToken } = require('../middleware/auth');
 
 // Optional auth — attaches user if token present, continues if not
@@ -24,6 +26,10 @@ router.get('/', async (req, res) => {
     const { rows } = await pool.query(`
       SELECT a.id, a.slug, a.title, a.category, a.summary, a.tags,
              a.published_at, a.reading_time, a.difficulty, a.ssb_relevance,
+             -- First [IMAGE:/path|caption] marker in the body doubles as the cover
+             substring(a.content from '\\[IMAGE:([^]|]+)') AS cover_image,
+             (SELECT COUNT(DISTINCT av.visitor_id)::int FROM article_views av
+               WHERE av.article_slug = a.slug)           AS readers,
              COUNT(v.id)::int          AS vote_count,
              ROUND(AVG(v.value)::numeric, 1) AS avg_rating
       FROM articles a
@@ -104,6 +110,187 @@ router.post('/:slug/vote', optionalAuth, async (req, res) => {
   } catch (err) {
     console.error('Vote error:', err);
     res.status(500).json({ error: 'Failed to submit vote' });
+  }
+});
+
+// ── Likes and comments ───────────────────────────────────────────────────────
+// Reading is public; liking and commenting need an account. Same split as the
+// community feed.
+
+const MAX_COMMENT = 2000;
+
+// A signed-in reader gets their own like state; a signed-out one still reads.
+function readViewer(req) {
+  const auth = req.headers.authorization;
+  if (!auth?.startsWith('Bearer ')) return null;
+  try {
+    return jwt.verify(auth.slice(7), process.env.JWT_SECRET).userId || null;
+  } catch {
+    return null;
+  }
+}
+
+function readAdmin(req) {
+  const auth = req.headers.authorization;
+  if (!auth?.startsWith('Bearer ')) return false;
+  try {
+    return jwt.verify(auth.slice(7), process.env.JWT_SECRET).role === 'superadmin';
+  } catch {
+    return false;
+  }
+}
+
+async function articleExists(slug) {
+  const { rows } = await pool.query(
+    'SELECT 1 FROM articles WHERE slug = $1 AND is_published = true', [slug]
+  );
+  return rows.length > 0;
+}
+
+async function likeStats(slug, viewerId) {
+  const { rows } = await pool.query(
+    `SELECT count(*)::int AS likes,
+            COALESCE(bool_or(user_id = $2), false) AS liked
+       FROM article_likes WHERE article_slug = $1`,
+    [slug, viewerId]
+  );
+  return rows[0];
+}
+
+async function listComments(slug) {
+  const { rows } = await pool.query(
+    `SELECT c.id, c.body, c.created_at,
+            u.id AS author_id, u.display_name AS author_name, u.avatar_url AS author_avatar
+       FROM article_comments c
+       LEFT JOIN users u ON u.id = c.author_id
+      WHERE c.article_slug = $1 AND c.deleted_at IS NULL
+      ORDER BY c.created_at ASC`,
+    [slug]
+  );
+  return rows;
+}
+
+router.get('/:slug/engagement', async (req, res) => {
+  try {
+    const { slug } = req.params;
+    const [stats, comments] = await Promise.all([
+      likeStats(slug, readViewer(req)),
+      listComments(slug),
+    ]);
+    res.json({ ...stats, comments });
+  } catch (err) {
+    console.error('Article engagement error:', err);
+    res.status(500).json({ error: 'Could not load likes and comments' });
+  }
+});
+
+// Liking again takes the like back.
+router.post('/:slug/like', authMiddleware, async (req, res) => {
+  try {
+    const { slug } = req.params;
+    if (!(await articleExists(slug))) return res.status(404).json({ error: 'Article not found' });
+
+    const { rowCount } = await pool.query(
+      'DELETE FROM article_likes WHERE article_slug = $1 AND user_id = $2',
+      [slug, req.userId]
+    );
+    if (rowCount === 0) {
+      await pool.query(
+        'INSERT INTO article_likes (article_slug, user_id) VALUES ($1, $2) ON CONFLICT DO NOTHING',
+        [slug, req.userId]
+      );
+    }
+    res.json(await likeStats(slug, req.userId));
+  } catch (err) {
+    console.error('Article like error:', err);
+    res.status(500).json({ error: 'Could not record your like' });
+  }
+});
+
+router.post('/:slug/comments', authMiddleware, async (req, res) => {
+  try {
+    const { slug } = req.params;
+    if (!(await articleExists(slug))) return res.status(404).json({ error: 'Article not found' });
+
+    const body = String(req.body?.body ?? '').trim().slice(0, MAX_COMMENT);
+    if (!body) return res.status(400).json({ error: 'Write something first.' });
+
+    await pool.query(
+      'INSERT INTO article_comments (article_slug, author_id, body) VALUES ($1, $2, $3)',
+      [slug, req.userId, body]
+    );
+    res.status(201).json({ comments: await listComments(slug) });
+  } catch (err) {
+    console.error('Article comment error:', err);
+    res.status(500).json({ error: 'Could not post your comment' });
+  }
+});
+
+// Authors can delete their own; the admin can delete anything. Soft delete.
+router.delete('/comments/:id', async (req, res) => {
+  try {
+    const isAdmin = readAdmin(req);
+    const userId  = readViewer(req);
+    if (!isAdmin && !userId) return res.status(401).json({ error: 'Sign in first.' });
+
+    const { rowCount } = await pool.query(
+      `UPDATE article_comments SET deleted_at = NOW()
+        WHERE id = $1 AND deleted_at IS NULL
+          AND ($2::boolean OR author_id = $3)`,
+      [req.params.id, isAdmin, userId]
+    );
+    if (!rowCount) return res.status(403).json({ error: 'You cannot delete that comment.' });
+    res.json({ deleted: true });
+  } catch (err) {
+    console.error('Article comment delete error:', err);
+    res.status(500).json({ error: 'Could not delete that comment' });
+  }
+});
+
+// ── Reading metrics ──────────────────────────────────────────────────────────
+// Counts are only shown in the admin dashboard, never to readers.
+
+const cleanVisitor = v => {
+  const s = String(v ?? '').trim();
+  return /^[A-Za-z0-9-]{8,64}$/.test(s) ? s : null;
+};
+
+router.post('/:slug/view', async (req, res) => {
+  try {
+    const { slug } = req.params;
+    const visitorId = cleanVisitor(req.body?.visitor_id);
+    if (!visitorId) return res.status(400).json({ error: 'visitor_id required' });
+    if (!(await articleExists(slug))) return res.status(404).json({ error: 'Article not found' });
+
+    await pool.query(
+      'INSERT INTO article_views (article_slug, visitor_id, user_id) VALUES ($1, $2, $3)',
+      [slug, visitorId, readViewer(req)]
+    );
+    res.status(204).end();
+  } catch (err) {
+    console.error('Article view error:', err);
+    res.status(500).json({ error: 'Could not record the view' });
+  }
+});
+
+// Marks this visitor's latest open of the article as read to the end.
+router.post('/:slug/read', async (req, res) => {
+  try {
+    const visitorId = cleanVisitor(req.body?.visitor_id);
+    if (!visitorId) return res.status(400).json({ error: 'visitor_id required' });
+
+    await pool.query(
+      `UPDATE article_views SET completed_at = NOW()
+        WHERE id = (SELECT id FROM article_views
+                     WHERE article_slug = $1 AND visitor_id = $2
+                     ORDER BY viewed_at DESC LIMIT 1)
+          AND completed_at IS NULL`,
+      [req.params.slug, visitorId]
+    );
+    res.status(204).end();
+  } catch (err) {
+    console.error('Article read error:', err);
+    res.status(500).json({ error: 'Could not record the read' });
   }
 });
 

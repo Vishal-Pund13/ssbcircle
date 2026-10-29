@@ -9,6 +9,12 @@ export default {
       fontFamily: {
         sans: ['Inter', 'system-ui', 'sans-serif'],
       },
+      // One step larger than Tailwind's defaults (12px / 14px): most of the
+      // site's reading text uses these two, and aspirants read on phones.
+      fontSize: {
+        xs: ['0.8125rem', { lineHeight: '1.25rem' }],   // 13px
+        sm: ['0.9375rem', { lineHeight: '1.5rem' }],    // 15px
+      },
       colors: {
         brand: {
           50:  '#eef2ff',

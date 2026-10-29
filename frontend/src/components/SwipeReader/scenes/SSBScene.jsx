@@ -19,7 +19,7 @@ export default function SSBScene({ scene }) {
       <div className="flex gap-1.5 bg-gray-100 p-1 rounded-xl">
         {TABS.map(t => (
           <button key={t} onClick={() => setTab(t)}
-            className={`flex-1 py-2 rounded-lg text-xs font-bold transition-all cursor-pointer ${
+            className={`flex-1 py-2 rounded-lg text-[12px] font-bold transition-all cursor-pointer ${
               tab === t ? 'bg-brand-600 text-white shadow-sm' : 'text-gray-500 hover:text-gray-700'
             }`}>
             {t}
@@ -32,7 +32,7 @@ export default function SSBScene({ scene }) {
         <div className="flex flex-col gap-3">
           <div className="bg-brand-50 border border-brand-100 rounded-xl p-4">
             <p className="text-[10px] font-bold text-brand-600 uppercase tracking-widest mb-2">Say this in GD</p>
-            <p className="text-sm text-brand-700 leading-relaxed">"{gd_line}"</p>
+            <p className="text-[14px] text-brand-700 leading-relaxed">"{gd_line}"</p>
           </div>
           <p className="text-[11px] text-gray-400 text-center">Shows analytical balance — a key Officer-Like Quality</p>
         </div>
@@ -46,7 +46,7 @@ export default function SSBScene({ scene }) {
               <span className="w-6 h-6 rounded-full bg-brand-600 text-white text-[10px] font-bold flex items-center justify-center shrink-0 mt-0.5">
                 {i + 1}
               </span>
-              <p className="text-sm text-gray-700 leading-relaxed">{point}</p>
+              <p className="text-[14px] text-gray-700 leading-relaxed">{point}</p>
             </div>
           ))}
         </div>
@@ -56,13 +56,13 @@ export default function SSBScene({ scene }) {
       {tab === 'PI' && (
         <div className="flex flex-col gap-3">
           {pi_question && (
-            <p className="text-sm text-gray-400 italic border border-gray-200 bg-gray-50 rounded-xl px-4 py-3">
+            <p className="text-[14px] text-gray-400 italic border border-gray-200 bg-gray-50 rounded-xl px-4 py-3">
               Q: "{pi_question}"
             </p>
           )}
           <div className="bg-gray-50 rounded-xl border border-gray-200 px-4 py-3">
             <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1.5">Your answer</p>
-            <p className="text-sm text-gray-700 leading-relaxed">{pi_answer}</p>
+            <p className="text-[14px] text-gray-700 leading-relaxed">{pi_answer}</p>
           </div>
         </div>
       )}
@@ -71,7 +71,7 @@ export default function SSBScene({ scene }) {
       {one_liner && (
         <div className="bg-brand-50 border border-brand-100 rounded-xl px-4 py-3">
           <p className="text-[10px] font-bold text-brand-600 uppercase tracking-widest mb-1">Key takeaway</p>
-          <p className="text-sm text-brand-700 italic font-medium leading-relaxed">"{one_liner}"</p>
+          <p className="text-[14px] text-brand-700 italic font-medium leading-relaxed">"{one_liner}"</p>
         </div>
       )}
     </div>

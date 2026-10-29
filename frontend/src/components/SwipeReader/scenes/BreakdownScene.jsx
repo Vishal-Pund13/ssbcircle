@@ -8,7 +8,7 @@ export default function BreakdownScene({ scene }) {
     <div className="px-5 py-5 flex flex-col gap-4">
       <div>
         <h2 className="text-lg font-bold text-gray-900">{title}</h2>
-        <p className="text-sm text-gray-400 mt-1 leading-relaxed">{intro}</p>
+        <p className="text-[14px] text-gray-400 mt-1 leading-relaxed">{intro}</p>
       </div>
 
       <div className="flex flex-col gap-2">
@@ -28,7 +28,7 @@ export default function BreakdownScene({ scene }) {
                 }`}>
                   {i + 1}
                 </span>
-                <span className={`text-sm font-medium flex-1 text-left ${isOpen ? 'text-brand-700' : 'text-gray-900'}`}>
+                <span className={`text-[14px] font-medium flex-1 text-left ${isOpen ? 'text-brand-700' : 'text-gray-900'}`}>
                   {item.title}
                 </span>
                 {item.stat && !isOpen && (
@@ -44,7 +44,7 @@ export default function BreakdownScene({ scene }) {
 
               {isOpen && (
                 <div className="px-4 pb-4 pt-0">
-                  <p className="text-sm text-gray-600 leading-relaxed">{item.detail}</p>
+                  <p className="text-[14px] text-gray-600 leading-relaxed">{item.detail}</p>
                   {item.stat && (
                     <span className="inline-block mt-2 text-[11px] bg-brand-100 text-brand-600 rounded-full px-3 py-0.5 font-semibold">
                       {item.stat}

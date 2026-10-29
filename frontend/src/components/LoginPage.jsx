@@ -5,7 +5,10 @@ import GoogleSignInButton from './GoogleSignInButton';
 export default function LoginPage() {
   const navigate  = useNavigate();
   const location  = useLocation();
-  const from      = location.state?.from?.pathname || '/';
+  // Keep the query too, so a prefilled community question survives sign-in
+  const from      = location.state?.from
+    ? location.state.from.pathname + (location.state.from.search || '')
+    : '/';
   const [error, setError] = useState('');
 
   return (

@@ -83,9 +83,9 @@ export default function WomenSeriesPage() {
 
               {/* Tags */}
               <div className="flex items-center gap-2 mb-3">
-                <span className="text-[10px] font-bold text-white/50 uppercase tracking-widest">Society</span>
+                <span className="text-[11px] font-bold text-white/50 uppercase tracking-widest">Society</span>
                 <span className="text-white/25">/</span>
-                <span className="text-[10px] font-bold text-white/40 uppercase tracking-widest">Women · 7 Cards</span>
+                <span className="text-[11px] font-bold text-white/40 uppercase tracking-widest">Women · 7 Cards</span>
               </div>
 
               <h1 className="text-2xl sm:text-3xl font-bold text-white leading-tight mb-1.5">
@@ -175,10 +175,10 @@ export default function WomenSeriesPage() {
                   <div className="p-4">
                     {/* Header row */}
                     <div className="flex items-start justify-between mb-3">
-                      <span className={`text-[9px] font-bold px-1.5 py-0.5 rounded uppercase tracking-widest ${cat.chip}`}>
+                      <span className={`text-[10.5px] font-bold px-1.5 py-0.5 rounded uppercase tracking-widest ${cat.chip}`}>
                         {card.category}
                       </span>
-                      <span className={`w-6 h-6 rounded-full flex items-center justify-center text-[11px] font-bold shrink-0 ${
+                      <span className={`w-6 h-6 rounded-full flex items-center justify-center text-[12px] font-bold shrink-0 ${
                         isDone ? 'bg-emerald-100 text-emerald-700' : 'bg-gray-100 text-gray-500'
                       }`}>
                         {isDone ? '✓' : card.n}
@@ -196,13 +196,13 @@ export default function WomenSeriesPage() {
                     </p>
 
                     {/* Summary */}
-                    <p className="text-[10px] text-gray-400 leading-relaxed line-clamp-2">
+                    <p className="text-[11px] text-gray-400 leading-relaxed line-clamp-2">
                       {card.summary}
                     </p>
 
                     {/* Footer */}
                     <div className="mt-3 pt-2.5 border-t border-gray-100">
-                      <span className="text-[9px] text-gray-400">{card.reading_time} min read</span>
+                      <span className="text-[10.5px] text-gray-400">{card.reading_time} min read</span>
                     </div>
                   </div>
                 </div>

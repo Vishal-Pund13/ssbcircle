@@ -3,6 +3,9 @@ import { useNavigate } from 'react-router-dom';
 import { Users, Radio, FolderOpen, CalendarDays, Trash2, LogOut, RefreshCw, Calendar, Bell, PlayCircle, Ban, ShieldCheck, Flag, CheckCircle, Edit3, Check, Star, BookOpen, Plus, Eye, EyeOff } from 'lucide-react';
 
 import CommunityAdmin from './community/CommunityAdmin';
+import Insights, { INSIGHT_TABS } from './admin/Insights';
+import { ModeratorsAdmin, PlatformFeedbackAdmin } from './admin/ModeratorsAdmin';
+import { LayoutDashboard, BarChart3, Sparkles, ThumbsUp } from 'lucide-react';
 
 const API = import.meta.env.VITE_API_URL || 'http://localhost:4000';
 
@@ -91,7 +94,7 @@ function RoomRow({ r, onClose, onFeature, CATEGORY_COLORS }) {
           )}
         </td>
         <td className="px-4 py-3 hidden sm:table-cell">
-          <p className="text-xs text-gray-700">{r.host || '—'}</p>
+          <p className="text-[12px] text-gray-700">{r.host || '—'}</p>
         </td>
         <td className="px-4 py-3">
           <span className={`inline-flex items-center gap-1 text-[10px] font-semibold px-2 py-0.5 rounded-full ${
@@ -101,7 +104,7 @@ function RoomRow({ r, onClose, onFeature, CATEGORY_COLORS }) {
             {r.is_active ? 'Active' : 'Closed'}
           </span>
         </td>
-        <td className="px-4 py-3 hidden sm:table-cell text-xs text-gray-400">{timeAgo(r.created_at)}</td>
+        <td className="px-4 py-3 hidden sm:table-cell text-[12px] text-gray-400">{timeAgo(r.created_at)}</td>
         <td className="px-4 py-3 text-right">
           {rowError && <p className="text-[10px] text-red-500 mb-1 text-right">{rowError}</p>}
           <div className="flex items-center gap-1 justify-end">
@@ -148,7 +151,7 @@ function RoomRow({ r, onClose, onFeature, CATEGORY_COLORS }) {
                 maxLength={400}
                 rows={2}
                 placeholder="e.g. 'Discussed AI's role in modern warfare with a 2024 NDA recommended candidate. Group debated drone policy and dual-use technology.'"
-                className="flex-1 text-xs text-gray-700 border border-amber-200 rounded-lg px-3 py-2 resize-none focus:outline-none focus:border-amber-400"
+                className="flex-1 text-[12px] text-gray-700 border border-amber-200 rounded-lg px-3 py-2 resize-none focus:outline-none focus:border-amber-400"
               />
               <div className="flex flex-col gap-1.5">
                 <button onClick={saveSummary} disabled={saving}
@@ -156,7 +159,7 @@ function RoomRow({ r, onClose, onFeature, CATEGORY_COLORS }) {
                   <Check className="w-3.5 h-3.5"/>
                 </button>
                 <button onClick={() => { setEditing(false); setDraft(r.summary || ''); }}
-                  className="p-2 rounded-lg bg-gray-100 hover:bg-gray-200 text-gray-500 transition-colors cursor-pointer text-xs">
+                  className="p-2 rounded-lg bg-gray-100 hover:bg-gray-200 text-gray-500 transition-colors cursor-pointer text-[12px]">
                   ✕
                 </button>
               </div>
@@ -196,76 +199,76 @@ function ArticleForm({ initial, onSave, onCancel }) {
     <div className="bg-white border border-gray-200 rounded-xl p-6 space-y-4">
       <div className="flex items-center justify-between mb-2">
         <h3 className="font-bold text-gray-900">{isEdit ? 'Edit Article' : 'New Article'}</h3>
-        <button onClick={onCancel} className="text-xs text-gray-400 hover:text-gray-600 cursor-pointer">Cancel</button>
+        <button onClick={onCancel} className="text-[12px] text-gray-400 hover:text-gray-600 cursor-pointer">Cancel</button>
       </div>
-      {error && <p className="text-xs text-red-500 bg-red-50 border border-red-100 rounded-lg px-3 py-2">{error}</p>}
+      {error && <p className="text-[12px] text-red-500 bg-red-50 border border-red-100 rounded-lg px-3 py-2">{error}</p>}
 
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         <div className="sm:col-span-2">
-          <label className="block text-xs font-semibold text-gray-600 mb-1">Title</label>
+          <label className="block text-[12px] font-semibold text-gray-600 mb-1">Title</label>
           <input value={form.title} onChange={e => set('title', e.target.value)} maxLength={300}
             placeholder="Article title..."
-            className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm text-gray-900 focus:outline-none focus:border-brand-400" />
+            className="w-full border border-gray-200 rounded-lg px-3 py-2 text-[14px] text-gray-900 focus:outline-none focus:border-brand-400" />
         </div>
         <div>
-          <label className="block text-xs font-semibold text-gray-600 mb-1">Category (Pillar)</label>
+          <label className="block text-[12px] font-semibold text-gray-600 mb-1">Category (Pillar)</label>
           <select value={form.category} onChange={e => set('category', e.target.value)}
-            className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm text-gray-900 focus:outline-none focus:border-brand-400">
+            className="w-full border border-gray-200 rounded-lg px-3 py-2 text-[14px] text-gray-900 focus:outline-none focus:border-brand-400">
             {ARTICLE_CATEGORIES.map(c => (
               <option key={c.id} value={c.id}>{c.label}</option>
             ))}
           </select>
         </div>
         <div>
-          <label className="block text-xs font-semibold text-gray-600 mb-1">Tags (comma separated)</label>
+          <label className="block text-[12px] font-semibold text-gray-600 mb-1">Tags (comma separated)</label>
           <input value={(form.tags || []).join(', ')}
             onChange={e => set('tags', e.target.value.split(',').map(t => t.trim()).filter(Boolean))}
             placeholder="e.g. GDP, Budget, RBI"
-            className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm text-gray-900 focus:outline-none focus:border-brand-400" />
+            className="w-full border border-gray-200 rounded-lg px-3 py-2 text-[14px] text-gray-900 focus:outline-none focus:border-brand-400" />
         </div>
         <div>
-          <label className="block text-xs font-semibold text-gray-600 mb-1">Reading Time</label>
+          <label className="block text-[12px] font-semibold text-gray-600 mb-1">Reading Time</label>
           <input value={form.reading_time || ''} onChange={e => set('reading_time', e.target.value)}
             placeholder="e.g. 8 min"
-            className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm text-gray-900 focus:outline-none focus:border-brand-400" />
+            className="w-full border border-gray-200 rounded-lg px-3 py-2 text-[14px] text-gray-900 focus:outline-none focus:border-brand-400" />
         </div>
         <div>
-          <label className="block text-xs font-semibold text-gray-600 mb-1">Difficulty</label>
+          <label className="block text-[12px] font-semibold text-gray-600 mb-1">Difficulty</label>
           <select value={form.difficulty || 'Beginner'} onChange={e => set('difficulty', e.target.value)}
-            className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm text-gray-900 focus:outline-none focus:border-brand-400">
+            className="w-full border border-gray-200 rounded-lg px-3 py-2 text-[14px] text-gray-900 focus:outline-none focus:border-brand-400">
             <option>Beginner</option><option>Intermediate</option><option>Advanced</option>
           </select>
         </div>
         <div className="sm:col-span-2">
-          <label className="block text-xs font-semibold text-gray-600 mb-1">SSB Relevance (comma separated)</label>
+          <label className="block text-[12px] font-semibold text-gray-600 mb-1">SSB Relevance (comma separated)</label>
           <input value={(form.ssb_relevance || []).join(', ')}
             onChange={e => set('ssb_relevance', e.target.value.split(',').map(t => t.trim()).filter(Boolean))}
             placeholder="e.g. GD Topics, Lecturette, PI"
-            className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm text-gray-900 focus:outline-none focus:border-brand-400" />
+            className="w-full border border-gray-200 rounded-lg px-3 py-2 text-[14px] text-gray-900 focus:outline-none focus:border-brand-400" />
         </div>
         <div className="sm:col-span-2">
-          <label className="block text-xs font-semibold text-gray-600 mb-1">Summary (shown in card)</label>
+          <label className="block text-[12px] font-semibold text-gray-600 mb-1">Summary (shown in card)</label>
           <textarea value={form.summary} onChange={e => set('summary', e.target.value)} rows={2} maxLength={500}
             placeholder="2-3 line summary for the article card..."
-            className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm text-gray-900 resize-none focus:outline-none focus:border-brand-400" />
+            className="w-full border border-gray-200 rounded-lg px-3 py-2 text-[14px] text-gray-900 resize-none focus:outline-none focus:border-brand-400" />
         </div>
         <div className="sm:col-span-2">
-          <label className="block text-xs font-semibold text-gray-600 mb-1">
+          <label className="block text-[12px] font-semibold text-gray-600 mb-1">
             Full Content <span className="text-gray-400 font-normal">(separate paragraphs with a blank line)</span>
           </label>
           <textarea value={form.content} onChange={e => set('content', e.target.value)} rows={16}
             placeholder="Write the full article here. Use blank lines between paragraphs..."
-            className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm text-gray-900 resize-y focus:outline-none focus:border-brand-400 font-mono" />
+            className="w-full border border-gray-200 rounded-lg px-3 py-2 text-[14px] text-gray-900 resize-y focus:outline-none focus:border-brand-400 font-mono" />
         </div>
       </div>
 
       <div className="flex items-center gap-3 pt-2">
         <button onClick={() => submit(true)} disabled={saving}
-          className="btn-primary text-sm px-5 py-2.5 disabled:opacity-50">
+          className="btn-primary text-[14px] px-5 py-2.5 disabled:opacity-50">
           {saving ? 'Saving…' : isEdit ? 'Save & Publish' : 'Publish Now'}
         </button>
         <button onClick={() => submit(false)} disabled={saving}
-          className="btn-secondary text-sm px-5 py-2.5 disabled:opacity-50">
+          className="btn-secondary text-[14px] px-5 py-2.5 disabled:opacity-50">
           {saving ? 'Saving…' : 'Save as Draft'}
         </button>
       </div>
@@ -282,7 +285,7 @@ export default function SuperAdminDashboard() {
   const [reports,       setReports]       = useState([]);
   const [articles,      setArticles]      = useState([]);
   const [registrations, setRegistrations] = useState([]);
-  const [tab,           setTab]           = useState('reports');
+  const [tab,           setTab]           = useState('overview');
   const [articleForm, setArticleForm] = useState(null);
   const [loading,  setLoading]  = useState(true);
   const [error,    setError]    = useState('');
@@ -407,14 +410,10 @@ export default function SuperAdminDashboard() {
     // No count: the panel loads its own posts, and an undefined count renders
     // as nothing rather than the word "undefined".
     { id: 'community',     label: 'Community' },
+    { id: 'moderators',    label: 'Moderators' },
+    { id: 'pfeedback',     label: 'Platform feedback' },
   ];
 
-  const STAT_CARDS = [
-    { label: 'Total Users',       value: stats?.totalUsers,       icon: Users,       color: 'text-blue-600 bg-blue-50' },
-    { label: 'Active Rooms',      value: stats?.activeRooms,      icon: Radio,       color: 'text-emerald-600 bg-emerald-50' },
-    { label: 'Upcoming Sessions', value: stats?.upcomingSessions, icon: Calendar,    color: 'text-brand-600 bg-brand-50' },
-    { label: 'Rooms Today',       value: stats?.todayRooms,       icon: CalendarDays, color: 'text-orange-600 bg-orange-50' },
-  ];
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -430,64 +429,70 @@ export default function SuperAdminDashboard() {
             <circle cx="18" cy="31" r="3.5" fill="#1e3a5f"/>
             <path d="M14 20 L24 14 L34 20 L30 31 L18 31 Z" stroke="#1e3a5f" strokeWidth="1.5" fill="none"/>
           </svg>
-          <span className="font-bold text-gray-900 text-sm">SSBCircle</span>
-          <span className="text-[10px] font-semibold text-brand-600 bg-brand-50 border border-brand-100 px-2 py-0.5 rounded-full uppercase tracking-widest">Super Admin</span>
+          <span className="font-bold text-gray-900 text-[14px]">SSBCircle</span>
+          <span className="text-[10px] font-semibold text-brand-600 bg-brand-50 border border-brand-100 px-2 py-0.5 rounded-full uppercase tracking-widest">Admin · v2</span>
         </div>
         <div className="flex items-center gap-2">
           <button onClick={fetchAll} className="p-1.5 rounded-lg text-gray-400 hover:text-gray-600 hover:bg-gray-100 transition-colors cursor-pointer">
             <RefreshCw className="w-4 h-4"/>
           </button>
-          <a href="/sa/export" className="flex items-center gap-1.5 text-xs font-semibold text-brand-600 bg-brand-50 hover:bg-brand-100 border border-brand-100 px-3 py-1.5 rounded-lg transition-colors">
+          <a href="/sa/export" className="flex items-center gap-1.5 text-[12px] font-semibold text-brand-600 bg-brand-50 hover:bg-brand-100 border border-brand-100 px-3 py-1.5 rounded-lg transition-colors">
             📤 Export Cards
           </a>
-          <button onClick={handleLogout} className="flex items-center gap-1.5 text-xs text-gray-400 hover:text-red-500 transition-colors cursor-pointer px-2 py-1.5">
+          <button onClick={handleLogout} className="flex items-center gap-1.5 text-[12px] text-gray-400 hover:text-red-500 transition-colors cursor-pointer px-2 py-1.5">
             <LogOut className="w-3.5 h-3.5"/> Sign out
           </button>
         </div>
       </header>
 
-      <main className="max-w-6xl mx-auto px-4 sm:px-6 py-6 sm:py-8">
+      <main className="max-w-7xl mx-auto px-4 sm:px-6 py-6 sm:py-8">
         {error && (
-          <div className="mb-6 text-sm text-red-600 bg-red-50 border border-red-100 rounded-lg px-4 py-3">{error}</div>
+          <div className="mb-6 text-[14px] text-red-600 bg-red-50 border border-red-100 rounded-lg px-4 py-3">{error}</div>
         )}
 
-        {/* Stat cards */}
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4 mb-8">
-          {STAT_CARDS.map(({ label, value, icon: Icon, color }) => (
-            <div key={label} className="bg-white border border-gray-200 rounded-xl p-4">
-              <div className={`w-8 h-8 rounded-lg flex items-center justify-center mb-3 ${color}`}>
-                <Icon className="w-4 h-4"/>
-              </div>
-              <p className="text-2xl font-bold text-gray-900 tabular-nums">
-                {loading ? '—' : (value ?? 0)}
-              </p>
-              <p className="text-xs text-gray-400 mt-0.5 font-medium">{label}</p>
+        {/* Sidebar: insights first, management below. A row of chips on small screens. */}
+        <div className="lg:grid lg:grid-cols-[210px_1fr] lg:gap-8">
+          <aside className="mb-5 lg:mb-0">
+            <div className="lg:sticky lg:top-6 flex lg:flex-col gap-1 overflow-x-auto lg:overflow-visible pb-1 lg:pb-0">
+              <p className="hidden lg:block px-3 pt-1 pb-1.5 text-[10px] font-bold uppercase tracking-widest text-gray-400">Insights</p>
+              {INSIGHT_TABS.map(t => {
+                const Icon = { overview: LayoutDashboard, features: BarChart3, ai: Sparkles, feedback: ThumbsUp }[t.id];
+                return (
+                  <button key={t.id} onClick={() => setTab(t.id)}
+                    className={`shrink-0 flex items-center gap-2 px-3 py-2 rounded-xl text-[14px] font-semibold text-left cursor-pointer transition-colors ${
+                      tab === t.id ? 'bg-brand-600 text-white' : 'text-gray-600 hover:bg-white'}`}>
+                    <Icon className="w-4 h-4" /> {t.label}
+                  </button>
+                );
+              })}
+              <p className="hidden lg:block px-3 pt-4 pb-1.5 text-[10px] font-bold uppercase tracking-widest text-gray-400">Manage</p>
+              {TABS.map(t => (
+                <button key={t.id} onClick={() => setTab(t.id)}
+                  className={`shrink-0 flex items-center justify-between gap-2 px-3 py-2 rounded-xl text-[14px] font-semibold text-left cursor-pointer transition-colors ${
+                    tab === t.id ? 'bg-gray-900 text-white' : 'text-gray-600 hover:bg-white'}`}>
+                  <span className="flex items-center gap-2">{t.id === 'reports' && <Flag className="w-3.5 h-3.5" />}{t.label}</span>
+                  {t.alert
+                    ? <span className="text-[10px] font-bold text-white bg-red-500 px-1.5 py-0.5 rounded-full">{t.count}</span>
+                    : t.count !== undefined && <span className={`text-[11px] ${tab === t.id ? 'text-white/70' : 'text-gray-400'}`}>{t.count}</span>}
+                </button>
+              ))}
             </div>
-          ))}
-        </div>
+          </aside>
 
-        {/* Tab nav */}
-        <div className="flex gap-1 mb-4 border-b border-gray-200">
-          {TABS.map(t => (
-            <button key={t.id} onClick={() => setTab(t.id)}
-              className={`flex items-center gap-1.5 px-4 py-2 text-sm font-semibold border-b-2 transition-all cursor-pointer -mb-px ${
-                tab === t.id ? 'text-brand-600 border-brand-600' : 'text-gray-400 border-transparent hover:text-gray-600'
-              }`}>
-              {t.id === 'reports' && <Flag className="w-3.5 h-3.5" />}
-              {t.label}
-              {t.alert
-                ? <span className="ml-0.5 text-[10px] font-bold text-white bg-red-500 px-1.5 py-0.5 rounded-full">{t.count}</span>
-                : <span className="ml-0.5 text-[10px] font-medium text-gray-400">{t.count}</span>
-              }
-            </button>
-          ))}
-        </div>
+          <div className="min-w-0">
+        {tab === 'moderators' && <ModeratorsAdmin authHeaders={authHeaders} />}
+        {tab === 'pfeedback' && <PlatformFeedbackAdmin authHeaders={authHeaders} />}
+
+        {INSIGHT_TABS.some(t => t.id === tab) && (
+          <Insights tab={tab} authHeaders={authHeaders} live={stats}
+            onAuthFail={() => { sessionStorage.removeItem('sa_token'); navigate('/sa'); }} />
+        )}
 
         {/* ── Reports ── */}
         {tab === 'reports' && (
           <div className="bg-white border border-gray-200 rounded-xl overflow-hidden">
             <div className="overflow-x-auto">
-              <table className="w-full text-sm">
+              <table className="w-full text-[14px]">
                 <thead>
                   <tr className="border-b border-gray-100 bg-gray-50 text-left">
                     <th className="px-4 py-3 text-[11px] font-semibold text-gray-500 uppercase tracking-wide">Reported User</th>
@@ -513,7 +518,7 @@ export default function SuperAdminDashboard() {
                       </tr>
                     ))
                   ) : reports.length === 0 ? (
-                    <tr><td colSpan={7} className="px-4 py-10 text-center text-sm text-gray-400">No reports yet</td></tr>
+                    <tr><td colSpan={7} className="px-4 py-10 text-center text-[14px] text-gray-400">No reports yet</td></tr>
                   ) : reports.map(r => (
                     <tr key={r.id} className={`hover:bg-gray-50 transition-colors ${r.status === 'resolved' ? 'opacity-50' : ''}`}>
                       <td className="px-4 py-3">
@@ -525,16 +530,16 @@ export default function SuperAdminDashboard() {
                               </div>
                           }
                           <div>
-                            <p className="text-xs font-semibold text-gray-900">{r.reported_name || '—'}</p>
+                            <p className="text-[12px] font-semibold text-gray-900">{r.reported_name || '—'}</p>
                             {r.reported_is_banned && <span className="text-[9px] text-red-500 font-semibold">Banned</span>}
                           </div>
                         </div>
                       </td>
                       <td className="px-4 py-3">
-                        <p className="text-xs font-medium text-gray-700">{r.reason}</p>
+                        <p className="text-[12px] font-medium text-gray-700">{r.reason}</p>
                         {r.description && <p className="text-[11px] text-gray-400 truncate max-w-[180px]">{r.description}</p>}
                       </td>
-                      <td className="px-4 py-3 hidden sm:table-cell text-xs text-gray-500">{r.reporter_name || 'Anonymous'}</td>
+                      <td className="px-4 py-3 hidden sm:table-cell text-[12px] text-gray-500">{r.reporter_name || 'Anonymous'}</td>
                       <td className="px-4 py-3 hidden sm:table-cell text-[11px] font-mono text-gray-400">{r.room_code || '—'}</td>
                       <td className="px-4 py-3">
                         <span className={`text-[10px] font-semibold px-2 py-0.5 rounded-full ${
@@ -543,7 +548,7 @@ export default function SuperAdminDashboard() {
                           : 'bg-red-50 text-red-600'
                         }`}>{r.status}</span>
                       </td>
-                      <td className="px-4 py-3 hidden sm:table-cell text-xs text-gray-400">{timeAgo(r.created_at)}</td>
+                      <td className="px-4 py-3 hidden sm:table-cell text-[12px] text-gray-400">{timeAgo(r.created_at)}</td>
                       <td className="px-4 py-3">
                         <div className="flex items-center gap-1 justify-end">
                           {!r.reported_is_banned && r.reported_user_id && (
@@ -580,22 +585,27 @@ export default function SuperAdminDashboard() {
             ) : (
               <>
                 <div className="flex items-center justify-between mb-4">
-                  <p className="text-sm text-gray-500">{articles.length} article{articles.length !== 1 ? 's' : ''} total</p>
+                  <p className="text-[14px] text-gray-500">{articles.length} article{articles.length !== 1 ? 's' : ''} total</p>
                   <button onClick={() => setArticleForm({ title:'', category:'economic', summary:'', content:'', tags:[], is_published:false })}
-                    className="flex items-center gap-1.5 btn-primary text-xs py-2 px-4">
+                    className="flex items-center gap-1.5 btn-primary text-[12px] py-2 px-4">
                     <Plus className="w-3.5 h-3.5" /> New Article
                   </button>
                 </div>
                 <div className="bg-white border border-gray-200 rounded-xl overflow-hidden">
                   {articles.length === 0 ? (
-                    <p className="text-sm text-gray-400 text-center py-12">No articles yet — click "New Article" to write the first one.</p>
+                    <p className="text-[14px] text-gray-400 text-center py-12">No articles yet — click "New Article" to write the first one.</p>
                   ) : (
-                    <table className="w-full text-sm">
+                    <table className="w-full text-[14px]">
                       <thead>
                         <tr className="border-b border-gray-100 bg-gray-50 text-left">
                           <th className="px-4 py-3 text-[11px] font-semibold text-gray-500 uppercase tracking-wide">Title</th>
                           <th className="px-4 py-3 text-[11px] font-semibold text-gray-500 uppercase tracking-wide hidden sm:table-cell">Category</th>
                           <th className="px-4 py-3 text-[11px] font-semibold text-gray-500 uppercase tracking-wide">Status</th>
+                          <th className="px-3 py-3 text-[11px] font-semibold text-gray-500 uppercase tracking-wide text-right" title="Total opens (last 7 days below)">Views</th>
+                          <th className="px-3 py-3 text-[11px] font-semibold text-gray-500 uppercase tracking-wide text-right hidden md:table-cell" title="Unique browsers that opened it">Readers</th>
+                          <th className="px-3 py-3 text-[11px] font-semibold text-gray-500 uppercase tracking-wide text-right hidden md:table-cell" title="Readers who scrolled to the end">Finished</th>
+                          <th className="px-3 py-3 text-[11px] font-semibold text-gray-500 uppercase tracking-wide text-right hidden md:table-cell">Likes</th>
+                          <th className="px-3 py-3 text-[11px] font-semibold text-gray-500 uppercase tracking-wide text-right hidden md:table-cell">Comments</th>
                           <th className="px-4 py-3 text-[11px] font-semibold text-gray-500 uppercase tracking-wide hidden sm:table-cell">Date</th>
                           <th className="px-4 py-3" />
                         </tr>
@@ -615,7 +625,20 @@ export default function SuperAdminDashboard() {
                                 {a.is_published ? 'Published' : 'Draft'}
                               </span>
                             </td>
-                            <td className="px-4 py-3 hidden sm:table-cell text-xs text-gray-400">
+                            <td className="px-3 py-3 text-right tabular-nums">
+                              <p className="font-semibold text-gray-900">{a.views ?? 0}</p>
+                              <p className="text-[10px] text-gray-400">{a.views_7d ?? 0} this week</p>
+                            </td>
+                            <td className="px-3 py-3 text-right tabular-nums text-gray-700 hidden md:table-cell">{a.readers ?? 0}</td>
+                            <td className="px-3 py-3 text-right tabular-nums text-gray-700 hidden md:table-cell">
+                              {a.finished ?? 0}
+                              {a.readers > 0 && (
+                                <span className="block text-[10px] text-gray-400">{Math.round((a.finished / a.readers) * 100)}%</span>
+                              )}
+                            </td>
+                            <td className="px-3 py-3 text-right tabular-nums text-gray-700 hidden md:table-cell">{a.likes ?? 0}</td>
+                            <td className="px-3 py-3 text-right tabular-nums text-gray-700 hidden md:table-cell">{a.comments ?? 0}</td>
+                            <td className="px-4 py-3 hidden sm:table-cell text-[12px] text-gray-400">
                               {a.published_at ? fmtDate(a.published_at) : '—'}
                             </td>
                             <td className="px-4 py-3 text-right">
@@ -649,13 +672,13 @@ export default function SuperAdminDashboard() {
         {tab === 'registrations' && (
           <div className="bg-white border border-gray-200 rounded-xl overflow-hidden">
             <div className="px-4 py-3 border-b border-gray-100 flex items-center justify-between">
-              <p className="text-sm font-semibold text-gray-900">Session Registrations — 23 May 2026</p>
-              <span className="text-xs font-bold text-brand-600 bg-brand-50 border border-brand-100 px-2.5 py-1 rounded-full">
+              <p className="text-[14px] font-semibold text-gray-900">Session Registrations — 23 May 2026</p>
+              <span className="text-[12px] font-bold text-brand-600 bg-brand-50 border border-brand-100 px-2.5 py-1 rounded-full">
                 {registrations.length} / 30 registered
               </span>
             </div>
             <div className="overflow-x-auto">
-              <table className="w-full text-sm">
+              <table className="w-full text-[14px]">
                 <thead>
                   <tr className="border-b border-gray-100 bg-gray-50 text-left">
                     <th className="px-4 py-3 text-[11px] font-semibold text-gray-500 uppercase tracking-wide">Name</th>
@@ -676,7 +699,7 @@ export default function SuperAdminDashboard() {
                       </tr>
                     ))
                   ) : registrations.length === 0 ? (
-                    <tr><td colSpan={6} className="px-4 py-8 text-center text-sm text-gray-400">No registrations yet</td></tr>
+                    <tr><td colSpan={6} className="px-4 py-8 text-center text-[14px] text-gray-400">No registrations yet</td></tr>
                   ) : registrations.map((r, i) => (
                     <tr key={r.id} className="hover:bg-gray-50 transition-colors">
                       <td className="px-4 py-3">
@@ -684,16 +707,16 @@ export default function SuperAdminDashboard() {
                           <div className="w-6 h-6 rounded-full bg-brand-50 border border-brand-100 flex items-center justify-center text-[10px] font-bold text-brand-600 shrink-0">
                             {i + 1}
                           </div>
-                          <span className="font-medium text-gray-900 text-sm">{r.name}</span>
+                          <span className="font-medium text-gray-900 text-[14px]">{r.name}</span>
                         </div>
                       </td>
-                      <td className="px-4 py-3 text-xs text-gray-500">{r.email}</td>
+                      <td className="px-4 py-3 text-[12px] text-gray-500">{r.email}</td>
                       <td className="px-4 py-3 hidden sm:table-cell">
                         <span className="text-[11px] font-semibold px-2 py-0.5 rounded-full bg-brand-50 text-brand-700">{r.entry_type || '—'}</span>
                       </td>
-                      <td className="px-4 py-3 hidden sm:table-cell text-sm text-gray-700 font-medium">{r.attempts ?? '—'}</td>
-                      <td className="px-4 py-3 hidden md:table-cell text-xs text-gray-500">{r.prev_recommendation || '—'}</td>
-                      <td className="px-4 py-3 hidden md:table-cell text-xs text-gray-400">{timeAgo(r.registered_at)}</td>
+                      <td className="px-4 py-3 hidden sm:table-cell text-[14px] text-gray-700 font-medium">{r.attempts ?? '—'}</td>
+                      <td className="px-4 py-3 hidden md:table-cell text-[12px] text-gray-500">{r.prev_recommendation || '—'}</td>
+                      <td className="px-4 py-3 hidden md:table-cell text-[12px] text-gray-400">{timeAgo(r.registered_at)}</td>
                     </tr>
                   ))}
                 </tbody>
@@ -706,7 +729,7 @@ export default function SuperAdminDashboard() {
         {tab === 'rooms' && (
           <div className="bg-white border border-gray-200 rounded-xl overflow-hidden">
             <div className="overflow-x-auto">
-              <table className="w-full text-sm">
+              <table className="w-full text-[14px]">
                 <thead>
                   <tr className="border-b border-gray-100 bg-gray-50 text-left">
                     <th className="px-4 py-3 text-[11px] font-semibold text-gray-500 uppercase tracking-wide">Room</th>
@@ -735,7 +758,7 @@ export default function SuperAdminDashboard() {
                 </tbody>
               </table>
               {!loading && rooms.length === 0 && (
-                <p className="text-sm text-gray-400 text-center py-10">No rooms yet</p>
+                <p className="text-[14px] text-gray-400 text-center py-10">No rooms yet</p>
               )}
             </div>
           </div>
@@ -745,7 +768,7 @@ export default function SuperAdminDashboard() {
         {tab === 'sessions' && (
           <div className="bg-white border border-gray-200 rounded-xl overflow-hidden">
             <div className="overflow-x-auto">
-              <table className="w-full text-sm">
+              <table className="w-full text-[14px]">
                 <thead>
                   <tr className="border-b border-gray-100 bg-gray-50 text-left">
                     <th className="px-4 py-3 text-[11px] font-semibold text-gray-500 uppercase tracking-wide">Session</th>
@@ -791,10 +814,10 @@ export default function SuperAdminDashboard() {
                           )}
                         </td>
                         <td className="px-4 py-3 hidden md:table-cell">
-                          <p className="text-xs text-gray-700">{s.host_display_name || '—'}</p>
+                          <p className="text-[12px] text-gray-700">{s.host_display_name || '—'}</p>
                           {s.host_email && <p className="text-[10px] text-gray-400">{s.host_email}</p>}
                         </td>
-                        <td className="px-4 py-3 hidden sm:table-cell text-xs text-gray-600">{fmtDate(s.scheduled_at)}</td>
+                        <td className="px-4 py-3 hidden sm:table-cell text-[12px] text-gray-600">{fmtDate(s.scheduled_at)}</td>
                         <td className="px-4 py-3">
                           <span className={`text-[10px] font-semibold px-2 py-0.5 rounded-full ${cls}`}>
                             {label}
@@ -803,7 +826,7 @@ export default function SuperAdminDashboard() {
                             <Bell className="w-3 h-3 text-gray-300 inline ml-1.5" title="Reminder sent"/>
                           )}
                         </td>
-                        <td className="px-4 py-3 hidden sm:table-cell text-xs text-gray-500 tabular-nums">
+                        <td className="px-4 py-3 hidden sm:table-cell text-[12px] text-gray-500 tabular-nums">
                           {s.interest_count}
                         </td>
                         <td className="px-4 py-3 text-right">
@@ -820,7 +843,7 @@ export default function SuperAdminDashboard() {
                 </tbody>
               </table>
               {!loading && sessions.length === 0 && (
-                <p className="text-sm text-gray-400 text-center py-10">No sessions yet</p>
+                <p className="text-[14px] text-gray-400 text-center py-10">No sessions yet</p>
               )}
             </div>
           </div>
@@ -835,7 +858,7 @@ export default function SuperAdminDashboard() {
         {tab === 'users' && (
           <div className="bg-white border border-gray-200 rounded-xl overflow-hidden">
             <div className="overflow-x-auto">
-              <table className="w-full text-sm">
+              <table className="w-full text-[14px]">
                 <thead>
                   <tr className="border-b border-gray-100 bg-gray-50 text-left">
                     <th className="px-4 py-3 text-[11px] font-semibold text-gray-500 uppercase tracking-wide">User</th>
@@ -874,7 +897,7 @@ export default function SuperAdminDashboard() {
                             </div>
                           )}
                           <div>
-                            <p className="font-medium text-gray-900 text-sm">{u.display_name}</p>
+                            <p className="font-medium text-gray-900 text-[14px]">{u.display_name}</p>
                             <span className="text-[10px] font-semibold px-1.5 py-0.5 rounded-full bg-blue-50 text-blue-700">Google</span>
                           </div>
                         </div>
@@ -884,20 +907,20 @@ export default function SuperAdminDashboard() {
                       <td className="px-4 py-3">
                         {u.exam_type
                           ? <span className="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-brand-50 text-brand-700 whitespace-nowrap">{u.exam_type}</span>
-                          : <span className="text-xs text-gray-300">—</span>}
+                          : <span className="text-[12px] text-gray-300">—</span>}
                       </td>
-                      <td className="px-4 py-3 text-xs">
+                      <td className="px-4 py-3 text-[12px]">
                         {u.phone
                           ? <a href={`tel:${u.phone}`} className="font-medium text-brand-600 hover:underline whitespace-nowrap">{u.phone}</a>
                           : <span className="text-gray-300">—</span>}
                       </td>
-                      <td className="px-4 py-3 text-xs whitespace-nowrap">
+                      <td className="px-4 py-3 text-[12px] whitespace-nowrap">
                         {u.ssb_date
                           ? <span className="font-medium text-gray-700">{u.ssb_date}</span>
                           : <span className="text-gray-300">—</span>}
                       </td>
-                      <td className="px-4 py-3 hidden sm:table-cell text-xs text-gray-500">{u.email || '—'}</td>
-                      <td className="px-4 py-3 hidden sm:table-cell text-xs text-gray-400">{timeAgo(u.created_at)}</td>
+                      <td className="px-4 py-3 hidden sm:table-cell text-[12px] text-gray-500">{u.email || '—'}</td>
+                      <td className="px-4 py-3 hidden sm:table-cell text-[12px] text-gray-400">{timeAgo(u.created_at)}</td>
                       <td className="px-4 py-3">
                         {u.is_banned
                           ? <span className="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-red-50 text-red-500">Banned</span>
@@ -916,11 +939,13 @@ export default function SuperAdminDashboard() {
                 </tbody>
               </table>
               {!loading && users.length === 0 && (
-                <p className="text-sm text-gray-400 text-center py-10">No users yet</p>
+                <p className="text-[14px] text-gray-400 text-center py-10">No users yet</p>
               )}
             </div>
           </div>
         )}
+          </div>
+        </div>
       </main>
     </div>
   );

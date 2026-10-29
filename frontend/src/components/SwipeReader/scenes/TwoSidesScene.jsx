@@ -17,7 +17,7 @@ export default function TwoSidesScene({ scene }) {
                 </svg>
               </div>
               <div>
-                <p className="text-xs font-semibold text-gray-800 leading-snug">{item.label}</p>
+                <p className="text-[12px] font-semibold text-gray-800 leading-snug">{item.label}</p>
                 <p className="text-[11px] text-gray-500 leading-snug mt-0.5">{item.detail}</p>
               </div>
             </div>
@@ -35,7 +35,7 @@ export default function TwoSidesScene({ scene }) {
                 </svg>
               </div>
               <div>
-                <p className="text-xs font-semibold text-gray-800 leading-snug">{item.label}</p>
+                <p className="text-[12px] font-semibold text-gray-800 leading-snug">{item.label}</p>
                 <p className="text-[11px] text-gray-500 leading-snug mt-0.5">{item.detail}</p>
               </div>
             </div>
@@ -46,7 +46,7 @@ export default function TwoSidesScene({ scene }) {
       {officer_framing && (
         <div className="border-l-2 border-brand-600 bg-brand-50 px-3 py-2.5 rounded-r-lg shrink-0">
           <p className="text-[10px] font-bold text-brand-600 uppercase tracking-widest mb-1">Officer's framing</p>
-          <p className="text-xs text-brand-700 leading-relaxed">{officer_framing}</p>
+          <p className="text-[12px] text-brand-700 leading-relaxed">{officer_framing}</p>
         </div>
       )}
     </div>

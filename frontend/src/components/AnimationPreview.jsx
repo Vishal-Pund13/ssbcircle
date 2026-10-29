@@ -182,10 +182,10 @@ export default function AnimationPreview() {
     <div className="min-h-screen bg-gray-50 px-4 py-10">
       <div className="max-w-4xl mx-auto">
 
-        <Link to="/" className="text-xs text-gray-400 hover:text-gray-600 transition-colors">← Back to home</Link>
+        <Link to="/" className="text-[12px] text-gray-400 hover:text-gray-600 transition-colors">← Back to home</Link>
 
         <h1 className="text-xl font-bold text-gray-900 mt-4 mb-1">Animation Preview</h1>
-        <p className="text-sm text-gray-400 mb-10">Both options use pure SVG + CSS — zero JS runtime, zero performance cost.</p>
+        <p className="text-[14px] text-gray-400 mb-10">Both options use pure SVG + CSS — zero JS runtime, zero performance cost.</p>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
 
@@ -194,7 +194,7 @@ export default function AnimationPreview() {
             <div className="text-center">
               <span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Option A</span>
               <h2 className="text-base font-bold text-gray-900 mt-1">Orbit</h2>
-              <p className="text-xs text-gray-400 mt-1 max-w-[200px]">SSB aspirants from major cities orbiting the platform — shows connection</p>
+              <p className="text-[12px] text-gray-400 mt-1 max-w-[200px]">SSB aspirants from major cities orbiting the platform — shows connection</p>
             </div>
             <OrbitAnimation />
           </div>
@@ -204,14 +204,14 @@ export default function AnimationPreview() {
             <div className="text-center">
               <span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Option B</span>
               <h2 className="text-base font-bold text-gray-900 mt-1">India Map</h2>
-              <p className="text-xs text-gray-400 mt-1 max-w-[200px]">SSB centres across India pulsing and connecting — more meaningful, SSB-specific</p>
+              <p className="text-[12px] text-gray-400 mt-1 max-w-[200px]">SSB centres across India pulsing and connecting — more meaningful, SSB-specific</p>
             </div>
             <IndiaMapAnimation />
           </div>
 
         </div>
 
-        <p className="text-center text-xs text-gray-300 mt-8">Tell me which one you prefer and I'll add it to the homepage hero.</p>
+        <p className="text-center text-[12px] text-gray-300 mt-8">Tell me which one you prefer and I'll add it to the homepage hero.</p>
       </div>
     </div>
   );

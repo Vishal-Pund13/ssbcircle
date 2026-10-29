@@ -37,8 +37,8 @@ function SliderVisual({ data }) {
       </div>
 
       <div className={`mt-3 flex items-start gap-2 rounded-lg border px-3 py-2.5 ${SENTIMENT_STYLES[zone.sentiment]}`}>
-        <span className="text-xs font-bold mt-0.5">◆</span>
-        <p className="text-xs leading-relaxed font-medium">{zone.label}</p>
+        <span className="text-[12px] font-bold mt-0.5">◆</span>
+        <p className="text-[12px] leading-relaxed font-medium">{zone.label}</p>
       </div>
     </div>
   );
@@ -50,12 +50,12 @@ export default function ConceptScene({ scene }) {
   return (
     <div className="px-5 py-5 flex flex-col gap-5">
       <h2 className="text-lg font-bold text-gray-900 leading-snug">{title}</h2>
-      <p className="text-sm text-gray-600 leading-relaxed">{body}</p>
+      <p className="text-[14px] text-gray-600 leading-relaxed">{body}</p>
 
       {analogy && (
         <div className="border-l-2 border-brand-600 bg-brand-50 pl-4 py-3 rounded-r-xl">
           <p className="text-[10px] text-brand-600 font-bold uppercase tracking-widest mb-1">Analogy</p>
-          <p className="text-sm text-brand-700 italic leading-relaxed">{analogy}</p>
+          <p className="text-[14px] text-brand-700 italic leading-relaxed">{analogy}</p>
         </div>
       )}
 

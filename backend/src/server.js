@@ -12,7 +12,11 @@ const sessionsRouter = require('./routes/sessions');
 const articlesRouter = require('./routes/articles');
 const eventRouter    = require('./routes/event');
 const piqRouter      = require('./routes/piq');
+const tatRouter      = require('./routes/tat');
+const trackRouter    = require('./routes/track');
+const modRouter      = require('./routes/moderators');
 const communityRouter = require('./routes/community');
+const prepRouter     = require('./routes/prep');
 const { startCleanup, runCleanup } = require('./cleanup');
 const { sendReminder, sendHostStartReminder } = require('./email');
 
@@ -44,6 +48,15 @@ app.use(cors({
 // own size check could return a useful message.
 app.use('/api/piq', generalLimiter, express.json({ limit: '64kb' }), piqRouter);
 
+// TAT stories are a few thousand characters at most; the router caps the length itself.
+app.use('/api/tat', generalLimiter, express.json({ limit: '32kb' }), tatRouter);
+
+// Usage events and AI-report feedback, for the admin dashboard.
+app.use('/api/track', generalLimiter, express.json({ limit: '16kb' }), trackRouter);
+
+// Moderator programme and platform feedback
+app.use('/api/moderators', generalLimiter, express.json({ limit: '16kb' }), modRouter);
+
 // Community posts carry long bodies, so they get the same larger limit and the
 // same placement ahead of the global parser.
 app.use('/api/community', generalLimiter, express.json({ limit: '64kb' }), communityRouter);
@@ -71,6 +84,9 @@ app.use('/api/sessions', generalLimiter, sessionsRouter);
 
 // Articles (public read)
 app.use('/api/articles', generalLimiter, articlesRouter);
+
+// Prep sheet progress (signed-in, own rows only)
+app.use('/api/prep', generalLimiter, prepRouter);
 
 // Event registration (public)
 app.use('/api/event', generalLimiter, eventRouter);
@@ -257,6 +273,138 @@ async function start() {
     await pool.query(`ALTER TABLE piq ADD COLUMN IF NOT EXISTS analysis_day   DATE`);
     await pool.query(`ALTER TABLE piq ADD COLUMN IF NOT EXISTS analysis_count INT DEFAULT 0`);
 
+    // TAT practice: one row per story written, with the feedback it got.
+    await pool.query(`
+      CREATE TABLE IF NOT EXISTS tat_attempts (
+        id         BIGSERIAL PRIMARY KEY,
+        user_id    UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+        picture_id INT  NOT NULL,
+        story      TEXT NOT NULL,
+        analysis   JSONB,
+        created_at TIMESTAMPTZ DEFAULT NOW()
+      )
+    `);
+    await pool.query(`CREATE INDEX IF NOT EXISTS idx_tat_attempts_user ON tat_attempts(user_id, created_at DESC)`);
+
+    // Admin dashboard data. llm_calls: one row per AI call (no prompt or answer
+    // text). app_events: page views and key actions. ai_feedback: the
+    // thumbs up / down on AI reports.
+    await pool.query(`
+      CREATE TABLE IF NOT EXISTS llm_calls (
+        id            BIGSERIAL PRIMARY KEY,
+        feature       VARCHAR(40) NOT NULL,
+        provider      VARCHAR(20),
+        model         VARCHAR(60),
+        user_id       UUID,
+        ok            BOOLEAN NOT NULL,
+        error_code    VARCHAR(40),
+        latency_ms    INT,
+        input_tokens  INT,
+        output_tokens INT,
+        fallback      BOOLEAN DEFAULT false,
+        created_at    TIMESTAMPTZ DEFAULT NOW()
+      )
+    `);
+    await pool.query(`CREATE INDEX IF NOT EXISTS idx_llm_calls_created ON llm_calls(created_at)`);
+    await pool.query(`
+      CREATE TABLE IF NOT EXISTS app_events (
+        id         BIGSERIAL PRIMARY KEY,
+        event      VARCHAR(40) NOT NULL,
+        section    VARCHAR(20),
+        path       VARCHAR(200),
+        user_id    UUID,
+        visitor_id VARCHAR(64),
+        meta       JSONB,
+        created_at TIMESTAMPTZ DEFAULT NOW()
+      )
+    `);
+    await pool.query(`CREATE INDEX IF NOT EXISTS idx_app_events_created ON app_events(created_at)`);
+    await pool.query(`CREATE INDEX IF NOT EXISTS idx_app_events_event ON app_events(event, created_at)`);
+    // Moderator programme: one row per person who opted in or was invited.
+    // status: trial | review | invited | approved | declined | withdrawn | removed
+    await pool.query(`
+      CREATE TABLE IF NOT EXISTS moderator_applications (
+        user_id          UUID PRIMARY KEY REFERENCES users(id) ON DELETE CASCADE,
+        status           VARCHAR(20) NOT NULL DEFAULT 'trial',
+        motivation       TEXT,
+        availability     VARCHAR(200),
+        trial_started_at TIMESTAMPTZ,
+        trial_ends_at    TIMESTAMPTZ,
+        decided_at       TIMESTAMPTZ,
+        admin_note       TEXT,
+        created_at       TIMESTAMPTZ DEFAULT NOW(),
+        updated_at       TIMESTAMPTZ DEFAULT NOW()
+      )
+    `);
+    await pool.query(`ALTER TABLE users ADD COLUMN IF NOT EXISTS is_moderator    BOOLEAN DEFAULT false`);
+    await pool.query(`ALTER TABLE users ADD COLUMN IF NOT EXISTS moderator_since TIMESTAMPTZ`);
+    // "Report a problem or idea"
+    await pool.query(`
+      CREATE TABLE IF NOT EXISTS platform_feedback (
+        id         BIGSERIAL PRIMARY KEY,
+        user_id    UUID REFERENCES users(id) ON DELETE SET NULL,
+        kind       VARCHAR(20) NOT NULL DEFAULT 'other',
+        message    TEXT NOT NULL,
+        page       VARCHAR(200),
+        status     VARCHAR(20) DEFAULT 'new',
+        created_at TIMESTAMPTZ DEFAULT NOW()
+      )
+    `);
+    await pool.query(`
+      CREATE TABLE IF NOT EXISTS ai_feedback (
+        id         BIGSERIAL PRIMARY KEY,
+        feature    VARCHAR(20) NOT NULL,
+        ref_id     VARCHAR(80) NOT NULL,
+        user_id    UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+        helpful    BOOLEAN NOT NULL,
+        comment    TEXT,
+        created_at TIMESTAMPTZ DEFAULT NOW(),
+        UNIQUE (feature, ref_id, user_id)
+      )
+    `);
+
+    // ── Prep sheet ───────────────────────────────────────────────────────────
+    // One row per aspirant per topic they have touched. The topics themselves
+    // live in the frontend (data/prepSheet.js) — they are content, not data —
+    // so topic_id is a slug from that file, not a foreign key.
+    //
+    // status: 1 = read, 2 = can speak on it. Reading is not the goal at SSB;
+    // being able to talk for two minutes is, so that is the second stage.
+    // review_due drives spaced revision once a topic reaches "can speak".
+    // The *_on dates are IST days, so "done today" matches the user's midnight.
+    await pool.query(`
+      CREATE TABLE IF NOT EXISTS prep_progress (
+        user_id    UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+        topic_id   VARCHAR(80) NOT NULL,
+        status     SMALLINT NOT NULL DEFAULT 0,
+        starred    BOOLEAN NOT NULL DEFAULT false,
+        note       TEXT NOT NULL DEFAULT '',
+        read_on    DATE,
+        spoken_on  DATE,
+        review_due DATE,
+        reviews    INT NOT NULL DEFAULT 0,
+        updated_at TIMESTAMPTZ DEFAULT NOW(),
+        PRIMARY KEY (user_id, topic_id)
+      )
+    `);
+    // One row per aspirant per IST day they did anything, for the streak and
+    // the activity grid.
+    await pool.query(`
+      CREATE TABLE IF NOT EXISTS prep_activity (
+        user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+        day     DATE NOT NULL,
+        actions INT  NOT NULL DEFAULT 0,
+        PRIMARY KEY (user_id, day)
+      )
+    `);
+    // The aspirant's last spoken answer on a topic and the AI's feedback on
+    // it, so they can re-read it without paying for another call.
+    await pool.query(`ALTER TABLE prep_progress ADD COLUMN IF NOT EXISTS attempt JSONB`);
+    // Feedback costs money per call, so it is capped per aspirant per IST day.
+    await pool.query(`ALTER TABLE prep_activity ADD COLUMN IF NOT EXISTS feedback_count INT NOT NULL DEFAULT 0`);
+    // Speech-to-text pieces sent today (each up to ~27 seconds of audio).
+    await pool.query(`ALTER TABLE prep_activity ADD COLUMN IF NOT EXISTS stt_count INT NOT NULL DEFAULT 0`);
+
     // ── Community ────────────────────────────────────────────────────────────
     // Simple key/value settings, so things like "who may post" can be changed
     // from the admin dashboard without a deploy.
@@ -311,6 +459,43 @@ async function start() {
         PRIMARY KEY (post_id, user_id)
       )
     `);
+
+    // ── Article likes and comments ───────────────────────────────────────────
+    // Keyed by slug like article_votes, so a re-seeded article keeps its likes.
+    await pool.query(`
+      CREATE TABLE IF NOT EXISTS article_likes (
+        article_slug VARCHAR(200) NOT NULL,
+        user_id      UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+        created_at   TIMESTAMPTZ DEFAULT NOW(),
+        PRIMARY KEY (article_slug, user_id)
+      )
+    `);
+    // Soft delete, same reason as post_comments: a moderator can see what went.
+    await pool.query(`
+      CREATE TABLE IF NOT EXISTS article_comments (
+        id           UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+        article_slug VARCHAR(200) NOT NULL,
+        author_id    UUID REFERENCES users(id) ON DELETE SET NULL,
+        body         TEXT NOT NULL,
+        created_at   TIMESTAMPTZ DEFAULT NOW(),
+        deleted_at   TIMESTAMPTZ
+      )
+    `);
+    await pool.query(`CREATE INDEX IF NOT EXISTS idx_article_comments_slug ON article_comments(article_slug, created_at) WHERE deleted_at IS NULL`);
+    // One row per article open. visitor_id is a random id the browser keeps,
+    // so signed-out readers can be counted once without storing anything
+    // personal. completed_at is set when the reader scrolls to the end.
+    await pool.query(`
+      CREATE TABLE IF NOT EXISTS article_views (
+        id           BIGSERIAL PRIMARY KEY,
+        article_slug VARCHAR(200) NOT NULL,
+        visitor_id   VARCHAR(64) NOT NULL,
+        user_id      UUID REFERENCES users(id) ON DELETE SET NULL,
+        viewed_at    TIMESTAMPTZ DEFAULT NOW(),
+        completed_at TIMESTAMPTZ
+      )
+    `);
+    await pool.query(`CREATE INDEX IF NOT EXISTS idx_article_views_slug ON article_views(article_slug, visitor_id)`);
     await pool.query(`ALTER TABLE scheduled_sessions ADD COLUMN IF NOT EXISTS reminder_sent BOOLEAN DEFAULT false`);
     await pool.query(`ALTER TABLE scheduled_sessions ADD COLUMN IF NOT EXISTS host_reminder_sent BOOLEAN DEFAULT false`);
     await pool.query(`
@@ -897,6 +1082,332 @@ The board is not testing how many videos you have watched. It is testing how man
         'cut-the-noise-ssb-sources',
       ]);
       console.log('✓ Seeded article: Cut the Noise — two SSB playlists');
+    }
+
+    // Seed IAF / Threye Mirage 2000 simulator article. Upserts on slug like the others.
+    {
+      const mirageSimContent = `## A startup will now help train India's Mirage 2000 pilots
+
+[IMAGE:/Blog_Images/IAF_Mirage_Simulator.jpg|Illustration: a part task simulator lets Mirage 2000 pilots practise radar, targeting and threat response on the ground]
+
+The Indian Air Force has signed a **₹135 crore (about $14 million)** deal with **Threye Interactive**, an Indian startup. Threye will build **part task simulators** for the IAF's Mirage 2000 fighter jets.
+
+In money terms, this is a small deal for the Air Force. But it is a big step in one way: the IAF is trusting a young Indian company to help train pilots of a frontline fighter. That is the real news.
+
+[CALLOUT]Threye Interactive is a part of NewSpace Research & Technologies. NewSpace was founded by Sameer Joshi, a former IAF fighter pilot who flew the Mirage 2000 himself.[/CALLOUT]
+
+## What is a part task simulator?
+
+A normal flight simulator copies a full flight, from takeoff to landing. A **part task simulator** focuses on just one part of the pilot's job.
+
+For example, a pilot can practise only these tasks, again and again:
+
+- using the radar
+- finding and identifying a target
+- choosing the right weapon
+- reacting when a threat appears
+
+The pilot makes a mistake, sees it, and tries again. No jet leaves the ground. No fuel is burnt. No flying hours are used up.
+
+[COMPARE:Training in the air|Training in a part task simulator]
+Costs fuel, flying hours and wear on the jet | Costs almost nothing per try
+Some dangerous situations are hard to set up | Any situation can be created on demand
+One attempt per sortie | Repeat the same task many times
+Mistakes can be costly | Mistakes are safe and easy to review
+[/COMPARE]
+
+## Why "large force" training matters
+
+The IAF especially wants these simulators for **large force combat training** — when many aircraft fly a mission together.
+
+In a big air operation, flying your own jet well is not enough. A pilot must also:
+
+- keep track of friendly fighters around them
+- react to enemy aircraft and ground defences
+- take quick decisions as the mission changes
+
+Setting this up in real life needs dozens of aircraft and a lot of planning. In a simulator, it can be practised as often as needed.
+
+## About the Mirage 2000
+
+The Mirage 2000 is a French-built delta-wing fighter made by Dassault. India brought it in during the 1980s, so it has served the IAF for about **four decades**.
+
+- It played a key role in the **1999 Kargil conflict**.
+- It was used in the **2019 Balakot air strike**.
+- It has been **upgraded** by Dassault Aviation, Thales and HAL to keep it modern.
+
+## From a video game to real training
+
+Threye did not start with military training. Its story is a good example of how skills grow step by step.
+
+- **2013 —** It made a PC game, *Operation Morning Glory*, where players flew a Mirage 2000 on a made-up mission.
+- **2019 —** It built *Indian Air Force: A Cut Above*, the IAF's official mobile game. It helped young people learn about joining the Air Force.
+- **2025 —** It showed a fighter jet and an unmanned combat aircraft working together on one mission.
+- **2026 —** It won the contract to train real Mirage 2000 pilots.
+
+The same team that once put the Mirage on a computer screen for fun is now helping pilots prepare for real combat.
+
+[QUOTE]Start small, keep building, and the big chance comes to those who are ready for it.[/QUOTE]
+
+## The bigger picture: startups and defence
+
+This deal is part of a larger change. Indian startups are moving into defence work that was once done only by big government companies or foreign firms.
+
+Threye's parent company, NewSpace, is also working on:
+
+- a **collaborative combat aircraft (CCA)** for the Indian Navy — a drone that flies along with piloted fighters
+- the **Sheshnaag** attack drone
+- other systems for the armed forces
+
+This links to **Atmanirbhar Bharat** — India's push to make its own defence equipment instead of buying it from abroad.
+
+## Why this topic matters for your SSB
+
+**It is a ready-made GD example.** Topics like "Role of startups in defence", "Atmanirbhar Bharat in defence" or "Technology in modern warfare" come up often. Most people speak in general terms. A real, recent example like this one makes your point stand out.
+
+**It is useful for AFSB candidates.** If you are going for the Air Force, you should know the main aircraft in service and why training methods are changing. Knowing what a part task simulator is shows real interest, not just a wish to fly.
+
+**It teaches a simple idea: cheap practice makes costly practice better.** Simulators do not replace real flying. They make each real flight count more, because the pilot arrives already practised.
+
+[SSB-GD]**Point you can make:** "Defence startups bring speed and new ideas, but the armed forces must still test them strictly. The IAF giving Threye a training contract — not a weapons contract — is a smart way to build trust step by step."
+
+**Balance it:** Startups are small and may struggle to deliver at large scale. Trust has to be earned with results, not given because a company is Indian.[/SSB-GD]
+
+[KEY-TERMS]
+Part task simulator|A trainer that lets a pilot practise one part of the job, like radar use or weapon selection
+Large force training|Training where many aircraft fly one mission together
+Mirage 2000|French-built IAF fighter, used in Kargil (1999) and Balakot (2019)
+CCA (Collaborative Combat Aircraft)|An unmanned aircraft that flies and fights alongside a piloted fighter
+Atmanirbhar Bharat|India's self-reliance push, including making defence equipment at home
+[/KEY-TERMS]
+
+## In one line
+
+A small deal with a big message: the IAF is ready to trust Indian startups with serious work, and India's defence future will be built by many more players than before.
+
+*Source: Livefist, 29 September 2026.*`;
+
+      await pool.query(`
+        INSERT INTO articles (title, category, summary, content, tags, is_published, published_at, reading_time, difficulty, ssb_relevance, slug)
+        VALUES ($1, $2, $3, $4, $5, true, NOW(), $6, $7, $8, $9)
+        ON CONFLICT (slug) WHERE slug IS NOT NULL DO UPDATE SET
+          title         = EXCLUDED.title,
+          category      = EXCLUDED.category,
+          summary       = EXCLUDED.summary,
+          content       = EXCLUDED.content,
+          tags          = EXCLUDED.tags,
+          reading_time  = EXCLUDED.reading_time,
+          difficulty    = EXCLUDED.difficulty,
+          ssb_relevance = EXCLUDED.ssb_relevance
+      `, [
+        'Indian Startup Wins IAF Deal to Train Mirage 2000 Pilots',
+        'defence',
+        "The IAF has signed a ₹135 crore deal with Indian startup Threye Interactive for Mirage 2000 part task simulators. What these simulators do, and why startups in defence is a strong GD topic.",
+        mirageSimContent,
+        ['IAF', 'mirage-2000', 'simulators', 'defence-startups', 'threye', 'newspace', 'atmanirbhar-bharat', 'AFSB'],
+        '4 min',
+        'Beginner',
+        ['GD Topics', 'Lecturette', 'PI'],
+        'iaf-mirage-simulator-startup-deal',
+      ]);
+      console.log('✓ Seeded article: IAF Mirage 2000 simulator deal');
+    }
+
+    // Seed LCA Mk2 / AMCA timelines article. Upserts on slug like the others.
+    {
+      const fighterTimelineContent = `## Why you should know this
+
+In the SSB interview, the Interviewing Officer (IO) often asks: **"What is happening in defence these days?"** If you are going for the Air Force, you may hear: **"What do you know about the Tejas or the AMCA?"**
+
+This news gives you a strong, recent answer. On 27 September 2026, the Defence Secretary, **Rajesh Kumar Singh**, gave clear dates for India's next fighter jets. He also shared some big changes in how India builds its defence equipment.
+
+Read this once, remember the five points below, and you can speak on it for two minutes with confidence.
+
+## The story in five points
+
+1. **LCA Mk2** — a bigger, more powerful Tejas — will make its first flight between **June and September 2027**.
+2. **AMCA** — India's own stealth fighter — will make its first flight by **September 2028**.
+3. The AMCA is now open to **private companies**. Tata Group and two other groups are bidding. HAL did not qualify on technical grounds.
+4. **Tejas Mk1A** is finally moving. The first squadron will join the IAF before the end of this financial year. **180 jets** are to be delivered by **2033**.
+5. India's **defence exports** have grown from **₹686 crore (2013–14)** to **₹38,400 crore** last year.
+
+[CALLOUT]"First flight" means the first test jet takes off. It does not mean the jet joins the Air Force. That takes several more years of testing. Many aspirants mix these up — don't.[/CALLOUT]
+
+## Numbers worth remembering
+
+One or two correct numbers make your answer sound well-read. Don't try to remember all of them — pick the ones you can say without mistakes.
+
+[COMPARE:What|Number]
+LCA Mk2 first flight | June–September 2027
+AMCA first flight | September 2028
+Tejas Mk1A order | 180 jets, by 2033
+Tejas production target | 24 jets a year
+China's J-20 stealth fighters | More than 500
+Rafale jets under study (MRFA) | 114
+Defence exports | ₹686 crore → ₹38,400 crore
+Countries India exports to | More than 80
+[/COMPARE]
+
+## The background you need
+
+The IO may go one level deeper. These are the ideas you need to explain the news in your own words.
+
+### What is a "5th generation" fighter?
+
+Fighter jets are grouped by generations. A **5th generation** fighter has **stealth** (it is hard for enemy radar to see), advanced sensors, and can share data with other jets. China's J-20 and America's F-35 are 5th generation. India's **AMCA** will be our first. Most IAF jets today are 4th or 4.5 generation, like the Su-30MKI and Rafale.
+
+### Why is the stealth gap a worry?
+
+China already has **500+ J-20s**. India's first stealth jet flies only in 2028, and joins the force years after that. So there is a gap.
+
+India's plan to manage it:
+- **No decision** yet to buy a foreign stealth jet like Russia's Su-57.
+- Add an **AI layer** to the IAF's air defence network (called IACCS). This helps current jets find targets and avoid threats better.
+- Buy more **Rafales** (the MRFA plan) to fill the gap in jet numbers.
+
+### Why does a second production line matter?
+
+Until now, **HAL** was the only company in India that built fighter jets. If HAL is busy or delayed, everything waits. Opening the AMCA to private companies like **Tata** means India can have a **second fighter line**. Two lines mean less risk and faster work.
+
+Note: HAL was **not pushed out on purpose**. The Defence Secretary said it did not meet some technical conditions in the tender.
+
+### Why have exports grown so much?
+
+The Defence Secretary gave one main reason: Indian companies now get **long-term orders**. When a company knows it will get orders for years, it can invest in factories and people. About **80%** of recent capital contracts went to Indian firms. India now sells **BrahMos missiles, 155mm artillery shells and radars** to more than 80 countries.
+
+## Questions the IO may ask you
+
+For each question, here is what the IO is checking and the points to cover. Use your own words — a memorised answer is easy to spot.
+
+### "What do you know about the AMCA?"
+
+**What they check:** Do you actually read about defence, or just say you do?
+
+**Cover these points:**
+- It is India's own 5th generation stealth fighter.
+- First flight is planned for September 2028.
+- It is now open to private companies — Tata and two other groups are bidding.
+- Why that matters: India gets a second fighter production line besides HAL.
+
+### "Tejas Mk2 was promised for 2026. Now it's 2027. Do you trust these dates?"
+
+**What they check:** Can you give a balanced view, or do you just praise or just complain?
+
+**Cover these points:**
+- Admit that defence timelines in India have often slipped. That is a fact.
+- Then add the positive: the Tejas Mk1A engine problem is being solved, 27 jets are ready, and the private sector is joining.
+- End with a balanced line: the dates are **targets**; what matters is steady progress and testing.
+
+### "China has 500 stealth jets. How will India manage?"
+
+**What they check:** Do you understand the problem, and can you think calmly about it?
+
+**Cover these points:**
+- Accept the gap honestly. Don't pretend it is not there.
+- Explain the short-term plan: more Rafales, and AI to make current jets and networks smarter.
+- Explain the long-term plan: LCA Mk2 and AMCA.
+- If you want, add: wars are fought by whole systems — radars, AEW&C aircraft, tankers, missiles — not by fighter jets alone.
+
+### "Should private companies build fighter jets?"
+
+**What they check:** Can you see both sides?
+
+**Cover these points:**
+- **For:** more capacity, competition, faster work, and less dependence on one company.
+- **Against:** private firms are new to fighters, and building skill takes time.
+- Your view: a mix of HAL and private firms is the safer path.
+
+### "How has India's defence industry changed?"
+
+**What they check:** Do you know the bigger picture behind Atmanirbhar Bharat?
+
+**Cover these points:**
+- Exports went from ₹686 crore to ₹38,400 crore.
+- Most new contracts go to Indian companies.
+- India exports BrahMos, artillery shells and radars to 80+ countries.
+
+## Form your own opinion
+
+The IO is not looking for the "right" opinion. They want to see that you **have** one and can give a reason for it. Here are both sides to help you decide.
+
+[COMPARE:Good signs|Concerns]
+Clear dates for LCA Mk2 and AMCA | Dates have slipped many times before
+Private sector now in fighter building | Private firms have never built a fighter
+Tejas Mk1A finally being delivered | Engine supply from GE caused long delays
+Exports have grown more than 50 times | China's stealth fleet is already flying
+India building its own military AI | Gap will last at least till the 2030s
+[/COMPARE]
+
+## Mistakes to avoid in the interview
+
+- **Don't mix up "first flight" and "joining the Air Force".** They are years apart.
+- **Don't blame HAL.** It did not qualify on technical points. Speak with respect about any Indian institution.
+- **Don't guess numbers.** If you are not sure, say "around" or leave the number out. A wrong number hurts more than no number.
+- **Don't only praise.** Pure praise sounds memorised. Mention one real concern.
+- **If you don't know something, say so.** "Sir, I am not sure about that" is far better than making something up. The IO will ask follow-up questions.
+
+## Other news from the same talk
+
+You don't need to remember these, but they are good to know if the IO goes further:
+
+- **Navy:** Project-75I submarines (German firm TKMS with Mazagon Dock) is waiting for final approval. Three more Scorpene submarines are also being considered.
+- **Air Force support:** Six old Air India planes will become **AEW&C** aircraft — planes with a big radar that watch the sky.
+- **Army:** The **Zorawar** light tank — 18 tanks first, total 59.
+- **Drones:** Contract in 6 months, delivery in 18 months.
+- **AI:** India said no to foreign software firms like Palantir to keep military data safe.
+
+[SSB-GD]**Useful GD topics:** "Private sector in defence", "Atmanirbhar Bharat in defence", "Can India match China's air power?"
+
+**Point you can make:** "Opening the AMCA to private firms gives India a second fighter line. We should not depend on one company for something this important."
+
+**Balance it:** "But dates have slipped before. Until the new jets fly, steps like more Rafales and smarter networks are needed."[/SSB-GD]
+
+[KEY-TERMS]
+LCA Mk2|A bigger, more powerful version of the Tejas
+AMCA|Advanced Medium Combat Aircraft — India's 5th generation stealth fighter
+5th generation|Fighters with stealth, advanced sensors and data sharing, like China's J-20
+Stealth|Design that makes a jet hard for enemy radar to detect
+MRFA|Multi-Role Fighter Aircraft — the plan to buy 114 fighters, with Rafale under study
+AEW&C|Airborne Early Warning and Control — an aircraft with a big radar that watches the sky
+IACCS|Integrated Air Command and Control System — the IAF's air defence network
+HAL|Hindustan Aeronautics Limited — the government company that builds the Tejas
+[/KEY-TERMS]
+
+## Quick revision before your interview
+
+- Mk2 flies **2027**. AMCA flies **2028**.
+- AMCA open to **private firms** (Tata + two groups) → second fighter line.
+- Tejas Mk1A: **180 jets by 2033**.
+- China: **500+ J-20s**. India's answer: Rafale + AI + Mk2 + AMCA.
+- Exports: **₹686 crore → ₹38,400 crore**.
+- Dates are **targets** — always give a balanced view.
+
+*Source: Livefist, 28 September 2026, reporting the Defence Secretary at the NDTV Defence Summit.*`;
+
+      await pool.query(`
+        INSERT INTO articles (title, category, summary, content, tags, is_published, published_at, reading_time, difficulty, ssb_relevance, slug)
+        VALUES ($1, $2, $3, $4, $5, true, NOW(), $6, $7, $8, $9)
+        ON CONFLICT (slug) WHERE slug IS NOT NULL DO UPDATE SET
+          title         = EXCLUDED.title,
+          category      = EXCLUDED.category,
+          summary       = EXCLUDED.summary,
+          content       = EXCLUDED.content,
+          tags          = EXCLUDED.tags,
+          reading_time  = EXCLUDED.reading_time,
+          difficulty    = EXCLUDED.difficulty,
+          ssb_relevance = EXCLUDED.ssb_relevance
+      `, [
+        'LCA Mk2 by 2027, AMCA by 2028: India\'s Fighter Jet Timeline',
+        'defence',
+        "Firm dates for LCA Mk2 and AMCA, private firms in fighter building, and a big jump in exports. The five points, numbers and likely IO questions you need to talk about it in your SSB interview.",
+        fighterTimelineContent,
+        ['IAF', 'LCA-Mk2', 'AMCA', 'tejas', 'rafale', 'defence-exports', 'atmanirbhar-bharat', 'AFSB'],
+        '7 min',
+        'Beginner',
+        ['PI', 'GD Topics', 'Lecturette'],
+        'lca-mk2-amca-timelines',
+      ]);
+      console.log('✓ Seeded article: LCA Mk2 and AMCA timelines');
     }
 
     // Seed Women in India series (4 cards)

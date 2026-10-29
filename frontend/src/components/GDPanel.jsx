@@ -211,7 +211,7 @@ function TranscriptTab({ onStateChange }) {
         </button>
       </div>
 
-      <p className="text-[10px] text-gray-400 px-4 pt-2.5 pb-1">
+      <p className="text-[11px] text-gray-400 px-4 pt-2.5 pb-1">
         Captures <span className="font-medium text-gray-600">your mic</span> · en-IN
         {IS_MOBILE && <span className="ml-1 text-gray-300">· mobile mode</span>}
       </p>
@@ -238,7 +238,7 @@ function TranscriptTab({ onStateChange }) {
         )}
         {entries.map((entry, i) => (
           <div key={i}>
-            <span className="text-[10px] text-gray-400 font-mono">{entry.ts}</span>
+            <span className="text-[11px] text-gray-400 font-mono">{entry.ts}</span>
             <p className="text-sm text-gray-800 leading-relaxed mt-0.5">{entry.text}</p>
           </div>
         ))}
@@ -282,7 +282,7 @@ function NotesTab() {
         {NOTE_PROMPTS.map(p => (
           <button key={p}
             onClick={() => setNotes(n => n + (n && !n.endsWith('\n') ? '\n\n' : '') + p + '\n')}
-            className="flex items-center gap-1 text-[10px] text-gray-500 hover:text-brand-600 bg-gray-50 hover:bg-brand-50 px-2 py-1 rounded-md transition-colors cursor-pointer border border-gray-200 hover:border-brand-200">
+            className="flex items-center gap-1 text-[11px] text-gray-500 hover:text-brand-600 bg-gray-50 hover:bg-brand-50 px-2 py-1 rounded-md transition-colors cursor-pointer border border-gray-200 hover:border-brand-200">
             <Plus className="w-2.5 h-2.5"/> {p}
           </button>
         ))}
@@ -295,7 +295,7 @@ function NotesTab() {
         spellCheck={false}
       />
       <div className="px-4 py-2 border-t border-gray-100 flex justify-end">
-        <span className="text-[10px] text-gray-300">{notes.length} chars</span>
+        <span className="text-[11px] text-gray-300">{notes.length} chars</span>
       </div>
     </div>
   );
@@ -331,7 +331,7 @@ function ChecklistTab() {
         <div className="h-1.5 bg-gray-100 rounded-full overflow-hidden">
           <div className={`h-full rounded-full transition-all duration-500 ${barColor}`} style={{ width: `${pct}%` }}/>
         </div>
-        <p className="text-[10px] text-gray-400 mt-1.5">{score} of {CHECKLIST.length} criteria met</p>
+        <p className="text-[11px] text-gray-400 mt-1.5">{score} of {CHECKLIST.length} criteria met</p>
       </div>
       <div className="flex-1 overflow-y-auto px-3 py-3 space-y-1">
         {CHECKLIST.map(({ id, label }) => (
@@ -377,12 +377,12 @@ function ChatTab({ messages, onSend }) {
           <div className="flex flex-col items-center justify-center h-32 text-center">
             <MessageSquare className="w-7 h-7 text-gray-200 mb-2"/>
             <p className="text-xs text-gray-400">No messages yet</p>
-            <p className="text-[11px] text-gray-300 mt-0.5">Start the conversation</p>
+            <p className="text-[12px] text-gray-300 mt-0.5">Start the conversation</p>
           </div>
         )}
         {messages.map(msg => (
           <div key={msg.id} className={`flex flex-col ${msg.isMe ? 'items-end' : 'items-start'}`}>
-            {!msg.isMe && <span className="text-[10px] text-gray-400 font-medium mb-0.5 px-1">{msg.sender}</span>}
+            {!msg.isMe && <span className="text-[11px] text-gray-400 font-medium mb-0.5 px-1">{msg.sender}</span>}
             <div className={`max-w-[85%] px-3 py-2 rounded-xl text-sm leading-snug ${
               msg.isMe
                 ? 'bg-brand-600 text-white rounded-br-sm'
@@ -390,7 +390,7 @@ function ChatTab({ messages, onSend }) {
             }`}>
               {msg.text}
             </div>
-            <span className="text-[10px] text-gray-300 mt-0.5 px-1">{msg.ts}</span>
+            <span className="text-[11px] text-gray-300 mt-0.5 px-1">{msg.ts}</span>
           </div>
         ))}
         <div ref={bottomRef}/>
@@ -423,14 +423,14 @@ function TopicTab({ article }) {
 
       {/* Header */}
       <div>
-        <span className="text-[9px] font-bold text-brand-600 bg-brand-50 border border-brand-100 px-2 py-0.5 rounded-full uppercase tracking-widest">
+        <span className="text-[10.5px] font-bold text-brand-600 bg-brand-50 border border-brand-100 px-2 py-0.5 rounded-full uppercase tracking-widest">
           {article.category}
         </span>
         <h3 className="text-sm font-bold text-gray-900 mt-1.5 leading-snug">{article.title}</h3>
         {hook?.stat?.value && (
           <div className="mt-2 inline-flex items-baseline gap-1.5">
             <span className="text-2xl font-extrabold text-brand-600 tracking-tight">{hook.stat.value}</span>
-            {hook.stat.label && <span className="text-[10px] font-semibold text-gray-400">{hook.stat.label}</span>}
+            {hook.stat.label && <span className="text-[11px] font-semibold text-gray-400">{hook.stat.label}</span>}
           </div>
         )}
         {hook?.subtext && <p className="text-xs text-gray-500 leading-relaxed mt-1">{hook.subtext}</p>}
@@ -439,11 +439,11 @@ function TopicTab({ article }) {
       {/* Key points from breakdown */}
       {breakdown?.items?.length > 0 && (
         <div>
-          <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-2">Key Points</p>
+          <p className="text-[11px] font-bold text-gray-400 uppercase tracking-widest mb-2">Key Points</p>
           <div className="flex flex-col gap-1.5">
             {breakdown.items.map((item, i) => (
               <div key={i} className="flex items-start gap-2 bg-gray-50 border border-gray-100 rounded-lg px-2.5 py-2">
-                <span className="w-4 h-4 rounded-full bg-brand-600 text-white text-[9px] font-bold flex items-center justify-center shrink-0 mt-0.5">{i + 1}</span>
+                <span className="w-4 h-4 rounded-full bg-brand-600 text-white text-[10.5px] font-bold flex items-center justify-center shrink-0 mt-0.5">{i + 1}</span>
                 <p className="text-xs font-semibold text-gray-700 leading-snug">{item.title}</p>
               </div>
             ))}
@@ -454,18 +454,18 @@ function TopicTab({ article }) {
       {/* Two sides */}
       {twoSides && (
         <div>
-          <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-2">Two Sides</p>
+          <p className="text-[11px] font-bold text-gray-400 uppercase tracking-widest mb-2">Two Sides</p>
           <div className="grid grid-cols-2 gap-2">
             <div className="bg-brand-50 border border-brand-100 rounded-lg p-2.5">
-              <p className="text-[9px] font-bold text-brand-600 uppercase tracking-widest mb-1.5">{twoSides.left_label}</p>
+              <p className="text-[10.5px] font-bold text-brand-600 uppercase tracking-widest mb-1.5">{twoSides.left_label}</p>
               {twoSides.left_items?.slice(0, 3).map((item, i) => (
-                <p key={i} className="text-[11px] text-gray-700 leading-snug mb-1">· {item.label}</p>
+                <p key={i} className="text-[12px] text-gray-700 leading-snug mb-1">· {item.label}</p>
               ))}
             </div>
             <div className="bg-gray-50 border border-gray-200 rounded-lg p-2.5">
-              <p className="text-[9px] font-bold text-gray-500 uppercase tracking-widest mb-1.5">{twoSides.right_label}</p>
+              <p className="text-[10.5px] font-bold text-gray-500 uppercase tracking-widest mb-1.5">{twoSides.right_label}</p>
               {twoSides.right_items?.slice(0, 3).map((item, i) => (
-                <p key={i} className="text-[11px] text-gray-700 leading-snug mb-1">· {item.label}</p>
+                <p key={i} className="text-[12px] text-gray-700 leading-snug mb-1">· {item.label}</p>
               ))}
             </div>
           </div>
@@ -475,7 +475,7 @@ function TopicTab({ article }) {
       {/* GD ready line */}
       {ssbApp?.gd_line && (
         <div className="bg-brand-50 border border-brand-100 rounded-xl px-3 py-2.5">
-          <p className="text-[9px] font-bold text-brand-600 uppercase tracking-widest mb-1">GD opener</p>
+          <p className="text-[10.5px] font-bold text-brand-600 uppercase tracking-widest mb-1">GD opener</p>
           <p className="text-xs text-brand-800 leading-relaxed italic">"{ssbApp.gd_line}"</p>
         </div>
       )}
@@ -483,7 +483,7 @@ function TopicTab({ article }) {
       {/* Lecturette structure */}
       {ssbApp?.lecturette_structure?.length > 0 && (
         <div>
-          <p className="text-[10px] font-bold text-brand-600 uppercase tracking-widest mb-2">Speaking structure</p>
+          <p className="text-[11px] font-bold text-brand-600 uppercase tracking-widest mb-2">Speaking structure</p>
           <div className="flex flex-col gap-1.5">
             {ssbApp.lecturette_structure.map((pt, i) => (
               <div key={i} className="flex items-start gap-2">
@@ -528,7 +528,7 @@ export default function GDPanel({ show, onClose, chatMessages = [], onSendMessag
       <div className="flex items-center border-b border-gray-200 shrink-0">
         {TABS.map(({ id, label, Icon }) => (
           <button key={id} onClick={() => handleTab(id)}
-            className={`flex-1 flex flex-col items-center gap-0.5 py-2.5 text-[10px] font-semibold tracking-wide uppercase transition-all cursor-pointer border-b-2 ${
+            className={`flex-1 flex flex-col items-center gap-0.5 py-2.5 text-[11px] font-semibold tracking-wide uppercase transition-all cursor-pointer border-b-2 ${
               active === id
                 ? 'text-brand-600 border-brand-600'
                 : 'text-gray-400 border-transparent hover:text-gray-600'

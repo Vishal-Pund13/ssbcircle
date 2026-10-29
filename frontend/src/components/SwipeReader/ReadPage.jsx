@@ -37,9 +37,9 @@ export default function ReadPage() {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center px-4">
         <div className="text-center">
-          <p className="text-sm font-medium text-gray-700 mb-1">Article not found</p>
-          <p className="text-xs text-gray-400 mb-4">"{articleId}" doesn't exist yet.</p>
-          <Link to="/current-affairs" className="btn-primary text-sm px-4 py-2">Browse articles</Link>
+          <p className="text-[14px] font-medium text-gray-700 mb-1">Article not found</p>
+          <p className="text-[12px] text-gray-400 mb-4">"{articleId}" doesn't exist yet.</p>
+          <Link to="/current-affairs" className="btn-primary text-[14px] px-4 py-2">Browse articles</Link>
         </div>
       </div>
     );

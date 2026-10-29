@@ -19,6 +19,7 @@ import { fileURLToPath } from 'node:url';
 
 import { SWIPE_SLUGS }  from '../src/data/swipeArticles.js';
 import { MENTORS }      from '../src/data/mentors.js';
+import * as GUIDE       from '../src/data/beginnerGuide.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const ROOT      = path.resolve(__dirname, '..');
@@ -27,6 +28,65 @@ const SITE      = 'https://www.ssbcircle.com';
 const API       = process.env.VITE_API_URL || 'https://ssbcircle.onrender.com';
 
 const today = new Date().toISOString().slice(0, 10);
+
+// ── "How to become an officer" guide ───────────────────────────────────────
+// Our main landing page for people who only have the dream so far. React draws
+// the interactive page; crawlers that do not run JS get every role, entry and
+// answer from the same data as plain HTML, plus the FAQ as structured data.
+function guideNoscript() {
+  const h2 = t => `<h2 style="font-size:1.35rem;margin:28px 0 8px;">${esc(t)}</h2>`;
+  const h3 = t => `<h3 style="font-size:1.1rem;margin:18px 0 4px;">${esc(t)}</h3>`;
+  const p  = t => `<p style="line-height:1.7;color:#333;margin:4px 0;">${esc(t)}</p>`;
+  let out = '';
+  for (const s of GUIDE.SERVICES) {
+    out += h2(`${s.name}: branches and roles for officers`) + p(s.oneLine + ' ' + s.intro) + p(s.note);
+    for (const g of s.groups) {
+      out += h3(`${s.name} — ${g.title}`) + p(g.blurb);
+      out += '<ul>' + g.roles.map(r => `<li style="margin:6px 0;line-height:1.6;"><strong>${esc(r.name)}</strong>: ${esc(r.what)} How to join: ${esc(r.join)}.</li>`).join('') + '</ul>';
+    }
+  }
+  out += h2('How to become an officer after 12th');
+  out += '<ul>' + GUIDE.ENTRIES.school.map(e => `<li><strong>${esc(e.name)}</strong> (${esc(e.who)}): ${esc(e.note)}</li>`).join('') + '</ul>';
+  out += h2('How to become an officer after graduation');
+  out += '<ul>' + GUIDE.ENTRIES.graduate.map(e => `<li><strong>${esc(e.name)}</strong> (${esc(e.who)}): ${esc(e.note)}</li>`).join('') + '</ul>';
+  out += h2('The SSB interview, stage by stage');
+  out += '<ol>' + GUIDE.SSB_DAYS.map(d => `<li><strong>${esc(d.day)} — ${esc(d.title)}</strong>: ${esc(d.what)}</li>`).join('') + '</ol>';
+  out += h2('Medical exam, merit list and training');
+  out += '<ol>' + GUIDE.AFTER_SSB.map(a => `<li><strong>${esc(a.title)}</strong>: ${esc(a.what)}</li>`).join('') + '</ol>';
+  out += h2('Questions people ask');
+  out += GUIDE.FAQ.map(f => h3(f.q) + p(f.a)).join('');
+  return out;
+}
+
+const GUIDE_ROUTE = {
+  path: '/become-an-officer',
+  title: 'How to Become an Officer in the Indian Army, Navy & Air Force | SSBCircle',
+  description: 'A simple guide for anyone who dreams of becoming an Indian Armed Forces officer: Army, Navy and Air Force branches explained, how to join after 12th (NDA, TES) or graduation (CDS, AFCAT, TGC), the SSB interview, medicals and training.',
+  priority: '0.9', changefreq: 'monthly',
+  heading: 'How to become an officer in the Indian Armed Forces',
+  blurb: 'What you can become in the Indian Army, Indian Navy and Indian Air Force, how to join after 12th or after graduation, and how the SSB interview, medical exam, merit list and training work — in simple words.',
+  // A getter: esc() is defined further down, after this table is built
+  get noscriptExtra() { return guideNoscript(); },
+  jsonLd: {
+    '@context': 'https://schema.org',
+    '@graph': [
+      {
+        '@type': 'FAQPage',
+        mainEntity: GUIDE.FAQ.map(f => ({
+          '@type': 'Question', name: f.q,
+          acceptedAnswer: { '@type': 'Answer', text: f.a },
+        })),
+      },
+      {
+        '@type': 'BreadcrumbList',
+        itemListElement: [
+          { '@type': 'ListItem', position: 1, name: 'SSBCircle', item: `${SITE}/` },
+          { '@type': 'ListItem', position: 2, name: 'How to become an officer', item: `${SITE}/become-an-officer` },
+        ],
+      },
+    ],
+  },
+};
 
 // ── Route table ────────────────────────────────────────────────────────────
 // noindex routes still get a self-canonical (so they are never reported as a
@@ -39,6 +99,7 @@ const STATIC_ROUTES = [
     // The template is already written for the homepage — leave its head alone.
     keepTemplateHead: true,
   },
+  GUIDE_ROUTE,
   {
     path: '/current-affairs',
     title: 'SSB Current Affairs & GD Topics — Explained for Aspirants | SSBCircle',

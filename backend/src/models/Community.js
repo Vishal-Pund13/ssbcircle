@@ -13,7 +13,7 @@ const POST_FIELDS = `
   p.id, p.title, p.body, p.category, p.is_official, p.is_pinned, p.is_locked,
   p.created_at, p.updated_at,
   COALESCE(p.author_label, u.display_name) AS author_name,
-  u.id AS author_id, u.avatar_url AS author_avatar,
+  u.id AS author_id, u.avatar_url AS author_avatar, coalesce(u.is_moderator, false) AS author_is_mod,
   (SELECT count(*)::int FROM post_votes v WHERE v.post_id = p.id) AS upvotes,
   (SELECT count(*)::int FROM post_comments c WHERE c.post_id = p.id AND c.deleted_at IS NULL) AS comment_count
 `;
@@ -49,7 +49,7 @@ async function listComments(postId) {
   const { rows } = await pool.query(
     `SELECT c.id, c.body, c.is_official, c.created_at,
             COALESCE(c.author_label, u.display_name) AS author_name,
-            u.id AS author_id, u.avatar_url AS author_avatar
+            u.id AS author_id, u.avatar_url AS author_avatar, coalesce(u.is_moderator, false) AS author_is_mod
        FROM post_comments c
        LEFT JOIN users u ON u.id = c.author_id
       WHERE c.post_id = $1 AND c.deleted_at IS NULL

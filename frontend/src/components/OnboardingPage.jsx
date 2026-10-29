@@ -72,7 +72,7 @@ export default function OnboardingPage() {
   return (
     <div className="min-h-screen bg-gray-50 px-4 sm:px-6 py-8 sm:py-12">
       <div className="max-w-lg mx-auto">
-        <p className="text-[10px] font-bold uppercase tracking-[0.3em] text-brand-600">Welcome to SSBCircle</p>
+        <p className="text-[11px] font-bold uppercase tracking-[0.3em] text-brand-600">Welcome to SSBCircle</p>
         <h1 className="mt-3 text-2xl sm:text-3xl font-bold text-gray-900 leading-tight">
           Two quick questions{user?.display_name ? `, ${user.display_name.split(' ')[0]}` : ''}
         </h1>
@@ -162,7 +162,7 @@ export default function OnboardingPage() {
           {/* Disclaimer */}
           <div className="flex items-start gap-3 bg-brand-50 border border-brand-100 rounded-xl px-4 py-3.5">
             <ShieldCheck className="w-4 h-4 text-brand-600 shrink-0 mt-0.5" />
-            <div className="text-[11px] text-gray-600 leading-relaxed space-y-1.5">
+            <div className="text-[12px] text-gray-600 leading-relaxed space-y-1.5">
               <p>
                 <span className="font-bold text-gray-800">How we use this.</span>{' '}
                 Your number is used only so our team can contact you and introduce you to other

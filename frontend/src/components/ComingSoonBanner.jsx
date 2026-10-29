@@ -31,7 +31,7 @@ export default function ComingSoonBanner() {
 
         <div className="relative flex flex-col sm:flex-row items-center gap-6 px-5 sm:px-8 py-7 sm:py-9">
           <div className="flex-1 min-w-0 text-center sm:text-left">
-            <p className="text-[10px] font-bold uppercase tracking-[0.3em] text-amber-300">Coming soon</p>
+            <p className="text-[11px] font-bold uppercase tracking-[0.3em] text-amber-300">Coming soon</p>
             <h2 className="mt-3 text-2xl sm:text-4xl font-bold uppercase leading-[0.95] tracking-tighter">
               The 21-day challenge
             </h2>
@@ -43,14 +43,14 @@ export default function ComingSoonBanner() {
             <p className="mt-3 text-xs text-white/50">
               Not the fastest. Not the fittest. The one who did not miss.
             </p>
-            <p className="mt-6 inline-block border border-white/25 text-[10px] font-bold uppercase tracking-[0.2em] text-white/70 px-5 py-3 rounded-full">
+            <p className="mt-6 inline-block border border-white/25 text-[11px] font-bold uppercase tracking-[0.2em] text-white/70 px-5 py-3 rounded-full">
               Seats open soon
             </p>
           </div>
 
           <div className="shrink-0 w-44 sm:w-56">
             <ShoeArt className="w-full drop-shadow-xl" />
-            <p className="mt-2 text-center text-[10px] font-bold uppercase tracking-[0.2em] text-amber-300">
+            <p className="mt-2 text-center text-[11px] font-bold uppercase tracking-[0.2em] text-amber-300">
               For the winner
             </p>
           </div>

@@ -31,6 +31,58 @@ router.post('/login', (req, res) => {
   res.json({ token });
 });
 
+// Moderator programme: applicants with their trial activity, rising
+// contributors who have not applied, and current moderators
+const Moderation = require('../models/Moderation');
+router.get('/moderators', adminGuard, async (_req, res) => {
+  try { res.json(await Moderation.adminOverview()); }
+  catch (err) { console.error('Admin moderators error:', err); res.status(500).json({ error: 'Failed to load moderators' }); }
+});
+
+router.post('/moderators/:userId/decision', adminGuard, async (req, res) => {
+  try {
+    const status = String(req.body?.status || '');
+    if (!['approved', 'declined', 'review', 'invited'].includes(status)) return res.status(400).json({ error: 'Unknown decision' });
+    await Moderation.decide(req.params.userId, status, String(req.body?.note || '').slice(0, 1000));
+    res.json(await Moderation.adminOverview());
+  } catch (err) { console.error('Admin moderator decision error:', err); res.status(500).json({ error: 'Failed to save decision' }); }
+});
+
+router.delete('/moderators/:userId', adminGuard, async (req, res) => {
+  try { await Moderation.removeModerator(req.params.userId); res.json(await Moderation.adminOverview()); }
+  catch (err) { res.status(500).json({ error: 'Failed to remove moderator' }); }
+});
+
+router.get('/platform-feedback', adminGuard, async (_req, res) => {
+  try {
+    const { rows } = await pool.query(`
+      SELECT f.id, f.kind, f.message, f.page, f.status, f.created_at, u.display_name, u.email
+        FROM platform_feedback f LEFT JOIN users u ON u.id = f.user_id
+       ORDER BY f.created_at DESC LIMIT 200`);
+    res.json({ feedback: rows });
+  } catch (err) { res.status(500).json({ error: 'Failed to load feedback' }); }
+});
+
+router.patch('/platform-feedback/:id', adminGuard, async (req, res) => {
+  try {
+    const status = ['new', 'seen', 'done'].includes(req.body?.status) ? req.body.status : 'seen';
+    await pool.query(`UPDATE platform_feedback SET status = $1 WHERE id = $2`, [status, req.params.id]);
+    res.json({ ok: true });
+  } catch (err) { res.status(500).json({ error: 'Failed to update' }); }
+});
+
+// v2 dashboard: usage, sections, features, AI calls and feedback for the last N days
+const Analytics = require('../models/Analytics');
+router.get('/analytics', adminGuard, async (req, res) => {
+  try {
+    const days = [7, 14, 30].includes(Number(req.query.days)) ? Number(req.query.days) : 14;
+    res.json(await Analytics.overview(days));
+  } catch (err) {
+    console.error('Admin analytics error:', err);
+    res.status(500).json({ error: 'Failed to load analytics' });
+  }
+});
+
 // Stats
 router.get('/stats', adminGuard, async (_req, res) => {
   try {
@@ -258,9 +310,25 @@ router.delete('/rooms/:code', adminGuard, async (req, res) => {
 // List all articles
 router.get('/articles', adminGuard, async (_req, res) => {
   try {
+    // Reading metrics come from article_views / likes / comments, all keyed by slug.
     const { rows } = await pool.query(
-      `SELECT id, title, category, summary, tags, is_published, published_at, created_at
-       FROM articles ORDER BY created_at DESC`
+      `SELECT a.id, a.slug, a.title, a.category, a.summary, a.tags, a.is_published, a.published_at, a.created_at,
+              COALESCE(v.views, 0)    AS views,
+              COALESCE(v.readers, 0)  AS readers,
+              COALESCE(v.finished, 0) AS finished,
+              COALESCE(v.views_7d, 0) AS views_7d,
+              (SELECT count(*)::int FROM article_likes l WHERE l.article_slug = a.slug) AS likes,
+              (SELECT count(*)::int FROM article_comments c WHERE c.article_slug = a.slug AND c.deleted_at IS NULL) AS comments
+         FROM articles a
+         LEFT JOIN (
+           SELECT article_slug,
+                  count(*)::int                                                      AS views,
+                  count(DISTINCT visitor_id)::int                                    AS readers,
+                  count(DISTINCT visitor_id) FILTER (WHERE completed_at IS NOT NULL)::int AS finished,
+                  count(*) FILTER (WHERE viewed_at > NOW() - INTERVAL '7 days')::int AS views_7d
+             FROM article_views GROUP BY article_slug
+         ) v ON v.article_slug = a.slug
+        ORDER BY a.created_at DESC`
     );
     res.json({ articles: rows });
   } catch (err) {
@@ -351,7 +419,7 @@ router.get('/event-registrations', adminGuard, async (_req, res) => {
 // settings rather than an env var means it changes without a deploy — and can
 // go straight back to 'admin' if moderation ever gets away from you.
 const WHO_CAN_POST = 'community.who_can_post';
-const CATEGORIES   = ['announcement', 'session', 'doubt', 'discussion'];
+const CATEGORIES   = ['announcement', 'session', 'experience', 'ssb_date', 'doubt', 'discussion'];
 
 router.get('/community/settings', adminGuard, async (_req, res) => {
   try {
