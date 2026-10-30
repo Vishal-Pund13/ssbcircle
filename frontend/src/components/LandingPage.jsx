@@ -1384,7 +1384,7 @@ export default function LandingPage() {
 
         {/* The page runs: where to start → every stage → read → practise live → discuss */}
         <div id="stages"><SsbStages /></div>
-        <div id="prep"><Suspense fallback={<div className="h-[640px] border-t border-gray-100" />}><HomePrepSheet /></Suspense></div>
+        <div id="prep"><Suspense fallback={<div className="h-[300px] border-t border-gray-100" />}><HomePrepSheet /></Suspense></div>
 
         {/* ── Latest Reads — right under the hero so every visitor sees them ── */}
         <div id="news"><LatestReadsSection articles={articles} loading={articlesLoading} /></div>
