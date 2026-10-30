@@ -13,10 +13,11 @@ import { trackEvent } from '../analytics';
 // nine sections as a row of icons, and the case for daily practice — two small
 // streak calendars, steady against cramming.
 //
-// Those two calendars are drawn, not taken from real aspirants: we have no
-// such data, and presenting made-up activity as someone's would be a false
-// claim. They are labelled as an illustration on the page. If real calendars
-// are ever shared with consent, they can replace these.
+// Those two calendars are drawn, not taken from real aspirants, so they are
+// labelled as approaches ("the recommended way", "last-minute cramming"), never
+// as a particular candidate's record. Do not caption them as real recommended
+// or not-recommended candidates — we have no such data. If real calendars are
+// ever shared with consent, they can replace these under the person's name.
 
 const WEEKS = 12;
 
@@ -98,14 +99,13 @@ export default function HomePrepSheet() {
           <p className="text-sm font-bold text-gray-900 flex items-center gap-1.5"><Flame className="w-4 h-4 text-orange-500" /> The most disciplined make it</p>
           <p className="mt-0.5 text-xs text-gray-500">Personality is not built in a day.</p>
           <div className="mt-3 grid grid-cols-2 gap-3">
-            {[['Steady, daily', illustration('steady', today), 'text-emerald-700'], ['Last-minute', illustration('cramming', today), 'text-gray-500']].map(([label, data, ink]) => (
+            {[['✓ The recommended way', illustration('steady', today), 'text-emerald-700'], ['✗ Last-minute cramming', illustration('cramming', today), 'text-gray-500']].map(([label, data, ink]) => (
               <div key={label} className="min-w-0">
                 <p className={`text-[11px] font-semibold mb-1 ${ink}`}>{label}</p>
                 <Heatmap activity={data} weeks={WEEKS} today={today} maxCell={7} />
               </div>
             ))}
           </div>
-          <p className="mt-2 text-[10px] text-gray-400">Illustration, not real aspirants' data.</p>
           {myStreak !== null && (
             <p className="mt-3 pt-3 border-t border-gray-100 text-xs font-semibold text-orange-600 flex items-center gap-1">
               <Flame className="w-3.5 h-3.5" /> Your streak: {myStreak} day{myStreak === 1 ? '' : 's'} in a row
