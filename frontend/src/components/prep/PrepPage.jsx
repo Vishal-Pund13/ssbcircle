@@ -35,6 +35,18 @@ const FILTERS = [
 
 const STATUS_LABEL = ['Not started', 'Read', 'Can speak'];
 const COLLAPSE_KEY = 'ssbc:prep-collapsed';
+
+// The chevron in a panel's corner that folds it to a one-line summary. On a
+// phone the sheet is long; every part of it can be put away and stays put
+// away (panel ids share the collapsed set with groups, prefixed "panel:").
+function FoldButton({ folded, onClick, label }) {
+  return (
+    <button type="button" onClick={onClick} aria-expanded={!folded} aria-label={`${folded ? 'Show' : 'Hide'} ${label}`}
+      className="shrink-0 -mr-1.5 -mt-1 w-9 h-9 rounded-full flex items-center justify-center text-gray-400 hover:bg-black/5 hover:text-gray-600 cursor-pointer">
+      <ChevronDown className={`w-4 h-4 transition-transform ${folded ? '-rotate-90' : ''}`} />
+    </button>
+  );
+}
 const groupKey = (stepId, title) => `${stepId}:${title}`;
 // Which group a topic sits in, so opening it can unfold that group
 const GROUP_OF = Object.fromEntries(STEPS.flatMap(s => s.groups.flatMap(g => g.topics.map(t => [t.id, groupKey(s.id, g.title)]))));
@@ -107,11 +119,20 @@ function LastAttempt({ attempt }) {
 }
 
 // A section's cover: its colour, and its themed icons scattered as the picture
-function StepCover({ step, index, count, read, spoken, total }) {
+function StepCover({ step, index, count, read, spoken, total, folded, onFold }) {
   const t = themeFor(step.id);
   const Icon = t.icon;
   const [A, B, C] = t.deco;
   const pct = total ? Math.round((spoken / total) * 100) : 0;
+  if (folded) {
+    return (
+      <div className={`rounded-2xl border border-gray-200 ${t.soft} px-4 py-2.5 flex items-center gap-3`}>
+        <span className={`w-8 h-8 rounded-lg bg-white border border-gray-200 flex items-center justify-center shrink-0 ${t.text}`}><Icon className="w-4 h-4" /></span>
+        <p className="flex-1 min-w-0 text-base font-bold text-gray-900 truncate">{step.title} <span className="text-sm font-semibold text-gray-500 tabular-nums">· {pct}%</span></p>
+        <FoldButton folded onClick={onFold} label="section cover" />
+      </div>
+    );
+  }
   return (
     <div className={`relative overflow-hidden rounded-2xl border border-gray-200 ${t.soft} px-5 sm:px-7 py-5 sm:py-6`}>
       <div className={`absolute inset-y-0 right-0 w-1/2 pointer-events-none hidden sm:block ${t.text}`} aria-hidden="true">
@@ -121,7 +142,10 @@ function StepCover({ step, index, count, read, spoken, total }) {
         <C className="absolute right-56 bottom-6 w-8 h-8 opacity-[0.12] rotate-6" strokeWidth={1.5} />
       </div>
       <div className="relative">
-        <p className={`text-[11px] font-bold uppercase tracking-[0.25em] ${t.text}`}>Section {index + 1} of {count}</p>
+        <div className="flex items-start justify-between gap-2">
+          <p className={`text-[11px] font-bold uppercase tracking-[0.25em] ${t.text}`}>Section {index + 1} of {count}</p>
+          <FoldButton folded={false} onClick={onFold} label="section cover" />
+        </div>
         <div className="mt-3 flex items-center gap-3">
           <span className={`w-11 h-11 rounded-xl bg-white border border-gray-200 shadow-sm flex items-center justify-center shrink-0 ${t.text}`}>
             <Icon className="w-5 h-5" />
@@ -398,6 +422,9 @@ export default function PrepPage() {
     next.has(key) ? next.delete(key) : next.add(key);
     saveCollapsed(next);
   }
+  const panelFolded = id => collapsed.has(`panel:${id}`);
+  const togglePanel = id => toggleGroup(`panel:${id}`);
+
   function setStepCollapsed(step, fold) {
     const next = new Set(collapsed);
     for (const g of step.groups) fold ? next.add(groupKey(step.id, g.title)) : next.delete(groupKey(step.id, g.title));
@@ -565,7 +592,14 @@ export default function PrepPage() {
         {/* ── Dashboard ── */}
         {/* Stacked on phones: as a sideways row the streak card sat off-screen */}
         <div className="mt-5 sm:mt-6 grid grid-cols-1 md:grid-cols-3 gap-3 md:gap-4">
-          {user && (
+          {user && panelFolded('progress') && (
+            <section className="bg-white border border-gray-200 rounded-2xl px-5 py-3.5 flex items-center gap-3">
+              <p className="flex-1 text-sm font-bold text-gray-900">{firstName(user)}'s progress
+                <span className="ml-2 font-semibold text-emerald-700 tabular-nums">{totals.all.total ? Math.round((totals.all.spoken / totals.all.total) * 100) : 0}%</span></p>
+              <FoldButton folded onClick={() => togglePanel('progress')} label="progress" />
+            </section>
+          )}
+          {user && !panelFolded('progress') && (
             <section className="bg-white border border-gray-200 rounded-2xl p-5 flex items-center gap-4">
               <div className="relative">
                 <Ring {...totals.all} />
@@ -574,8 +608,11 @@ export default function PrepPage() {
                 </span>
               </div>
               <div className="min-w-0 flex-1">
-                <p className="text-sm font-bold text-gray-900">{firstName(user)}'s progress</p>
-                <p className="text-xs text-gray-500 mt-0.5">{totals.all.spoken} can speak · {totals.all.read} read · {totals.all.total} topics</p>
+                <div className="flex items-start justify-between gap-2">
+                  <p className="text-sm font-bold text-gray-900">{firstName(user)}'s progress</p>
+                  <FoldButton folded={false} onClick={() => togglePanel('progress')} label="progress" />
+                </div>
+                <p className="text-xs text-gray-500 -mt-1.5">{totals.all.spoken} can speak · {totals.all.read} read · {totals.all.total} topics</p>
                 <div className="mt-2.5 space-y-1">
                   {['must', 'good', 'deep'].map(l => (
                     <div key={l} className="flex items-center gap-2">
@@ -590,24 +627,31 @@ export default function PrepPage() {
           )}
 
           {user && (
-            <section className="bg-white border border-gray-200 rounded-2xl p-5">
+            <section className={`bg-white border border-gray-200 rounded-2xl ${panelFolded('streak') ? 'px-5 py-3.5' : 'p-5'}`}>
               <div className="flex items-center gap-2">
-                <span className={`w-9 h-9 rounded-xl flex items-center justify-center ${streakDays ? 'bg-orange-50' : 'bg-gray-50'}`}>
+                <span className={`w-9 h-9 rounded-xl flex items-center justify-center shrink-0 ${streakDays ? 'bg-orange-50' : 'bg-gray-50'}`}>
                   <Flame className={`w-5 h-5 ${streakDays ? 'text-orange-500' : 'text-gray-300'}`} />
                 </span>
-                <div>
+                <div className="flex-1">
                   <p className="text-xl font-bold text-gray-900 tabular-nums leading-none">{streakDays} <span className="text-xs font-medium text-gray-500">day{streakDays === 1 ? '' : 's'} in a row</span></p>
-                  <p className="text-[12px] text-gray-400 mt-1">Any tick or revision counts</p>
+                  {!panelFolded('streak') && <p className="text-[12px] text-gray-400 mt-1">Any tick or revision counts</p>}
                 </div>
+                <FoldButton folded={panelFolded('streak')} onClick={() => togglePanel('streak')} label="streak calendar" />
               </div>
-              <div className="mt-3"><Heatmap activity={activity} /></div>
+              {!panelFolded('streak') && <div className="mt-3"><Heatmap activity={activity} /></div>}
             </section>
           )}
 
-          <section className={`relative overflow-hidden rounded-2xl p-5 bg-gradient-to-br from-amber-50 to-orange-50 border border-amber-100 ${user ? '' : 'md:col-span-3'}`}>
-            <Lightbulb className="absolute -right-3 -top-3 w-20 h-20 text-amber-200/70" strokeWidth={1.25} aria-hidden="true" />
-            <p className="relative text-[12px] font-bold text-amber-700 uppercase tracking-wide">Topic of the day</p>
-            <p className="relative mt-2 text-base font-bold text-gray-900">{totd.title}</p>
+          <section className={`relative overflow-hidden rounded-2xl ${panelFolded('totd') ? 'px-5 py-3.5' : 'p-5'} bg-gradient-to-br from-amber-50 to-orange-50 border border-amber-100 ${user ? '' : 'md:col-span-3'}`}>
+            {!panelFolded('totd') && <Lightbulb className="absolute -right-3 -top-3 w-20 h-20 text-amber-200/70" strokeWidth={1.25} aria-hidden="true" />}
+            <div className="relative flex items-start justify-between gap-2">
+              <p className="text-[12px] font-bold text-amber-700 uppercase tracking-wide">
+                Topic of the day{panelFolded('totd') && <span className="normal-case tracking-normal font-semibold text-gray-800"> · {totd.title}</span>}
+              </p>
+              <FoldButton folded={panelFolded('totd')} onClick={() => togglePanel('totd')} label="topic of the day" />
+            </div>
+            {!panelFolded('totd') && <>
+            <p className="relative -mt-1 text-base font-bold text-gray-900">{totd.title}</p>
             <p className="relative mt-1 text-sm text-gray-700">"{totd.ask}"</p>
             <div className="relative mt-3 flex flex-wrap gap-2">
               <button type="button" onClick={() => jumpTo(totd, { speakNow: true })} className="btn-primary text-xs px-3 py-2">
@@ -617,19 +661,21 @@ export default function PrepPage() {
                 <Radio className="w-3.5 h-3.5" /> GD room
               </button>
             </div>
+            </>}
           </section>
         </div>
 
         {/* ── Today's plan + revision ── */}
         {user && (
           <div className={`mt-4 grid grid-cols-1 ${due.length ? 'md:grid-cols-2' : ''} gap-4`}>
-            <section className="bg-white border border-gray-200 rounded-2xl p-5">
+            <section className={`bg-white border border-gray-200 rounded-2xl ${panelFolded('plan') ? 'px-5 py-3.5' : 'p-5'}`}>
               <div className="flex items-start justify-between gap-3">
-                <div>
+                <div className="flex-1 min-w-0">
                   <p className="text-sm font-bold text-gray-900 flex items-center gap-1.5">
                     <Target className="w-4 h-4 text-brand-600" /> {firstName(user)}'s plan for today
+                    {panelFolded('plan') && <span className="font-medium text-gray-500">· {planTopics.length} topic{planTopics.length === 1 ? '' : 's'}</span>}
                   </p>
-                  <p className="text-xs text-gray-500 mt-1">
+                  {!panelFolded('plan') && <p className="text-xs text-gray-500 mt-1">
                     {plan.daysLeft == null && 'Three topics a day. Add your SSB date and the plan fits itself to it.'}
                     {plan.daysLeft != null && plan.daysLeft > 0 && (
                       <>{plan.daysLeft} day{plan.daysLeft === 1 ? '' : 's'} to your SSB · {plan.remaining} topic{plan.remaining === 1 ? '' : 's'} left · {plan.perDay} a day
@@ -637,16 +683,17 @@ export default function PrepPage() {
                     )}
                     {plan.daysLeft === 0 && 'Your SSB is today. No new topics — trust your preparation. All the best!'}
                     {plan.daysLeft != null && plan.daysLeft < 0 && 'Your SSB date has passed. Set your next date to get a new plan.'}
-                  </p>
+                  </p>}
                 </div>
-                {plan.daysLeft != null && (
+                {plan.daysLeft != null && !panelFolded('plan') && (
                   <span className="shrink-0 inline-flex items-center gap-1 text-[12px] text-gray-500 bg-gray-50 border border-gray-100 rounded-lg px-2 py-1">
                     <Calendar className="w-3 h-3" /> {user.ssb_date}
                   </span>
                 )}
+                <FoldButton folded={panelFolded('plan')} onClick={() => togglePanel('plan')} label="today's plan" />
               </div>
 
-              {(plan.daysLeft == null || plan.daysLeft < 0) && (
+              {!panelFolded('plan') && (plan.daysLeft == null || plan.daysLeft < 0) && (
                 <div className="mt-3 flex items-center gap-2">
                   <input type="date" min={addDays(today, 1)} value={dateDraft} onChange={e => setDateDraft(e.target.value)}
                     className="input-base text-sm w-auto py-1.5" />
@@ -656,7 +703,7 @@ export default function PrepPage() {
                 </div>
               )}
 
-              {plan.daysLeft !== 0 && (
+              {!panelFolded('plan') && plan.daysLeft !== 0 && (
                 <ul className="mt-3 space-y-0.5">
                   {planTopics.map(t => {
                     const done = plan.doneToday.includes(t);
@@ -686,11 +733,15 @@ export default function PrepPage() {
             </section>
 
             {due.length > 0 && (
-              <section className="bg-white border border-amber-200 rounded-2xl p-5">
-                <p className="text-sm font-bold text-gray-900 flex items-center gap-1.5">
-                  <RotateCcw className="w-4 h-4 text-amber-500" /> Revision due · {due.length}
-                </p>
-                <p className="text-xs text-gray-500 mt-1">
+              <section className={`bg-white border border-amber-200 rounded-2xl ${panelFolded('revision') ? 'px-5 py-3.5' : 'p-5'}`}>
+                <div className="flex items-start justify-between gap-2">
+                  <p className="text-sm font-bold text-gray-900 flex items-center gap-1.5">
+                    <RotateCcw className="w-4 h-4 text-amber-500" /> Revision due · {due.length}
+                  </p>
+                  <FoldButton folded={panelFolded('revision')} onClick={() => togglePanel('revision')} label="revision" />
+                </div>
+                {!panelFolded('revision') && <>
+                <p className="text-xs text-gray-500 -mt-1">
                   Answer the question out loud again. If it still flows, it comes back later. If not, tomorrow.
                 </p>
                 <ul className="mt-3 divide-y divide-gray-100">
@@ -713,6 +764,7 @@ export default function PrepPage() {
                     </li>
                   ))}
                 </ul>
+                </>}
               </section>
             )}
           </div>
@@ -755,8 +807,11 @@ export default function PrepPage() {
                 real question from inside it. A strip of chips scrolling sideways
                 hid most of them, and few people found the rest. */}
             <div id="sections" className="lg:hidden scroll-mt-16 mb-5">
-              <p className="text-sm font-bold text-gray-900">{STEPS.length} sections <span className="font-normal text-gray-500">· tap one to see its questions</span></p>
-              <div className="mt-2.5 grid grid-cols-2 gap-2">
+              <div className="flex items-center justify-between gap-2">
+                <p className="text-sm font-bold text-gray-900">{STEPS.length} sections <span className="font-normal text-gray-500">· {panelFolded('sections') ? `now in ${currentStep.title}` : 'tap one to see its questions'}</span></p>
+                <FoldButton folded={panelFolded('sections')} onClick={() => togglePanel('sections')} label="section list" />
+              </div>
+              {!panelFolded('sections') && <div className="mt-2.5 grid grid-cols-2 gap-2">
                 {STEPS.map(step => {
                   const t = themeFor(step.id);
                   const Icon = t.icon;
@@ -780,7 +835,7 @@ export default function PrepPage() {
                     </button>
                   );
                 })}
-              </div>
+              </div>}
             </div>
 
             {/* Search and filters */}
@@ -857,7 +912,8 @@ export default function PrepPage() {
                     </button>
                   </div>
                   <div id="section-open" className="scroll-mt-28" />
-                  <StepCover step={currentStep} index={stepIndex} count={STEPS.length} read={st.read} spoken={st.spoken} total={st.total} />
+                  <StepCover step={currentStep} index={stepIndex} count={STEPS.length} read={st.read} spoken={st.spoken} total={st.total}
+                    folded={panelFolded('cover')} onFold={() => togglePanel('cover')} />
                   {/* Fold away what you have finished; your choice is remembered */}
                   {(() => {
                     const keys = currentStep.groups.map(g => groupKey(currentStep.id, g.title));
