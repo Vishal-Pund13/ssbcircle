@@ -62,6 +62,7 @@ export default function OnboardingPage() {
     if (!/^(\+?91)?[6-9]\d{9}$/.test(phone.replace(/[\s()-]/g, ''))) {
       setError('Please enter your 10-digit mobile number.'); return;
     }
+    if (!source) { setError('Please tell us where you heard about us.'); return; }
     if (source === 'Other' && sourceOther.trim().length < 2) {
       setError('Please tell us where you heard about us.'); return;
     }
@@ -178,7 +179,7 @@ export default function OnboardingPage() {
           {/* Referral */}
           <div>
             <label className="block text-sm font-bold text-gray-900 mb-1">
-              Where did you hear about us? <span className="font-medium text-gray-400">(optional)</span>
+              Where did you hear about us? <span className="font-medium text-red-500">*</span>
             </label>
             <p className="text-xs text-gray-400 mb-3">It tells us where to find more aspirants like you.</p>
             <div className="flex flex-wrap gap-2">

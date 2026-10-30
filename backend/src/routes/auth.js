@@ -139,6 +139,10 @@ router.post('/me/onboarding', authMiddleware, async (req, res) => {
       return res.status(400).json({ error: 'That does not look like an Indian mobile number. Enter 10 digits.' });
 
     let source = String(body.referral_source || '').trim();
+    // Required on the welcome page, which always sends it. The profile page
+    // saves through here without the field, and must not be blocked by it.
+    if ('referral_source' in body && !source)
+      return res.status(400).json({ error: 'Please tell us where you heard about us.' });
     if (source && !REFERRAL_SOURCES.includes(source))
       return res.status(400).json({ error: 'Please pick one of the listed options.' });
     // "Other" must say what: stored as "Other: <their words>", which fits the
