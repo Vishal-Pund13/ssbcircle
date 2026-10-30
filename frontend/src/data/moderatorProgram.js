@@ -20,7 +20,7 @@ export const DUTIES = [
 ];
 
 export const WHO_CAN_APPLY = [
-  'Any SSBCircle member with a free account in good standing.',
+  'Any SSBCircle member with an account in good standing.',
   'You enjoy helping others prepare, and can give a few hours a week.',
   'You are respectful, honest and follow the community rules.',
   'You do not need to be recommended at the SSB already. Many great moderators are still preparing.',

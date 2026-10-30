@@ -568,7 +568,7 @@ export default function PrepPage() {
           <div className="mt-6 bg-brand-50 border border-brand-100 rounded-2xl p-5 flex flex-col sm:flex-row sm:items-center gap-4">
             <div className="flex-1">
               <p className="font-bold text-gray-900">Track your progress, get a daily plan, and never forget what you learnt.</p>
-              <p className="text-sm text-gray-600 mt-1">Free. Sign in and your ticks, notes and revision are saved.</p>
+              <p className="text-sm text-gray-600 mt-1">Sign in and your ticks, notes and revision are saved.</p>
             </div>
             <Link to="/login" state={{ from: location }} className="btn-primary text-sm px-5 py-2.5 text-center">
               Sign in to track

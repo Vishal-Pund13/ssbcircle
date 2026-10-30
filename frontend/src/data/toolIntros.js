@@ -15,7 +15,7 @@ export const TOOL_INTROS = {
     ],
     points: [
       'Private: only you can see your PIQ, and you can delete it any time.',
-      'Free to use. AI analysis has a daily limit, so use it when your PIQ is ready.',
+      'AI analysis has a daily limit, so use it when your PIQ is ready.',
     ],
     faq: [
       { q: 'What is the PIQ form in SSB?',
@@ -25,7 +25,7 @@ export const TOOL_INTROS = {
       { q: 'Is my PIQ data safe?',
         a: 'Your PIQ is never shown to other members and never appears on your profile. When you delete it, it is removed from our database, not just hidden.' },
     ],
-    cta: 'Sign in free to fill your PIQ',
+    cta: 'Sign in to fill your PIQ',
   },
   tat: {
     path: '/tat',
@@ -39,7 +39,7 @@ export const TOOL_INTROS = {
     ],
     points: [
       'Write your own thoughts. A simple honest idea beats a memorised theme.',
-      'Free to use. AI analysis has a daily limit, so use it when you are ready to write.',
+      'AI analysis has a daily limit, so use it when you are ready to write.',
     ],
     faq: [
       { q: 'What is TAT in SSB?',
@@ -49,6 +49,6 @@ export const TOOL_INTROS = {
       { q: 'How should I write a TAT story?',
         a: 'Let the story come from the picture. Keep your hero real and solve the problem with practical steps. Think in three parts: what led to this, what the hero does, and how it ends.' },
     ],
-    cta: 'Sign in free to start writing',
+    cta: 'Sign in to start writing',
   },
 };

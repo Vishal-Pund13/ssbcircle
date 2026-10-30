@@ -125,7 +125,7 @@ export function CommentsSection({ engagement, inputRef }) {
         </form>
       ) : (
         <p className="text-sm text-gray-500">
-          <Link to="/register" className="font-semibold text-brand-600 hover:underline">Create a free account</Link>
+          <Link to="/register" className="font-semibold text-brand-600 hover:underline">Create an account</Link>
           {' '}to like and comment.
         </p>
       )}

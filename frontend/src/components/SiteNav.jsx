@@ -150,14 +150,14 @@ export default function SiteNav() {
           ) : (
             <>
               <Link to="/login" className="text-sm text-gray-500 hover:text-gray-900 px-3 py-2 font-medium">Sign in</Link>
-              <Link to="/register" className="btn-primary py-1.5 px-4 text-sm">Start free</Link>
+              <Link to="/register" className="btn-primary py-1.5 px-4 text-sm">Get started</Link>
             </>
           )}
         </div>
 
         {/* ── Mobile ── */}
         <div className="md:hidden flex items-center gap-2">
-          {!user && <Link to="/register" className="btn-primary py-1.5 px-3 text-xs">Start free</Link>}
+          {!user && <Link to="/register" className="btn-primary py-1.5 px-3 text-xs">Get started</Link>}
           <button onClick={() => setMenuOpen(v => !v)} aria-label="Menu" aria-expanded={menuOpen}
             className="flex items-center justify-center w-9 h-9 rounded-xl border border-gray-200 bg-white hover:bg-gray-50 transition-colors cursor-pointer">
             {menuOpen ? <X className="w-4 h-4 text-gray-600" /> : (
@@ -221,7 +221,7 @@ export default function SiteNav() {
             ) : (
               <div className="grid grid-cols-2 gap-2 px-1">
                 <Link to="/login" className="btn-secondary text-sm py-2.5 text-center">Sign in</Link>
-                <Link to="/register" className="btn-primary text-sm py-2.5 text-center">Start free</Link>
+                <Link to="/register" className="btn-primary text-sm py-2.5 text-center">Get started</Link>
               </div>
             )}
           </div>

@@ -892,7 +892,7 @@ function UpcomingTab({ sessions, loading, user, onRefresh, navigate, onInterest,
           <p className="text-sm font-medium text-gray-700 mb-1">No upcoming sessions</p>
           <p className="text-xs text-gray-400 mb-5">Schedule one and invite your batch to join.</p>
           <button onClick={() => navigate(user ? '/create' : '/register')} className="btn-primary text-xs py-2 px-5">
-            {user ? 'Schedule a Session' : 'Get started free'}
+            {user ? 'Schedule a Session' : 'Get started'}
           </button>
         </div>
       ) : (
@@ -1036,7 +1036,7 @@ function FaqSection() {
         {/* AI costs money per call — say so plainly, where people read about the tools */}
         <p className="mt-4 flex items-start gap-2.5 text-sm text-amber-900 bg-amber-50 border border-amber-100 rounded-xl px-4 py-3 leading-relaxed">
           <Lightbulb className="w-4 h-4 text-amber-500 shrink-0 mt-0.5" />
-          <span><span className="font-semibold">Please use AI feedback responsibly.</span> Every check costs us real money to run. Use it when your answer is ready — that keeps SSBCircle free for everyone.</span>
+          <span><span className="font-semibold">Please use AI feedback responsibly.</span> Every check costs us real money to run. Use it when your answer is ready — that keeps SSBCircle running for everyone.</span>
         </p>
       </div>
     </section>
@@ -1363,7 +1363,7 @@ export default function LandingPage() {
                 <Hello className="mb-4" />
               ) : (
                 <p className="inline-flex items-center gap-2 text-xs font-semibold text-brand-700 bg-white border border-brand-100 px-3 py-1.5 rounded-full mb-5">
-                  <Shield className="w-3.5 h-3.5" /> Free SSB preparation for every entry
+                  <Shield className="w-3.5 h-3.5" /> SSB preparation for every entry
                 </p>
               )}
 
@@ -1396,13 +1396,13 @@ export default function LandingPage() {
 
               <p className="text-gray-600 text-sm sm:text-lg leading-relaxed mb-6">
                 Know yourself through your PIQ, practise TAT stories with honest feedback, stay ready with
-                news cards, and speak in live GD and PPDT rooms with other aspirants. All free.
+                news cards, and speak in live GD and PPDT rooms with other aspirants.
               </p>
 
               <div className="flex flex-col sm:flex-row gap-3 mb-6">
                 <button onClick={() => { trackEvent('home_cta', { which: user ? 'piq' : 'start_free' }); navigate(user ? '/piq' : '/register'); }}
                   className="btn-primary text-sm px-7 py-3 w-full sm:w-auto flex items-center justify-center gap-2">
-                  {user ? 'Open my PIQ' : 'Start free'} <ArrowRight className="w-4 h-4" />
+                  {user ? 'Open my PIQ' : 'Get started'} <ArrowRight className="w-4 h-4" />
                 </button>
                 <button onClick={() => { trackEvent('home_cta', { which: 'tat' }); navigate('/tat'); }}
                   className="btn-secondary text-sm px-7 py-3 w-full sm:w-auto">
@@ -1449,7 +1449,7 @@ export default function LandingPage() {
           <div className="mb-5">
             <p className="text-[11px] font-bold uppercase tracking-[0.25em] text-brand-600">Practise together</p>
             <h2 className="mt-1.5 text-xl sm:text-2xl font-bold text-gray-900">Speak with other aspirants</h2>
-            <p className="text-sm text-gray-500 mt-1">GD, PPDT, Lecturette and mock interviews with other aspirants. Voice only, free, join from your phone.</p>
+            <p className="text-sm text-gray-500 mt-1">GD, PPDT, Lecturette and mock interviews with other aspirants. Voice only, join from your phone.</p>
           </div>
 
           {/* Tab switcher */}
@@ -1591,7 +1591,7 @@ export default function LandingPage() {
               </p>
               <p className="text-xs text-gray-400 mb-5 max-w-xs mx-auto">Start a discussion and share the code with your batch.</p>
               <button onClick={() => navigate(user ? '/create' : '/register')} className="btn-primary text-xs py-2 px-5">
-                {user ? 'Create a Room' : 'Get started free'}
+                {user ? 'Create a Room' : 'Get started'}
               </button>
               <p className="text-xs text-gray-400 mt-4">
                 No GD topic?{' '}
@@ -1616,7 +1616,7 @@ export default function LandingPage() {
               {!user && (
                 <div className="mt-4 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 bg-brand-50 border border-brand-100 rounded-xl px-4 sm:px-5 py-4">
                   <p className="text-sm text-brand-700 font-medium">Sign in to join or create a room</p>
-                  <Link to="/register" className="btn-primary text-xs py-2 px-4 shrink-0 w-full sm:w-auto text-center">Join free</Link>
+                  <Link to="/register" className="btn-primary text-xs py-2 px-4 shrink-0 w-full sm:w-auto text-center">Join now</Link>
                 </div>
               )}
               {user && (

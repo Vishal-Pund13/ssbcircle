@@ -183,7 +183,7 @@ export default function PostPage() {
               <p className="text-sm text-gray-600">
                 <Link to="/login" state={{ from: { pathname: `/community/${post.id}` } }} className="font-semibold text-brand-600 hover:underline">Sign in</Link>
                 {' '}or{' '}
-                <Link to="/register" className="font-semibold text-brand-600 hover:underline">create a free account</Link> to comment.
+                <Link to="/register" className="font-semibold text-brand-600 hover:underline">create an account</Link> to comment.
               </p>
             )}
 

@@ -45,7 +45,7 @@ function StatusCard({ user }) {
     return (
       <div className="bg-white border border-gray-200 rounded-2xl p-6 text-center">
         <p className="text-lg font-bold text-gray-900">Sign in to opt in</p>
-        <p className="text-sm text-gray-500 mt-1">A free account is all you need.</p>
+        <p className="text-sm text-gray-500 mt-1">An SSBCircle account is all you need.</p>
         <Link to="/login" state={{ from: { pathname: '/moderators' } }} className="btn-primary text-sm px-6 py-2.5 mt-4 inline-flex">Sign in</Link>
       </div>
     );

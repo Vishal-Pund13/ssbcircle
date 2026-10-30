@@ -891,10 +891,10 @@ export default function RoomView() {
 
     return () => {
       document.title = prev;
-      setMeta('property', 'og:title',       'SSBCircle – Free SSB Interview GD Practice Online | Service Selection Board Prep');
-      setMeta('property', 'og:description', 'Practice SSB interview Group Discussions online with real defence aspirants. Free voice rooms, GD timer, live transcripts.');
+      setMeta('property', 'og:title',       'SSBCircle – SSB Interview GD Practice Online | Service Selection Board Prep');
+      setMeta('property', 'og:description', 'Practice SSB interview Group Discussions online with real defence aspirants. Live voice rooms, GD timer, live transcripts.');
       setMeta('property', 'og:url',         'https://www.ssbcircle.com/');
-      setMeta('name',     'description',    'Practice SSB interview Group Discussions online with real defence aspirants. Free voice rooms, GD timer, live transcripts.');
+      setMeta('name',     'description',    'Practice SSB interview Group Discussions online with real defence aspirants. Live voice rooms, GD timer, live transcripts.');
     };
   }, [room, isTranscribing]);
 

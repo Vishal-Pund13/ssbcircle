@@ -10,7 +10,7 @@
 export const HOME_FAQ = [
   {
     q: 'What is SSBCircle?',
-    a: 'A free platform for anyone who wants to become an officer in the Indian Army, Navy or Air Force. It covers the whole journey: what you can become and how to join, the exam dates, AI feedback on your PIQ, TAT stories and spoken answers, a Prep Sheet of topics for GD and interview, and live practice with other aspirants.',
+    a: 'A platform for anyone who wants to become an officer in the Indian Army, Navy or Air Force. It covers the whole journey: what you can become and how to join, the exam dates, AI feedback on your PIQ, TAT stories and spoken answers, a Prep Sheet of topics for GD and interview, and live practice with other aspirants.',
   },
   {
     q: 'I am new to all this. Where do I start?',
@@ -38,8 +38,8 @@ export const HOME_FAQ = [
     a: 'Yes. Join live voice rooms for Group Discussion, PPDT, Lecturette and mock interviews, or create your own and share the code. Aspirants meet every day at 10 PM and 11 PM IST. In the Community you can share your SSB experience, find others with the same SSB dates, and ask your doubts.',
   },
   {
-    q: 'Is SSBCircle free? Why is AI feedback limited each day?',
-    a: 'SSBCircle is free for every aspirant, for every entry. But every AI check — a PIQ report, TAT feedback or a spoken answer — costs us real money to run. That is why there is a daily limit. Please use it when your answer is ready, not just to test; using it responsibly keeps it free for everyone.',
+    q: 'Why is AI feedback limited each day?',
+    a: 'Every AI check — a PIQ report, TAT feedback or a spoken answer — costs us real money to run. That is why there is a daily limit. Please use it when your answer is ready, not just to test; using it responsibly keeps it available for everyone.',
   },
   {
     q: 'Is my PIQ private?',

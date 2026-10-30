@@ -136,7 +136,7 @@ function docDefinition(analysis, name, analysedAt) {
 
   content.push({
     margin: [0, 16, 0, 0], style: 'small', color: MUTED,
-    text: ['Practice guidance based on what you wrote, not a real assessment. Be honest on the day; keep improving.\nPrepare free at ', { text: 'ssbcircle.com', bold: true }],
+    text: ['Practice guidance based on what you wrote, not a real assessment. Be honest on the day; keep improving.\nPrepare at ', { text: 'ssbcircle.com', bold: true }],
   });
 
   return {

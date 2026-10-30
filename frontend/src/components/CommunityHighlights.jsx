@@ -85,7 +85,7 @@ function AskBox({ user }) {
     <div className="bg-white border border-gray-200 rounded-2xl p-4 sm:p-5 flex flex-col gap-3.5 h-full">
       <div>
         <p className="text-sm font-bold text-gray-900">Share, find batchmates, or ask.</p>
-        <p className="mt-0.5 text-xs text-gray-500">Post how your SSB went, your upcoming SSB date, or any doubt. Free, and anyone can reply.</p>
+        <p className="mt-0.5 text-xs text-gray-500">Post how your SSB went, your upcoming SSB date, or any doubt. Anyone can reply.</p>
       </div>
 
       {/* Looks like an input, opens the real composer */}

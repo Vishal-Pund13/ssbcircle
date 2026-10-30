@@ -169,7 +169,7 @@ const TOOL_ROUTES = [
   {
     path: '/piq',
     title: 'SSB PIQ Form Analyzer — See What Your IO Will Ask | SSBCircle',
-    description: 'Fill your SSB PIQ (Personal Information Questionnaire) and see the interview questions your Interviewing Officer is likely to ask from it. Free, private, and downloadable as a PDF blueprint.',
+    description: 'Fill your SSB PIQ (Personal Information Questionnaire) and see the interview questions your Interviewing Officer is likely to ask from it. Private, and downloadable as a PDF blueprint.',
     priority: '0.9', changefreq: 'monthly',
     heading: TOOL_INTROS.piq.title,
     blurb: TOOL_INTROS.piq.subtitle,
@@ -179,7 +179,7 @@ const TOOL_ROUTES = [
   {
     path: '/tat',
     title: 'TAT Practice for SSB — Write Stories, Get Feedback Online | SSBCircle',
-    description: 'Practise the SSB Thematic Apperception Test online: see a picture for 30 seconds, write your story in 4 minutes, and get feedback on your hero, your plot and the qualities your story shows. Free.',
+    description: 'Practise the SSB Thematic Apperception Test online: see a picture for 30 seconds, write your story in 4 minutes, and get feedback on your hero, your plot and the qualities your story shows.',
     priority: '0.9', changefreq: 'monthly',
     heading: TOOL_INTROS.tat.title,
     blurb: TOOL_INTROS.tat.subtitle,
@@ -240,10 +240,10 @@ const STATIC_ROUTES = [
   {
     path: '/session',
     title: 'Upcoming Live SSB Practice Sessions | SSBCircle',
-    description: 'Scheduled live SSB practice sessions — GD, PPDT, Lecturette and IO mock interviews with real defence aspirants. Free to join, straight from your browser.',
+    description: 'Scheduled live SSB practice sessions — GD, PPDT, Lecturette and IO mock interviews with real defence aspirants. Join straight from your browser.',
     priority: '0.7', changefreq: 'daily',
     heading: 'Upcoming live SSB practice sessions',
-    blurb: 'Scheduled GD, PPDT, Lecturette and IO mock interview sessions you can join free with other NDA, CDS and AFCAT aspirants.',
+    blurb: 'Scheduled GD, PPDT, Lecturette and IO mock interview sessions you can join with other NDA, CDS and AFCAT aspirants.',
   },
   {
     path: '/community',
@@ -255,11 +255,11 @@ const STATIC_ROUTES = [
   },
   {
     path: '/register',
-    title: 'Create a Free SSBCircle Account — Start SSB Practice | SSBCircle',
-    description: 'Sign up free with Google and start practising SSB Group Discussion, PPDT, Lecturette and IO mock interviews in live voice rooms with real defence aspirants.',
+    title: 'Create Your SSBCircle Account — Start SSB Practice | SSBCircle',
+    description: 'Sign up with Google and start practising SSB Group Discussion, PPDT, Lecturette and IO mock interviews in live voice rooms with real defence aspirants.',
     priority: '0.7', changefreq: 'monthly',
-    heading: 'Join SSBCircle free',
-    blurb: 'Create a free account and start practising SSB GD, PPDT, Lecturette and IO mock interviews with real aspirants. No subscription, no paywall.',
+    heading: 'Join SSBCircle',
+    blurb: 'Create an account and start practising SSB GD, PPDT, Lecturette and IO mock interviews with real aspirants.',
   },
   { path: '/login',  title: 'Sign in | SSBCircle',            description: 'Sign in to SSBCircle to join live SSB practice rooms.',        noindex: true },
   { path: '/join',   title: 'Join a practice room | SSBCircle', description: 'Enter a room code to join a live SSB practice room.',       noindex: true },
@@ -331,7 +331,7 @@ function setNoscript(html, heading, blurb, extra = '') {
       <div style="max-width:900px;margin:0 auto;padding:24px;font-family:sans-serif;color:#111;">
         <h1 style="font-size:1.9rem;font-weight:800;margin-bottom:8px;">${esc(heading)}</h1>
         <p style="font-size:1.05rem;color:#444;line-height:1.7;">${esc(blurb)}</p>${extra}
-        <p style="margin-top:24px;"><a href="${SITE}/">SSBCircle — free SSB interview practice with real aspirants</a></p>
+        <p style="margin-top:24px;"><a href="${SITE}/">SSBCircle — SSB interview preparation with real aspirants</a></p>
       </div>
     </noscript>`
   );

@@ -29,7 +29,7 @@ export default function ToolIntro({ tool }) {
             <Link to="/login" state={{ from: location }} className="btn-primary text-sm px-6 py-3 inline-flex items-center gap-2">
               {t.cta} <ArrowRight className="w-4 h-4" />
             </Link>
-            <Link to="/register" className="text-sm font-semibold text-brand-700 hover:underline">New here? Create a free account</Link>
+            <Link to="/register" className="text-sm font-semibold text-brand-700 hover:underline">New here? Create an account</Link>
           </div>
         </PageHead>
 

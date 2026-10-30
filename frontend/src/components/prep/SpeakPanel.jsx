@@ -61,7 +61,7 @@ const VERDICT = {
 function CostNote() {
   return (
     <p className="mt-3 text-sm text-amber-800 bg-amber-50 border border-amber-100 rounded-lg px-3 py-2 leading-relaxed">
-      Every check costs us real money to run. It is free for you, so please use it when your answer is ready, not just to test.
+      Every check costs us real money to run, so please use it when your answer is ready, not just to test.
     </p>
   );
 }

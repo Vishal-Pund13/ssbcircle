@@ -95,7 +95,7 @@ export default function AnnouncementPoster() {
             {user ? <>{firstName(user)}, prepare<br />for the SSB smartly.</> : <>Prepare for the SSB<br />smartly.</>}
           </h2>
           <p className="relative mt-3 text-sm sm:text-base text-white/85 leading-relaxed max-w-sm">
-            AI feedback built on the methods SSB mentors use to assess candidates. Free.
+            AI feedback built on the methods SSB mentors use to assess candidates.
           </p>
         </div>
 
@@ -137,7 +137,7 @@ export default function AnnouncementPoster() {
         {/* Action */}
         <div className="px-6 pt-5 pb-6" style={{ paddingBottom: 'calc(1.5rem + env(safe-area-inset-bottom))' }}>
           <button type="button" onClick={go} className="w-full btn-primary text-base py-3.5">
-            {user ? 'Get my PIQ assessed' : 'Start free'} <ArrowRight className="w-5 h-5" />
+            {user ? 'Get my PIQ assessed' : 'Get started'} <ArrowRight className="w-5 h-5" />
           </button>
           <button type="button" onClick={() => close('later')}
             className="mt-2 w-full text-sm font-semibold text-gray-500 hover:text-gray-700 py-2.5 cursor-pointer">

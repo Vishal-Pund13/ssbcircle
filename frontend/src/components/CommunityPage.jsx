@@ -349,7 +349,7 @@ export default function CommunityPage() {
           )}
           {canPost && !user && !loading && (
             <p className="text-sm text-gray-500 text-center py-2">
-              <Link to="/register" className="font-semibold text-brand-600 hover:underline">Create a free account</Link> to post, reply and upvote.
+              <Link to="/register" className="font-semibold text-brand-600 hover:underline">Create an account</Link> to post, reply and upvote.
             </p>
           )}
         </div>
