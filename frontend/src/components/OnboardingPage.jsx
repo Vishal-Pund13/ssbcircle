@@ -1,16 +1,20 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
+import { Link } from 'react-router-dom';
 import { saveOnboarding } from '../services/api';
-import { Check, AlertCircle, ShieldCheck } from 'lucide-react';
+import { Check, AlertCircle, ShieldCheck, Users } from 'lucide-react';
 import { EXAM_TYPES, SOURCES } from '../data/examTypes';
 
 // Shown once, right after the first Google sign-in.
 //
-// Only the exam matters enough to insist on — it is what lets us pair two
-// aspirants sensibly. The phone number is optional on purpose: it is the field
-// most likely to make someone abandon the form, and the one that carries real
-// obligations once we hold it.
+// Name, exam and mobile number are required. The exam lets us pair aspirants
+// sensibly; the number keeps out throwaway accounts, spam and noise. Members
+// who joined before the number was required land here once to add it, with
+// their other answers filled in.
+//
+// A tick-box records interest in the moderator programme; the team sees it in
+// the admin panel and can invite them to a trial.
 
 function Chip({ label, selected, onClick }) {
   return (
@@ -32,11 +36,13 @@ export default function OnboardingPage() {
   const { user, refreshUser } = useAuth();
   const navigate = useNavigate();
 
+  const returning = !!user?.onboarded_at;   // here only to add a mobile number
   const [name,   setName]   = useState(user?.display_name || '');
-  const [exam,   setExam]   = useState('');
-  const [phone,  setPhone]  = useState('');
-  const [source, setSource] = useState('');
-  const [ssbDate, setSsbDate] = useState('');
+  const [exam,   setExam]   = useState(user?.exam_type || '');
+  const [phone,  setPhone]  = useState(user?.phone || '');
+  const [source, setSource] = useState(user?.referral_source || '');
+  const [ssbDate, setSsbDate] = useState(user?.ssb_date || '');
+  const [modInterest, setModInterest] = useState(false);
   const [saving, setSaving] = useState(false);
   const [error,  setError]  = useState('');
 
@@ -44,6 +50,9 @@ export default function OnboardingPage() {
     e.preventDefault();
     if (!name.trim())  { setError('Please tell us your name.'); return; }
     if (!exam)         { setError('Please choose which exam you are preparing for.'); return; }
+    if (!/^(\+?91)?[6-9]\d{9}$/.test(phone.replace(/[\s()-]/g, ''))) {
+      setError('Please enter your 10-digit mobile number.'); return;
+    }
 
     setSaving(true); setError('');
     try {
@@ -53,6 +62,7 @@ export default function OnboardingPage() {
         phone:           phone.trim(),
         referral_source: source,
         ssb_date:        ssbDate,
+        moderator_interest: modInterest,
       });
       await refreshUser();
       navigate('/');
@@ -62,23 +72,17 @@ export default function OnboardingPage() {
     }
   }
 
-  // Skipping does not mark the user as onboarded, so the screen comes back on a
-  // later visit. A session flag stops it reappearing on every page this visit.
-  function skip() {
-    try { sessionStorage.setItem('ssbcircle:onboarding-skipped', '1'); } catch { /* private mode */ }
-    navigate('/');
-  }
-
   return (
     <div className="min-h-screen bg-gray-50 px-4 sm:px-6 py-8 sm:py-12">
       <div className="max-w-lg mx-auto">
         <p className="text-[11px] font-bold uppercase tracking-[0.3em] text-brand-600">Welcome to SSBCircle</p>
         <h1 className="mt-3 text-2xl sm:text-3xl font-bold text-gray-900 leading-tight">
-          Two quick questions{user?.display_name ? `, ${user.display_name.split(' ')[0]}` : ''}
+          {returning ? 'One more thing' : 'A few quick questions'}{user?.display_name ? `, ${user.display_name.split(' ')[0]}` : ''}
         </h1>
         <p className="mt-3 text-sm text-gray-500 leading-relaxed">
-          This helps us put you with aspirants preparing for the same exam, so you are not
-          sitting in an empty room.
+          {returning
+            ? 'Every member now adds a mobile number. It keeps SSBCircle free of spam and noise — please add yours below.'
+            : 'This helps us put you with aspirants preparing for the same exam, and keeps SSBCircle a serious place to prepare.'}
         </p>
 
         <form onSubmit={submit} className="mt-7 bg-white border border-gray-200 rounded-2xl p-5 sm:p-6 space-y-6">
@@ -128,12 +132,12 @@ export default function OnboardingPage() {
           {/* Phone */}
           <div>
             <label className="block text-sm font-bold text-gray-900 mb-1">
-              Phone number <span className="font-medium text-gray-400">(optional)</span>
+              Mobile number <span className="font-medium text-red-500">*</span>
             </label>
-            <p className="text-xs text-gray-400 mb-3 leading-relaxed">
-              SSBCircle is in beta, so not many aspirants are online at the same time.
-              Share your number and someone from our team will personally connect you with
-              others at your stage.
+            <p className="text-xs text-gray-500 mb-3 leading-relaxed">
+              Required for every member. It keeps SSBCircle free of fake accounts, spam and noise,
+              so the rooms and community stay useful for serious aspirants. Our team may also use it
+              to connect you with others at your stage.
             </p>
             <input
               type="tel"
@@ -170,7 +174,7 @@ export default function OnboardingPage() {
                 never sold or shared with anyone else.
               </p>
               <p>
-                You can ask us to delete your number at any time and we will remove it.
+                You can ask us to delete your account and number at any time and we will remove them.
               </p>
               <p>
                 <span className="font-bold text-gray-800">If you are under 18</span>, please check
@@ -179,22 +183,28 @@ export default function OnboardingPage() {
             </div>
           </div>
 
+          {/* Moderator programme */}
+          <label className={`flex items-start gap-3 rounded-xl border px-4 py-3.5 cursor-pointer transition-colors ${modInterest ? 'border-emerald-300 bg-emerald-50' : 'border-gray-200 bg-white hover:border-gray-300'}`}>
+            <input type="checkbox" checked={modInterest} onChange={e => setModInterest(e.target.checked)}
+              className="mt-0.5 w-4 h-4 accent-emerald-600 shrink-0" />
+            <span className="text-[13px] text-gray-600 leading-relaxed">
+              <span className="flex items-center gap-1.5 font-bold text-gray-900"><Users className="w-4 h-4 text-emerald-600" /> I'd like to help run SSBCircle as a moderator</span>
+              Moderators host sessions, help new aspirants and keep the community clean. After a two-week trial,
+              the officers who built SSBCircle choose moderators, who earn a stipend and a MOD badge. Tick this and
+              we will reach out. <Link to="/moderators" target="_blank" className="font-semibold text-emerald-700 underline">How it works</Link>
+            </span>
+          </label>
+
           {error && (
             <p className="text-xs text-red-600 flex items-start gap-1.5">
               <AlertCircle className="w-3.5 h-3.5 shrink-0 mt-0.5" /> {error}
             </p>
           )}
 
-          <div className="flex items-center gap-3 pt-1">
-            <button type="submit" disabled={saving}
-              className="btn-primary flex-1 py-3 text-sm flex items-center justify-center gap-1.5">
-              {saving ? 'Saving…' : <>Continue <Check className="w-4 h-4" /></>}
-            </button>
-            <button type="button" onClick={skip}
-              className="text-xs font-semibold text-gray-400 hover:text-gray-600 px-3 py-3 cursor-pointer">
-              Skip for now
-            </button>
-          </div>
+          <button type="submit" disabled={saving}
+            className="btn-primary w-full py-3 text-sm flex items-center justify-center gap-1.5">
+            {saving ? 'Saving…' : <>Continue <Check className="w-4 h-4" /></>}
+          </button>
         </form>
       </div>
     </div>

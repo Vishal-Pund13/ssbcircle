@@ -66,12 +66,13 @@ export default function ProfilePage() {
 
   // referral_source is deliberately not sent: it is a one-time answer and the
   // model COALESCEs anything omitted, so editing here cannot wipe it.
-  // An empty phone clears the stored number — that is how someone removes it
-  // without having to ask us.
+  // The mobile number is required (it keeps out spam accounts), so it can be
+  // changed here but not cleared.
   async function saveDetails(e) {
     e.preventDefault();
     if (!name.trim()) { setDError('Please enter your name.'); return; }
     if (!exam)        { setDError('Please choose which exam you are preparing for.'); return; }
+    if (!phone.trim()) { setDError('Your mobile number is required. It keeps SSBCircle free of spam.'); return; }
 
     setDSaving(true); setDError(''); setDSaved(false);
     try {
@@ -184,8 +185,8 @@ export default function ProfilePage() {
               <input type="date" className="input-base" value={ssbDate}
                 onChange={e => { setSsbDate(e.target.value); setDError(''); }} />
 
-              <label className={labelCls}>Phone number <span className="font-medium text-gray-400">(optional)</span></label>
-              <p className={hintCls}>Only our team sees it, to reach you and introduce you to other aspirants. Clear it and save to remove.</p>
+              <label className={labelCls}>Mobile number</label>
+              <p className={hintCls}>Required — it keeps SSBCircle free of spam. Only our team sees it; it is never shown to other members.</p>
               <input type="tel" inputMode="numeric" className="input-base" value={phone}
                 onChange={e => { setPhone(e.target.value); setDError(''); }} placeholder="10-digit mobile number" />
 

@@ -7,6 +7,7 @@ const {
   findByEmail, findByGoogleId, findById, saveOnboarding, updateSsbDate,
 } = require('../models/User');
 const authMiddleware = require('../middleware/auth');
+const Moderation = require('../models/Moderation');
 const { authLimiter } = require('../middleware/rateLimit');
 
 const googleClient = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
@@ -119,9 +120,13 @@ router.post('/me/onboarding', authMiddleware, async (req, res) => {
     if (!EXAM_TYPES.includes(exam))
       return res.status(400).json({ error: 'Please choose which exam you are preparing for.' });
 
+    // Required: a real number per member keeps out throwaway accounts, spam
+    // and noise. Profile edits go through here too, so it cannot be cleared.
     const phone = normalizePhone(body.phone);
+    if (phone === null)
+      return res.status(400).json({ error: 'Please enter your mobile number. It keeps SSBCircle free of spam.' });
     if (phone === false)
-      return res.status(400).json({ error: 'That does not look like an Indian mobile number. Enter 10 digits, or leave it blank.' });
+      return res.status(400).json({ error: 'That does not look like an Indian mobile number. Enter 10 digits.' });
 
     const source = String(body.referral_source || '').trim();
     if (source && !REFERRAL_SOURCES.includes(source))
@@ -138,6 +143,8 @@ router.post('/me/onboarding', authMiddleware, async (req, res) => {
       referral_source: source || null,
       ssb_date:        ssbDate,
     });
+    // Ticked "I'd like to help as a moderator" on the welcome page
+    if (body.moderator_interest === true) await Moderation.expressInterest(req.userId);
     res.json({ user });
   } catch (err) {
     console.error('Onboarding error:', err);

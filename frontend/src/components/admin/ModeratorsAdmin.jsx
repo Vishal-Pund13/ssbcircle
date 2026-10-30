@@ -11,6 +11,7 @@ const fmtDate = d => d ? new Date(d).toLocaleDateString('en-IN', { day: 'numeric
 const STATUS = {
   trial:     'bg-brand-50 text-brand-700',
   invited:   'bg-sky-50 text-sky-700',
+  interested: 'bg-violet-50 text-violet-700',
   review:    'bg-amber-50 text-amber-700',
   approved:  'bg-emerald-50 text-emerald-700',
   declined:  'bg-gray-100 text-gray-500',
@@ -68,8 +69,10 @@ export function ModeratorsAdmin({ authHeaders }) {
   if (!data) return <div className="h-48 bg-white border border-gray-200 rounded-2xl animate-pulse" />;
 
   const t = data.targets;
-  const active = data.applications.filter(a => ['trial', 'invited', 'review'].includes(a.status));
-  const past = data.applications.filter(a => !['trial', 'invited', 'review'].includes(a.status));
+  // 'interested' = ticked the box on the welcome page; invite them to start a trial
+  const OPEN = ['trial', 'invited', 'review', 'interested'];
+  const active = data.applications.filter(a => OPEN.includes(a.status));
+  const past = data.applications.filter(a => !OPEN.includes(a.status));
 
   return (
     <div className="space-y-6">

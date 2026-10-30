@@ -112,6 +112,16 @@ async function apply(userId, { motivation, availability }) {
   return rows[0];
 }
 
+// A tick on the welcome page: "I'd like to help as a moderator". Recorded as
+// 'interested' — no trial starts — so the team can see it and invite them.
+// Never overwrites an application that already exists.
+async function expressInterest(userId) {
+  await pool.query(`
+    INSERT INTO moderator_applications (user_id, status)
+    VALUES ($1, 'interested')
+    ON CONFLICT (user_id) DO NOTHING`, [userId]);
+}
+
 async function withdraw(userId) {
   await pool.query(`UPDATE moderator_applications SET status = 'withdrawn', updated_at = NOW() WHERE user_id = $1`, [userId]);
 }
@@ -122,7 +132,7 @@ async function adminOverview() {
   const { rows: apps } = await pool.query(`
     SELECT a.*, u.display_name, u.email, u.phone, u.avatar_url
       FROM moderator_applications a JOIN users u ON u.id = a.user_id
-     ORDER BY CASE a.status WHEN 'trial' THEN 0 WHEN 'review' THEN 1 WHEN 'invited' THEN 2 ELSE 3 END, a.updated_at DESC`);
+     ORDER BY CASE a.status WHEN 'trial' THEN 0 WHEN 'review' THEN 1 WHEN 'interested' THEN 2 WHEN 'invited' THEN 3 ELSE 4 END, a.updated_at DESC`);
 
   // Each applicant scored over their own trial window
   const scored = await Promise.all(apps.map(async a => {
@@ -163,4 +173,4 @@ async function removeModerator(userId) {
   await pool.query(`UPDATE moderator_applications SET status = 'removed', updated_at = NOW() WHERE user_id = $1`, [userId]);
 }
 
-module.exports = { activity, mine, apply, withdraw, adminOverview, decide, removeModerator, WEIGHTS, TARGETS, TRIAL_DAYS };
+module.exports = { activity, mine, apply, expressInterest, withdraw, adminOverview, decide, removeModerator, WEIGHTS, TARGETS, TRIAL_DAYS };

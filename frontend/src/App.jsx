@@ -8,21 +8,15 @@ function RouteTracker() {
   return null;
 }
 
-// Send a signed-in user who has not answered the welcome questions to /welcome,
-// once. While auth is still loading, user is null and nothing redirects.
-//
-// Skipping sets a session flag instead of marking them onboarded, so the screen
-// can come back on a later visit without nagging on every page of this one.
-// A live room and the admin area are never interrupted.
+// Send a signed-in user who has not answered the welcome questions — or who
+// has no mobile number yet, now that one is required — to /welcome. While auth
+// is still loading, user is null and nothing redirects. A live room and the
+// admin area are never interrupted.
 function OnboardingGate() {
   const { user } = useAuth();
   const location = useLocation();
 
-  if (!user || user.onboarded_at) return null;
-
-  let skipped = false;
-  try { skipped = sessionStorage.getItem('ssbcircle:onboarding-skipped') === '1'; } catch { /* private mode */ }
-  if (skipped) return null;
+  if (!user || (user.onboarded_at && user.phone)) return null;
 
   const { pathname } = location;
   if (pathname === '/welcome' || pathname.startsWith('/sa') || pathname.startsWith('/room/')) return null;

@@ -109,6 +109,11 @@ function StatusCard({ user }) {
   return (
     <form onSubmit={submit} className="bg-white border border-gray-200 rounded-2xl p-5 sm:p-6 space-y-4">
       <div>
+        {app?.status === 'interested' && (
+          <p className="text-sm text-emerald-800 bg-emerald-50 border border-emerald-100 rounded-xl px-3 py-2">
+            We have your interest from when you joined, and the team will reach out. Want to start sooner? Opt in below to begin your two-week trial now.
+          </p>
+        )}
         <p className="text-lg font-bold text-gray-900">{again ? 'Opt in again' : 'Opt in to the programme'}</p>
         <p className="text-sm text-gray-500 mt-1">
           {again && app.status === 'declined' ? 'Not this time — but keep helping and try again. ' : ''}
