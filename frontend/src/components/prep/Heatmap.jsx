@@ -3,27 +3,25 @@ import { todayIST, addDays } from './plan';
 // The streak calendar: one column per week, Monday at the top, the latest week
 // on the right. activity is [{ day: 'YYYY-MM-DD', actions }]. Used on the Prep
 // Sheet and on the home page.
+//
+// Drawn as a grid that shrinks to fit its container, so the latest weeks are
+// never pushed off the right edge on a narrow phone. maxCell caps how large a
+// square grows on wide screens.
 
 const SHADE = n => !n ? 'bg-gray-100' : n < 3 ? 'bg-emerald-200' : n < 6 ? 'bg-emerald-400' : 'bg-emerald-600';
 
-export default function Heatmap({ activity, weeks = 18, today = todayIST(), cell = 'w-2.5 h-2.5' }) {
+export default function Heatmap({ activity, weeks = 18, today = todayIST(), maxCell = 11 }) {
   const counts = Object.fromEntries(activity.map(a => [a.day, a.actions]));
   const dow = (new Date(today + 'T00:00:00Z').getUTCDay() + 6) % 7;
   const start = addDays(today, -((weeks - 1) * 7 + dow));
-  const cols = Array.from({ length: weeks }, (_, w) =>
-    Array.from({ length: 7 }, (_, d) => addDays(start, w * 7 + d)));
+  const days = Array.from({ length: weeks * 7 }, (_, i) => addDays(start, i));
   return (
-    <div className="overflow-x-auto scrollbar-hide">
-      <div className="flex gap-[3px] w-max">
-        {cols.map((week, w) => (
-          <div key={w} className="flex flex-col gap-[3px]">
-            {week.map(day => (
-              <div key={day} title={day > today ? '' : `${day}: ${counts[day] || 0} updates`}
-                className={`${cell} rounded-[2px] ${day > today ? 'bg-transparent' : SHADE(counts[day])}`} />
-            ))}
-          </div>
-        ))}
-      </div>
+    <div className="grid gap-[3px] w-full"
+      style={{ gridTemplateRows: 'repeat(7, auto)', gridAutoFlow: 'column', gridAutoColumns: 'minmax(0, 1fr)', maxWidth: weeks * (maxCell + 3) }}>
+      {days.map(day => (
+        <div key={day} title={day > today ? '' : `${day}: ${counts[day] || 0} updates`}
+          className={`aspect-square rounded-[2px] ${day > today ? 'bg-transparent' : SHADE(counts[day])}`} />
+      ))}
     </div>
   );
 }

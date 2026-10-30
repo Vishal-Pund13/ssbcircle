@@ -534,7 +534,8 @@ export default function PrepPage() {
         )}
 
         {/* ── Dashboard ── */}
-        <div className={`mt-5 sm:mt-6 ${user ? 'm-rail md:grid-cols-3' : 'grid grid-cols-1'} md:gap-4`}>
+        {/* Stacked on phones: as a sideways row the streak card sat off-screen */}
+        <div className="mt-5 sm:mt-6 grid grid-cols-1 md:grid-cols-3 gap-3 md:gap-4">
           {user && (
             <section className="bg-white border border-gray-200 rounded-2xl p-5 flex items-center gap-4">
               <div className="relative">

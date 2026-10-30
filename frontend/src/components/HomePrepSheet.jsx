@@ -101,7 +101,7 @@ export default function HomePrepSheet() {
             {[['Steady, daily', illustration('steady', today), 'text-emerald-700'], ['Last-minute', illustration('cramming', today), 'text-gray-500']].map(([label, data, ink]) => (
               <div key={label} className="min-w-0">
                 <p className={`text-[11px] font-semibold mb-1 ${ink}`}>{label}</p>
-                <Heatmap activity={data} weeks={WEEKS} today={today} cell="w-[7px] h-[7px]" />
+                <Heatmap activity={data} weeks={WEEKS} today={today} maxCell={7} />
               </div>
             ))}
           </div>
