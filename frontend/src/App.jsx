@@ -27,6 +27,7 @@ import { AuthProvider, useAuth } from './context/AuthContext';
 import ProtectedRoute from './components/ProtectedRoute';
 import LandingPage from './components/LandingPage';
 import MobileTabBar from './components/MobileTabBar';
+import { SoldierLoader } from './components/SoldierRunner';
 import AnnouncementPoster from './components/AnnouncementPoster';
 
 // Heavy routes loaded on demand — keeps initial bundle small
@@ -54,13 +55,8 @@ const CommunityPage       = lazy(() => import('./components/CommunityPage'));
 const PostPage            = lazy(() => import('./components/PostPage'));
 const PrepPage            = lazy(() => import('./components/prep/PrepPage'));
 
-function PageLoader() {
-  return (
-    <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-      <div className="w-8 h-8 border-2 border-brand-600 border-t-transparent rounded-full animate-spin" />
-    </div>
-  );
-}
+// Shown while a page's code loads: the running soldier, not a spinner
+const PageLoader = () => <SoldierLoader />;
 
 export default function App() {
   return (

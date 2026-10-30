@@ -60,6 +60,20 @@
   }
 }
 
+@keyframes fadeIn { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: none; } }
+
+/* Loading animation: a soldier running with a rifle (SoldierRunner.jsx) */
+@keyframes soldierLeg   { 0%, 100% { transform: rotate(-32deg); } 50% { transform: rotate(30deg); } }
+@keyframes soldierBob   { 0%, 50%, 100% { transform: translateY(0); } 25%, 75% { transform: translateY(-2.5px); } }
+@keyframes soldierGround { from { stroke-dashoffset: 0; } to { stroke-dashoffset: 36; } }
+.soldier-leg    { animation: soldierLeg 0.55s ease-in-out infinite; }
+.soldier-leg-b  { animation-delay: -0.275s; }
+.soldier-bob    { animation: soldierBob 0.55s ease-in-out infinite; }
+.soldier-ground { animation: soldierGround 0.55s linear infinite; }
+@media (prefers-reduced-motion: reduce) {
+  .soldier-leg, .soldier-bob, .soldier-ground { animation: none; }
+}
+
 /* Hero spread-cards float animation */
 @keyframes heroCardFloat {
   0%, 100% { transform: translateY(0px); }

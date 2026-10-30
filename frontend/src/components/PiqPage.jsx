@@ -4,6 +4,8 @@ import { getPiq, savePiq, deletePiq, analyzePiq } from '../services/api';
 import { SAMPLE_PIQ } from '../data/samplePiq';
 import { Check, AlertCircle, Trash2, Lock, Plus, X, Sparkles, ChevronDown, Lightbulb, Eye, Heart } from 'lucide-react';
 import PiqPdfButton from './PiqPdfButton';
+import AiWaitPanel from './AiWaitPanel';
+import { SoldierLoader } from './SoldierRunner';
 import { trackEvent } from '../analytics';
 import AiFeedback from './AiFeedback';
 
@@ -429,13 +431,7 @@ export default function PiqPage() {
 
   const jumpTo = id => document.getElementById(id)?.scrollIntoView({ behavior: 'smooth', block: 'start' });
 
-  if (loading) {
-    return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <div className="w-8 h-8 border-2 border-brand-600 border-t-transparent rounded-full animate-spin" />
-      </div>
-    );
-  }
+  if (loading) return <SoldierLoader label="Opening your PIQ…" />;
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -727,6 +723,15 @@ export default function PiqPage() {
             <Trash2 className="w-3.5 h-3.5" /> Delete my PIQ
           </button>
         </div>
+
+        {analysing && (
+          <AiWaitPanel title="Reading your PIQ like an IO would" steps={[
+            { label: 'Reading your answers', at: 0 },
+            { label: 'Finding the questions you are likely to get', at: 8 },
+            { label: 'Spotting where the IO will press you', at: 20 },
+            { label: 'Writing your practice plan', at: 35 },
+          ]} />
+        )}
 
         {aError && (
           <p className="text-xs text-red-600 flex items-start gap-1.5">
