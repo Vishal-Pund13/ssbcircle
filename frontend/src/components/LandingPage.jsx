@@ -12,9 +12,8 @@ import { trackEvent } from '../analytics';
 import { PrepPath, SsbStages } from './HomePrep';
 import { ExamTicker } from './ExamCalendar';
 import HomeRail from './HomeRail';
-import MentorConnectModal from './MentorConnectModal';
 import { HOME_FAQ } from '../data/homeFaq';
-import { Mic, Timer, FileText, CheckSquare, Radio, ArrowRight, Trash2, Zap, Lightbulb, Users, Presentation, Target, Headphones, RefreshCw, X, Calendar, Heart, PlayCircle, Share2, Check, Sparkles, ChevronDown, Shield, Star, Lock, BookOpen, Video, Award, ChevronRight, GraduationCap, ExternalLink, AlertTriangle, HeartHandshake, PenLine, Footprints, MessageCircle } from 'lucide-react';
+import { Mic, Timer, FileText, CheckSquare, Radio, ArrowRight, Trash2, Zap, Lightbulb, Users, Presentation, Target, Headphones, RefreshCw, X, Calendar, Heart, PlayCircle, Share2, Check, Sparkles, ChevronDown, Shield, Star, Lock, BookOpen, Video, Award, ChevronRight, GraduationCap, ExternalLink, AlertTriangle, HeartHandshake, PenLine, Footprints } from 'lucide-react';
 import Hello, { firstName } from './Hello';
 import { todayIST, daysBetween } from './prep/dates';
 
@@ -434,7 +433,7 @@ function timeAgo(dateStr) {
 // Split layout: navy left panel (identity) + white right panel (content).
 // Clicking anywhere navigates to the full /mentor/:slug page.
 
-function MentorCard({ mentor, onConnect }) {
+function MentorCard({ mentor }) {
   const navigate = useNavigate();
   return (
     <div
@@ -504,16 +503,9 @@ function MentorCard({ mentor, onConnect }) {
 
         {/* Footer: talk to them, or read more */}
         <div className="flex flex-wrap items-center justify-between gap-2 pt-3 border-t border-gray-100 mt-auto">
-          {mentor.whatsapp ? (
-            <button type="button" onClick={e => { e.stopPropagation(); onConnect(mentor); }}
-              className="inline-flex items-center gap-1.5 text-sm font-semibold text-white bg-emerald-600 hover:bg-emerald-700 rounded-lg px-3.5 py-2 cursor-pointer">
-              <MessageCircle className="w-4 h-4" /> Message on WhatsApp
-            </button>
-          ) : (
-            <span className="flex items-center gap-1 text-[11px] text-gray-400">
-              <Award className="w-3 h-3 text-sky-300" /> {mentor.yearsOfService} service
-            </span>
-          )}
+          <span className="flex items-center gap-1 text-[11px] text-gray-400">
+            <Award className="w-3 h-3 text-sky-300" /> {mentor.yearsOfService} service
+          </span>
           <span className="flex items-center gap-0.5 text-[12px] font-semibold text-brand-600 group-hover:gap-1 transition-all">
             View profile <ChevronRight className="w-3 h-3" />
           </span>
@@ -525,12 +517,11 @@ function MentorCard({ mentor, onConnect }) {
 
 // Mentors are here for one thing: an aspirant who wants to hear from a real
 // officer — about life in the forces, or for guidance on their own
-// preparation — can reach one directly. "Message on WhatsApp" opens the same
-// form as the mentor's page, which pre-fills a WhatsApp introduction.
+// preparation — can reach one. Each card opens the mentor's profile, which is
+// where they get in touch.
 const MENTOR_TOPICS = ['Life in the forces', 'Which entry and branch suits you', 'Your PIQ and SSB prep'];
 
 function MentorsSection() {
-  const [connect, setConnect] = useState(null);
   return (
     <section className="border-t border-gray-100 bg-white py-10 sm:py-14 px-4 sm:px-6">
       <div className="max-w-5xl mx-auto">
@@ -540,7 +531,7 @@ function MentorsSection() {
           <h2 className="mt-1.5 text-xl sm:text-2xl font-bold text-gray-900">Talk to a real officer</h2>
           <p className="text-sm text-gray-600 mt-1 max-w-2xl leading-relaxed">
             Want to know what life in the forces is really like, or need guidance for your preparation?
-            Reach out to our mentors directly — they reply personally on WhatsApp. Slots are limited.
+            Open a mentor's profile to reach out — they reply personally. Slots are limited.
           </p>
           <div className="mt-3 flex flex-wrap gap-1.5">
             {MENTOR_TOPICS.map(t => (
@@ -554,7 +545,7 @@ function MentorsSection() {
         {/* 2-column grid — credential cards are wider than article cards */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-3 sm:gap-4">
           {MENTORS.map(mentor => (
-            <MentorCard key={mentor.id} mentor={mentor} onConnect={m => { setConnect(m); trackEvent('home_mentor_connect', { mentor: m.slug }); }} />
+            <MentorCard key={mentor.id} mentor={mentor} />
           ))}
 
           {/* Placeholder card — same split layout, greyed out */}
@@ -572,7 +563,6 @@ function MentorsSection() {
           </div>
         </div>
 
-        {connect && <MentorConnectModal mentor={connect} onClose={() => setConnect(null)} />}
       </div>
     </section>
   );
@@ -1151,7 +1141,7 @@ function MentorAnnouncementBanner() {
   const mentor = MENTORS[0];
   if (!mentor) return null;
 
-  const availableFromLabel = mentor.availableFrom
+  const availableFromLabel = mentor.availableFrom && new Date(mentor.availableFrom) > new Date()
     ? new Date(mentor.availableFrom).toLocaleDateString('en-IN', { day: 'numeric', month: 'long', year: 'numeric' })
     : null;
 
@@ -1169,70 +1159,30 @@ function MentorAnnouncementBanner() {
       <ChevronRight className="w-4 h-4 text-brand-600 shrink-0" />
     </Link>
 
-    <div className="hidden sm:block border-b border-gray-100 bg-white px-4 sm:px-6 py-5 sm:py-6">
+    <div className="hidden sm:block border-b border-gray-100 bg-white px-6 py-3">
       <div className="max-w-5xl mx-auto">
-
-        <div className="rounded-2xl border border-brand-100 bg-brand-50 px-5 sm:px-7 py-5 sm:py-6 flex flex-col sm:flex-row items-start sm:items-center gap-5 sm:gap-8">
-
-          {/* Avatar */}
-          <div className="shrink-0 flex flex-row sm:flex-col items-center gap-3 sm:gap-2 w-full sm:w-auto">
-            {mentor.photo ? (
-              <img src={mentor.photoAvatar || mentor.photo} alt={mentor.name}
-                width="64" height="64" loading="lazy" decoding="async"
-                className="w-14 h-14 sm:w-16 sm:h-16 rounded-full object-cover object-top shrink-0 ring-2 ring-brand-200" />
-            ) : (
-              <div className="w-14 h-14 sm:w-16 sm:h-16 rounded-full bg-brand-600 flex items-center justify-center shrink-0 ring-2 ring-brand-200">
-                <Star className="w-7 h-7 text-white" />
-              </div>
-            )}
-            <div className="sm:hidden">
-              <p className="text-sm font-bold text-gray-900">{mentor.name}</p>
-            </div>
-          </div>
-
-          {/* Info */}
+        <Link to={`/mentor/${mentor.slug}`}
+          className="group flex items-center gap-4 rounded-xl border border-brand-100 bg-brand-50 px-4 py-2.5 hover:border-brand-600/30 transition-colors">
+          {mentor.photo ? (
+            <img src={mentor.photoAvatar || mentor.photo} alt="" width="40" height="40" loading="lazy" decoding="async"
+              className="w-10 h-10 rounded-full object-cover object-top shrink-0 ring-2 ring-brand-200" />
+          ) : (
+            <span className="w-10 h-10 rounded-full bg-brand-600 flex items-center justify-center shrink-0"><Star className="w-5 h-5 text-white" /></span>
+          )}
           <div className="flex-1 min-w-0">
-            <div className="inline-flex items-center gap-1.5 bg-brand-100 text-brand-600 text-[11px] font-bold px-2.5 py-0.5 rounded-full mb-2 tracking-widest uppercase">
-              <span className="w-1.5 h-1.5 rounded-full bg-brand-600 animate-pulse shrink-0" />
-              New Mentor
-            </div>
-            <h2 className="text-gray-900 text-base sm:text-lg font-bold leading-snug mb-3">
-              <span className="text-brand-600">{mentor.name}</span> joins SSBCircle as a Mentor
-            </h2>
-
-            {/* Specialty badges */}
-            <div className="flex items-center gap-2 mb-4 flex-wrap">
-              {mentor.specialties.slice(0, 2).map(tag => (
-                <span key={tag} className="flex items-center gap-1.5 text-[12px] font-semibold text-brand-700 bg-white border border-brand-100 px-3 py-1.5 rounded-lg">
-                  <Shield className="w-3.5 h-3.5 text-brand-500" /> {tag}
-                </span>
-              ))}
-            </div>
-
-            <div className="flex items-center gap-3 flex-wrap">
-              {availableFromLabel && (
-                <>
-                  <span className="flex items-center gap-1.5 text-[12px] text-gray-500 font-medium">
-                    <Calendar className="w-3 h-3" /> Appointments open {availableFromLabel}
-                  </span>
-                  <span className="w-1 h-1 rounded-full bg-gray-300" />
-                </>
-              )}
-              <span className="flex items-center gap-1.5 text-[12px] text-gray-500 font-medium">
-                <Shield className="w-3 h-3" /> Verified Officer
-              </span>
-            </div>
+            <p className="text-sm text-gray-900 leading-snug truncate">
+              <span className="text-[10px] font-bold tracking-widest uppercase text-brand-600 bg-brand-100 px-2 py-0.5 rounded-full mr-2 align-middle">New mentor</span>
+              <span className="font-bold text-brand-600">{mentor.name}</span> joins SSBCircle
+            </p>
+            <p className="mt-0.5 text-xs text-gray-500 truncate flex items-center gap-1.5">
+              <Shield className="w-3 h-3 shrink-0" /> Verified officer · {mentor.specialties.slice(0, 2).join(' · ')}
+              {availableFromLabel && <> · Appointments open {availableFromLabel}</>}
+            </p>
           </div>
-
-          {/* CTA */}
-          <div className="shrink-0 flex flex-col items-center gap-1.5 w-full sm:w-auto">
-            <Link to={`/mentor/${mentor.slug}`} className="btn-primary text-sm px-5 py-2.5 w-full sm:w-auto text-center whitespace-nowrap flex items-center justify-center gap-2">
-              View Profile <ArrowRight className="w-4 h-4" />
-            </Link>
-            <p className="text-gray-400 text-[11px]">Meet your mentor</p>
-          </div>
-
-        </div>
+          <span className="shrink-0 inline-flex items-center gap-1 text-sm font-semibold text-brand-700 group-hover:gap-1.5 transition-all">
+            View profile <ArrowRight className="w-4 h-4" />
+          </span>
+        </Link>
       </div>
     </div>
     </>
