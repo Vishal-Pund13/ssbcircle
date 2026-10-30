@@ -6,8 +6,8 @@ import SiteNav from './SiteNav';
 import { trackEvent } from '../analytics';
 import AiFeedback from './AiFeedback';
 import AiWaitPanel from './AiWaitPanel';
-import { AlertCircle, Clock, Eye, PenLine, Sparkles, ChevronRight, RotateCcw, Quote, User } from 'lucide-react';
-import Hello from './Hello';
+import { AlertCircle, Clock, Eye, PenLine, Sparkles, ChevronRight, RotateCcw, Quote, User, Image as ImageIcon, Feather } from 'lucide-react';
+import { CoverBand, PageHead } from './PageCover';
 
 // TAT practice, run the way the real test runs: the picture shows for 30
 // seconds and disappears, then there are 4 minutes to write. The feedback
@@ -311,20 +311,16 @@ export default function TatPage() {
     <div className="min-h-screen bg-gray-50">
       <SiteNav />
 
-      <main className="max-w-3xl mx-auto px-4 sm:px-6 py-7 space-y-5">
+      {phase === 'intro' && <CoverBand deco={[ImageIcon, Feather, Clock]} />}
+
+      <main className={`max-w-3xl mx-auto px-4 sm:px-6 ${phase === 'intro' ? 'pb-7' : 'py-7'} space-y-5`}>
 
         {phase === 'intro' && (
           <>
-            <div>
-              <Hello className="mb-3" />
-              <p className="text-[11px] font-bold uppercase tracking-[0.3em] text-brand-600">TAT Practice</p>
-              <h1 className="mt-2 text-2xl sm:text-3xl font-bold text-gray-900 leading-tight">Write a story, see how it reads</h1>
-              <p className="mt-3 text-sm text-gray-500 leading-relaxed">
-                Just like the real test: you see a picture for 30 seconds, then you have 4 minutes to write a story.
-                The feedback reads it the way a psychologist would.
-              </p>
+            <PageHead icon={PenLine} eyebrow="TAT Practice" title="Write a story, see how it reads"
+              subtitle="Just like the real test: you see a picture for 30 seconds, then you have 4 minutes to write a story. The feedback reads it the way a psychologist would.">
               {usage && <p className="mt-2 text-[12px] text-gray-400">{usage.used} of {usage.limit} stories analysed today</p>}
-            </div>
+            </PageHead>
 
             <div className="bg-white border border-gray-200 rounded-2xl p-5 space-y-3">
               <p className="text-sm font-bold text-gray-900">Before you start</p>

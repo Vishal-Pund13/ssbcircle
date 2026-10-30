@@ -23,7 +23,8 @@ const MY_PREP = [
 
 function Avatar({ name, url }) {
   const initials = name?.split(' ').map((w) => w[0]).join('').toUpperCase().slice(0, 2) || '?';
-  if (url) return <img src={url} alt="" className="w-16 h-16 rounded-full object-cover shrink-0" />;
+  const [broken, setBroken] = useState(false);
+  if (url && !broken) return <img src={url} alt="" referrerPolicy="no-referrer" onError={() => setBroken(true)} className="w-16 h-16 rounded-full object-cover shrink-0" />;
   return (
     <div className="w-16 h-16 text-xl rounded-full bg-brand-600 flex items-center justify-center font-bold text-white shrink-0">
       {initials}

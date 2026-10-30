@@ -1,13 +1,14 @@
 import { useState, useEffect, useMemo } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
-import { CalendarDays, ArrowRight, ExternalLink, CheckCircle2, Clock, Megaphone, FileCheck, UserCheck, Hourglass, XCircle, ChevronDown, Info } from 'lucide-react';
+import { CalendarDays, ArrowRight, ExternalLink, CheckCircle2, Clock, Megaphone, FileCheck, UserCheck, Hourglass, XCircle, ChevronDown, Info, GraduationCap, Bell } from 'lucide-react';
 import SiteNav from './SiteNav';
 import { useAuth } from '../context/AuthContext';
 import { getPiq } from '../services/api';
 import { trackEvent } from '../analytics';
 import { EXAMS, RESULTS, CALENDAR_CHECKED } from '../data/examCalendar';
 import { ENTRIES, EDU_LEVELS, DEGREES } from '../data/eligibility';
-import Hello, { firstName } from './Hello';
+import { firstName } from './Hello';
+import { CoverBand, PageHead } from './PageCover';
 
 // Upcoming defence entry exams, recent results, and an "Am I eligible?"
 // checker. Exact dates come from the UPSC calendar or a released
@@ -508,24 +509,19 @@ export default function ExamCalendarPage() {
     <div className="min-h-screen bg-gray-50">
       <SiteNav />
 
-      <div className="bg-brand-600 text-white px-4 sm:px-6 pt-8 pb-14">
-        <div className="max-w-3xl mx-auto">
-          <Hello dark className="mb-3" />
-          <p className="text-[11px] font-bold uppercase tracking-[0.3em] text-brand-100">Exams & eligibility</p>
-          <h1 className="mt-2 text-2xl sm:text-3xl font-bold leading-tight">Your way into the armed forces</h1>
-          <p className="mt-2 text-sm text-brand-100 leading-relaxed max-w-xl">
-            Find the officer entries you can apply for, and never miss a notification, exam or result.
-          </p>
-          {headline && (
-            <div className="mt-4 inline-flex items-center gap-2 bg-white/10 border border-white/20 rounded-full px-3 py-1.5 text-xs">
-              <Clock className="w-3.5 h-3.5" />
-              <span><span className="font-semibold">{headline.exam.name}</span> {headline.label.toLowerCase()} in {daysLeft(headline.date)} days</span>
-            </div>
-          )}
-        </div>
-      </div>
+      <CoverBand deco={[GraduationCap, Bell, Clock]} />
 
-      <main className="max-w-3xl mx-auto px-4 sm:px-6 -mt-8 pb-10 space-y-5">
+      <main className="max-w-3xl mx-auto px-4 sm:px-6 pb-10 space-y-5">
+        <PageHead icon={CalendarDays} eyebrow="Exams & eligibility" title="Your way into the armed forces"
+          subtitle="Find the officer entries you can apply for, and never miss a notification, exam or result.">
+          {headline && (
+            <p className="mt-3 inline-flex items-center gap-2 bg-white border border-gray-200 text-gray-700 rounded-full px-3 py-1.5 text-xs">
+              <Clock className="w-3.5 h-3.5 text-brand-600" />
+              <span><span className="font-semibold text-gray-900">{headline.exam.name}</span> {headline.label.toLowerCase()} in {daysLeft(headline.date)} days</span>
+            </p>
+          )}
+        </PageHead>
+
         <div className="bg-white border border-gray-200 rounded-2xl p-1.5 shadow-sm grid grid-cols-3 gap-1">
           {TABS.map(({ id, label, icon: Icon }) => (
             <button key={id} onClick={() => { setParams({ tab: id }, { replace: true }); trackEvent('exams_tab', { tab: id }); }}

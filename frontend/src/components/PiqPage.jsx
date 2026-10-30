@@ -1,14 +1,15 @@
 import { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
 import { getPiq, savePiq, deletePiq, analyzePiq } from '../services/api';
 import { SAMPLE_PIQ } from '../data/samplePiq';
-import { Check, AlertCircle, Trash2, Lock, Plus, X, Sparkles, ChevronDown, Lightbulb, Eye, Heart } from 'lucide-react';
+import { Check, AlertCircle, Trash2, Lock, Plus, X, Sparkles, ChevronDown, Lightbulb, Eye, Heart, FileText, ClipboardList, MessageCircleQuestion, UserRound } from 'lucide-react';
 import PiqPdfButton from './PiqPdfButton';
 import AiWaitPanel from './AiWaitPanel';
 import { SoldierLoader } from './SoldierRunner';
 import { trackEvent } from '../analytics';
 import AiFeedback from './AiFeedback';
-import Hello, { firstName } from './Hello';
+import { firstName } from './Hello';
+import { CoverBand, PageHead } from './PageCover';
+import SiteNav from './SiteNav';
 import { useAuth } from '../context/AuthContext';
 
 // A working copy of the Personal Information Questionnaire (DIPR 107-A).
@@ -438,9 +439,11 @@ export default function PiqPage() {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <header className="bg-white border-b border-gray-100 px-4 sm:px-6 py-3.5 sticky top-0 z-10">
+      <SiteNav />
+      {/* The form is long, so saving stays in reach just under the site nav */}
+      <div className="bg-white/95 backdrop-blur-md border-b border-gray-100 px-4 sm:px-6 py-2 sticky top-14 z-40">
         <div className="max-w-3xl mx-auto flex items-center justify-between gap-3">
-          <Link to="/" className="text-brand-600 font-bold">SSBCircle</Link>
+          <span className="text-sm font-semibold text-gray-700">Your PIQ</span>
           <div className="flex items-center gap-3">
             {saved && (
               <span className="inline-flex items-center gap-1 text-xs font-semibold text-emerald-600">
@@ -453,21 +456,15 @@ export default function PiqPage() {
             </button>
           </div>
         </div>
-      </header>
+      </div>
 
-      <form onSubmit={save} className="max-w-3xl mx-auto px-4 sm:px-6 py-7 space-y-4">
+      <CoverBand deco={[ClipboardList, MessageCircleQuestion, UserRound]} />
 
-        <div>
-          <Hello className="mb-3" />
-          <p className="text-[11px] font-bold uppercase tracking-[0.3em] text-brand-600">PIQ Analyzer</p>
-          <h1 className="mt-2 text-2xl sm:text-3xl font-bold text-gray-900 leading-tight">
-            {me ? `${firstName(me)}'s Personal Information Questionnaire` : 'Your Personal Information Questionnaire'}
-          </h1>
-          <p className="mt-3 text-sm text-gray-500 leading-relaxed">
-            This is the form you fill on day one at the SSB, and the one your Interviewing Officer
-            reads before calling you in. Fill it as you would on the day — the questions you get
-            asked come straight out of it.
-          </p>
+      <form onSubmit={save} className="max-w-3xl mx-auto px-4 sm:px-6 pb-7 space-y-4">
+
+        <PageHead icon={FileText} eyebrow="PIQ Analyzer"
+          title={me ? `${firstName(me)}'s Personal Information Questionnaire` : 'Your Personal Information Questionnaire'}
+          subtitle="This is the form you fill on day one at the SSB, and the one your Interviewing Officer reads before calling you in. Fill it as you would on the day — the questions you get asked come straight out of it.">
           {/* Local testing only — stripped from production builds */}
           {import.meta.env.DEV && (
             <button type="button"
@@ -481,7 +478,7 @@ export default function PiqPage() {
               Last saved {new Date(updated).toLocaleString('en-IN')}
             </p>
           )}
-        </div>
+        </PageHead>
 
         <div className="flex items-start gap-3 bg-brand-50 border border-brand-100 rounded-xl px-4 py-3.5">
           <Lock className="w-4 h-4 text-brand-600 shrink-0 mt-0.5" />

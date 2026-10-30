@@ -13,7 +13,8 @@ import SiteNav from '../SiteNav';
 import { themeFor } from './stepThemes';
 import Heatmap from './Heatmap';
 import { todayIST, addDays, buildPlan, dueReviews, streak, topicOfTheDay } from './plan';
-import Hello, { firstName } from '../Hello';
+import { firstName } from '../Hello';
+import { CoverBand, PageHead } from '../PageCover';
 
 // The SSB Prep Sheet: every topic worth being able to talk about, in order,
 // with a two-stage tick per topic — "Read" and "Can speak". Reading is the easy
@@ -530,25 +531,11 @@ export default function PrepPage() {
       <SiteNav />
 
       {/* ── Page cover ── */}
-      <div className="relative h-20 sm:h-36 bg-gradient-to-r from-brand-50 via-slate-50 to-indigo-50 border-b border-gray-100 overflow-hidden">
-        <div className="absolute right-6 sm:right-24 top-4 flex gap-6 opacity-[0.12] text-brand-600" aria-hidden="true">
-          <BookOpen className="w-14 h-14 -rotate-6" strokeWidth={1.25} />
-          <Mic className="w-10 h-10 mt-8 rotate-12" strokeWidth={1.25} />
-          <Target className="w-12 h-12 mt-2" strokeWidth={1.25} />
-        </div>
-      </div>
+      <CoverBand deco={[BookOpen, Mic, Target]} />
 
       <div className="max-w-6xl mx-auto px-4 sm:px-6 pb-16">
-        <div className="-mt-7 sm:-mt-10 relative">
-          <span className="w-14 h-14 sm:w-20 sm:h-20 rounded-2xl bg-white shadow-lg border border-gray-100 flex items-center justify-center">
-            <ListChecks className="w-7 h-7 sm:w-10 sm:h-10 text-brand-600" />
-          </span>
-        </div>
-        <Hello className="mt-3" />
-        <h1 className="mt-3 sm:mt-4 text-2xl sm:text-4xl font-bold text-gray-900 tracking-tight">SSB Prep Sheet</h1>
-        <p className="mt-1.5 text-sm sm:text-[15px] text-gray-500 max-w-2xl leading-relaxed">
-          {TOPICS.length} topics in {STEPS.length} sections, in the order worth learning them.
-        </p>
+        <PageHead icon={ListChecks} title="SSB Prep Sheet"
+          subtitle={`${TOPICS.length} topics in ${STEPS.length} sections, in the order worth learning them.`} />
         <p className="mt-2 inline-flex items-start gap-1.5 text-xs sm:text-sm font-medium text-emerald-800 bg-emerald-50 border border-emerald-100 rounded-xl px-3 py-1.5">
           <ShieldCheck className="w-4 h-4 shrink-0 mt-px" />
           Made with SSB ex-assessors and recommended candidates, and kept up to date with current trends.

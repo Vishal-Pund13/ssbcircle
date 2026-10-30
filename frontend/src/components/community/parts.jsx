@@ -6,6 +6,7 @@ import { POST_TYPES, CategoryIcon } from './CategoryChip';
 // Pieces shared by the community feed and the post page.
 
 export function Avatar({ name, url, official, size = 'w-8 h-8' }) {
+  const [broken, setBroken] = useState(false);
   if (official) {
     return (
       <div className={`${size} rounded-full bg-brand-600 flex items-center justify-center shrink-0`}>
@@ -13,7 +14,7 @@ export function Avatar({ name, url, official, size = 'w-8 h-8' }) {
       </div>
     );
   }
-  if (url) return <img src={url} alt="" className={`${size} rounded-full object-cover shrink-0`} />;
+  if (url && !broken) return <img src={url} alt="" referrerPolicy="no-referrer" onError={() => setBroken(true)} className={`${size} rounded-full object-cover shrink-0`} />;
   return (
     <div className={`${size} rounded-full bg-gradient-to-br from-brand-600 to-indigo-500 flex items-center justify-center text-[11px] font-bold text-white shrink-0`}>
       {(name || '?').split(' ').map(w => w[0]).join('').toUpperCase().slice(0, 2)}

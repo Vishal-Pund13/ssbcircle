@@ -1,12 +1,12 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { IndianRupee, BadgeCheck, Users, Award, Check, ArrowRight, Eye, Clock, Sparkles, ChevronDown, AlertCircle, ShieldCheck } from 'lucide-react';
+import { IndianRupee, BadgeCheck, Users, Award, Check, ArrowRight, Eye, Clock, ChevronDown, AlertCircle, ShieldCheck } from 'lucide-react';
 import SiteNav from './SiteNav';
 import { useAuth } from '../context/AuthContext';
 import { getModeratorStatus, applyModerator, withdrawModerator } from '../services/api';
 import { PERKS, DUTIES, WHO_CAN_APPLY, STEPS, SCORE_ROWS, TARGET_ROWS, FAQ } from '../data/moderatorProgram';
 import { trackEvent } from '../analytics';
-import Hello from './Hello';
+import { PageHead, CoverBand } from './PageCover';
 
 // The moderator programme, pitched as an opportunity: help run the platform,
 // get recognised and paid for it. Opt in, two weeks of tracked activity,
@@ -151,35 +151,25 @@ export default function ModeratorProgram() {
     <div className="min-h-screen bg-gray-50">
       <SiteNav />
 
-      {/* Hero */}
-      <header className="relative overflow-hidden bg-gradient-to-br from-brand-800 via-brand-600 to-emerald-600 text-white">
-        <div className="absolute inset-0 opacity-[0.1]" style={{ backgroundImage: 'radial-gradient(circle, #fff 1px, transparent 1px)', backgroundSize: '22px 22px' }} />
-        <ShieldCheck className="absolute -right-10 -bottom-10 w-72 h-72 opacity-10 hidden md:block" strokeWidth={1} aria-hidden="true" />
-        <div className="relative max-w-5xl mx-auto px-4 sm:px-6 py-12 sm:py-16">
-          <Hello dark className="mb-3 flex" />
-          <p className="inline-flex items-center gap-2 text-xs font-semibold bg-white/10 border border-white/20 px-3 py-1.5 rounded-full">
-            <Sparkles className="w-3.5 h-3.5" /> Moderator Programme
-          </p>
-          <h1 className="mt-4 text-3xl sm:text-5xl font-bold leading-[1.1] tracking-tight max-w-2xl">Lead the community. Get recognised and paid for it.</h1>
-          <p className="mt-4 text-base sm:text-lg text-white/85 max-w-xl leading-relaxed">
-            Active members who host sessions, help others and keep SSBCircle safe can become moderators — with a monthly stipend,
-            a MOD badge and direct access to the founding officers.
-          </p>
-          <div className="mt-6 flex flex-wrap gap-3">
+      <CoverBand deco={[Users, BadgeCheck, Award]} />
+      <header className="max-w-5xl mx-auto px-4 sm:px-6">
+        <PageHead icon={ShieldCheck} eyebrow="Moderator Programme" title="Lead the community. Get recognised and paid for it."
+          subtitle="Active members who host sessions, help others and keep SSBCircle safe can become moderators — with a monthly stipend, a MOD badge and direct access to the founding officers.">
+          <div className="mt-5 flex flex-wrap gap-3">
             <button type="button" onClick={() => { jump('opt-in'); trackEvent('moderator_cta'); }}
-              className="inline-flex items-center gap-2 bg-white text-brand-700 font-bold text-sm px-6 py-3 rounded-xl hover:bg-brand-50 cursor-pointer">
+              className="btn-primary text-sm px-6 py-3 inline-flex items-center gap-2">
               Opt in now <ArrowRight className="w-4 h-4" />
             </button>
-            <button type="button" onClick={() => jump('how')} className="border border-white/40 font-semibold text-sm px-6 py-3 rounded-xl hover:bg-white/10 cursor-pointer">
+            <button type="button" onClick={() => jump('how')} className="btn-secondary text-sm px-6 py-3">
               How it works
             </button>
           </div>
-        </div>
+        </PageHead>
       </header>
 
       <main className="max-w-5xl mx-auto px-4 sm:px-6 py-10 space-y-12">
         {/* Perks */}
-        <section className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 -mt-16 relative">
+        <section className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
           {PERKS.map(p => {
             const Icon = ICONS[p.icon];
             return (

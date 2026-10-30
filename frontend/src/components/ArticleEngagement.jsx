@@ -69,7 +69,8 @@ export function EngagementBar({ engagement, onCommentClick }) {
 }
 
 function Avatar({ name, url }) {
-  if (url) return <img src={url} alt="" className="w-7 h-7 rounded-full object-cover shrink-0" />;
+  const [broken, setBroken] = useState(false);
+  if (url && !broken) return <img src={url} alt="" referrerPolicy="no-referrer" onError={() => setBroken(true)} className="w-7 h-7 rounded-full object-cover shrink-0" />;
   return (
     <div className="w-7 h-7 rounded-full bg-brand-600 flex items-center justify-center text-[11px] font-bold text-white shrink-0">
       {(name || '?').split(' ').map(w => w[0]).join('').toUpperCase().slice(0, 2)}

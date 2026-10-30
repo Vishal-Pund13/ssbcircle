@@ -890,7 +890,7 @@ export default function SuperAdminDashboard() {
                       <td className="px-4 py-3">
                         <div className="flex items-center gap-2.5">
                           {u.avatar_url ? (
-                            <img src={u.avatar_url} alt={u.display_name} className="w-7 h-7 rounded-full object-cover shrink-0"/>
+                            <img src={u.avatar_url} referrerPolicy="no-referrer" alt={u.display_name} className="w-7 h-7 rounded-full object-cover shrink-0"/>
                           ) : (
                             <div className="w-7 h-7 rounded-full bg-brand-600 flex items-center justify-center text-[10px] font-bold text-white shrink-0">
                               {u.display_name?.split(' ').map(w => w[0]).join('').slice(0,2).toUpperCase() || '?'}

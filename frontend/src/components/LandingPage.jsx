@@ -382,7 +382,8 @@ function Logo() {
 
 function Avatar({ name, avatarUrl }) {
   const initials = name?.split(' ').map(w => w[0]).join('').toUpperCase().slice(0, 2) || '?';
-  if (avatarUrl) return <img src={avatarUrl} alt={name} className="w-7 h-7 rounded-full object-cover" />;
+  const [broken, setBroken] = useState(false);
+  if (avatarUrl && !broken) return <img src={avatarUrl} referrerPolicy="no-referrer" onError={() => setBroken(true)} alt={name} className="w-7 h-7 rounded-full object-cover" />;
   return (
     <div className="w-7 h-7 rounded-full bg-brand-600 flex items-center justify-center text-[11px] font-bold text-white shrink-0">
       {initials}
@@ -677,7 +678,7 @@ function ActiveAspirantsSection({ aspirants }) {
             return (
               <div key={a.id} className="shrink-0 flex flex-col items-center gap-2 p-3 bg-white border border-gray-100 rounded-xl w-[72px] hover:border-brand-200 hover:shadow-sm transition-all">
                 {a.avatar_url
-                  ? <img src={a.avatar_url} alt={a.display_name} className="w-10 h-10 rounded-full object-cover border-2 border-white shadow-sm" />
+                  ? <img src={a.avatar_url} referrerPolicy="no-referrer" alt={a.display_name} className="w-10 h-10 rounded-full object-cover border-2 border-white shadow-sm" />
                   : <div className={`w-10 h-10 rounded-full ${a.color || 'bg-brand-600'} flex items-center justify-center text-xs font-bold text-white shadow-sm`}>{initials}</div>
                 }
                 <p className="text-[11px] font-semibold text-gray-700 text-center truncate w-full leading-tight">{a.display_name?.split(' ')[0]}</p>
@@ -791,7 +792,7 @@ function RoomCard({ room, user, onJoin, onDelete }) {
             <div className="flex -space-x-2">
               {room.participants.map((p, i) => (
                 p.avatar_url
-                  ? <img key={i} src={p.avatar_url} alt={p.name}
+                  ? <img key={i} src={p.avatar_url} referrerPolicy="no-referrer" alt={p.name}
                       className="w-7 h-7 rounded-full border-2 border-white object-cover"
                       title={p.name} />
                   : <div key={i}

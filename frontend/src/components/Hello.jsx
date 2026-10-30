@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { useAuth } from '../context/AuthContext';
 
 // A signed-in aspirant's first name, capitalised ("sid kumar" -> "Sid"), and
@@ -17,8 +18,11 @@ export function greeting() {
   return 'Burning the midnight oil';
 }
 
+// Google profile photos refuse some hot-linked requests, so they are fetched
+// without a referrer and fall back to the initial if they still fail.
 function Avatar({ user, dark }) {
-  if (user.avatar_url) return <img src={user.avatar_url} alt="" className="w-6 h-6 rounded-full object-cover ring-2 ring-white/70" />;
+  const [broken, setBroken] = useState(false);
+  if (user.avatar_url && !broken) return <img src={user.avatar_url} alt="" referrerPolicy="no-referrer" onError={() => setBroken(true)} className="w-6 h-6 rounded-full object-cover ring-2 ring-white/70" />;
   return (
     <span className={`w-6 h-6 rounded-full text-[11px] font-bold flex items-center justify-center ${dark ? 'bg-white/20 text-white' : 'bg-brand-600 text-white'}`}>
       {firstName(user)[0]}

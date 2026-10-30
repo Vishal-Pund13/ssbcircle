@@ -5,6 +5,7 @@ import { getArticles, getArticle } from '../services/api';
 import { SWIPE_SLUGS } from '../data/swipeArticles';
 import ArticleRenderer from './ArticleRenderer';
 import SiteNav from './SiteNav';
+import { CoverBand, PageHead } from './PageCover';
 import { useArticleEngagement, EngagementBar, CommentsSection, useScrollToComments, useArticleTracking } from './ArticleEngagement';
 
 const PILLARS = [
@@ -211,7 +212,7 @@ function _SessionBannerRemoved() {
                   <div className="bg-gray-50 border border-gray-100 rounded-xl p-3 space-y-2">
                     <p className="text-[11px] font-bold text-gray-400 uppercase tracking-widest mb-2">Your Details (from Google)</p>
                     <div className="flex items-center gap-2">
-                      {user.avatar_url && <img src={user.avatar_url} className="w-7 h-7 rounded-full" alt="" />}
+                      {user.avatar_url && <img src={user.avatar_url} referrerPolicy="no-referrer" className="w-7 h-7 rounded-full" alt="" />}
                       <div>
                         <p className="text-sm font-semibold text-gray-800">{user.display_name}</p>
                         <p className="text-xs text-gray-400">{user.email}</p>
@@ -499,15 +500,11 @@ export default function CurrentAffairs() {
       ) : (
         <>
           {/* Page header */}
-          <section className="border-b border-gray-100 px-4 sm:px-6 py-8 sm:py-10">
+          <CoverBand deco={[Landmark, TrendingUp, Shield]} />
+          <section className="border-b border-gray-100 px-4 sm:px-6 pb-8">
             <div className="max-w-5xl mx-auto">
-              <div className="inline-flex items-center gap-2 bg-brand-50 text-brand-600 text-[12px] font-bold px-3 py-1 rounded-full mb-4 border border-brand-100 uppercase tracking-widest">
-                <BookOpen className="w-3.5 h-3.5" /> News Cards
-              </div>
-              <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-2">News Cards</h1>
-              <p className="text-sm text-gray-500 max-w-xl">
-                Bite-sized explainers across 5 SSB pillars — read a card, understand the issue, then walk into any GD or Lecturette ready to speak.
-              </p>
+              <PageHead icon={BookOpen} title="News Cards"
+                subtitle="Bite-sized explainers across 5 SSB pillars — read a card, understand the issue, then walk into any GD or Lecturette ready to speak." />
 
               {/* 5 pillar overview */}
               <div className="flex flex-wrap gap-2 mt-5">

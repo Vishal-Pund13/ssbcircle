@@ -39,7 +39,8 @@ export function Logo() {
 
 function Avatar({ name, avatarUrl }) {
   const initials = name?.split(' ').map(w => w[0]).join('').toUpperCase().slice(0, 2) || '?';
-  if (avatarUrl) return <img src={avatarUrl} alt="" className="w-7 h-7 rounded-full object-cover" />;
+  const [broken, setBroken] = useState(false);
+  if (avatarUrl && !broken) return <img src={avatarUrl} alt="" referrerPolicy="no-referrer" onError={() => setBroken(true)} className="w-7 h-7 rounded-full object-cover" />;
   return (
     <div className="w-7 h-7 rounded-full bg-brand-600 flex items-center justify-center text-[11px] font-bold text-white shrink-0">
       {initials}

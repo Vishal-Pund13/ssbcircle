@@ -144,7 +144,7 @@ export default function SessionPage() {
             {/* Signed-in user row */}
             <div className="flex items-center gap-3 border border-gray-100 rounded-xl p-3.5 mb-6 bg-gray-50">
               {user.avatar_url && (
-                <img src={user.avatar_url} alt="" className="w-8 h-8 rounded-full shrink-0" />
+                <img src={user.avatar_url} referrerPolicy="no-referrer" alt="" className="w-8 h-8 rounded-full shrink-0" />
               )}
               <div className="flex-1 min-w-0">
                 <p className="text-sm font-semibold text-gray-800 truncate">{user.display_name}</p>

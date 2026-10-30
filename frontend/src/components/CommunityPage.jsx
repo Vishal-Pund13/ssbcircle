@@ -6,6 +6,7 @@ import { MessageSquare, Pin, Lock, AlertCircle, Flame, Clock, TrendingUp, X, Fil
 import CategoryChip, { CATEGORY_META, CategoryIcon, POST_TYPES, timeAgo } from './community/CategoryChip';
 import { Avatar, VoteRail, ShareButton, CommunitySidebar, ModBadge } from './community/parts';
 import SiteNav from './SiteNav';
+import { CoverBand } from './PageCover';
 import { trackEvent } from '../analytics';
 
 // The community feed, laid out like Reddit and Facebook because most
@@ -247,7 +248,7 @@ export default function CommunityPage() {
 
       {/* Community banner */}
       <div className="bg-white border-b border-gray-200">
-        <div className="h-20 sm:h-24 bg-gradient-to-r from-brand-700 via-brand-600 to-indigo-500" />
+        <CoverBand deco={[MessageSquare, Users, PenLine]} />
         <div className="max-w-6xl mx-auto px-4 sm:px-6 pb-4">
           {/* Only the badge overlaps the cover; the title stays on white */}
           <div className="flex items-end gap-4">

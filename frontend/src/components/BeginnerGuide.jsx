@@ -10,7 +10,7 @@ import {
   QUALITIES, MYTHS, INTERESTS, SERVICES, ENTRIES, SSB_DAYS, AFTER_SSB, START_STEPS, FAQ,
 } from '../data/beginnerGuide';
 import { trackEvent } from '../analytics';
-import Hello from './Hello';
+import { CoverBand, PageHead } from './PageCover';
 
 // "How to become an officer in the Indian Armed Forces" — /become-an-officer.
 //
@@ -489,19 +489,12 @@ export default function BeginnerGuide() {
       <SiteNav />
 
       {/* Hero — the dream, then every part of the page one tap away */}
-      <header className="bg-gradient-to-b from-brand-50 to-white px-4 sm:px-6 pt-8 sm:pt-14 pb-8">
+      <CoverBand deco={[Shield, Anchor, Plane]} />
+      <header className="px-4 sm:px-6 pb-8">
         <div className="max-w-5xl mx-auto">
-          <Hello className="mb-3 flex" />
-          <p className="inline-flex items-center gap-2 text-sm font-semibold text-brand-700 bg-white border border-brand-100 px-3 py-1.5 rounded-full">
-            <Shield className="w-4 h-4" /> Indian Army · Indian Navy · Indian Air Force
-          </p>
-          <h1 className="mt-4 text-[1.75rem] sm:text-5xl font-bold text-gray-900 leading-[1.1] tracking-tight max-w-3xl">
-            How to become an officer in the Indian Armed Forces
-          </h1>
-          <p className="mt-4 text-base sm:text-lg text-gray-600 leading-relaxed max-w-2xl">
-            Dream of the uniform? Here is what you can become, how to join after 12th or after graduation,
-            and how selection works — in simple words. Read in any order.
-          </p>
+          <PageHead icon={Compass} eyebrow="Indian Army · Indian Navy · Indian Air Force"
+            title="How to become an officer in the Indian Armed Forces"
+            subtitle="Dream of the uniform? Here is what you can become, how to join after 12th or after graduation, and how selection works — in simple words. Read in any order." />
 
           <nav aria-label="Jump to a part of this guide" className="mt-7 grid grid-cols-2 lg:grid-cols-4 gap-2.5">
             {SECTIONS.map(s => (
