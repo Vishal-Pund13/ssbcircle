@@ -531,7 +531,7 @@ const MENTOR_TOPICS = ['Life in the forces', 'Which entry and branch suits you',
 function MentorsSection() {
   const [connect, setConnect] = useState(null);
   return (
-    <section className="border-t border-gray-100 bg-slate-50 py-10 sm:py-14 px-4 sm:px-6">
+    <section className="border-t border-gray-100 bg-white py-10 sm:py-14 px-4 sm:px-6">
       <div className="max-w-5xl mx-auto">
 
         <div className="mb-6">
@@ -664,7 +664,7 @@ function ActiveAspirantsSection({ aspirants }) {
   const displayed = real.length >= 4 ? real : [...real, ...MOCK_ASPIRANTS.slice(real.length)];
 
   return (
-    <section className="border-t border-gray-100 bg-white py-10 sm:py-14 px-4 sm:px-6">
+    <section className="border-t border-gray-100 bg-slate-50 py-10 sm:py-14 px-4 sm:px-6">
       <div className="max-w-5xl mx-auto">
         <div className="flex items-center gap-2 mb-1">
           <h2 className="text-xl sm:text-2xl font-bold text-gray-900">Active Aspirants</h2>
@@ -693,7 +693,7 @@ function ActiveAspirantsSection({ aspirants }) {
 
 function ContributeSection() {
   return (
-    <section className="border-t border-gray-100 bg-slate-50 px-4 sm:px-6 py-8 sm:py-10">
+    <section className="border-t border-gray-100 bg-white px-4 sm:px-6 py-8 sm:py-10">
       <div className="max-w-5xl mx-auto">
         <p className="text-xs font-bold uppercase tracking-widest text-brand-600 flex items-center gap-2"><Sparkles className="w-3.5 h-3.5" /> Before the uniform</p>
         <h2 className="mt-1 text-lg sm:text-xl font-bold text-gray-900">Start serving now, whatever your result</h2>
@@ -1006,7 +1006,7 @@ function StepFlow({ steps }) {
 function FaqSection() {
   const [open, setOpen] = useState(null);
   return (
-    <section className="border-t border-gray-100 bg-slate-50 py-10 sm:py-14 px-4 sm:px-6">
+    <section className="border-t border-gray-100 bg-white py-10 sm:py-14 px-4 sm:px-6">
       <div className="max-w-5xl mx-auto">
         <div className="mb-8">
           <h2 className="text-xl sm:text-2xl font-bold text-gray-900">Frequently asked questions</h2>
@@ -1442,7 +1442,7 @@ export default function LandingPage() {
         <div id="news"><LatestReadsSection articles={articles} loading={articlesLoading} /></div>
 
         {/* ── Live / Upcoming tabs ── */}
-        <section id="rooms" ref={tabsSectionRef} className="scroll-mt-16 border-t border-emerald-100 bg-emerald-50/50 px-4 sm:px-6 py-10 sm:py-14">
+        <section id="rooms" ref={tabsSectionRef} className="scroll-mt-16 border-t border-gray-100 bg-white px-4 sm:px-6 py-10 sm:py-14">
           <div className="max-w-5xl mx-auto">
 
           <div className="mb-5">
@@ -1644,7 +1644,7 @@ export default function LandingPage() {
 
         {/* ── Notable Sessions — social proof, sits with the rooms zone ── */}
         {pastSessions.length > 0 && (
-          <section className="border-t border-gray-100 bg-white py-10 sm:py-14 px-4 sm:px-6">
+          <section className="border-t border-gray-100 bg-slate-50 py-10 sm:py-14 px-4 sm:px-6">
             <div className="max-w-5xl mx-auto">
               <div className="flex items-center justify-between mb-6">
                 <div>
@@ -1696,7 +1696,7 @@ export default function LandingPage() {
         <ContributeSection />
 
         {/* ── Coming soon: three short cards instead of two full-width blocks ── */}
-        <section className="border-t border-gray-100 bg-white px-4 sm:px-6 py-8 sm:py-10">
+        <section className="border-t border-gray-100 bg-slate-50 px-4 sm:px-6 py-8 sm:py-10">
           <div className="max-w-5xl mx-auto">
             <p className="text-xs font-bold uppercase tracking-widest text-brand-600 flex items-center gap-2"><Lock className="w-3.5 h-3.5" /> Coming soon</p>
             <h2 className="mt-1 text-lg sm:text-xl font-bold text-gray-900">Built in the open — you shape what comes next</h2>
@@ -1706,7 +1706,7 @@ export default function LandingPage() {
                 { icon: Shield, title: 'Sessions with veterans', text: 'Guided sessions with ex-servicemen and recommended candidates, with feedback on how you speak and lead.', tag: 'Invite-only' },
                 { icon: Star, title: 'Peer ratings', text: 'After a session, rate each other on communication and leadership, and build a profile over time.', tag: 'Planned' },
               ].map(({ icon: Icon, title, text, tag }) => (
-                <div key={title} className="rounded-2xl border border-gray-200 bg-gray-50/60 p-4">
+                <div key={title} className="rounded-2xl border border-gray-200 bg-white p-4">
                   <div className="flex items-center justify-between gap-2">
                     <span className="w-9 h-9 rounded-xl bg-white border border-gray-200 text-brand-600 flex items-center justify-center"><Icon className="w-4 h-4" /></span>
                     <span className="text-[11px] font-semibold text-gray-500 bg-white border border-gray-200 px-2 py-0.5 rounded-full">{tag}</span>

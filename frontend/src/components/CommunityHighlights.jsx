@@ -138,7 +138,7 @@ export default function CommunityHighlights() {
     .slice(0, MAX_POSTS);
 
   return (
-    <section className="border-t border-gray-100 bg-white px-4 sm:px-6 py-10 sm:py-14">
+    <section className="border-t border-gray-100 bg-slate-50 px-4 sm:px-6 py-10 sm:py-14">
       <div className="max-w-5xl mx-auto">
         <div className="flex items-end justify-between gap-4 mb-5">
           <div>
