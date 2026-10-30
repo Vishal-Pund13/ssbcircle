@@ -102,33 +102,35 @@ export function PrepPath({ user, liveCount = 0 }) {
 //
 // Drawn as a journey: each stage has its own colour and an illustrated band
 // (its icon, with smaller themed icons around it), arrows join the stages on
-// wide screens, and the conference on Day 5 is the finish line. Class strings
-// are written out in full so Tailwind keeps them.
+// wide screens, and the conference on Day 5 is the finish line. Colours stay
+// soft — light tints with a coloured accent — so the section reads calm and
+// professional rather than loud. Class strings are written out in full so
+// Tailwind keeps them.
 const STAGES = [
   {
     day: 'Day 1', icon: Eye, deco: [ImageIcon, ListChecks], title: 'Screening',
-    band: 'from-sky-500 to-cyan-400', soft: 'bg-sky-50 hover:bg-sky-100 text-sky-800', dot: 'bg-sky-500',
+    band: 'bg-sky-50 border-sky-100', ink: 'text-sky-600', faint: 'text-sky-200', soft: 'bg-sky-50 hover:bg-sky-100 text-sky-800',
     what: 'A short reasoning test (OIR), then a picture story you write and discuss with your group (PPDT). Most candidates are sent home here.',
     main: { to: '/?tab=live', label: 'Practise PPDT with others', rooms: true },
     more: { to: '/tat', label: 'Write picture stories' },
   },
   {
     day: 'Day 2', icon: Brain, deco: [PenLine, Lightbulb], title: 'Psychology tests',
-    band: 'from-violet-600 to-fuchsia-500', soft: 'bg-violet-50 hover:bg-violet-100 text-violet-800', dot: 'bg-violet-500',
+    band: 'bg-violet-50 border-violet-100', ink: 'text-violet-600', faint: 'text-violet-200', soft: 'bg-violet-50 hover:bg-violet-100 text-violet-800',
     what: 'Quick-fire writing: TAT stories, word and situation tests, and a self-description. It shows how you really think.',
     main: { to: '/tat', label: 'Write a TAT story, get feedback' },
     soon: 'Word and situation tests coming soon',
   },
   {
     day: 'Days 3–4', icon: Users, deco: [Flag, Mountain], title: 'Group tasks (GTO)',
-    band: 'from-emerald-600 to-lime-500', soft: 'bg-emerald-50 hover:bg-emerald-100 text-emerald-800', dot: 'bg-emerald-500',
+    band: 'bg-emerald-50 border-emerald-100', ink: 'text-emerald-600', faint: 'text-emerald-200', soft: 'bg-emerald-50 hover:bg-emerald-100 text-emerald-800',
     what: 'Group discussions, a lecturette, planning and outdoor tasks. It tests how you work with a group and lead it.',
     main: { to: '/?tab=live', label: 'Join a live GD or lecturette', rooms: true },
     more: { to: '/current-affairs', label: 'GD topics in News Cards' },
   },
   {
     day: 'Days 2–4', icon: Mic, deco: [MessageCircle, FileText], title: 'Interview',
-    band: 'from-amber-500 to-orange-400', soft: 'bg-amber-50 hover:bg-amber-100 text-amber-900', dot: 'bg-amber-500',
+    band: 'bg-amber-50 border-amber-100', ink: 'text-amber-600', faint: 'text-amber-200', soft: 'bg-amber-50 hover:bg-amber-100 text-amber-900',
     what: 'One evening, a one-to-one talk with an officer, built on your own PIQ form. Know your life story and answer honestly.',
     main: { to: '/piq', label: 'Get your PIQ analysed' },
     more: { to: '/prep', label: 'Practise answers in the Prep Sheet' },
@@ -154,7 +156,7 @@ export function SsbStages() {
 
         {/* Day strip: the five days at a glance, coloured by stage */}
         <div className="hidden sm:flex items-center gap-1.5 mb-4" aria-hidden="true">
-          {[['Day 1', 'bg-sky-500'], ['Day 2', 'bg-violet-500'], ['Day 3', 'bg-emerald-500'], ['Day 4', 'bg-emerald-500'], ['Day 5', 'bg-brand-600']].map(([d, c]) => (
+          {[['Day 1', 'bg-sky-300'], ['Day 2', 'bg-violet-300'], ['Day 3', 'bg-emerald-300'], ['Day 4', 'bg-emerald-300'], ['Day 5', 'bg-slate-400']].map(([d, c]) => (
             <div key={d} className="flex-1">
               <div className={`h-1.5 rounded-full ${c}`} />
               <p className="mt-1 text-[11px] font-semibold text-gray-400">{d}</p>
@@ -163,20 +165,18 @@ export function SsbStages() {
         </div>
 
         <ol className="m-rail sm:grid-cols-2 lg:grid-cols-4">
-          {STAGES.map(({ day, icon: Icon, deco: [A, B], title, band, soft, what, main, more, soon }, i) => (
+          {STAGES.map(({ day, icon: Icon, deco: [A, B], title, band, ink, faint, soft, what, main, more, soon }, i) => (
             <li key={title} className="relative flex">
               <div className="flex-1 bg-white border border-gray-200 rounded-2xl overflow-hidden flex flex-col shadow-sm">
                 {/* Illustrated band */}
-                <div className={`relative h-24 bg-gradient-to-br ${band} text-white overflow-hidden`}>
-                  <div className="absolute inset-0 opacity-[0.15]" aria-hidden="true"
-                    style={{ backgroundImage: 'radial-gradient(circle, #fff 1px, transparent 1px)', backgroundSize: '14px 14px' }} />
-                  <A className="absolute right-12 top-3 w-8 h-8 opacity-30 -rotate-12" strokeWidth={1.5} aria-hidden="true" />
-                  <B className="absolute right-3 bottom-2 w-10 h-10 opacity-30 rotate-6" strokeWidth={1.5} aria-hidden="true" />
-                  <span className="absolute left-4 top-3 text-[11px] font-bold uppercase tracking-wide bg-white/20 border border-white/25 px-2 py-0.5 rounded-full">{day}</span>
-                  <span className="absolute left-4 bottom-3 w-11 h-11 rounded-xl bg-white/20 border border-white/30 flex items-center justify-center">
+                <div className={`relative h-24 border-b ${band} overflow-hidden`}>
+                  <A className={`absolute right-12 top-3 w-8 h-8 -rotate-12 ${faint}`} strokeWidth={1.5} aria-hidden="true" />
+                  <B className={`absolute right-3 bottom-2 w-10 h-10 rotate-6 ${faint}`} strokeWidth={1.5} aria-hidden="true" />
+                  <span className={`absolute left-4 top-3 text-[11px] font-bold uppercase tracking-wide bg-white border border-gray-200 px-2 py-0.5 rounded-full ${ink}`}>{day}</span>
+                  <span className={`absolute left-4 bottom-3 w-11 h-11 rounded-xl bg-white border border-gray-200 shadow-sm flex items-center justify-center ${ink}`}>
                     <Icon className="w-6 h-6" />
                   </span>
-                  <span className="absolute left-[4.25rem] bottom-3 text-3xl font-black text-white/35 leading-none">0{i + 1}</span>
+                  <span className={`absolute left-[4.25rem] bottom-3 text-3xl font-black leading-none ${faint}`}>0{i + 1}</span>
                 </div>
 
                 <div className="p-4 flex-1 flex flex-col">
@@ -209,11 +209,11 @@ export function SsbStages() {
         </ol>
 
         {/* Day 5: the finish line */}
-        <div className="mt-4 flex items-center gap-3 rounded-2xl bg-gradient-to-r from-brand-600 to-indigo-600 text-white px-4 py-3.5">
-          <span className="w-10 h-10 rounded-xl bg-white/15 border border-white/25 flex items-center justify-center shrink-0"><Trophy className="w-5 h-5 text-amber-300" /></span>
+        <div className="mt-4 flex items-center gap-3 rounded-2xl bg-slate-50 border border-slate-200 px-4 py-3.5">
+          <span className="w-10 h-10 rounded-xl bg-white border border-gray-200 shadow-sm flex items-center justify-center shrink-0"><Trophy className="w-5 h-5 text-amber-500" /></span>
           <p className="text-sm leading-snug">
-            <span className="font-bold">Day 5 · Conference.</span>{' '}
-            <span className="text-white/85">All the assessors meet you once more, and results come the same day. Nothing extra to prepare — be yourself.</span>
+            <span className="font-bold text-gray-900">Day 5 · Conference.</span>{' '}
+            <span className="text-gray-600">All the assessors meet you once more, and results come the same day. Nothing extra to prepare — be yourself.</span>
           </p>
         </div>
       </div>

@@ -132,31 +132,29 @@ function StepCover({ step, index, count, read, spoken, total }) {
   const [A, B, C] = t.deco;
   const pct = total ? Math.round((spoken / total) * 100) : 0;
   return (
-    <div className={`relative overflow-hidden rounded-2xl bg-gradient-to-br ${t.cover} text-white px-5 sm:px-7 py-5 sm:py-7`}>
-      <div className="absolute inset-0 opacity-[0.12] pointer-events-none"
-        style={{ backgroundImage: 'radial-gradient(circle, #fff 1px, transparent 1px)', backgroundSize: '18px 18px' }} />
-      <div className="absolute inset-y-0 right-0 w-1/2 pointer-events-none hidden sm:block" aria-hidden="true">
-        <Icon className="absolute -right-6 -bottom-8 w-44 h-44 opacity-[0.13]" strokeWidth={1.25} />
-        <A className="absolute right-40 top-5 w-12 h-12 opacity-25 -rotate-12" strokeWidth={1.5} />
-        <B className="absolute right-12 top-6 w-9 h-9 opacity-30 rotate-12" strokeWidth={1.5} />
-        <C className="absolute right-56 bottom-6 w-8 h-8 opacity-20 rotate-6" strokeWidth={1.5} />
+    <div className={`relative overflow-hidden rounded-2xl border border-gray-200 ${t.soft} px-5 sm:px-7 py-5 sm:py-6`}>
+      <div className={`absolute inset-y-0 right-0 w-1/2 pointer-events-none hidden sm:block ${t.text}`} aria-hidden="true">
+        <Icon className="absolute -right-6 -bottom-8 w-44 h-44 opacity-[0.08]" strokeWidth={1.25} />
+        <A className="absolute right-40 top-5 w-12 h-12 opacity-[0.15] -rotate-12" strokeWidth={1.5} />
+        <B className="absolute right-12 top-6 w-9 h-9 opacity-[0.15] rotate-12" strokeWidth={1.5} />
+        <C className="absolute right-56 bottom-6 w-8 h-8 opacity-[0.12] rotate-6" strokeWidth={1.5} />
       </div>
       <div className="relative">
-        <p className="text-[11px] font-bold uppercase tracking-[0.25em] text-white/70">Section {index + 1} of {count}</p>
+        <p className={`text-[11px] font-bold uppercase tracking-[0.25em] ${t.text}`}>Section {index + 1} of {count}</p>
         <div className="mt-3 flex items-center gap-3">
-          <span className="w-11 h-11 rounded-xl bg-white/15 border border-white/25 flex items-center justify-center shrink-0">
+          <span className={`w-11 h-11 rounded-xl bg-white border border-gray-200 shadow-sm flex items-center justify-center shrink-0 ${t.text}`}>
             <Icon className="w-5 h-5" />
           </span>
-          <h2 className="text-xl sm:text-2xl font-bold leading-tight">{step.title}</h2>
+          <h2 className="text-xl sm:text-2xl font-bold leading-tight text-gray-900">{step.title}</h2>
         </div>
-        <p className="mt-2 text-sm text-white/85 max-w-md leading-relaxed">{step.blurb}</p>
+        <p className="mt-2 text-sm text-gray-600 max-w-md leading-relaxed">{step.blurb}</p>
         <div className="mt-4 max-w-xs">
-          <div className="flex items-center justify-between text-[12px] text-white/80">
+          <div className="flex items-center justify-between text-[12px] text-gray-600">
             <span>{spoken} of {total} can speak{read ? ` · ${read} read` : ''}</span>
-            <span className="font-bold">{pct}%</span>
+            <span className="font-bold text-gray-900">{pct}%</span>
           </div>
-          <div className="mt-1.5 h-1.5 bg-white/20 rounded-full overflow-hidden">
-            <div className="h-full bg-white rounded-full transition-all" style={{ width: `${pct}%` }} />
+          <div className="mt-1.5 h-1.5 bg-white rounded-full overflow-hidden border border-gray-200/70">
+            <div className={`h-full ${t.bar} rounded-full transition-all`} style={{ width: `${pct}%` }} />
           </div>
         </div>
       </div>
@@ -493,10 +491,8 @@ export default function PrepPage() {
       <SiteNav />
 
       {/* ── Page cover ── */}
-      <div className="relative h-20 sm:h-36 bg-gradient-to-r from-brand-700 via-brand-600 to-indigo-500 overflow-hidden">
-        <div className="absolute inset-0 opacity-[0.12]"
-          style={{ backgroundImage: 'radial-gradient(circle, #fff 1px, transparent 1px)', backgroundSize: '20px 20px' }} />
-        <div className="absolute right-6 sm:right-24 top-4 flex gap-6 opacity-20 text-white" aria-hidden="true">
+      <div className="relative h-20 sm:h-36 bg-gradient-to-r from-brand-50 via-slate-50 to-indigo-50 border-b border-gray-100 overflow-hidden">
+        <div className="absolute right-6 sm:right-24 top-4 flex gap-6 opacity-[0.12] text-brand-600" aria-hidden="true">
           <BookOpen className="w-14 h-14 -rotate-6" strokeWidth={1.25} />
           <Mic className="w-10 h-10 mt-8 rotate-12" strokeWidth={1.25} />
           <Target className="w-12 h-12 mt-2" strokeWidth={1.25} />
