@@ -462,7 +462,10 @@ export default function PrepPage() {
   function selectStep(id) {
     setOpenStep(id);
     setOpenTopic(null);
-    document.getElementById('sheet')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    // Desktop: top of the sheet. Phones: past the section picker, to the
+    // section itself.
+    const target = window.matchMedia('(min-width: 1024px)').matches ? 'sheet' : 'section-open';
+    setTimeout(() => document.getElementById(target)?.scrollIntoView({ behavior: 'smooth', block: 'start' }), 30);
   }
 
   const renderTopics = (topics, theme) => (
@@ -511,25 +514,15 @@ export default function PrepPage() {
           {TOPICS.length} topics in {STEPS.length} sections, in the order worth learning them.
         </p>
 
-        {/* Why the sheet exists — the one thing to take away before the list */}
-        <div className="mt-4 max-w-3xl rounded-2xl border border-brand-100 bg-brand-50/70 p-4 sm:p-5 flex gap-3">
-          <span className="w-9 h-9 rounded-xl bg-white text-brand-600 flex items-center justify-center shrink-0"><Lightbulb className="w-5 h-5" /></span>
-          <div>
-            <p className="text-[15px] font-bold text-gray-900">You need to know a little about everything here</p>
-            <p className="mt-1 text-sm text-gray-700 leading-relaxed">
-              Any of these can come up in your interview, GD or lecturette. You do not have to be an expert — but know the basics
-              of each topic and <span className="font-semibold">have your own opinion</span> on it. That is what lets you speak with
-              confidence on any front at the SSB.
-            </p>
-            <p className="mt-2 text-sm text-gray-700 leading-relaxed">
-              Tick a topic when you have read it. It is <span className="font-semibold">done when you can answer it out loud without notes</span>.
-            </p>
-          </div>
-        </div>
+        {/* Why the sheet exists — one line, the thing to take away before the list */}
+        <p className="mt-3 max-w-3xl flex items-start gap-2 text-sm text-gray-700 bg-amber-50 border border-amber-100 rounded-xl px-3 py-2 leading-snug">
+          <Lightbulb className="w-4 h-4 text-amber-500 shrink-0 mt-0.5" />
+          <span><span className="font-semibold text-gray-900">Know a little about everything.</span> Any topic here can come up at your SSB — learn the basics and have your own view.</span>
+        </p>
 
         <div className="mt-3 flex flex-wrap items-center gap-x-4 gap-y-1.5 text-xs text-gray-500">
           <span className="inline-flex items-center gap-1.5"><span className="w-[14px] h-[14px] rounded-[4px] bg-emerald-100 border-2 border-emerald-400" /> Read</span>
-          <span className="inline-flex items-center gap-1.5"><span className="w-[14px] h-[14px] rounded-[4px] bg-emerald-500" /> Can speak</span>
+          <span className="inline-flex items-center gap-1.5"><span className="w-[14px] h-[14px] rounded-[4px] bg-emerald-500" /> Can speak — answered out loud, no notes</span>
           <span className="hidden sm:contents">
             {['must', 'good', 'deep'].map(l => (
               <span key={l} className="inline-flex items-center gap-1.5"><span className={`w-2 h-2 rounded-full ${LEVEL_DOT[l]}`} /> {LEVELS[l].label}</span>
@@ -744,20 +737,36 @@ export default function PrepPage() {
           </aside>
 
           <div className="min-w-0">
-            {/* Section chips on smaller screens */}
-            <div className="lg:hidden sticky top-14 z-20 -mx-4 px-4 py-2 mb-3 bg-white/95 backdrop-blur border-b border-gray-100 flex gap-2 overflow-x-auto scrollbar-hide">
-              {STEPS.map(step => {
-                const t = themeFor(step.id);
-                const Icon = t.icon;
-                const active = !narrowing && step.id === currentStep.id;
-                return (
-                  <button key={step.id} type="button" data-step={step.id} onClick={() => { setFilter('all'); setQuery(''); selectStep(step.id); }}
-                    className={`shrink-0 inline-flex items-center gap-1.5 text-xs font-semibold px-3 min-h-[36px] rounded-full border cursor-pointer ${active
-                      ? 'bg-gray-900 border-gray-900 text-white' : 'bg-white border-gray-200 text-gray-600'}`}>
-                    <Icon className="w-3.5 h-3.5" /> {step.title}
-                  </button>
-                );
-              })}
+            {/* Smaller screens: every section in view at once, each teasing a
+                real question from inside it. A strip of chips scrolling sideways
+                hid most of them, and few people found the rest. */}
+            <div id="sections" className="lg:hidden scroll-mt-16 mb-5">
+              <p className="text-sm font-bold text-gray-900">{STEPS.length} sections <span className="font-normal text-gray-500">· tap one to see its questions</span></p>
+              <div className="mt-2.5 grid grid-cols-2 gap-2">
+                {STEPS.map(step => {
+                  const t = themeFor(step.id);
+                  const Icon = t.icon;
+                  const st = stepStats(step);
+                  const active = !narrowing && step.id === currentStep.id;
+                  const sample = (st.all.find(x => x.level === 'must') || st.all[0])?.ask;
+                  return (
+                    <button key={step.id} type="button" onClick={() => { setFilter('all'); setQuery(''); selectStep(step.id); }}
+                      aria-current={active ? 'true' : undefined}
+                      className={`text-left rounded-2xl border p-3 flex flex-col cursor-pointer transition ${active ? `border-transparent ring-2 ${t.ring} ${t.soft}` : 'border-gray-200 bg-white active:bg-gray-50'}`}>
+                      <span className="flex items-center gap-2">
+                        <span className={`w-7 h-7 rounded-lg flex items-center justify-center shrink-0 ${st.spoken === st.total ? 'bg-emerald-500 text-white' : `${t.soft} ${t.text}`}`}>
+                          {st.spoken === st.total ? <Check className="w-3.5 h-3.5" strokeWidth={3} /> : <Icon className="w-3.5 h-3.5" />}
+                        </span>
+                        <span className="text-[13px] font-bold text-gray-900 leading-tight">{step.title}</span>
+                      </span>
+                      <span className="mt-2 text-xs text-gray-600 leading-snug italic line-clamp-2">"{sample}"</span>
+                      <span className="mt-auto pt-2 text-[11px] text-gray-400 tabular-nums">
+                        {st.total} topics{user && st.spoken ? ` · ${st.spoken} done` : ''}
+                      </span>
+                    </button>
+                  );
+                })}
+              </div>
             </div>
 
             {/* Search and filters */}
@@ -809,8 +818,31 @@ export default function PrepPage() {
             {!narrowing && currentStep && (() => {
               const st = stepStats(currentStep);
               const t = themeFor(currentStep.id);
+              const CurIcon = t.icon;
               return (
                 <div className="mt-5">
+                  <div className="lg:hidden sticky top-14 z-20 -mx-4 px-4 py-2 mb-3 bg-white/95 backdrop-blur border-b border-gray-100 flex items-center gap-2">
+                    <span className={`w-7 h-7 rounded-lg flex items-center justify-center shrink-0 ${t.soft} ${t.text}`}><CurIcon className="w-3.5 h-3.5" /></span>
+                    <span className="flex-1 min-w-0">
+                      <span className="block text-sm font-bold text-gray-900 truncate">{currentStep.title}</span>
+                      <span className="block text-[11px] text-gray-500">Section {stepIndex + 1} of {STEPS.length}</span>
+                    </span>
+                    <button type="button" aria-label="Previous section" disabled={stepIndex === 0}
+                      onClick={() => selectStep(STEPS[stepIndex - 1].id)}
+                      className="w-9 h-9 rounded-full border border-gray-200 flex items-center justify-center disabled:opacity-30 cursor-pointer">
+                      <ChevronLeft className="w-4 h-4" />
+                    </button>
+                    <button type="button" aria-label="Next section" disabled={stepIndex === STEPS.length - 1}
+                      onClick={() => selectStep(STEPS[stepIndex + 1].id)}
+                      className="w-9 h-9 rounded-full border border-gray-200 flex items-center justify-center disabled:opacity-30 cursor-pointer">
+                      <ChevronRight className="w-4 h-4" />
+                    </button>
+                    <button type="button" onClick={() => document.getElementById('sections')?.scrollIntoView({ behavior: 'smooth', block: 'start' })}
+                      className="text-xs font-semibold text-brand-700 bg-brand-50 rounded-full px-3 min-h-[36px] cursor-pointer">
+                      All sections
+                    </button>
+                  </div>
+                  <div id="section-open" className="scroll-mt-28" />
                   <StepCover step={currentStep} index={stepIndex} count={STEPS.length} read={st.read} spoken={st.spoken} total={st.total} />
                   <div className="mt-6 space-y-7">
                     {currentStep.groups.map(group => {
