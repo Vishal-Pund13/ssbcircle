@@ -1,7 +1,7 @@
 import { useState, useEffect, useMemo, useRef } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import {
-  Star, Check, Mic, Flame, Calendar, ChevronDown, ChevronLeft, ChevronRight, Search, BookOpen,
+  Star, Check, Mic, Flame, ShieldCheck, Calendar, ChevronDown, ChevronLeft, ChevronRight, Search, BookOpen,
   StickyNote, RotateCcw, Target, Radio, AlertCircle, X, Sparkles, ListChecks, Lightbulb,
 } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
@@ -512,6 +512,10 @@ export default function PrepPage() {
         <h1 className="mt-3 sm:mt-4 text-2xl sm:text-4xl font-bold text-gray-900 tracking-tight">SSB Prep Sheet</h1>
         <p className="mt-1.5 text-sm sm:text-[15px] text-gray-500 max-w-2xl leading-relaxed">
           {TOPICS.length} topics in {STEPS.length} sections, in the order worth learning them.
+        </p>
+        <p className="mt-2 inline-flex items-start gap-1.5 text-xs sm:text-sm font-medium text-emerald-800 bg-emerald-50 border border-emerald-100 rounded-xl px-3 py-1.5">
+          <ShieldCheck className="w-4 h-4 shrink-0 mt-px" />
+          Made with SSB ex-assessors and recommended candidates, and kept up to date with current trends.
         </p>
 
         {/* Why the sheet exists — one line, the thing to take away before the list */}
