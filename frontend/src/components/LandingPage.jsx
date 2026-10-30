@@ -12,8 +12,9 @@ import { trackEvent } from '../analytics';
 import { PrepPath, SsbStages } from './HomePrep';
 import { ExamTicker } from './ExamCalendar';
 import HomeRail from './HomeRail';
+import MentorConnectModal from './MentorConnectModal';
 import { HOME_FAQ } from '../data/homeFaq';
-import { Mic, Timer, FileText, CheckSquare, Radio, ArrowRight, Trash2, Zap, Lightbulb, Users, Presentation, Target, Headphones, RefreshCw, X, Calendar, Heart, PlayCircle, Share2, Check, Sparkles, ChevronDown, Shield, Star, Lock, BookOpen, Video, Award, ChevronRight, GraduationCap, ExternalLink, AlertTriangle, HeartHandshake, PenLine, Footprints } from 'lucide-react';
+import { Mic, Timer, FileText, CheckSquare, Radio, ArrowRight, Trash2, Zap, Lightbulb, Users, Presentation, Target, Headphones, RefreshCw, X, Calendar, Heart, PlayCircle, Share2, Check, Sparkles, ChevronDown, Shield, Star, Lock, BookOpen, Video, Award, ChevronRight, GraduationCap, ExternalLink, AlertTriangle, HeartHandshake, PenLine, Footprints, MessageCircle } from 'lucide-react';
 
 
 const HERO_CARDS = [
@@ -430,7 +431,7 @@ function timeAgo(dateStr) {
 // Split layout: navy left panel (identity) + white right panel (content).
 // Clicking anywhere navigates to the full /mentor/:slug page.
 
-function MentorCard({ mentor }) {
+function MentorCard({ mentor, onConnect }) {
   const navigate = useNavigate();
   return (
     <div
@@ -498,13 +499,20 @@ function MentorCard({ mentor }) {
           ))}
         </div>
 
-        {/* Footer */}
-        <div className="flex items-center justify-between gap-2 pt-2 border-t border-gray-50 mt-auto">
-          <span className="flex items-center gap-1 text-[11px] text-gray-300">
-            <Award className="w-3 h-3 text-sky-300" /> {mentor.yearsOfService} service
-          </span>
+        {/* Footer: talk to them, or read more */}
+        <div className="flex flex-wrap items-center justify-between gap-2 pt-3 border-t border-gray-100 mt-auto">
+          {mentor.whatsapp ? (
+            <button type="button" onClick={e => { e.stopPropagation(); onConnect(mentor); }}
+              className="inline-flex items-center gap-1.5 text-sm font-semibold text-white bg-emerald-600 hover:bg-emerald-700 rounded-lg px-3.5 py-2 cursor-pointer">
+              <MessageCircle className="w-4 h-4" /> Talk one-on-one
+            </button>
+          ) : (
+            <span className="flex items-center gap-1 text-[11px] text-gray-400">
+              <Award className="w-3 h-3 text-sky-300" /> {mentor.yearsOfService} service
+            </span>
+          )}
           <span className="flex items-center gap-0.5 text-[12px] font-semibold text-brand-600 group-hover:gap-1 transition-all">
-            View Profile <ChevronRight className="w-3 h-3" />
+            View profile <ChevronRight className="w-3 h-3" />
           </span>
         </div>
       </div>
@@ -512,25 +520,38 @@ function MentorCard({ mentor }) {
   );
 }
 
+// Mentors are here for one thing: an aspirant who wants to hear from a real
+// officer — about life in the forces, or for one-on-one guidance on their
+// own preparation — can reach one directly. "Talk one-on-one" opens the same
+// form as the mentor's page, which pre-fills a WhatsApp introduction.
+const MENTOR_TOPICS = ['Life in the forces', 'Which entry and branch suits you', 'Your PIQ and SSB prep'];
+
 function MentorsSection() {
+  const [connect, setConnect] = useState(null);
   return (
     <section className="border-t border-gray-100 bg-white py-10 sm:py-14 px-4 sm:px-6">
       <div className="max-w-5xl mx-auto">
 
-        <div className="flex items-center justify-between mb-6">
-          <div>
-            <h2 className="text-xl sm:text-2xl font-bold text-gray-900">Mentors</h2>
-            <p className="text-sm text-gray-400 mt-0.5">Verified officers guiding SSB aspirants — hand-picked, limited seats</p>
-          </div>
-          <div className="flex items-center gap-1.5 text-[12px] font-semibold text-sky-700 bg-sky-50 border border-sky-100 px-3 py-1.5 rounded-full shrink-0">
-            <Shield className="w-3.5 h-3.5" /> Verified Service
+        <div className="mb-6">
+          <p className="text-[11px] font-bold uppercase tracking-[0.25em] text-brand-600 flex items-center gap-1.5"><Shield className="w-3.5 h-3.5" /> Verified officers</p>
+          <h2 className="mt-1.5 text-xl sm:text-2xl font-bold text-gray-900">Talk to a real officer</h2>
+          <p className="text-sm text-gray-600 mt-1 max-w-2xl leading-relaxed">
+            Want to know what life in the forces is really like, or need one-on-one guidance for your preparation?
+            Reach out to our mentors directly — they reply personally on WhatsApp. Slots are limited.
+          </p>
+          <div className="mt-3 flex flex-wrap gap-1.5">
+            {MENTOR_TOPICS.map(t => (
+              <span key={t} className="inline-flex items-center gap-1 text-xs font-medium text-gray-700 bg-gray-50 border border-gray-200 px-2.5 py-1 rounded-full">
+                <Check className="w-3 h-3 text-emerald-600" /> {t}
+              </span>
+            ))}
           </div>
         </div>
 
         {/* 2-column grid — credential cards are wider than article cards */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-3 sm:gap-4">
           {MENTORS.map(mentor => (
-            <MentorCard key={mentor.id} mentor={mentor} />
+            <MentorCard key={mentor.id} mentor={mentor} onConnect={m => { setConnect(m); trackEvent('home_mentor_connect', { mentor: m.slug }); }} />
           ))}
 
           {/* Placeholder card — same split layout, greyed out */}
@@ -548,6 +569,7 @@ function MentorsSection() {
           </div>
         </div>
 
+        {connect && <MentorConnectModal mentor={connect} onClose={() => setConnect(null)} />}
       </div>
     </section>
   );
