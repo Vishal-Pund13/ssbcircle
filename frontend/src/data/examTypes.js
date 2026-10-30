@@ -25,3 +25,9 @@ export const SOURCES = [
   'Coaching academy',
   'Other',
 ];
+
+// "Other" answers are saved as "Other: <their words>". These split a saved
+// value back into the chip to select and the text for its box.
+export const isOther = v => typeof v === 'string' && v.startsWith('Other:');
+export const otherChoice = v => (isOther(v) ? 'Other' : v || '');
+export const otherText = v => (isOther(v) ? v.slice(6).trim() : '');

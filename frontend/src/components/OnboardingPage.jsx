@@ -4,7 +4,7 @@ import { useAuth } from '../context/AuthContext';
 import { saveOnboarding } from '../services/api';
 import { Check, AlertCircle, ShieldCheck, Users, ChevronDown } from 'lucide-react';
 import { STEPS as MOD_STEPS, DUTIES as MOD_DUTIES } from '../data/moderatorProgram';
-import { EXAM_TYPES, SOURCES } from '../data/examTypes';
+import { EXAM_TYPES, SOURCES, otherChoice, otherText } from '../data/examTypes';
 
 // Shown once, right after the first Google sign-in.
 //
@@ -38,9 +38,12 @@ export default function OnboardingPage() {
 
   const returning = !!user?.onboarded_at;   // here only to add a mobile number
   const [name,   setName]   = useState(user?.display_name || '');
-  const [exam,   setExam]   = useState(user?.exam_type || '');
+  const [exam,   setExam]   = useState(otherChoice(user?.exam_type));
+  const [examOther, setExamOther] = useState(otherText(user?.exam_type));
   const [phone,  setPhone]  = useState(user?.phone || '');
-  const [source, setSource] = useState(user?.referral_source || '');
+  // A saved "Other: <words>" comes back split into the chip and the box
+  const [source, setSource] = useState(otherChoice(user?.referral_source));
+  const [sourceOther, setSourceOther] = useState(otherText(user?.referral_source));
   const [ssbDate, setSsbDate] = useState(user?.ssb_date || '');
   const [modInterest, setModInterest] = useState(false);
   // "How it works" opens here, not on /moderators: until this form is done,
@@ -53,8 +56,14 @@ export default function OnboardingPage() {
     e.preventDefault();
     if (!name.trim())  { setError('Please tell us your name.'); return; }
     if (!exam)         { setError('Please choose which exam you are preparing for.'); return; }
+    if (exam === 'Other' && examOther.trim().length < 2) {
+      setError('Please tell us which exam you are preparing for.'); return;
+    }
     if (!/^(\+?91)?[6-9]\d{9}$/.test(phone.replace(/[\s()-]/g, ''))) {
       setError('Please enter your 10-digit mobile number.'); return;
+    }
+    if (source === 'Other' && sourceOther.trim().length < 2) {
+      setError('Please tell us where you heard about us.'); return;
     }
 
     setSaving(true); setError('');
@@ -62,8 +71,10 @@ export default function OnboardingPage() {
       await saveOnboarding({
         display_name:    name.trim(),
         exam_type:       exam,
+        exam_other:      exam === 'Other' ? examOther.trim() : '',
         phone:           phone.trim(),
         referral_source: source,
+        referral_other:  source === 'Other' ? sourceOther.trim() : '',
         ssb_date:        ssbDate,
         moderator_interest: modInterest,
       });
@@ -113,6 +124,18 @@ export default function OnboardingPage() {
                   onClick={() => { setExam(t); setError(''); }} />
               ))}
             </div>
+            {exam === 'Other' && (
+              <div className="mt-3">
+                <label className="block text-xs font-semibold text-gray-700 mb-1.5">
+                  Which exam? <span className="text-red-500">*</span>
+                </label>
+                <input type="text" maxLength={32} autoFocus
+                  className="input-base text-sm w-full"
+                  value={examOther}
+                  onChange={e => { setExamOther(e.target.value); setError(''); }}
+                  placeholder="e.g. Territorial Army, JAG, NCC Special Entry" />
+              </div>
+            )}
           </div>
 
           {/* SSB date */}
@@ -161,9 +184,21 @@ export default function OnboardingPage() {
             <div className="flex flex-wrap gap-2">
               {SOURCES.map(s => (
                 <Chip key={s} label={s} selected={source === s}
-                  onClick={() => setSource(source === s ? '' : s)} />
+                  onClick={() => { setSource(source === s ? '' : s); setError(''); }} />
               ))}
             </div>
+            {source === 'Other' && (
+              <div className="mt-3">
+                <label className="block text-xs font-semibold text-gray-700 mb-1.5">
+                  Tell us where <span className="text-red-500">*</span>
+                </label>
+                <input type="text" maxLength={50} autoFocus
+                  className="input-base text-sm w-full"
+                  value={sourceOther}
+                  onChange={e => { setSourceOther(e.target.value); setError(''); }}
+                  placeholder="e.g. a Facebook group, my school, a poster" />
+              </div>
+            )}
           </div>
 
           {/* Disclaimer */}

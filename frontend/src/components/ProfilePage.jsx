@@ -6,7 +6,7 @@ import {
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { saveOnboarding } from '../services/api';
-import { EXAM_TYPES } from '../data/examTypes';
+import { EXAM_TYPES, otherChoice, otherText } from '../data/examTypes';
 import SiteNav from './SiteNav';
 import PlatformFeedbackDialog from './PlatformFeedbackDialog';
 
@@ -55,7 +55,8 @@ export default function ProfilePage() {
   // Safe to seed from user on first render: /profile sits behind ProtectedRoute,
   // which does not mount this component until the user has loaded.
   const [name,  setName]  = useState(user?.display_name || '');
-  const [exam,  setExam]  = useState(user?.exam_type    || '');
+  const [exam,  setExam]  = useState(otherChoice(user?.exam_type));
+  const [examOther, setExamOther] = useState(otherText(user?.exam_type));
   const [phone, setPhone] = useState(user?.phone        || '');
   const [ssbDate, setSsbDate] = useState(user?.ssb_date || '');
   const [dSaving, setDSaving] = useState(false);
@@ -72,6 +73,7 @@ export default function ProfilePage() {
     e.preventDefault();
     if (!name.trim()) { setDError('Please enter your name.'); return; }
     if (!exam)        { setDError('Please choose which exam you are preparing for.'); return; }
+    if (exam === 'Other' && examOther.trim().length < 2) { setDError('Please tell us which exam you are preparing for.'); return; }
     if (!phone.trim()) { setDError('Your mobile number is required. It keeps SSBCircle free of spam.'); return; }
 
     setDSaving(true); setDError(''); setDSaved(false);
@@ -79,6 +81,7 @@ export default function ProfilePage() {
       await saveOnboarding({
         display_name: name.trim(),
         exam_type:    exam,
+        exam_other:   exam === 'Other' ? examOther.trim() : '',
         phone:        phone.trim(),
         ssb_date:     ssbDate,
       });
@@ -179,6 +182,11 @@ export default function ProfilePage() {
                   </button>
                 ))}
               </div>
+              {exam === 'Other' && (
+                <input type="text" maxLength={32} className="input-base mt-2" value={examOther}
+                  onChange={e => { setExamOther(e.target.value); setDError(''); }}
+                  placeholder="Which exam? e.g. Territorial Army, JAG" aria-label="Which exam?" />
+              )}
 
               <label className={labelCls}>SSB date <span className="font-medium text-gray-400">(optional)</span></label>
               <p className={hintCls}>From your call-up letter. The home page counts down the days. Clear it and save to remove.</p>

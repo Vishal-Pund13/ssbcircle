@@ -116,9 +116,19 @@ router.post('/me/onboarding', authMiddleware, async (req, res) => {
     if (name.length < 2 || name.length > 60)
       return res.status(400).json({ error: 'Please enter your name.' });
 
-    const exam = String(body.exam_type || '').trim();
+    // An "Other" answer must say what, and is stored as "Other: <their words>"
+    // (sized to fit the column). Both the exam and the referral work this way.
+    const otherWords = (v, max) => String(v || '').trim().replace(/\s+/g, ' ').slice(0, max);
+
+    let exam = String(body.exam_type || '').trim();
+    if (exam.startsWith('Other:')) exam = 'Other';   // a profile re-saving a stored answer
     if (!EXAM_TYPES.includes(exam))
       return res.status(400).json({ error: 'Please choose which exam you are preparing for.' });
+    if (exam === 'Other') {
+      const other = otherWords(body.exam_other, 32);
+      if (other.length < 2) return res.status(400).json({ error: 'Please tell us which exam you are preparing for.' });
+      exam = `Other: ${other}`;
+    }
 
     // Required: a real number per member keeps out throwaway accounts, spam
     // and noise. Profile edits go through here too, so it cannot be cleared.
@@ -128,9 +138,16 @@ router.post('/me/onboarding', authMiddleware, async (req, res) => {
     if (phone === false)
       return res.status(400).json({ error: 'That does not look like an Indian mobile number. Enter 10 digits.' });
 
-    const source = String(body.referral_source || '').trim();
+    let source = String(body.referral_source || '').trim();
     if (source && !REFERRAL_SOURCES.includes(source))
       return res.status(400).json({ error: 'Please pick one of the listed options.' });
+    // "Other" must say what: stored as "Other: <their words>", which fits the
+    // 60-character column and reads plainly wherever it is shown.
+    if (source === 'Other') {
+      const other = otherWords(body.referral_other, 50);
+      if (other.length < 2) return res.status(400).json({ error: 'Please tell us where you heard about us.' });
+      source = `Other: ${other}`;
+    }
 
     const ssbDate = normalizeSsbDate(body.ssb_date);
     if (ssbDate === false)
