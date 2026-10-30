@@ -12,6 +12,7 @@ import { trackEvent } from '../analytics';
 import { PrepPath, SsbStages } from './HomePrep';
 import { ExamTicker } from './ExamCalendar';
 import HomeRail from './HomeRail';
+import { HOME_FAQ } from '../data/homeFaq';
 import { Mic, Timer, FileText, CheckSquare, Radio, ArrowRight, Trash2, Zap, Lightbulb, Users, Presentation, Target, Headphones, RefreshCw, X, Calendar, Heart, PlayCircle, Share2, Check, Sparkles, ChevronDown, Shield, Star, Lock, BookOpen, Video, Award, ChevronRight, GraduationCap, ExternalLink, AlertTriangle, HeartHandshake, PenLine, Footprints } from 'lucide-react';
 
 
@@ -981,75 +982,6 @@ function UpcomingTab({ sessions, loading, user, onRefresh, navigate, onInterest,
   );
 }
 
-const FAQ_ITEMS = [
-  {
-    q: 'What is SSBCircle and what can I practice on it?',
-    a: 'SSBCircle is a free platform for every stage of the SSB. Fill your PIQ to see what your Interviewing Officer is likely to ask, practise TAT stories and get honest feedback, read News Cards to stay ready for GD and interview, and join live voice rooms for GD, PPDT, Lecturette and mock interviews with other aspirants. No download, no subscription.',
-  },
-  {
-    q: 'What are News Cards on SSBCircle?',
-    a: 'News Cards are bite-sized swipeable topic cards on Defence, Economy, Polity, Geography & Society — built specifically for SSB GD and Lecturette prep. Each card takes about 5 minutes and gives you key data, multiple perspectives, and how to frame the topic in an SSB discussion. There is a short quiz at the end to lock it in.',
-    steps: [
-      'Open News Cards from the homepage',
-      'Pick a topic — Rupee, El Niño, etc.',
-      'Swipe through scenes: hook → concept → breakdown → two sides',
-      'Take the optional quick quiz',
-      'Open a GD room on the same topic',
-    ],
-  },
-  {
-    q: 'How to practice SSB Group Discussion (GD) on SSBCircle?',
-    a: 'Matches the real SSB GD format — up to 8 participants, timed discussion, live transcript. No GD topic? Read a News Card first.',
-    steps: [
-      'Read a News Card for topic ideas',
-      'Create GD room & set topic',
-      'Share 6-letter code with peers',
-      'Start GD timer',
-      'Discuss — live transcript on',
-      'Review transcript after',
-    ],
-  },
-  {
-    q: 'How to practice PPDT (Picture Perception & Discussion Test) on SSBCircle?',
-    a: 'Simulates the full Day 1 PPDT flow — picture viewing, story writing, narration, and group discussion.',
-    steps: [
-      'Host creates PPDT room',
-      'Share screen — show picture to group',
-      'View picture — 30 sec timer',
-      'Everyone writes story — 4 min',
-      'Narrate stories — 1 min each',
-      'Group discussion begins',
-    ],
-  },
-  {
-    q: 'How to practice Lecturette on SSBCircle?',
-    a: 'Replicates the SSB Lecturette format — 4 topics, 1-min prep, 3-min talk to the group. Use News Cards to prepare solid talking points before the session.',
-    steps: [
-      'Read a News Card to prepare content',
-      'Host creates Lecturette room',
-      'Host announces 4 topics',
-      'Each person picks a topic',
-      '1 min preparation time',
-      'Speak 3 min — timer running',
-    ],
-  },
-  {
-    q: 'How to practice SSB IO mock interview on SSBCircle?',
-    a: 'Simulates the SSB personal interview — one person plays the IO, others observe and give feedback.',
-    steps: [
-      'Create IO Practice room',
-      'One person plays interviewer (IO)',
-      'Q&A — background, hobbies, current affairs',
-      'Swap roles with next person',
-      'Group debrief & feedback',
-    ],
-  },
-  {
-    q: 'Is SSBCircle free?',
-    a: 'Yes — 100% free for all SSB aspirants. NDA, CDS, AFCAT, TA, TES, UES — all entry schemes. Sign in with Google and start instantly. No subscription, no paywall, no hidden charges.',
-  },
-];
-
 function StepFlow({ steps }) {
   return (
     <div className="flex flex-wrap gap-1.5 mt-3">
@@ -1074,28 +1006,34 @@ function FaqSection() {
     <section className="border-t border-gray-100 bg-gray-50 py-10 sm:py-14 px-4 sm:px-6">
       <div className="max-w-5xl mx-auto">
         <div className="mb-8">
-          <h2 className="text-xl sm:text-2xl font-bold text-gray-900">SSB Interview — Frequently Asked Questions</h2>
-          <p className="text-sm text-gray-400 mt-1">How to use SSBCircle for every part of SSB interview prep.</p>
+          <h2 className="text-xl sm:text-2xl font-bold text-gray-900">Frequently asked questions</h2>
+          <p className="text-sm text-gray-500 mt-1">Everything SSBCircle offers, in short.</p>
         </div>
         <div className="divide-y divide-gray-100 rounded-2xl border border-gray-100 bg-white overflow-hidden">
-          {FAQ_ITEMS.map((item, i) => (
+          {HOME_FAQ.map((item, i) => (
             <div key={i}>
               <button
                 onClick={() => setOpen(p => p === i ? null : i)}
                 className="w-full flex items-center justify-between gap-4 px-5 py-4 text-left hover:bg-gray-50 transition-colors cursor-pointer"
               >
-                <span className="text-sm font-semibold text-gray-800">{item.q}</span>
+                <span className="text-[15px] font-semibold text-gray-800">{item.q}</span>
                 <ChevronDown className={`w-4 h-4 text-gray-400 shrink-0 transition-transform duration-200 ${open === i ? 'rotate-180' : ''}`} />
               </button>
               {open === i && (
                 <div className="px-5 pb-5">
-                  {item.a && <p className="text-sm text-gray-500 leading-relaxed">{item.a}</p>}
+                  {item.a && <p className="text-sm text-gray-600 leading-relaxed">{item.a}</p>}
                   {item.steps && <StepFlow steps={item.steps} />}
                 </div>
               )}
             </div>
           ))}
         </div>
+
+        {/* AI costs money per call — say so plainly, where people read about the tools */}
+        <p className="mt-4 flex items-start gap-2.5 text-sm text-amber-900 bg-amber-50 border border-amber-100 rounded-xl px-4 py-3 leading-relaxed">
+          <Lightbulb className="w-4 h-4 text-amber-500 shrink-0 mt-0.5" />
+          <span><span className="font-semibold">Please use AI feedback responsibly.</span> Every check costs us real money to run. Use it when your answer is ready — that keeps SSBCircle free for everyone.</span>
+        </p>
       </div>
     </section>
   );

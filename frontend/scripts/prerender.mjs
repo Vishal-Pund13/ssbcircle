@@ -20,6 +20,7 @@ import { fileURLToPath } from 'node:url';
 import { SWIPE_SLUGS }  from '../src/data/swipeArticles.js';
 import { MENTORS }      from '../src/data/mentors.js';
 import * as GUIDE       from '../src/data/beginnerGuide.js';
+import { HOME_FAQ }     from '../src/data/homeFaq.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const ROOT      = path.resolve(__dirname, '..');
@@ -270,7 +271,25 @@ if (!fs.existsSync(templatePath)) {
   console.error('prerender: dist/index.html not found — run vite build first');
   process.exit(1);
 }
-const template = fs.readFileSync(templatePath, 'utf8');
+let template = fs.readFileSync(templatePath, 'utf8');
+
+// The home page's FAQPage structured data comes from the same file as the FAQ
+// on the page (src/data/homeFaq.js), so the two can never drift apart. It is
+// written into the template before anything else; inner pages strip it again.
+function homeFaqJsonLd() {
+  return JSON.stringify({
+    '@context': 'https://schema.org',
+    '@type': 'FAQPage',
+    mainEntity: HOME_FAQ.map(f => ({ '@type': 'Question', name: f.q, acceptedAnswer: { '@type': 'Answer', text: f.a } })),
+  }, null, 2);
+}
+const FAQ_BLOCK = /<script type="application\/ld\+json">\s*\{\s*"@context": "https:\/\/schema\.org",\s*"@type": "FAQPage"[\s\S]*?<\/script>/;
+if (!FAQ_BLOCK.test(template)) {
+  console.error('prerender: home FAQPage block not found in index.html');
+  process.exit(1);
+}
+template = template.replace(FAQ_BLOCK, `<script type="application/ld+json">\n${homeFaqJsonLd()}\n    </script>`);
+fs.writeFileSync(templatePath, template);
 
 console.log('prerender: generating per-route HTML');
 const articles = await loadArticles();
