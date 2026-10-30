@@ -24,7 +24,7 @@ const EVENT_LABEL = {
   eligibility_check: 'Eligibility checked', exams_tab: 'Exam tab switched',
   home_path_click: 'Home: prep path click', home_cta: 'Home: hero button',
   community_post: 'Community post', community_comment: 'Community comment',
-  tabbar: 'Phone tab bar tap', home_rail: 'Home: side-rail jump', home_stage_click: 'Home: SSB stage link', poster_view: 'Poster: shown', poster_cta: 'Poster: tapped through', poster_close: 'Poster: closed', start_service: 'Guide: service viewed',start_role: 'Guide: role opened', start_interest: 'Guide: interest picked', start_jump: 'Guide: jumped to section',start_cta: 'Guide: next-step click', start_step_done: 'Guide: plan step ticked',
+  tabbar: 'Phone tab bar tap', home_rail: 'Home: section jump', home_rail_open: 'Home: opened section list', home_stage_click: 'Home: SSB stage link', poster_view: 'Poster: shown', poster_cta: 'Poster: tapped through', poster_close: 'Poster: closed', start_service: 'Guide: service viewed',start_role: 'Guide: role opened', start_interest: 'Guide: interest picked', start_jump: 'Guide: jumped to section',start_cta: 'Guide: next-step click', start_step_done: 'Guide: plan step ticked',
 };
 
 const fmt = n => (n ?? 0).toLocaleString('en-IN');
