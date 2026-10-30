@@ -11,6 +11,7 @@ import { articleHref } from '../../data/swipeArticles';
 import SpeakPanel, { Feedback } from './SpeakPanel';
 import SiteNav from '../SiteNav';
 import { themeFor } from './stepThemes';
+import Heatmap from './Heatmap';
 import { todayIST, addDays, buildPlan, dueReviews, streak, topicOfTheDay } from './plan';
 
 // The SSB Prep Sheet: every topic worth being able to talk about, in order,
@@ -73,31 +74,6 @@ function Ring({ spoken, read, total, size = 72 }) {
       <circle cx={size / 2} cy={size / 2} r={r} fill="none" stroke="#10b981" strokeWidth="8" strokeLinecap="round"
         strokeDasharray={`${s * c} ${c}`} />
     </svg>
-  );
-}
-
-// Last 18 weeks, one column per week, Monday at the top.
-function Heatmap({ activity }) {
-  const today = todayIST();
-  const counts = Object.fromEntries(activity.map(a => [a.day, a.actions]));
-  const dow = (new Date(today + 'T00:00:00Z').getUTCDay() + 6) % 7;
-  const start = addDays(today, -(17 * 7 + dow));
-  const weeks = Array.from({ length: 18 }, (_, w) =>
-    Array.from({ length: 7 }, (_, d) => addDays(start, w * 7 + d)));
-  const shade = n => !n ? 'bg-gray-100' : n < 3 ? 'bg-emerald-200' : n < 6 ? 'bg-emerald-400' : 'bg-emerald-600';
-  return (
-    <div className="overflow-x-auto">
-      <div className="flex gap-[3px] w-max">
-        {weeks.map((week, w) => (
-          <div key={w} className="flex flex-col gap-[3px]">
-            {week.map(day => (
-              <div key={day} title={day > today ? '' : `${day}: ${counts[day] || 0} updates`}
-                className={`w-2.5 h-2.5 rounded-[2px] ${day > today ? 'bg-transparent' : shade(counts[day])}`} />
-            ))}
-          </div>
-        ))}
-      </div>
-    </div>
   );
 }
 
@@ -324,6 +300,14 @@ export default function PrepPage() {
     if (!loaded || openStep !== null) return;
     const first = STEPS.find(s => s.groups.some(g => g.topics.some(t => (progress[t.id]?.status || 0) < 2)));
     setOpenStep((first || STEPS[0]).id);
+  }, [loaded]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  // Arriving from the home page with a section or today's topic picked
+  useEffect(() => {
+    if (!loaded) return;
+    const { step, topic } = location.state || {};
+    if (topic && TOPIC_BY_ID[topic]) jumpTo(TOPIC_BY_ID[topic]);
+    else if (step && STEPS.some(x => x.id === step)) selectStep(step);
   }, [loaded]); // eslint-disable-line react-hooks/exhaustive-deps
 
   function flash(msg) {

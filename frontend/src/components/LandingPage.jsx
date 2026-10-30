@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState, lazy, Suspense } from 'react';
 import { useNavigate, Link, useSearchParams } from 'react-router-dom';
 import { getActiveRooms, closeRoom, getSessions, toggleInterest, cancelSession, startSession, getFeatured, getPastSessions, getArticles } from '../services/api';
 import { useAuth } from '../context/AuthContext';
@@ -154,42 +154,21 @@ function SpreadNewsCards({ small = false }) {
 
 const CATEGORIES = ['All', 'GD', 'PPDT', 'Lecturette', 'IO Practice'];
 const GD_SUBCATEGORIES = ['Defence', 'International Relations', 'Society', 'Economy', 'Science & Tech', 'Environment', 'Sports & Awards'];
-// The home page reads as five chapters, each opened by a slim coloured band
-// (Chapter below), so a long page has clear breaks instead of one endless
-// scroll. HomeRail follows the same chapters. Page order.
-const CHAPTERS = {
-  learn:    { n: 2, title: 'Learn the SSB',       blurb: 'What each stage tests, and short reads for GD and interview.',
-              band: 'bg-sky-50 border-sky-100', dot: 'bg-sky-500', ink: 'text-sky-700' },
-  practise: { n: 3, title: 'Practise with others', blurb: 'Live rooms and a community of aspirants preparing like you.',
-              band: 'bg-emerald-50 border-emerald-100', dot: 'bg-emerald-500', ink: 'text-emerald-700' },
-  people:   { n: 4, title: 'The people',           blurb: 'Officers who mentor, and aspirants who show up every day.',
-              band: 'bg-amber-50 border-amber-100', dot: 'bg-amber-500', ink: 'text-amber-700' },
-  more:     { n: 5, title: 'More',                 blurb: 'Ways to serve now, what is coming next, and common questions.',
-              band: 'bg-slate-50 border-slate-200', dot: 'bg-slate-500', ink: 'text-slate-600' },
-};
-const HOME_SECTIONS = [
-  { id: 'top',      label: 'Start' },
-  { id: 'learn',    label: 'Learn the SSB' },
-  { id: 'practise', label: 'Practise' },
-  { id: 'people',   label: 'The people' },
-  { id: 'more',     label: 'More & FAQ' },
-];
+// Below the first screen and it carries the whole Prep Sheet's data (~20 KB
+// gzipped), so it loads after the page instead of with it.
+const HomePrepSheet = lazy(() => import('./HomePrepSheet'));
 
-function Chapter({ id }) {
-  const c = CHAPTERS[id];
-  return (
-    <div id={id} className={`scroll-mt-14 border-y ${c.band} px-4 sm:px-6 py-3.5 sm:py-4`}>
-      <div className="max-w-5xl mx-auto flex items-center gap-3">
-        <span className={`w-8 h-8 rounded-full ${c.dot} text-white text-sm font-bold flex items-center justify-center shrink-0`}>{c.n}</span>
-        <div className="min-w-0">
-          <p className={`text-[11px] font-bold uppercase tracking-[0.2em] ${c.ink}`}>Part {c.n} of 5</p>
-          <p className="text-base sm:text-lg font-bold text-gray-900 leading-tight">{c.title}</p>
-        </div>
-        <p className="hidden md:block ml-auto text-sm text-gray-500 text-right max-w-sm">{c.blurb}</p>
-      </div>
-    </div>
-  );
-}
+// The home page is long; HomeRail shows where you are on it. Page order.
+const HOME_SECTIONS = [
+  { id: 'top',       label: 'Start' },
+  { id: 'stages',    label: 'SSB stages' },
+  { id: 'prep',      label: 'Prep Sheet' },
+  { id: 'news',      label: 'News cards' },
+  { id: 'rooms',     label: 'Live rooms' },
+  { id: 'community', label: 'Community' },
+  { id: 'mentors',   label: 'Mentors' },
+  { id: 'faq',       label: 'FAQ' },
+];
 
 // Three rooms is a screenful on a phone and one tidy row on a desktop
 const PAGE_SIZE = 3;
@@ -1404,13 +1383,11 @@ export default function LandingPage() {
         <SsbCountdown user={user} />
 
         {/* The page runs: where to start → every stage → read → practise live → discuss */}
-        <Chapter id="learn" />
-        <SsbStages />
+        <div id="stages"><SsbStages /></div>
+        <div id="prep"><Suspense fallback={<div className="h-[640px] border-t border-gray-100" />}><HomePrepSheet /></Suspense></div>
 
         {/* ── Latest Reads — right under the hero so every visitor sees them ── */}
-        <LatestReadsSection articles={articles} loading={articlesLoading} />
-
-        <Chapter id="practise" />
+        <div id="news"><LatestReadsSection articles={articles} loading={articlesLoading} /></div>
 
         {/* ── Live / Upcoming tabs ── */}
         <section id="rooms" ref={tabsSectionRef} className="scroll-mt-16 border-t border-gray-100 bg-white px-4 sm:px-6 py-10 sm:py-14">
@@ -1610,7 +1587,7 @@ export default function LandingPage() {
         </section>
 
         {/* ── Community — ask box + recent posts; renders nothing if empty and closed to posting ── */}
-        <CommunityHighlights />
+        <div id="community"><CommunityHighlights /></div>
 
 
         {/* ── Notable Sessions — social proof, sits with the rooms zone ── */}
@@ -1658,13 +1635,10 @@ export default function LandingPage() {
         )}
 
         {/* ── Mentors ── */}
-        <Chapter id="people" />
-        <MentorsSection />
+        <div id="mentors"><MentorsSection /></div>
 
         {/* ── Active Aspirants ── */}
         <ActiveAspirantsSection aspirants={aspirants} />
-
-        <Chapter id="more" />
 
         {/* ── Ways to serve before the uniform ── */}
         <ContributeSection />
@@ -1696,7 +1670,7 @@ export default function LandingPage() {
       </main>
 
       {/* ── SSB FAQ Section ── */}
-      <FaqSection />
+      <div id="faq"><FaqSection /></div>
 
       <footer className="border-t border-gray-100 py-8 px-4 sm:px-6">
         <div className="max-w-5xl mx-auto flex items-center justify-between">
