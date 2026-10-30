@@ -12,6 +12,7 @@ import SiteNav from './SiteNav';
 import { trackEvent } from '../analytics';
 import { PrepPath, SsbStages } from './HomePrep';
 import { ExamTicker } from './ExamCalendar';
+import HomeRail from './HomeRail';
 import { Mic, Timer, FileText, CheckSquare, Radio, ArrowRight, Trash2, Zap, Lightbulb, Users, Presentation, Target, Headphones, RefreshCw, X, Calendar, Heart, PlayCircle, Share2, Check, Sparkles, ChevronDown, Shield, Star, Lock, BookOpen, Video, Award, ChevronRight, GraduationCap, ExternalLink, AlertTriangle, HeartHandshake, PenLine } from 'lucide-react';
 
 
@@ -153,6 +154,17 @@ function SpreadNewsCards({ small = false }) {
 
 const CATEGORIES = ['All', 'GD', 'PPDT', 'Lecturette', 'IO Practice'];
 const GD_SUBCATEGORIES = ['Defence', 'International Relations', 'Society', 'Economy', 'Science & Tech', 'Environment', 'Sports & Awards'];
+// The home page is long; HomeRail shows where you are on it. Page order.
+const HOME_SECTIONS = [
+  { id: 'top',       label: 'Start' },
+  { id: 'stages',    label: 'SSB stages' },
+  { id: 'news',      label: 'News cards' },
+  { id: 'rooms',     label: 'Live rooms' },
+  { id: 'community', label: 'Community' },
+  { id: 'mentors',   label: 'Mentors' },
+  { id: 'faq',       label: 'FAQ' },
+];
+
 const PAGE_SIZE = 6;
 // On a phone each room card is a full screen-width block; three is a screenful
 const pageSize = typeof window !== 'undefined' && window.innerWidth < 640 ? 3 : PAGE_SIZE;
@@ -1378,6 +1390,7 @@ export default function LandingPage() {
     <div className="min-h-screen bg-white">
 
       <SiteNav />
+      <HomeRail sections={HOME_SECTIONS} />
 
       {/* Exam dates and results, scrolling under the navbar */}
       <ExamTicker />
@@ -1391,7 +1404,7 @@ export default function LandingPage() {
         <MentorAnnouncementBanner />
 
         {/* ── Hero — what this is, one clear start, and (signed in) where you left off ── */}
-        <section className="border-b border-gray-100 bg-gradient-to-b from-brand-50/60 to-white py-10 sm:py-14 lg:py-16 px-4 sm:px-6">
+        <section id="top" className="border-b border-gray-100 bg-gradient-to-b from-brand-50/60 to-white py-10 sm:py-14 lg:py-16 px-4 sm:px-6">
           <div className="max-w-5xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12 items-center">
             <div>
               <p className="inline-flex items-center gap-2 text-xs font-semibold text-brand-700 bg-white border border-brand-100 px-3 py-1.5 rounded-full mb-5">
@@ -1445,10 +1458,10 @@ export default function LandingPage() {
         <SsbCountdown user={user} />
 
         {/* The page runs: where to start → every stage → read → practise live → discuss */}
-        <SsbStages />
+        <div id="stages"><SsbStages /></div>
 
         {/* ── Latest Reads — right under the hero so every visitor sees them ── */}
-        <LatestReadsSection articles={articles} loading={articlesLoading} />
+        <div id="news"><LatestReadsSection articles={articles} loading={articlesLoading} /></div>
 
         {/* ── Live / Upcoming tabs ── */}
         <section id="rooms" ref={tabsSectionRef} className="scroll-mt-16 border-t border-gray-100 bg-white px-4 sm:px-6 py-10 sm:py-14">
@@ -1647,7 +1660,7 @@ export default function LandingPage() {
         </section>
 
         {/* ── Community — ask box + recent posts; renders nothing if empty and closed to posting ── */}
-        <CommunityHighlights />
+        <div id="community"><CommunityHighlights /></div>
 
         {/* ── Announcement: the 21-day challenge, ahead of the feature itself ── */}
         <ComingSoonBanner />
@@ -1697,7 +1710,7 @@ export default function LandingPage() {
         )}
 
         {/* ── Mentors ── */}
-        <MentorsSection />
+        <div id="mentors"><MentorsSection /></div>
 
         {/* ── Active Aspirants ── */}
         <ActiveAspirantsSection aspirants={aspirants} />
@@ -1746,7 +1759,7 @@ export default function LandingPage() {
       </main>
 
       {/* ── SSB FAQ Section ── */}
-      <FaqSection />
+      <div id="faq"><FaqSection /></div>
 
       <footer className="border-t border-gray-100 py-8 px-4 sm:px-6">
         <div className="max-w-5xl mx-auto flex items-center justify-between">

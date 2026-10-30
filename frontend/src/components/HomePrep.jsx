@@ -2,7 +2,10 @@ import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { getPiq, getTat } from '../services/api';
 import { trackEvent } from '../analytics';
-import { FileText, PenLine, BookOpen, Radio, ArrowRight, Check, Eye, Users, Mic, Brain } from 'lucide-react';
+import {
+  FileText, PenLine, BookOpen, Radio, ArrowRight, Check, Eye, Users, Mic, Brain,
+  Image as ImageIcon, ListChecks, Lightbulb, Flag, Mountain, MessageCircle, Trophy,
+} from 'lucide-react';
 
 // Two home-page blocks that answer "where do I start?".
 //
@@ -96,28 +99,37 @@ export function PrepPath({ user, liveCount = 0 }) {
 // way to practise it here. Link labels say exactly where they go — an earlier
 // version labelled TAT practice "picture story practice" under Screening, and
 // readers took it for PPDT.
+//
+// Drawn as a journey: each stage has its own colour and an illustrated band
+// (its icon, with smaller themed icons around it), arrows join the stages on
+// wide screens, and the conference on Day 5 is the finish line. Class strings
+// are written out in full so Tailwind keeps them.
 const STAGES = [
   {
-    day: 'Day 1', icon: Eye, title: 'Screening',
+    day: 'Day 1', icon: Eye, deco: [ImageIcon, ListChecks], title: 'Screening',
+    band: 'from-sky-500 to-cyan-400', soft: 'bg-sky-50 hover:bg-sky-100 text-sky-800', dot: 'bg-sky-500',
     what: 'A short reasoning test (OIR), then a picture story you write and discuss with your group (PPDT). Most candidates are sent home here.',
     main: { to: '/?tab=live', label: 'Practise PPDT with others', rooms: true },
     more: { to: '/tat', label: 'Write picture stories' },
   },
   {
-    day: 'Day 2', icon: Brain, title: 'Psychology tests',
+    day: 'Day 2', icon: Brain, deco: [PenLine, Lightbulb], title: 'Psychology tests',
+    band: 'from-violet-600 to-fuchsia-500', soft: 'bg-violet-50 hover:bg-violet-100 text-violet-800', dot: 'bg-violet-500',
     what: 'Quick-fire writing: TAT stories, word and situation tests, and a self-description. It shows how you really think.',
     main: { to: '/tat', label: 'Write a TAT story, get feedback' },
-    soon: 'Word and situation test practice coming soon',
+    soon: 'Word and situation tests coming soon',
   },
   {
-    day: 'Days 3–4', icon: Users, title: 'Group tasks (GTO)',
+    day: 'Days 3–4', icon: Users, deco: [Flag, Mountain], title: 'Group tasks (GTO)',
+    band: 'from-emerald-600 to-lime-500', soft: 'bg-emerald-50 hover:bg-emerald-100 text-emerald-800', dot: 'bg-emerald-500',
     what: 'Group discussions, a lecturette, planning and outdoor tasks. It tests how you work with a group and lead it.',
     main: { to: '/?tab=live', label: 'Join a live GD or lecturette', rooms: true },
-    more: { to: '/current-affairs', label: 'Read GD topics in News Cards' },
+    more: { to: '/current-affairs', label: 'GD topics in News Cards' },
   },
   {
-    day: 'One evening, Days 2–4', icon: Mic, title: 'Interview',
-    what: 'A one-to-one talk with an officer, built on your own PIQ form. Know your life story and answer honestly.',
+    day: 'Days 2–4', icon: Mic, deco: [MessageCircle, FileText], title: 'Interview',
+    band: 'from-amber-500 to-orange-400', soft: 'bg-amber-50 hover:bg-amber-100 text-amber-900', dot: 'bg-amber-500',
+    what: 'One evening, a one-to-one talk with an officer, built on your own PIQ form. Know your life story and answer honestly.',
     main: { to: '/piq', label: 'Get your PIQ analysed' },
     more: { to: '/prep', label: 'Practise answers in the Prep Sheet' },
   },
@@ -137,43 +149,73 @@ export function SsbStages() {
         <p className="text-[11px] font-bold uppercase tracking-[0.25em] text-brand-600">The whole board, not just GD</p>
         <h2 className="mt-1.5 text-xl sm:text-2xl font-bold text-gray-900">Prepare for every stage of the SSB</h2>
         <p className="text-sm text-gray-500 mt-1 mb-6 max-w-2xl">
-          The SSB runs for five days. Here is what each stage tests, and how to practise it on SSBCircle.
+          Five days at the Selection Board. Here is what each stage tests, and how to practise it on SSBCircle.
         </p>
 
+        {/* Day strip: the five days at a glance, coloured by stage */}
+        <div className="hidden sm:flex items-center gap-1.5 mb-4" aria-hidden="true">
+          {[['Day 1', 'bg-sky-500'], ['Day 2', 'bg-violet-500'], ['Day 3', 'bg-emerald-500'], ['Day 4', 'bg-emerald-500'], ['Day 5', 'bg-brand-600']].map(([d, c]) => (
+            <div key={d} className="flex-1">
+              <div className={`h-1.5 rounded-full ${c}`} />
+              <p className="mt-1 text-[11px] font-semibold text-gray-400">{d}</p>
+            </div>
+          ))}
+        </div>
+
         <ol className="m-rail sm:grid-cols-2 lg:grid-cols-4">
-          {STAGES.map(({ day, icon: Icon, title, what, main, more, soon }, i) => (
-            <li key={title} className="relative bg-white border border-gray-200 rounded-2xl p-4 sm:p-5 flex flex-col">
-              {/* Timeline: the numbered dot and the day */}
-              <div className="flex items-center gap-2">
-                <span className="w-7 h-7 rounded-full bg-brand-600 text-white text-xs font-bold flex items-center justify-center shrink-0">{i + 1}</span>
-                <span className="text-xs font-bold uppercase tracking-wide text-brand-700">{day}</span>
+          {STAGES.map(({ day, icon: Icon, deco: [A, B], title, band, soft, what, main, more, soon }, i) => (
+            <li key={title} className="relative flex">
+              <div className="flex-1 bg-white border border-gray-200 rounded-2xl overflow-hidden flex flex-col shadow-sm">
+                {/* Illustrated band */}
+                <div className={`relative h-24 bg-gradient-to-br ${band} text-white overflow-hidden`}>
+                  <div className="absolute inset-0 opacity-[0.15]" aria-hidden="true"
+                    style={{ backgroundImage: 'radial-gradient(circle, #fff 1px, transparent 1px)', backgroundSize: '14px 14px' }} />
+                  <A className="absolute right-12 top-3 w-8 h-8 opacity-30 -rotate-12" strokeWidth={1.5} aria-hidden="true" />
+                  <B className="absolute right-3 bottom-2 w-10 h-10 opacity-30 rotate-6" strokeWidth={1.5} aria-hidden="true" />
+                  <span className="absolute left-4 top-3 text-[11px] font-bold uppercase tracking-wide bg-white/20 border border-white/25 px-2 py-0.5 rounded-full">{day}</span>
+                  <span className="absolute left-4 bottom-3 w-11 h-11 rounded-xl bg-white/20 border border-white/30 flex items-center justify-center">
+                    <Icon className="w-6 h-6" />
+                  </span>
+                  <span className="absolute left-[4.25rem] bottom-3 text-3xl font-black text-white/35 leading-none">0{i + 1}</span>
+                </div>
+
+                <div className="p-4 flex-1 flex flex-col">
+                  <h3 className="text-base font-bold text-gray-900 leading-tight">{title}</h3>
+                  <p className="mt-1.5 text-sm text-gray-600 leading-relaxed flex-1">{what}</p>
+                  <Link to={main.to} onClick={e => onLink(e, main)}
+                    className={`mt-4 inline-flex items-center justify-between gap-2 text-sm font-semibold rounded-xl px-3.5 py-2.5 transition-colors ${soft}`}>
+                    {main.label} <ArrowRight className="w-4 h-4 shrink-0" />
+                  </Link>
+                  <div className="mt-2 min-h-[2.25rem] px-1">
+                    {more && (
+                      <Link to={more.to} onClick={e => onLink(e, more)}
+                        className="inline-flex items-center gap-1 text-xs font-semibold text-gray-500 hover:text-gray-800">
+                        {more.label} <ArrowRight className="w-3 h-3" />
+                      </Link>
+                    )}
+                    {soon && <p className="text-xs text-gray-400">{soon}</p>}
+                  </div>
+                </div>
               </div>
 
-              <div className="mt-3 flex items-center gap-2.5">
-                <Icon className="w-5 h-5 text-brand-600 shrink-0" />
-                <h3 className="text-base font-bold text-gray-900 leading-tight">{title}</h3>
-              </div>
-              <p className="mt-2 text-sm text-gray-600 leading-relaxed flex-1">{what}</p>
-
-              <Link to={main.to} onClick={e => onLink(e, main)}
-                className="mt-4 inline-flex items-center justify-between gap-2 bg-brand-50 hover:bg-brand-100 text-brand-700 text-sm font-semibold rounded-xl px-3.5 py-2.5 transition-colors">
-                {main.label} <ArrowRight className="w-4 h-4 shrink-0" />
-              </Link>
-              {more && (
-                <Link to={more.to} onClick={e => onLink(e, more)}
-                  className="mt-2 inline-flex items-center gap-1 text-xs font-semibold text-gray-500 hover:text-brand-700 px-1">
-                  {more.label} <ArrowRight className="w-3 h-3" />
-                </Link>
+              {/* Arrow to the next stage, wide screens */}
+              {i < STAGES.length - 1 && (
+                <span className="hidden lg:flex absolute -right-[13px] top-10 z-10 w-6 h-6 rounded-full bg-white border border-gray-200 shadow-sm items-center justify-center" aria-hidden="true">
+                  <ArrowRight className="w-3.5 h-3.5 text-gray-400" />
+                </span>
               )}
-              {soon && <p className="mt-2 text-xs text-gray-400 px-1">{soon}</p>}
             </li>
           ))}
         </ol>
 
-        <p className="mt-5 flex items-start gap-2 text-sm text-gray-600">
-          <span className="w-7 h-7 rounded-full bg-gray-100 text-gray-500 text-xs font-bold flex items-center justify-center shrink-0">5</span>
-          <span className="pt-1"><span className="font-semibold text-gray-800">Day 5 · Conference.</span> All the assessors meet you once more, and results come the same day. Nothing extra to prepare — be yourself.</span>
-        </p>
+        {/* Day 5: the finish line */}
+        <div className="mt-4 flex items-center gap-3 rounded-2xl bg-gradient-to-r from-brand-600 to-indigo-600 text-white px-4 py-3.5">
+          <span className="w-10 h-10 rounded-xl bg-white/15 border border-white/25 flex items-center justify-center shrink-0"><Trophy className="w-5 h-5 text-amber-300" /></span>
+          <p className="text-sm leading-snug">
+            <span className="font-bold">Day 5 · Conference.</span>{' '}
+            <span className="text-white/85">All the assessors meet you once more, and results come the same day. Nothing extra to prepare — be yourself.</span>
+          </p>
+        </div>
       </div>
     </section>
   );
