@@ -7,6 +7,7 @@ import { trackEvent } from '../analytics';
 import AiFeedback from './AiFeedback';
 import AiWaitPanel from './AiWaitPanel';
 import { AlertCircle, Clock, Eye, PenLine, Sparkles, ChevronRight, RotateCcw, Quote, User } from 'lucide-react';
+import Hello from './Hello';
 
 // TAT practice, run the way the real test runs: the picture shows for 30
 // seconds and disappears, then there are 4 minutes to write. The feedback
@@ -315,6 +316,7 @@ export default function TatPage() {
         {phase === 'intro' && (
           <>
             <div>
+              <Hello className="mb-3" />
               <p className="text-[11px] font-bold uppercase tracking-[0.3em] text-brand-600">TAT Practice</p>
               <h1 className="mt-2 text-2xl sm:text-3xl font-bold text-gray-900 leading-tight">Write a story, see how it reads</h1>
               <p className="mt-3 text-sm text-gray-500 leading-relaxed">

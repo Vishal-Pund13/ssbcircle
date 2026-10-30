@@ -13,6 +13,7 @@ import SiteNav from '../SiteNav';
 import { themeFor } from './stepThemes';
 import Heatmap from './Heatmap';
 import { todayIST, addDays, buildPlan, dueReviews, streak, topicOfTheDay } from './plan';
+import Hello, { firstName } from '../Hello';
 
 // The SSB Prep Sheet: every topic worth being able to talk about, in order,
 // with a two-stage tick per topic — "Read" and "Can speak". Reading is the easy
@@ -516,6 +517,7 @@ export default function PrepPage() {
             <ListChecks className="w-7 h-7 sm:w-10 sm:h-10 text-brand-600" />
           </span>
         </div>
+        <Hello className="mt-3" />
         <h1 className="mt-3 sm:mt-4 text-2xl sm:text-4xl font-bold text-gray-900 tracking-tight">SSB Prep Sheet</h1>
         <p className="mt-1.5 text-sm sm:text-[15px] text-gray-500 max-w-2xl leading-relaxed">
           {TOPICS.length} topics in {STEPS.length} sections, in the order worth learning them.
@@ -572,7 +574,7 @@ export default function PrepPage() {
                 </span>
               </div>
               <div className="min-w-0 flex-1">
-                <p className="text-sm font-bold text-gray-900">Your progress</p>
+                <p className="text-sm font-bold text-gray-900">{firstName(user)}'s progress</p>
                 <p className="text-xs text-gray-500 mt-0.5">{totals.all.spoken} can speak · {totals.all.read} read · {totals.all.total} topics</p>
                 <div className="mt-2.5 space-y-1">
                   {['must', 'good', 'deep'].map(l => (
@@ -625,7 +627,7 @@ export default function PrepPage() {
               <div className="flex items-start justify-between gap-3">
                 <div>
                   <p className="text-sm font-bold text-gray-900 flex items-center gap-1.5">
-                    <Target className="w-4 h-4 text-brand-600" /> Today's plan
+                    <Target className="w-4 h-4 text-brand-600" /> {firstName(user)}'s plan for today
                   </p>
                   <p className="text-xs text-gray-500 mt-1">
                     {plan.daysLeft == null && 'Three topics a day. Add your SSB date and the plan fits itself to it.'}

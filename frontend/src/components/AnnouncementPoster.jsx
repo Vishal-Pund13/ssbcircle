@@ -4,6 +4,7 @@ import { X, FileText, PenLine, Mic, ArrowRight, Quote, BadgeCheck } from 'lucide
 import { useAuth } from '../context/AuthContext';
 import { TESTIMONIALS } from '../data/testimonials';
 import { trackEvent } from '../analytics';
+import { firstName } from './Hello';
 
 // "Prepare for the SSB smartly" — an announcement poster for the AI tools.
 //
@@ -91,7 +92,7 @@ export default function AnnouncementPoster() {
             New on SSBCircle
           </p>
           <h2 id="poster-title" className="relative mt-3 text-[1.9rem] sm:text-4xl font-extrabold leading-[1.05] tracking-tight">
-            Prepare for the SSB<br />smartly.
+            {user ? <>{firstName(user)}, prepare<br />for the SSB smartly.</> : <>Prepare for the SSB<br />smartly.</>}
           </h2>
           <p className="relative mt-3 text-sm sm:text-base text-white/85 leading-relaxed max-w-sm">
             AI feedback built on the methods SSB mentors use to assess candidates. Free.

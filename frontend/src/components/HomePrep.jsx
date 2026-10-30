@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { getPiq, getTat, getPrepProgress } from '../services/api';
 import { todayIST, addDays, streak } from './prep/dates';
 import { trackEvent } from '../analytics';
+import { firstName } from './Hello';
 import {
   FileText, PenLine, BookOpen, Radio, ArrowRight, Check, Eye, Users, Mic, Brain,
   Image as ImageIcon, ListChecks, Lightbulb, Flag, Mountain, MessageCircle, Trophy, Flame,
@@ -70,7 +71,7 @@ export function PrepPath({ user, liveCount = 0 }) {
     <div className="bg-white border border-gray-200 rounded-2xl shadow-sm p-4 sm:p-5">
       <div className="flex items-center justify-between gap-3 mb-3">
         <div>
-          <p className="text-sm font-bold text-gray-900">{user ? 'Your SSB prep' : 'Your SSB prep path'}</p>
+          <p className="text-sm font-bold text-gray-900">{user ? `${firstName(user)}'s SSB prep` : 'Your SSB prep path'}</p>
           <p className="text-xs text-gray-500">{user ? `${doneCount} of ${KEY_STEPS} done today` : 'Five steps. Start with the first.'}</p>
         </div>
         {user && (

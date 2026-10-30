@@ -10,6 +10,7 @@ import {
   QUALITIES, MYTHS, INTERESTS, SERVICES, ENTRIES, SSB_DAYS, AFTER_SSB, START_STEPS, FAQ,
 } from '../data/beginnerGuide';
 import { trackEvent } from '../analytics';
+import Hello from './Hello';
 
 // "How to become an officer in the Indian Armed Forces" — /become-an-officer.
 //
@@ -490,6 +491,7 @@ export default function BeginnerGuide() {
       {/* Hero — the dream, then every part of the page one tap away */}
       <header className="bg-gradient-to-b from-brand-50 to-white px-4 sm:px-6 pt-8 sm:pt-14 pb-8">
         <div className="max-w-5xl mx-auto">
+          <Hello className="mb-3 flex" />
           <p className="inline-flex items-center gap-2 text-sm font-semibold text-brand-700 bg-white border border-brand-100 px-3 py-1.5 rounded-full">
             <Shield className="w-4 h-4" /> Indian Army · Indian Navy · Indian Air Force
           </p>

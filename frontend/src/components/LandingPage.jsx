@@ -15,6 +15,8 @@ import HomeRail from './HomeRail';
 import MentorConnectModal from './MentorConnectModal';
 import { HOME_FAQ } from '../data/homeFaq';
 import { Mic, Timer, FileText, CheckSquare, Radio, ArrowRight, Trash2, Zap, Lightbulb, Users, Presentation, Target, Headphones, RefreshCw, X, Calendar, Heart, PlayCircle, Share2, Check, Sparkles, ChevronDown, Shield, Star, Lock, BookOpen, Video, Award, ChevronRight, GraduationCap, ExternalLink, AlertTriangle, HeartHandshake, PenLine, Footprints, MessageCircle } from 'lucide-react';
+import Hello, { firstName } from './Hello';
+import { todayIST, daysBetween } from './prep/dates';
 
 
 const HERO_CARDS = [
@@ -1308,6 +1310,8 @@ export default function LandingPage() {
     setVisibleCount(pageSize);
   }
 
+  const ssbDays = user?.ssb_date ? daysBetween(todayIST(), user.ssb_date) : null;
+
   const filteredRooms = rooms.filter(r => {
     if (catFilter !== 'All' && r.category !== catFilter) return false;
     if (subFilter && r.subcategory !== subFilter) return false;
@@ -1354,14 +1358,40 @@ export default function LandingPage() {
         <section id="top" className="border-b border-gray-100 bg-gradient-to-b from-brand-50/60 to-white py-10 sm:py-14 lg:py-16 px-4 sm:px-6">
           <div className="max-w-5xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12 items-center">
             <div>
-              <p className="inline-flex items-center gap-2 text-xs font-semibold text-brand-700 bg-white border border-brand-100 px-3 py-1.5 rounded-full mb-5">
-                <Shield className="w-3.5 h-3.5" /> Free SSB preparation for every entry
-              </p>
+              {user ? (
+                <Hello className="mb-4" />
+              ) : (
+                <p className="inline-flex items-center gap-2 text-xs font-semibold text-brand-700 bg-white border border-brand-100 px-3 py-1.5 rounded-full mb-5">
+                  <Shield className="w-3.5 h-3.5" /> Free SSB preparation for every entry
+                </p>
+              )}
 
               <h1 className="text-[1.75rem] sm:text-5xl font-bold text-gray-900 leading-[1.1] tracking-tight mb-4">
-                {user ? <>Welcome back, {user.display_name?.split(' ')[0]}.<br /><span className="text-brand-600">Let's keep going.</span></>
-                      : <>Start your SSB prep<br /><span className="text-brand-600">the right way.</span></>}
+                {user ? (
+                  <>Welcome back,{' '}
+                    {/* The name is the point of this line: brand colour on a marker stroke */}
+                    <span className="relative inline-block whitespace-nowrap">
+                      <span className="absolute inset-x-0 bottom-[0.08em] h-[0.38em] bg-amber-200/80 rounded-sm -rotate-1" aria-hidden="true" />
+                      <span className="relative text-brand-600">{firstName(user)}</span>
+                    </span>.
+                    <br /><span className="text-gray-800">Let's keep going.</span></>
+                ) : <>Start your SSB prep<br /><span className="text-brand-600">the right way.</span></>}
               </h1>
+
+              {user && (user.exam_type || ssbDays != null) && (
+                <div className="-mt-1 mb-5 flex flex-wrap gap-2">
+                  {user.exam_type && (
+                    <span className="inline-flex items-center gap-1.5 text-xs font-semibold text-brand-700 bg-white border border-brand-100 px-3 py-1.5 rounded-full">
+                      <Target className="w-3.5 h-3.5" /> Preparing for {user.exam_type.replace(/^Other:\s*/, '')}
+                    </span>
+                  )}
+                  {ssbDays != null && ssbDays >= 0 && (
+                    <span className="inline-flex items-center gap-1.5 text-xs font-semibold text-amber-800 bg-amber-50 border border-amber-200 px-3 py-1.5 rounded-full">
+                      <Calendar className="w-3.5 h-3.5" /> {ssbDays === 0 ? 'Your SSB is today — all the best' : `Your SSB in ${ssbDays} day${ssbDays === 1 ? '' : 's'}`}
+                    </span>
+                  )}
+                </div>
+              )}
 
               <p className="text-gray-600 text-sm sm:text-lg leading-relaxed mb-6">
                 Know yourself through your PIQ, practise TAT stories with honest feedback, stay ready with

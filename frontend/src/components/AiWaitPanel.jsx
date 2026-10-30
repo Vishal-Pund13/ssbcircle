@@ -2,6 +2,8 @@ import { useState, useEffect } from 'react';
 import { Check, Lightbulb } from 'lucide-react';
 import SoldierRunner from './SoldierRunner';
 import { FORCES_FACTS } from '../data/forcesFacts';
+import { firstName } from './Hello';
+import { useAuth } from '../context/AuthContext';
 
 // Shown while an AI request runs (a PIQ report takes 30–60 seconds). It says
 // why the wait is long, shows what is being worked on, and passes the time
@@ -14,6 +16,7 @@ import { FORCES_FACTS } from '../data/forcesFacts';
 const FACT_EVERY = 8000;
 
 export default function AiWaitPanel({ title, steps }) {
+  const name = firstName(useAuth().user);
   const [seconds, setSeconds] = useState(0);
   const [fact, setFact] = useState(() => Math.floor(Math.random() * FORCES_FACTS.length));
 
@@ -34,7 +37,7 @@ export default function AiWaitPanel({ title, steps }) {
           <SoldierRunner className="w-28" />
           <h2 className="mt-1 text-lg font-bold text-gray-900">{title}</h2>
           <p className="mt-1.5 text-sm text-gray-600 leading-relaxed">
-            This usually takes 30–60 seconds. Many aspirants are preparing at the same time and our AI
+            {name ? `${name}, this` : 'This'} usually takes 30–60 seconds. Many aspirants are preparing at the same time and our AI
             answers them one by one — please keep this page open.
           </p>
           <p className="mt-2 text-xs font-semibold text-gray-400 tabular-nums">{clock}</p>

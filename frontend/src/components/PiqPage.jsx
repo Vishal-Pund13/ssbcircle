@@ -8,6 +8,8 @@ import AiWaitPanel from './AiWaitPanel';
 import { SoldierLoader } from './SoldierRunner';
 import { trackEvent } from '../analytics';
 import AiFeedback from './AiFeedback';
+import Hello, { firstName } from './Hello';
+import { useAuth } from '../context/AuthContext';
 
 // A working copy of the Personal Information Questionnaire (DIPR 107-A).
 //
@@ -339,6 +341,7 @@ function AnalysisReport({ analysis, analysedAt, name }) {
 }
 
 export default function PiqPage() {
+  const { user: me } = useAuth();
   const [form,    setForm]    = useState(emptyForm);
   const [loading, setLoading] = useState(true);
   const [saving,  setSaving]  = useState(false);
@@ -455,9 +458,10 @@ export default function PiqPage() {
       <form onSubmit={save} className="max-w-3xl mx-auto px-4 sm:px-6 py-7 space-y-4">
 
         <div>
+          <Hello className="mb-3" />
           <p className="text-[11px] font-bold uppercase tracking-[0.3em] text-brand-600">PIQ Analyzer</p>
           <h1 className="mt-2 text-2xl sm:text-3xl font-bold text-gray-900 leading-tight">
-            Your Personal Information Questionnaire
+            {me ? `${firstName(me)}'s Personal Information Questionnaire` : 'Your Personal Information Questionnaire'}
           </h1>
           <p className="mt-3 text-sm text-gray-500 leading-relaxed">
             This is the form you fill on day one at the SSB, and the one your Interviewing Officer

@@ -7,6 +7,7 @@ import { getPiq } from '../services/api';
 import { trackEvent } from '../analytics';
 import { EXAMS, RESULTS, CALENDAR_CHECKED } from '../data/examCalendar';
 import { ENTRIES, EDU_LEVELS, DEGREES } from '../data/eligibility';
+import Hello, { firstName } from './Hello';
 
 // Upcoming defence entry exams, recent results, and an "Am I eligible?"
 // checker. Exact dates come from the UPSC calendar or a released
@@ -254,7 +255,7 @@ function EligibilityChecker() {
   return (
     <div className="space-y-5">
       <div className="bg-white border border-gray-200 rounded-2xl p-5 sm:p-6">
-        <p className="text-base font-bold text-gray-900">Tell us about yourself</p>
+        <p className="text-base font-bold text-gray-900">{user ? `${firstName(user)}, tell us about yourself` : 'Tell us about yourself'}</p>
         <p className="text-xs text-gray-500 mt-1 mb-4">Saved only on this device. Nothing is sent to us.</p>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -509,6 +510,7 @@ export default function ExamCalendarPage() {
 
       <div className="bg-brand-600 text-white px-4 sm:px-6 pt-8 pb-14">
         <div className="max-w-3xl mx-auto">
+          <Hello dark className="mb-3" />
           <p className="text-[11px] font-bold uppercase tracking-[0.3em] text-brand-100">Exams & eligibility</p>
           <h1 className="mt-2 text-2xl sm:text-3xl font-bold leading-tight">Your way into the armed forces</h1>
           <p className="mt-2 text-sm text-brand-100 leading-relaxed max-w-xl">

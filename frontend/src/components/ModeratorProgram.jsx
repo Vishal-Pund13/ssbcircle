@@ -6,6 +6,7 @@ import { useAuth } from '../context/AuthContext';
 import { getModeratorStatus, applyModerator, withdrawModerator } from '../services/api';
 import { PERKS, DUTIES, WHO_CAN_APPLY, STEPS, SCORE_ROWS, TARGET_ROWS, FAQ } from '../data/moderatorProgram';
 import { trackEvent } from '../analytics';
+import Hello from './Hello';
 
 // The moderator programme, pitched as an opportunity: help run the platform,
 // get recognised and paid for it. Opt in, two weeks of tracked activity,
@@ -155,6 +156,7 @@ export default function ModeratorProgram() {
         <div className="absolute inset-0 opacity-[0.1]" style={{ backgroundImage: 'radial-gradient(circle, #fff 1px, transparent 1px)', backgroundSize: '22px 22px' }} />
         <ShieldCheck className="absolute -right-10 -bottom-10 w-72 h-72 opacity-10 hidden md:block" strokeWidth={1} aria-hidden="true" />
         <div className="relative max-w-5xl mx-auto px-4 sm:px-6 py-12 sm:py-16">
+          <Hello dark className="mb-3 flex" />
           <p className="inline-flex items-center gap-2 text-xs font-semibold bg-white/10 border border-white/20 px-3 py-1.5 rounded-full">
             <Sparkles className="w-3.5 h-3.5" /> Moderator Programme
           </p>
