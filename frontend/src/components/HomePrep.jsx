@@ -172,7 +172,7 @@ export function SsbStages() {
   }
 
   return (
-    <section className="border-t border-gray-100 bg-white px-4 sm:px-6 py-10 sm:py-14">
+    <section className="border-t border-gray-100 bg-slate-50 px-4 sm:px-6 py-10 sm:py-14">
       <div className="max-w-5xl mx-auto">
         <p className="text-[11px] font-bold uppercase tracking-[0.25em] text-brand-600">The whole board, not just GD</p>
         <h2 className="mt-1.5 text-xl sm:text-2xl font-bold text-gray-900">Prepare for every stage of the SSB</h2>
@@ -235,7 +235,7 @@ export function SsbStages() {
         </ol>
 
         {/* Day 5: the finish line */}
-        <div className="mt-4 flex items-center gap-3 rounded-2xl bg-slate-50 border border-slate-200 px-4 py-3.5">
+        <div className="mt-4 flex items-center gap-3 rounded-2xl bg-white border border-slate-200 px-4 py-3.5">
           <span className="w-10 h-10 rounded-xl bg-white border border-gray-200 shadow-sm flex items-center justify-center shrink-0"><Trophy className="w-5 h-5 text-amber-500" /></span>
           <p className="text-sm leading-snug">
             <span className="font-bold text-gray-900">Day 5 · Conference.</span>{' '}
