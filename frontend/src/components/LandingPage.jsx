@@ -4,7 +4,6 @@ import { getActiveRooms, closeRoom, getSessions, toggleInterest, cancelSession, 
 import { useAuth } from '../context/AuthContext';
 import { MENTORS } from '../data/mentors';
 import { articleHref } from '../data/swipeArticles';
-import ComingSoonBanner from './ComingSoonBanner';
 import DailyMeetsNote from './DailyMeetsNote';
 import SsbCountdown from './SsbCountdown';
 import CommunityHighlights from './CommunityHighlights';
@@ -13,7 +12,7 @@ import { trackEvent } from '../analytics';
 import { PrepPath, SsbStages } from './HomePrep';
 import { ExamTicker } from './ExamCalendar';
 import HomeRail from './HomeRail';
-import { Mic, Timer, FileText, CheckSquare, Radio, ArrowRight, Trash2, Zap, Lightbulb, Users, Presentation, Target, Headphones, RefreshCw, X, Calendar, Heart, PlayCircle, Share2, Check, Sparkles, ChevronDown, Shield, Star, Lock, BookOpen, Video, Award, ChevronRight, GraduationCap, ExternalLink, AlertTriangle, HeartHandshake, PenLine } from 'lucide-react';
+import { Mic, Timer, FileText, CheckSquare, Radio, ArrowRight, Trash2, Zap, Lightbulb, Users, Presentation, Target, Headphones, RefreshCw, X, Calendar, Heart, PlayCircle, Share2, Check, Sparkles, ChevronDown, Shield, Star, Lock, BookOpen, Video, Award, ChevronRight, GraduationCap, ExternalLink, AlertTriangle, HeartHandshake, PenLine, Footprints } from 'lucide-react';
 
 
 const HERO_CARDS = [
@@ -154,20 +153,46 @@ function SpreadNewsCards({ small = false }) {
 
 const CATEGORIES = ['All', 'GD', 'PPDT', 'Lecturette', 'IO Practice'];
 const GD_SUBCATEGORIES = ['Defence', 'International Relations', 'Society', 'Economy', 'Science & Tech', 'Environment', 'Sports & Awards'];
-// The home page is long; HomeRail shows where you are on it. Page order.
+// The home page reads as five chapters, each opened by a slim coloured band
+// (Chapter below), so a long page has clear breaks instead of one endless
+// scroll. HomeRail follows the same chapters. Page order.
+const CHAPTERS = {
+  learn:    { n: 2, title: 'Learn the SSB',       blurb: 'What each stage tests, and short reads for GD and interview.',
+              band: 'bg-sky-50 border-sky-100', dot: 'bg-sky-500', ink: 'text-sky-700' },
+  practise: { n: 3, title: 'Practise with others', blurb: 'Live rooms and a community of aspirants preparing like you.',
+              band: 'bg-emerald-50 border-emerald-100', dot: 'bg-emerald-500', ink: 'text-emerald-700' },
+  people:   { n: 4, title: 'The people',           blurb: 'Officers who mentor, and aspirants who show up every day.',
+              band: 'bg-amber-50 border-amber-100', dot: 'bg-amber-500', ink: 'text-amber-700' },
+  more:     { n: 5, title: 'More',                 blurb: 'Ways to serve now, what is coming next, and common questions.',
+              band: 'bg-slate-50 border-slate-200', dot: 'bg-slate-500', ink: 'text-slate-600' },
+};
 const HOME_SECTIONS = [
-  { id: 'top',       label: 'Start' },
-  { id: 'stages',    label: 'SSB stages' },
-  { id: 'news',      label: 'News cards' },
-  { id: 'rooms',     label: 'Live rooms' },
-  { id: 'community', label: 'Community' },
-  { id: 'mentors',   label: 'Mentors' },
-  { id: 'faq',       label: 'FAQ' },
+  { id: 'top',      label: 'Start' },
+  { id: 'learn',    label: 'Learn the SSB' },
+  { id: 'practise', label: 'Practise' },
+  { id: 'people',   label: 'The people' },
+  { id: 'more',     label: 'More & FAQ' },
 ];
 
-const PAGE_SIZE = 6;
-// On a phone each room card is a full screen-width block; three is a screenful
-const pageSize = typeof window !== 'undefined' && window.innerWidth < 640 ? 3 : PAGE_SIZE;
+function Chapter({ id }) {
+  const c = CHAPTERS[id];
+  return (
+    <div id={id} className={`scroll-mt-14 border-y ${c.band} px-4 sm:px-6 py-3.5 sm:py-4`}>
+      <div className="max-w-5xl mx-auto flex items-center gap-3">
+        <span className={`w-8 h-8 rounded-full ${c.dot} text-white text-sm font-bold flex items-center justify-center shrink-0`}>{c.n}</span>
+        <div className="min-w-0">
+          <p className={`text-[11px] font-bold uppercase tracking-[0.2em] ${c.ink}`}>Part {c.n} of 5</p>
+          <p className="text-base sm:text-lg font-bold text-gray-900 leading-tight">{c.title}</p>
+        </div>
+        <p className="hidden md:block ml-auto text-sm text-gray-500 text-right max-w-sm">{c.blurb}</p>
+      </div>
+    </div>
+  );
+}
+
+// Three rooms is a screenful on a phone and one tidy row on a desktop
+const PAGE_SIZE = 3;
+const pageSize = PAGE_SIZE;
 
 // Shown until enough real users are active on the platform
 const MOCK_ASPIRANTS = [
@@ -612,26 +637,18 @@ function ContributeCard({ way }) {
   const showImage = way.image && !imgFailed;
 
   return (
-    <a href={way.link} target="_blank" rel="noopener noreferrer"
-      className="group flex flex-col gap-3 bg-white border border-gray-200 rounded-2xl p-4 sm:p-5 hover:border-brand-600/30 hover:shadow-md transition-all duration-200">
-      <div className="flex items-center justify-between">
-        <div className="w-11 h-11 rounded-xl bg-brand-50 border border-brand-100 flex items-center justify-center group-hover:bg-brand-100 transition-colors overflow-hidden shrink-0">
-          {showImage ? (
-            <img src={way.image} alt={`${way.title} emblem`} loading="lazy"
-              className="w-full h-full object-contain p-1.5" onError={() => setImgFailed(true)} />
-          ) : (
-            <Icon className="w-5 h-5 text-brand-600" />
-          )}
-        </div>
-        <ExternalLink className="w-3.5 h-3.5 text-gray-300 group-hover:text-brand-600 transition-colors" />
-      </div>
-      <div>
-        <h3 className="text-sm font-bold text-gray-900">{way.title}</h3>
-        <p className="text-[12px] text-gray-400">{way.org}</p>
-      </div>
-      <p className="text-xs text-gray-500 leading-relaxed flex-1">{way.desc}</p>
-      <span className="text-[12px] font-semibold text-brand-600 flex items-center gap-1">
-        Learn how <ArrowRight className="w-3 h-3 group-hover:translate-x-0.5 transition-transform" />
+    <a href={way.link} target="_blank" rel="noopener noreferrer" title={way.desc}
+      className="group flex items-center gap-2.5 bg-white border border-gray-200 rounded-xl p-2.5 hover:border-brand-600/30 hover:shadow-sm transition-all">
+      <span className="w-9 h-9 rounded-lg bg-brand-50 border border-brand-100 flex items-center justify-center overflow-hidden shrink-0">
+        {showImage ? (
+          <img src={way.image} alt="" loading="lazy" className="w-full h-full object-contain p-1" onError={() => setImgFailed(true)} />
+        ) : (
+          <Icon className="w-4 h-4 text-brand-600" />
+        )}
+      </span>
+      <span className="min-w-0">
+        <span className="block text-sm font-bold text-gray-900 leading-tight">{way.title}</span>
+        <span className="block text-[11px] text-gray-500 truncate">{way.org}</span>
       </span>
     </a>
   );
@@ -672,30 +689,21 @@ function ActiveAspirantsSection({ aspirants }) {
 
 function ContributeSection() {
   return (
-    <section className="border-t border-gray-100 bg-white py-10 sm:py-14 px-4 sm:px-6">
+    <section className="bg-white px-4 sm:px-6 py-8 sm:py-10">
       <div className="max-w-5xl mx-auto">
-
-        <div className="mb-8">
-          <div className="flex items-center gap-2 mb-1">
-            <Sparkles className="w-4 h-4 text-brand-600" />
-            <span className="text-xs font-bold uppercase tracking-widest text-brand-600">Before The Uniform</span>
-          </div>
-          <h2 className="text-xl sm:text-2xl font-bold text-gray-900">Your Journey to Serve Doesn't Wait for a Result</h2>
-          <p className="text-sm text-gray-400 mt-1 max-w-2xl">
-            Selection isn't the only door in. Every option below builds the same Officer-Like Qualities SSB assessors look for — Initiative, Social Adaptability, Cooperation — and lets you contribute to the nation right now.
-          </p>
-        </div>
-
-        <div className="m-rail sm:grid-cols-2 lg:grid-cols-3">
+        <p className="text-xs font-bold uppercase tracking-widest text-brand-600 flex items-center gap-2"><Sparkles className="w-3.5 h-3.5" /> Before the uniform</p>
+        <h2 className="mt-1 text-lg sm:text-xl font-bold text-gray-900">Start serving now, whatever your result</h2>
+        <p className="mt-1 text-sm text-gray-500 max-w-2xl">
+          Each of these builds the same qualities the board looks for — initiative, cooperation, getting along with people.
+        </p>
+        <div className="mt-4 grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-2">
           {CONTRIBUTE_WAYS.map(way => <ContributeCard key={way.title} way={way} />)}
         </div>
-
-        <p className="text-[11px] text-gray-300 mt-4">
+        <p className="text-[11px] text-gray-300 mt-3">
           Emblems via Wikimedia Commons — NCC (Bharata-indstar) & Goonj (Cyyanide) logos under{' '}
           <a href="https://creativecommons.org/licenses/by-sa/4.0/" target="_blank" rel="noopener noreferrer" className="underline hover:text-gray-400">CC BY-SA 4.0</a>;
           {' '}Territorial Army crest & NSS logo are public domain. Civil Defence emblem is the official Ministry of Home Affairs / DGFSCDHG mark, shown for identification only — SSBCircle is not affiliated with or endorsed by the Government of India.
         </p>
-
       </div>
     </section>
   );
@@ -1458,10 +1466,13 @@ export default function LandingPage() {
         <SsbCountdown user={user} />
 
         {/* The page runs: where to start → every stage → read → practise live → discuss */}
-        <div id="stages"><SsbStages /></div>
+        <Chapter id="learn" />
+        <SsbStages />
 
         {/* ── Latest Reads — right under the hero so every visitor sees them ── */}
-        <div id="news"><LatestReadsSection articles={articles} loading={articlesLoading} /></div>
+        <LatestReadsSection articles={articles} loading={articlesLoading} />
+
+        <Chapter id="practise" />
 
         {/* ── Live / Upcoming tabs ── */}
         <section id="rooms" ref={tabsSectionRef} className="scroll-mt-16 border-t border-gray-100 bg-white px-4 sm:px-6 py-10 sm:py-14">
@@ -1621,7 +1632,8 @@ export default function LandingPage() {
             </div>
           ) : (
             <>
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4">
+              {/* Phones: a swipeable row, so the rooms cost one screen, not three */}
+              <div className="m-rail sm:grid-cols-2 lg:grid-cols-3">
                 {displayedRooms.map(r => (
                   <RoomCard key={r.id} room={r} user={user} onJoin={handleJoin} onDelete={handleDelete} />
                 ))}
@@ -1660,10 +1672,8 @@ export default function LandingPage() {
         </section>
 
         {/* ── Community — ask box + recent posts; renders nothing if empty and closed to posting ── */}
-        <div id="community"><CommunityHighlights /></div>
+        <CommunityHighlights />
 
-        {/* ── Announcement: the 21-day challenge, ahead of the feature itself ── */}
-        <ComingSoonBanner />
 
         {/* ── Notable Sessions — social proof, sits with the rooms zone ── */}
         {pastSessions.length > 0 && (
@@ -1710,48 +1720,37 @@ export default function LandingPage() {
         )}
 
         {/* ── Mentors ── */}
-        <div id="mentors"><MentorsSection /></div>
+        <Chapter id="people" />
+        <MentorsSection />
 
         {/* ── Active Aspirants ── */}
         <ActiveAspirantsSection aspirants={aspirants} />
 
+        <Chapter id="more" />
+
         {/* ── Ways to serve before the uniform ── */}
         <ContributeSection />
 
-        {/* ── Coming to SSBCircle ── */}
-        <section className="border-t border-gray-100 bg-white py-10 sm:py-14 px-4 sm:px-6">
+        {/* ── Coming soon: three short cards instead of two full-width blocks ── */}
+        <section className="bg-white px-4 sm:px-6 py-8 sm:py-10">
           <div className="max-w-5xl mx-auto">
-            <div className="mb-8">
-              <div className="flex items-center gap-2 mb-1">
-                <Lock className="w-4 h-4 text-brand-600" />
-                <span className="text-xs font-bold uppercase tracking-widest text-brand-600">What's Ahead</span>
-              </div>
-              <h2 className="text-xl sm:text-2xl font-bold text-gray-900">Coming to SSBCircle</h2>
-              <p className="text-sm text-gray-400 mt-1">Built in the open — you shape what we build next.</p>
-            </div>
-            <div className="m-rail sm:grid-cols-2">
-              <div className="relative rounded-2xl border border-brand-100 bg-brand-50 p-5 overflow-hidden">
-                <div className="absolute top-3 right-3 text-[11px] font-bold uppercase tracking-widest text-brand-600 bg-brand-100 px-2.5 py-0.5 rounded-full">Coming Soon</div>
-                <div className="w-10 h-10 rounded-xl bg-brand-600 flex items-center justify-center mb-3">
-                  <Shield className="w-5 h-5 text-white" />
+            <p className="text-xs font-bold uppercase tracking-widest text-brand-600 flex items-center gap-2"><Lock className="w-3.5 h-3.5" /> Coming soon</p>
+            <h2 className="mt-1 text-lg sm:text-xl font-bold text-gray-900">Built in the open — you shape what comes next</h2>
+            <div className="mt-4 m-rail sm:grid-cols-3">
+              {[
+                { icon: Footprints, title: 'The 21-day challenge', text: 'One entry a day for 21 days, checked by hand. The most consistent aspirant wins a new pair of running shoes.', tag: 'Seats open soon' },
+                { icon: Shield, title: 'Sessions with veterans', text: 'Guided sessions with ex-servicemen and recommended candidates, with feedback on how you speak and lead.', tag: 'Invite-only' },
+                { icon: Star, title: 'Peer ratings', text: 'After a session, rate each other on communication and leadership, and build a profile over time.', tag: 'Planned' },
+              ].map(({ icon: Icon, title, text, tag }) => (
+                <div key={title} className="rounded-2xl border border-gray-200 bg-gray-50/60 p-4">
+                  <div className="flex items-center justify-between gap-2">
+                    <span className="w-9 h-9 rounded-xl bg-white border border-gray-200 text-brand-600 flex items-center justify-center"><Icon className="w-4 h-4" /></span>
+                    <span className="text-[11px] font-semibold text-gray-500 bg-white border border-gray-200 px-2 py-0.5 rounded-full">{tag}</span>
+                  </div>
+                  <h3 className="mt-3 text-sm font-bold text-gray-900">{title}</h3>
+                  <p className="mt-1 text-xs text-gray-500 leading-relaxed">{text}</p>
                 </div>
-                <h3 className="text-sm font-bold text-gray-900 mb-1">Sessions with Veterans & Ex-Servicemen</h3>
-                <p className="text-xs text-gray-500 leading-relaxed">
-                  Live guided sessions hosted by SSB-recommended aspirants and ex-servicemen. Get real feedback on your GD performance, body language, and communication style from those who have cleared the board themselves.
-                </p>
-                <p className="text-[12px] text-brand-600 font-semibold mt-3">Invite-only · Limited seats per session</p>
-              </div>
-              <div className="relative rounded-2xl border border-gray-200 bg-gray-50 p-5 overflow-hidden">
-                <div className="absolute top-3 right-3 text-[11px] font-bold uppercase tracking-widest text-gray-400 bg-gray-100 px-2.5 py-0.5 rounded-full">Planned</div>
-                <div className="w-10 h-10 rounded-xl bg-gray-200 flex items-center justify-center mb-3">
-                  <Star className="w-5 h-5 text-gray-500" />
-                </div>
-                <h3 className="text-sm font-bold text-gray-900 mb-1">Peer Assessment & Ratings</h3>
-                <p className="text-xs text-gray-500 leading-relaxed">
-                  After each session, rate your peers on communication, leadership, and participation. Build a performance profile that speaks louder than words on your SSB prep journey.
-                </p>
-                <p className="text-[12px] text-gray-400 font-semibold mt-3">Anonymous · Merit-based</p>
-              </div>
+              ))}
             </div>
           </div>
         </section>
@@ -1759,7 +1758,7 @@ export default function LandingPage() {
       </main>
 
       {/* ── SSB FAQ Section ── */}
-      <div id="faq"><FaqSection /></div>
+      <FaqSection />
 
       <footer className="border-t border-gray-100 py-8 px-4 sm:px-6">
         <div className="max-w-5xl mx-auto flex items-center justify-between">
