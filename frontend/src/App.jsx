@@ -48,6 +48,7 @@ const MentorPage          = lazy(() => import('./components/MentorPage'));
 const OnboardingPage      = lazy(() => import('./components/OnboardingPage'));
 const PiqPage             = lazy(() => import('./components/PiqPage'));
 const TatPage             = lazy(() => import('./components/TatPage'));
+const ToolIntro           = lazy(() => import('./components/ToolIntro'));
 const ExamCalendarPage    = lazy(() => import('./components/ExamCalendar'));
 const BeginnerGuide       = lazy(() => import('./components/BeginnerGuide'));
 const ModeratorProgram    = lazy(() => import('./components/ModeratorProgram'));
@@ -81,8 +82,8 @@ export default function App() {
             <Route path="/session"               element={<SessionPage />} />
             <Route path="/mentor/:slug"          element={<MentorPage />} />
             <Route path="/welcome"               element={<ProtectedRoute><OnboardingPage /></ProtectedRoute>} />
-            <Route path="/piq"                   element={<ProtectedRoute><PiqPage /></ProtectedRoute>} />
-            <Route path="/tat"                   element={<ProtectedRoute><TatPage /></ProtectedRoute>} />
+            <Route path="/piq"                   element={<ProtectedRoute fallback={<ToolIntro tool="piq" />}><PiqPage /></ProtectedRoute>} />
+            <Route path="/tat"                   element={<ProtectedRoute fallback={<ToolIntro tool="tat" />}><TatPage /></ProtectedRoute>} />
             <Route path="/exams"                 element={<ExamCalendarPage />} />
             <Route path="/become-an-officer"     element={<BeginnerGuide />} />
             <Route path="/start"                 element={<Navigate to="/become-an-officer" replace />} />

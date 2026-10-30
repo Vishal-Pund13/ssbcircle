@@ -21,6 +21,10 @@ import { SWIPE_SLUGS }  from '../src/data/swipeArticles.js';
 import { MENTORS }      from '../src/data/mentors.js';
 import * as GUIDE       from '../src/data/beginnerGuide.js';
 import { HOME_FAQ }     from '../src/data/homeFaq.js';
+import { STEPS as PREP_STEPS, TOPICS as PREP_TOPICS, LEVELS as PREP_LEVELS } from '../src/data/prepSheet.js';
+import { EXAMS, RESULTS } from '../src/data/examCalendar.js';
+import { TOOL_INTROS }  from '../src/data/toolIntros.js';
+import * as MODS        from '../src/data/moderatorProgram.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const ROOT      = path.resolve(__dirname, '..');
@@ -89,6 +93,121 @@ const GUIDE_ROUTE = {
   },
 };
 
+// ── Tool pages ────────────────────────────────────────────────────────────
+// Each of these used to answer with the homepage's head, so Google treated
+// them as copies of the homepage. They now get their own head and real body
+// text built from the same data the page draws. Builders are getters for the
+// same reason as the guide: esc() is defined further down.
+
+const crumbs = (name, p) => ({
+  '@type': 'BreadcrumbList',
+  itemListElement: [
+    { '@type': 'ListItem', position: 1, name: 'SSBCircle', item: `${SITE}/` },
+    { '@type': 'ListItem', position: 2, name, item: `${SITE}${p}` },
+  ],
+});
+const faqLd = faq => ({
+  '@type': 'FAQPage',
+  mainEntity: faq.map(f => ({ '@type': 'Question', name: f.q, acceptedAnswer: { '@type': 'Answer', text: f.a } })),
+});
+const H2 = t => `<h2 style="font-size:1.35rem;margin:28px 0 8px;">${esc(t)}</h2>`;
+const H3 = t => `<h3 style="font-size:1.1rem;margin:18px 0 4px;">${esc(t)}</h3>`;
+const P  = t => `<p style="line-height:1.7;color:#333;margin:4px 0;">${esc(t)}</p>`;
+const UL = items => '<ul>' + items.map(i => `<li style="margin:6px 0;line-height:1.6;">${i}</li>`).join('') + '</ul>';
+const OL = steps => '<ol>' + steps.map(s => `<li style="margin:6px 0;line-height:1.6;"><strong>${esc(s.title)}</strong>: ${esc(s.text)}</li>`).join('') + '</ol>';
+
+// Every topic on the sheet, by section, with the question it prepares you for
+function prepNoscript() {
+  let out = '';
+  for (const step of PREP_STEPS) {
+    out += H2(step.title) + P(step.blurb);
+    for (const g of step.groups) {
+      out += H3(`${step.title}: ${g.title}`);
+      out += UL(g.topics.map(t =>
+        `<strong>${esc(t.title)}</strong> (${esc(PREP_LEVELS[t.level]?.label || '')})${t.ask ? ` — likely question: “${esc(t.ask)}”` : ''}`));
+    }
+  }
+  return out;
+}
+
+const fmtDate = d => {
+  const [y, m, day] = d.split('-').map(Number);
+  const month = new Date(Date.UTC(y, m - 1, 1)).toLocaleString('en-IN', { month: 'long', timeZone: 'UTC' });
+  return day ? `${day} ${month} ${y}` : `${month} ${y} (expected)`;
+};
+function examsNoscript() {
+  let out = H2('Officer entry exam dates');
+  for (const e of EXAMS) {
+    out += H3(`${e.name} — ${e.body}`) + P(`For: ${e.who}. Joins: ${e.service}.`);
+    out += UL(e.events.map(ev => `${esc(ev.label)}: ${esc(fmtDate(ev.date))}`));
+  }
+  out += H2('Recent results');
+  out += UL(RESULTS.map(r => `<strong>${esc(r.name)}</strong> (${esc(fmtDate(r.date))}): ${esc(r.note)}`));
+  return out;
+}
+
+const toolNoscript = t => H2('How it works') + OL(t.steps) + UL(t.points.map(esc))
+  + H2('Questions people ask') + t.faq.map(f => H3(f.q) + P(f.a)).join('');
+
+const modsNoscript = () => H2('What moderators get') + UL(MODS.PERKS.map(p => `<strong>${esc(p.title)}</strong>: ${esc(p.text)}`))
+  + H2('What moderators do') + UL(MODS.DUTIES.map(esc))
+  + H2('Who can apply') + UL(MODS.WHO_CAN_APPLY.map(esc))
+  + H2('How it works') + OL(MODS.STEPS)
+  + H2('Questions people ask') + MODS.FAQ.map(f => H3(f.q) + P(f.a)).join('');
+
+const TOOL_ROUTES = [
+  {
+    path: '/prep',
+    title: `SSB Interview Prep Sheet — ${PREP_TOPICS.length} Must-Know Topics with Questions | SSBCircle`,
+    description: `Every topic to know before your SSB interview and GD: ${PREP_TOPICS.length} topics in ${PREP_STEPS.length} sections, from your own PIQ to defence and current affairs, each with the likely question. Made with SSB ex-assessors and recommended candidates.`,
+    priority: '0.9', changefreq: 'weekly',
+    heading: 'SSB Prep Sheet',
+    blurb: `${PREP_TOPICS.length} topics in ${PREP_STEPS.length} sections, in the order worth learning them — each with the points to know and the question an Interviewing Officer is likely to ask. Made with SSB ex-assessors and recommended candidates, and kept up to date with current trends.`,
+    get noscriptExtra() { return prepNoscript(); },
+    jsonLd: { '@context': 'https://schema.org', '@graph': [crumbs('SSB Prep Sheet', '/prep')] },
+  },
+  {
+    path: '/piq',
+    title: 'SSB PIQ Form Analyzer — See What Your IO Will Ask | SSBCircle',
+    description: 'Fill your SSB PIQ (Personal Information Questionnaire) and see the interview questions your Interviewing Officer is likely to ask from it. Free, private, and downloadable as a PDF blueprint.',
+    priority: '0.9', changefreq: 'monthly',
+    heading: TOOL_INTROS.piq.title,
+    blurb: TOOL_INTROS.piq.subtitle,
+    get noscriptExtra() { return toolNoscript(TOOL_INTROS.piq); },
+    jsonLd: { '@context': 'https://schema.org', '@graph': [crumbs('PIQ Analyzer', '/piq'), faqLd(TOOL_INTROS.piq.faq)] },
+  },
+  {
+    path: '/tat',
+    title: 'TAT Practice for SSB — Write Stories, Get Feedback Online | SSBCircle',
+    description: 'Practise the SSB Thematic Apperception Test online: see a picture for 30 seconds, write your story in 4 minutes, and get feedback on your hero, your plot and the qualities your story shows. Free.',
+    priority: '0.9', changefreq: 'monthly',
+    heading: TOOL_INTROS.tat.title,
+    blurb: TOOL_INTROS.tat.subtitle,
+    get noscriptExtra() { return toolNoscript(TOOL_INTROS.tat); },
+    jsonLd: { '@context': 'https://schema.org', '@graph': [crumbs('TAT Practice', '/tat'), faqLd(TOOL_INTROS.tat.faq)] },
+  },
+  {
+    path: '/exams',
+    title: 'NDA, CDS, AFCAT Exam Dates 2027 & Eligibility Checker | SSBCircle',
+    description: 'Upcoming defence officer exam dates for NDA, CDS, AFCAT and more: notification, last date, exam and result dates, plus a checker for which officer entries you are eligible for.',
+    priority: '0.9', changefreq: 'weekly',
+    heading: 'Exam dates and eligibility for officer entries',
+    blurb: 'Find the officer entries you can apply for in the Indian Army, Navy and Air Force, and never miss a notification, exam or result.',
+    get noscriptExtra() { return examsNoscript(); },
+    jsonLd: { '@context': 'https://schema.org', '@graph': [crumbs('Exam calendar', '/exams')] },
+  },
+  {
+    path: '/moderators',
+    title: 'Become an SSBCircle Moderator — Lead the SSB Community | SSBCircle',
+    description: 'Host practice sessions, help other defence aspirants and keep the community safe. SSBCircle moderators get a monthly stipend, a MOD badge and direct access to the founding officers.',
+    priority: '0.5', changefreq: 'monthly',
+    heading: 'Lead the community. Get recognised and paid for it.',
+    blurb: 'Active members who host sessions, help others and keep SSBCircle safe can become moderators — with a monthly stipend, a MOD badge and direct access to the founding officers.',
+    get noscriptExtra() { return modsNoscript(); },
+    jsonLd: { '@context': 'https://schema.org', '@graph': [crumbs('Moderator Programme', '/moderators'), faqLd(MODS.FAQ)] },
+  },
+];
+
 // ── Route table ────────────────────────────────────────────────────────────
 // noindex routes still get a self-canonical (so they are never reported as a
 // duplicate of the homepage) but are kept out of the sitemap — they are forms
@@ -101,6 +220,7 @@ const STATIC_ROUTES = [
     keepTemplateHead: true,
   },
   GUIDE_ROUTE,
+  ...TOOL_ROUTES,
   {
     path: '/current-affairs',
     title: 'SSB Current Affairs & GD Topics — Explained for Aspirants | SSBCircle',
