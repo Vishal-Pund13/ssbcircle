@@ -5,6 +5,7 @@ import { TAT_DEMOS } from '../data/tatDemo';
 import SiteNav from './SiteNav';
 import { trackEvent } from '../analytics';
 import AiFeedback from './AiFeedback';
+import AiWaitPanel from './AiWaitPanel';
 import { AlertCircle, Clock, Eye, PenLine, Sparkles, ChevronRight, RotateCcw, Quote, User } from 'lucide-react';
 
 // TAT practice, run the way the real test runs: the picture shows for 30
@@ -397,6 +398,14 @@ export default function TatPage() {
             </div>
             {error && (
               <p className="text-xs text-red-600 flex items-start gap-1.5"><AlertCircle className="w-3.5 h-3.5 shrink-0 mt-0.5" /> {error}</p>
+            )}
+            {phase === 'analysing' && (
+              <AiWaitPanel title="Reading your story like an assessor would" steps={[
+                { label: 'Reading your story', at: 0 },
+                { label: 'Looking at your hero, the action and the outcome', at: 6 },
+                { label: 'Spotting the qualities it shows', at: 15 },
+                { label: 'Writing your feedback', at: 26 },
+              ]} />
             )}
           </div>
         )}

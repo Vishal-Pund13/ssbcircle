@@ -33,6 +33,10 @@ const FILTERS = [
 ];
 
 const STATUS_LABEL = ['Not started', 'Read', 'Can speak'];
+const COLLAPSE_KEY = 'ssbc:prep-collapsed';
+const groupKey = (stepId, title) => `${stepId}:${title}`;
+// Which group a topic sits in, so opening it can unfold that group
+const GROUP_OF = Object.fromEntries(STEPS.flatMap(s => s.groups.flatMap(g => g.topics.map(t => [t.id, groupKey(s.id, g.title)]))));
 const LEVEL_DOT = { must: 'bg-red-500', good: 'bg-amber-400', deep: 'bg-sky-400' };
 
 function ProgressBar({ read, spoken, total, className = '' }) {
@@ -275,6 +279,11 @@ export default function PrepPage() {
   const [openStep, setOpenStep] = useState(null);
   const [openTopic, setOpenTopic] = useState(null);
   const [speakTopic, setSpeakTopic] = useState(null);   // topic whose mic panel is open
+  // Groups the aspirant has folded away ("stepId:group title"), kept on this
+  // device so finished groups stay out of the way on the next visit.
+  const [collapsed, setCollapsed] = useState(() => {
+    try { return new Set(JSON.parse(localStorage.getItem(COLLAPSE_KEY)) || []); } catch { return new Set(); }
+  });
   const [serverStt, setServerStt] = useState(false);     // Sarvam speech-to-text available?
   const [dateDraft, setDateDraft] = useState('');
   const errTimer = useRef(null);
@@ -379,7 +388,25 @@ export default function PrepPage() {
     bumpActivity();
   }
 
+  function saveCollapsed(next) {
+    setCollapsed(next);
+    try { localStorage.setItem(COLLAPSE_KEY, JSON.stringify([...next])); } catch { /* private mode */ }
+  }
+  function toggleGroup(key) {
+    const next = new Set(collapsed);
+    next.has(key) ? next.delete(key) : next.add(key);
+    saveCollapsed(next);
+  }
+  function setStepCollapsed(step, fold) {
+    const next = new Set(collapsed);
+    for (const g of step.groups) fold ? next.add(groupKey(step.id, g.title)) : next.delete(groupKey(step.id, g.title));
+    saveCollapsed(next);
+  }
+
   function jumpTo(topic, { speakNow = false } = {}) {
+    // A topic opened from the plan, revision or the home page must be visible
+    const key = GROUP_OF[topic.id];
+    if (key && collapsed.has(key)) { const next = new Set(collapsed); next.delete(key); saveCollapsed(next); }
     if (speakNow) speak(topic.id, true);
     setFilter('all'); setQuery('');
     setOpenStep(topic.stepId);
@@ -829,16 +856,40 @@ export default function PrepPage() {
                   </div>
                   <div id="section-open" className="scroll-mt-28" />
                   <StepCover step={currentStep} index={stepIndex} count={STEPS.length} read={st.read} spoken={st.spoken} total={st.total} />
-                  <div className="mt-6 space-y-7">
+                  {/* Fold away what you have finished; your choice is remembered */}
+                  {(() => {
+                    const keys = currentStep.groups.map(g => groupKey(currentStep.id, g.title));
+                    const allFolded = keys.every(k => collapsed.has(k));
+                    return (
+                      <div className="mt-4 flex items-center justify-between gap-3 px-1">
+                        <p className="text-xs text-gray-500">Tap a group title to hide or show it.</p>
+                        <button type="button" onClick={() => setStepCollapsed(currentStep, !allFolded)}
+                          className="shrink-0 inline-flex items-center gap-1 text-xs font-semibold text-brand-700 hover:text-brand-900 min-h-[32px] cursor-pointer">
+                          <ChevronDown className={`w-3.5 h-3.5 transition-transform ${allFolded ? '' : 'rotate-180'}`} />
+                          {allFolded ? 'Expand all' : 'Collapse all'}
+                        </button>
+                      </div>
+                    );
+                  })()}
+                  <div className="mt-3 space-y-3">
                     {currentStep.groups.map(group => {
                       const gs = group.topics.filter(x => progress[x.id]?.status === 2).length;
+                      const gr = group.topics.filter(x => progress[x.id]?.status === 1).length;
+                      const key = groupKey(currentStep.id, group.title);
+                      const folded = collapsed.has(key);
+                      const done = gs === group.topics.length;
                       return (
-                        <div key={group.title}>
-                          <div className="flex items-baseline justify-between px-2 mb-1.5">
-                            <h3 className="text-base font-bold text-gray-900">{group.title}</h3>
-                            <span className="text-xs text-gray-400 tabular-nums">{gs}/{group.topics.length}</span>
-                          </div>
-                          {renderTopics(group.topics, t)}
+                        <div key={group.title} className={folded ? 'rounded-xl bg-gray-50' : ''}>
+                          <button type="button" onClick={() => toggleGroup(key)} aria-expanded={!folded}
+                            className="w-full flex items-center gap-2 px-2 min-h-[44px] text-left rounded-xl hover:bg-gray-50 cursor-pointer">
+                            <ChevronDown className={`w-4 h-4 text-gray-400 shrink-0 transition-transform ${folded ? '-rotate-90' : ''}`} />
+                            <h3 className="flex-1 text-base font-bold text-gray-900">{group.title}</h3>
+                            {done && <Check className="w-4 h-4 text-emerald-600" strokeWidth={3} aria-label="All done" />}
+                            <span className="text-xs text-gray-400 tabular-nums">
+                              {folded && gr ? `${gr} read · ` : ''}{gs}/{group.topics.length}
+                            </span>
+                          </button>
+                          {!folded && <div className="mt-0.5 mb-3">{renderTopics(group.topics, t)}</div>}
                         </div>
                       );
                     })}
