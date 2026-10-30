@@ -5,7 +5,7 @@ import { useAuth } from '../context/AuthContext';
 import { getPrepProgress } from '../services/api';
 import { STEPS, TOPICS } from '../data/prepSheet';
 import { themeFor } from './prep/stepThemes';
-import { todayIST, addDays, streak } from './prep/plan';
+import { todayIST, addDays, streak } from './prep/dates';
 import Heatmap from './prep/Heatmap';
 import { trackEvent } from '../analytics';
 

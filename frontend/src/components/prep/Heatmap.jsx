@@ -1,4 +1,4 @@
-import { todayIST, addDays } from './plan';
+import { todayIST, addDays } from './dates';
 
 // The streak calendar: one column per week, Monday at the top, the latest week
 // on the right. activity is [{ day: 'YYYY-MM-DD', actions }]. Used on the Prep

@@ -1,24 +1,10 @@
 import { TOPICS } from '../../data/prepSheet';
+import { todayIST, daysBetween, addDays, streak } from './dates';
 
-// Pure helpers behind the prep page: dates in IST, the daily plan, the streak.
-// Dates are 'YYYY-MM-DD' strings throughout, matching what the backend sends.
-
-export function todayIST() {
-  return new Date().toLocaleDateString('en-CA', { timeZone: 'Asia/Kolkata' });
-}
-
-function toUTC(day) {
-  const [y, m, d] = day.split('-').map(Number);
-  return Date.UTC(y, m - 1, d);
-}
-
-export function daysBetween(from, to) {
-  return Math.round((toUTC(to) - toUTC(from)) / 86400000);
-}
-
-export function addDays(day, n) {
-  return new Date(toUTC(day) + n * 86400000).toISOString().slice(0, 10);
-}
+// Pure helpers behind the prep page: the daily plan, revision and the topic of
+// the day. Date helpers and the streak live in dates.js and are re-exported
+// here for the prep page.
+export { todayIST, daysBetween, addDays, streak };
 
 const LEVEL_RANK = { must: 0, good: 1, deep: 2 };
 
@@ -68,16 +54,6 @@ export function dueReviews(progress, today = todayIST()) {
     const p = progress[t.id];
     return p && p.status === 2 && p.review_due && p.review_due <= today;
   });
-}
-
-// Consecutive days with activity, ending today — or yesterday, so the streak
-// does not read zero all morning before you have studied.
-export function streak(activity, today = todayIST()) {
-  const days = new Set(activity.map(a => a.day));
-  let day = days.has(today) ? today : addDays(today, -1);
-  let n = 0;
-  while (days.has(day)) { n++; day = addDays(day, -1); }
-  return n;
 }
 
 // Same topic for everyone on a given day. Personal "Know Yourself" topics and

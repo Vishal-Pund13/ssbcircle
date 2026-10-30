@@ -1,10 +1,11 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { getPiq, getTat } from '../services/api';
+import { getPiq, getTat, getPrepProgress } from '../services/api';
+import { todayIST, addDays, streak } from './prep/dates';
 import { trackEvent } from '../analytics';
 import {
   FileText, PenLine, BookOpen, Radio, ArrowRight, Check, Eye, Users, Mic, Brain,
-  Image as ImageIcon, ListChecks, Lightbulb, Flag, Mountain, MessageCircle, Trophy,
+  Image as ImageIcon, ListChecks, Lightbulb, Flag, Mountain, MessageCircle, Trophy, Flame,
 } from 'lucide-react';
 
 // Two home-page blocks that answer "where do I start?".
@@ -12,7 +13,9 @@ import {
 // PrepPath is a short, ordered path through the tools. For a signed-in
 // aspirant it also shows where they are on it — what they have done and the
 // one thing to do next — so a returning visitor picks up where they left off
-// instead of facing the whole site again.
+// instead of facing the whole site again. The Prep Sheet step is daily: it
+// shows the streak and this week's days, and becomes "next" again each day
+// until that day's practice is done, so the card keeps a reason to come back.
 //
 // SsbStages maps the real SSB (screening, psychology, GTO, interview) to what
 // the site offers for each, so it reads as prep for the whole board, not GD.
@@ -23,11 +26,18 @@ export function PrepPath({ user, liveCount = 0 }) {
   useEffect(() => {
     if (!user) { setStatus({}); return; }
     let cancelled = false;
-    Promise.allSettled([getPiq(), getTat()]).then(([piq, tat]) => {
+    Promise.allSettled([getPiq(), getTat(), getPrepProgress()]).then(([piq, tat, prep]) => {
       if (cancelled) return;
       const p = piq.value || {};
       const filled = p.piq && Object.keys(p.piq).length > 3;
+      const today = todayIST();
+      const activity = prep.value?.activity || [];
+      const active = new Set(activity.map(a => a.day));
       setStatus({
+        prepStreak: streak(activity, today),
+        prepToday: active.has(today),
+        // Monday-to-today of this week, for the little row of squares
+        week: Array.from({ length: 7 }, (_, i) => addDays(today, i - 6)).map(d => active.has(d)),
         piq: p.analysis ? 'Report ready' : filled ? 'Filled — get your report' : null,
         piqDone: !!p.analysis,
         tat: tat.value?.attempts?.length ? `${tat.value.attempts.length} ${tat.value.attempts.length === 1 ? 'story' : 'stories'} written` : null,
@@ -37,14 +47,19 @@ export function PrepPath({ user, liveCount = 0 }) {
     return () => { cancelled = true; };
   }, [user]);
 
+  const streakText = status.prepToday
+    ? `Done today · 🔥 ${status.prepStreak}-day streak`
+    : status.prepStreak ? `🔥 ${status.prepStreak}-day streak — keep it alive today` : status.week ? 'Start your streak today' : null;
   const steps = [
     { to: '/piq',             icon: FileText, title: 'Know yourself',     desc: 'Fill your PIQ and see what your IO will ask', status: status.piq, done: status.piqDone },
     { to: '/tat',             icon: PenLine,  title: 'Write a TAT story', desc: 'See a picture, write in 4 minutes, get feedback', status: status.tat, done: status.tatDone },
+    { to: '/prep',            icon: ListChecks, title: 'Daily Prep Sheet', desc: 'A topic or two a day — build your streak', status: streakText, done: status.prepToday, daily: true },
     { to: '/current-affairs', icon: BookOpen, title: 'Read a news card',  desc: 'Current affairs made simple for GD and PI' },
     { to: '/?tab=live',       icon: Radio,    title: 'Practise live',     desc: 'GD, PPDT and Lecturette with other aspirants', status: liveCount > 0 ? `${liveCount} live now` : null, rooms: true },
   ];
   const next = user ? steps.findIndex(s => !s.done) : 0;
-  const doneCount = steps.filter(s => s.done).length;
+  const doneCount = steps.filter(s => s.done).length;   // PIQ, TAT and today's practice
+  const KEY_STEPS = 3;
 
   function scrollRooms(e) {
     e.preventDefault();
@@ -56,11 +71,11 @@ export function PrepPath({ user, liveCount = 0 }) {
       <div className="flex items-center justify-between gap-3 mb-3">
         <div>
           <p className="text-sm font-bold text-gray-900">{user ? 'Your SSB prep' : 'Your SSB prep path'}</p>
-          <p className="text-xs text-gray-500">{user ? `${doneCount} of 2 key steps done` : 'Four steps. Start with the first.'}</p>
+          <p className="text-xs text-gray-500">{user ? `${doneCount} of ${KEY_STEPS} done today` : 'Five steps. Start with the first.'}</p>
         </div>
         {user && (
           <div className="w-20 h-1.5 bg-gray-100 rounded-full overflow-hidden">
-            <div className="h-full bg-emerald-500 rounded-full transition-all" style={{ width: `${(doneCount / 2) * 100}%` }} />
+            <div className="h-full bg-emerald-500 rounded-full transition-all" style={{ width: `${(doneCount / KEY_STEPS) * 100}%` }} />
           </div>
         )}
       </div>
@@ -83,8 +98,15 @@ export function PrepPath({ user, liveCount = 0 }) {
                     {s.title}
                     {isNext && <span className="text-[10.5px] font-bold uppercase tracking-wider text-brand-700 bg-white border border-brand-200 px-1.5 py-0.5 rounded-full">{user ? 'Next' : 'Start here'}</span>}
                   </p>
-                  <p className="text-xs text-gray-500 truncate">{s.status || s.desc}</p>
+                  <p className={`text-xs truncate ${s.daily && status.prepStreak ? 'text-orange-600 font-medium' : 'text-gray-500'}`}>{s.status || s.desc}</p>
                 </div>
+                {s.daily && status.week && (
+                  <span className="hidden xs:flex gap-[3px] shrink-0" title="Practice this week" aria-hidden="true">
+                    {status.week.map((on, k) => (
+                      <span key={k} className={`w-2 h-2 rounded-[2px] ${on ? 'bg-emerald-500' : 'bg-gray-200'}`} />
+                    ))}
+                  </span>
+                )}
                 <ArrowRight className="w-4 h-4 text-gray-300 group-hover:text-brand-600 shrink-0 transition-colors" />
               </Link>
             </li>
