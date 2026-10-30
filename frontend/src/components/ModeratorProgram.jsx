@@ -151,7 +151,7 @@ export default function ModeratorProgram() {
     <div className="min-h-screen bg-gray-50">
       <SiteNav />
 
-      <CoverBand deco={[Users, BadgeCheck, Award]} />
+      <CoverBand scene="moderators" />
       <header className="max-w-5xl mx-auto px-4 sm:px-6">
         <PageHead icon={ShieldCheck} eyebrow="Moderator Programme" title="Lead the community. Get recognised and paid for it."
           subtitle="Active members who host sessions, help others and keep SSBCircle safe can become moderators — with a monthly stipend, a MOD badge and direct access to the founding officers.">

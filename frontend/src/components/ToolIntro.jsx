@@ -1,5 +1,5 @@
 import { Link, useLocation } from 'react-router-dom';
-import { ArrowRight, Check, FileText, PenLine, ClipboardList, MessageCircleQuestion, UserRound, Image as ImageIcon, Feather, Clock } from 'lucide-react';
+import { ArrowRight, Check, FileText, PenLine } from 'lucide-react';
 import SiteNav from './SiteNav';
 import { CoverBand, PageHead } from './PageCover';
 import { TOOL_INTROS } from '../data/toolIntros';
@@ -9,19 +9,19 @@ import { TOOL_INTROS } from '../data/toolIntros';
 // /tat. Now they get what the tool does and how, with one way in.
 
 const LOOK = {
-  piq: { icon: FileText, deco: [ClipboardList, MessageCircleQuestion, UserRound] },
-  tat: { icon: PenLine,  deco: [ImageIcon, Feather, Clock] },
+  piq: { icon: FileText },
+  tat: { icon: PenLine },
 };
 
 export default function ToolIntro({ tool }) {
   const location = useLocation();
   const t = TOOL_INTROS[tool];
-  const { icon, deco } = LOOK[tool];
+  const { icon } = LOOK[tool];
 
   return (
     <div className="min-h-screen bg-gray-50">
       <SiteNav />
-      <CoverBand deco={deco} />
+      <CoverBand scene={tool} />
 
       <main className="max-w-3xl mx-auto px-4 sm:px-6 pb-12 space-y-6">
         <PageHead icon={icon} eyebrow={t.eyebrow} title={t.title} subtitle={t.subtitle}>

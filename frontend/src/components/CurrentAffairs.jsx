@@ -500,7 +500,7 @@ export default function CurrentAffairs() {
       ) : (
         <>
           {/* Page header */}
-          <CoverBand deco={[Landmark, TrendingUp, Shield]} />
+          <CoverBand scene="news" />
           <section className="border-b border-gray-100 px-4 sm:px-6 pb-8">
             <div className="max-w-5xl mx-auto">
               <PageHead icon={BookOpen} title="News Cards"

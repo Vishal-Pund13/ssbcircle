@@ -1,6 +1,6 @@
 import { useState, useEffect, useMemo } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
-import { CalendarDays, ArrowRight, ExternalLink, CheckCircle2, Clock, Megaphone, FileCheck, UserCheck, Hourglass, XCircle, ChevronDown, Info, GraduationCap, Bell } from 'lucide-react';
+import { CalendarDays, ArrowRight, ExternalLink, CheckCircle2, Clock, Megaphone, FileCheck, UserCheck, Hourglass, XCircle, ChevronDown, Info } from 'lucide-react';
 import SiteNav from './SiteNav';
 import { useAuth } from '../context/AuthContext';
 import { getPiq } from '../services/api';
@@ -509,7 +509,7 @@ export default function ExamCalendarPage() {
     <div className="min-h-screen bg-gray-50">
       <SiteNav />
 
-      <CoverBand deco={[GraduationCap, Bell, Clock]} />
+      <CoverBand scene="exams" />
 
       <main className="max-w-3xl mx-auto px-4 sm:px-6 pb-10 space-y-5">
         <PageHead icon={CalendarDays} eyebrow="Exams & eligibility" title="Your way into the armed forces"

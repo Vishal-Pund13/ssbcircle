@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { getPiq, savePiq, deletePiq, analyzePiq } from '../services/api';
 import { SAMPLE_PIQ } from '../data/samplePiq';
-import { Check, AlertCircle, Trash2, Lock, Plus, X, Sparkles, ChevronDown, Lightbulb, Eye, Heart, FileText, ClipboardList, MessageCircleQuestion, UserRound } from 'lucide-react';
+import { Check, AlertCircle, Trash2, Lock, Plus, X, Sparkles, ChevronDown, Lightbulb, Eye, Heart, FileText } from 'lucide-react';
 import PiqPdfButton from './PiqPdfButton';
 import AiWaitPanel from './AiWaitPanel';
 import { SoldierLoader } from './SoldierRunner';
@@ -458,7 +458,7 @@ export default function PiqPage() {
         </div>
       </div>
 
-      <CoverBand deco={[ClipboardList, MessageCircleQuestion, UserRound]} />
+      <CoverBand scene="piq" />
 
       <form onSubmit={save} className="max-w-3xl mx-auto px-4 sm:px-6 pb-7 space-y-4">
 

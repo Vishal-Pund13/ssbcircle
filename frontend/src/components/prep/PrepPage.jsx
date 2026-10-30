@@ -531,7 +531,7 @@ export default function PrepPage() {
       <SiteNav />
 
       {/* ── Page cover ── */}
-      <CoverBand deco={[BookOpen, Mic, Target]} />
+      <CoverBand scene="prep" />
 
       <div className="max-w-6xl mx-auto px-4 sm:px-6 pb-16">
         <PageHead icon={ListChecks} title="SSB Prep Sheet"

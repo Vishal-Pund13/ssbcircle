@@ -6,7 +6,7 @@ import SiteNav from './SiteNav';
 import { trackEvent } from '../analytics';
 import AiFeedback from './AiFeedback';
 import AiWaitPanel from './AiWaitPanel';
-import { AlertCircle, Clock, Eye, PenLine, Sparkles, ChevronRight, RotateCcw, Quote, User, Image as ImageIcon, Feather } from 'lucide-react';
+import { AlertCircle, Clock, Eye, PenLine, Sparkles, ChevronRight, RotateCcw, Quote, User } from 'lucide-react';
 import { CoverBand, PageHead } from './PageCover';
 
 // TAT practice, run the way the real test runs: the picture shows for 30
@@ -311,7 +311,7 @@ export default function TatPage() {
     <div className="min-h-screen bg-gray-50">
       <SiteNav />
 
-      {phase === 'intro' && <CoverBand deco={[ImageIcon, Feather, Clock]} />}
+      {phase === 'intro' && <CoverBand scene="tat" />}
 
       <main className={`max-w-3xl mx-auto px-4 sm:px-6 ${phase === 'intro' ? 'pb-7' : 'py-7'} space-y-5`}>
 

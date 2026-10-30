@@ -1,23 +1,28 @@
 import Hello from './Hello';
+import { SCENES } from './coverScenes';
 
-// The header every tool page shares: a soft tinted band with a few faint
-// icons, then the page's icon on a white tile overlapping it, the greeting,
-// the title and one line on what the page is for. Pages keep their own width,
-// so the band and the head are separate pieces:
+// The header every tool page shares: a soft tinted band with a small
+// illustration of the page's subject (coverScenes.jsx), then the page's icon
+// on a white tile overlapping it, the greeting, the title and one line on what
+// the page is for. Pages keep their own width, so the band and the head are
+// separate pieces:
 //
-//   <CoverBand deco={[BookOpen, Mic, Target]} />
+//   <CoverBand scene="prep" />
 //   <div className="max-w-6xl mx-auto px-4 sm:px-6">
 //     <PageHead icon={ListChecks} title="SSB Prep Sheet" subtitle="…" />
 //   </div>
 
-export function CoverBand({ deco = [] }) {
-  const [A, B, C] = deco;
+export function CoverBand({ scene }) {
+  const Scene = SCENES[scene];
   return (
-    <div className="relative h-20 sm:h-36 bg-gradient-to-r from-brand-50 via-slate-50 to-indigo-50 border-b border-gray-100 overflow-hidden">
-      <div className="absolute right-6 sm:right-24 top-4 flex gap-6 opacity-[0.12] text-brand-600" aria-hidden="true">
-        {A && <A className="w-14 h-14 -rotate-6" strokeWidth={1.25} />}
-        {B && <B className="w-10 h-10 mt-8 rotate-12" strokeWidth={1.25} />}
-        {C && <C className="w-12 h-12 mt-2" strokeWidth={1.25} />}
+    <div className="h-[88px] sm:h-28 bg-gradient-to-r from-brand-50 via-slate-50 to-indigo-50 border-b border-gray-100 overflow-hidden">
+      <div className="relative max-w-6xl mx-auto h-full">
+        {Scene && (
+          <svg viewBox="0 0 520 160" preserveAspectRatio="xMaxYMax meet" aria-hidden="true"
+            className="absolute right-0 bottom-0 h-full" style={{ aspectRatio: '13 / 4' }}>
+            <Scene />
+          </svg>
+        )}
       </div>
     </div>
   );
@@ -26,7 +31,7 @@ export function CoverBand({ deco = [] }) {
 export function PageHead({ icon: Icon, eyebrow, title, subtitle, children }) {
   return (
     <div>
-      <div className="-mt-7 sm:-mt-10 relative">
+      <div className="-mt-7 sm:-mt-9 relative">
         <span className="w-14 h-14 sm:w-20 sm:h-20 rounded-2xl bg-white shadow-lg border border-gray-100 flex items-center justify-center">
           <Icon className="w-7 h-7 sm:w-10 sm:h-10 text-brand-600" />
         </span>

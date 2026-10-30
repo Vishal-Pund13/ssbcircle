@@ -248,7 +248,7 @@ export default function CommunityPage() {
 
       {/* Community banner */}
       <div className="bg-white border-b border-gray-200">
-        <CoverBand deco={[MessageSquare, Users, PenLine]} />
+        <CoverBand scene="community" />
         <div className="max-w-6xl mx-auto px-4 sm:px-6 pb-4">
           {/* Only the badge overlaps the cover; the title stays on white */}
           <div className="flex items-end gap-4">

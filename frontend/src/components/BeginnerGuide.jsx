@@ -489,7 +489,7 @@ export default function BeginnerGuide() {
       <SiteNav />
 
       {/* Hero — the dream, then every part of the page one tap away */}
-      <CoverBand deco={[Shield, Anchor, Plane]} />
+      <CoverBand scene="guide" />
       <header className="px-4 sm:px-6 pb-8">
         <div className="max-w-5xl mx-auto">
           <PageHead icon={Compass} eyebrow="Indian Army · Indian Navy · Indian Air Force"
