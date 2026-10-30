@@ -132,7 +132,7 @@ function StepCover({ step, index, count, read, spoken, total }) {
   const [A, B, C] = t.deco;
   const pct = total ? Math.round((spoken / total) * 100) : 0;
   return (
-    <div className={`relative overflow-hidden rounded-2xl bg-gradient-to-br ${t.cover} text-white px-5 sm:px-7 py-6 sm:py-7`}>
+    <div className={`relative overflow-hidden rounded-2xl bg-gradient-to-br ${t.cover} text-white px-5 sm:px-7 py-5 sm:py-7`}>
       <div className="absolute inset-0 opacity-[0.12] pointer-events-none"
         style={{ backgroundImage: 'radial-gradient(circle, #fff 1px, transparent 1px)', backgroundSize: '18px 18px' }} />
       <div className="absolute inset-y-0 right-0 w-1/2 pointer-events-none hidden sm:block" aria-hidden="true">
@@ -171,47 +171,56 @@ function TopicRow({ topic, p, open, speaking, serverStt, theme, onToggle, onStat
 
   return (
     <li id={`topic-${topic.id}`} className="scroll-mt-20">
-      <div className={`group flex items-center gap-2.5 sm:gap-3 px-2 sm:px-3 py-2.5 rounded-xl transition-colors ${open ? 'bg-gray-50' : 'hover:bg-gray-50'}`}>
-        {/* Checkbox: ticks "Read". Filled green once you can speak on it. */}
+      <div className={`group flex items-start gap-2 sm:gap-3 px-1 sm:px-3 py-2 rounded-xl transition-colors ${open ? 'bg-gray-50' : 'hover:bg-gray-50'}`}>
+        {/* Checkbox: ticks "Read". Filled green once you can speak on it. The
+            padding gives a thumb-sized target around a small box. */}
         <button type="button" onClick={() => onStatus(status >= 1 ? 0 : 1)}
           title={status >= 1 ? 'Mark as not started' : 'Mark as read'} aria-label={STATUS_LABEL[status]}
-          className={`w-[18px] h-[18px] rounded-[5px] border-2 flex items-center justify-center shrink-0 cursor-pointer transition-colors ${status === 2
+          className="p-2 -m-0.5 shrink-0 cursor-pointer">
+          <span className={`w-5 h-5 rounded-[6px] border-2 flex items-center justify-center transition-colors ${status === 2
             ? 'bg-emerald-500 border-emerald-500' : status === 1 ? 'bg-emerald-100 border-emerald-400' : 'border-gray-300 hover:border-gray-400 bg-white'}`}>
-          {status >= 1 && <Check className={`w-3 h-3 ${status === 2 ? 'text-white' : 'text-emerald-600'}`} strokeWidth={3} />}
+            {status >= 1 && <Check className={`w-3.5 h-3.5 ${status === 2 ? 'text-white' : 'text-emerald-600'}`} strokeWidth={3} />}
+          </span>
         </button>
 
-        <button type="button" onClick={onToggle} className="flex-1 min-w-0 text-left flex items-center gap-2 cursor-pointer">
-          <span className={`text-[15px] leading-snug ${status === 2 ? 'text-gray-400 line-through decoration-gray-300' : 'text-gray-800'}`}>
+        <button type="button" onClick={onToggle} aria-expanded={open} className="flex-1 min-w-0 text-left cursor-pointer py-1.5">
+          <span className={`block text-[15px] leading-snug ${status === 2 ? 'text-gray-400 line-through decoration-gray-300' : 'text-gray-900 font-medium'}`}>
             {topic.title}
           </span>
-          {p?.note && <StickyNote className="w-3.5 h-3.5 text-amber-400 shrink-0" />}
+          <span className="mt-1 flex flex-wrap items-center gap-x-2 gap-y-0.5 text-xs text-gray-500">
+            <span className="inline-flex items-center gap-1"><span className={`w-1.5 h-1.5 rounded-full ${LEVEL_DOT[topic.level]}`} />{LEVELS[topic.level].label}</span>
+            <span className="text-gray-300">·</span>
+            <span>{ANSWER[answerOf(topic)].label}</span>
+            {p?.note && <StickyNote className="w-3.5 h-3.5 text-amber-400" aria-label="Has notes" />}
+            {p?.starred && <Star className="sm:hidden w-3.5 h-3.5 fill-amber-400 text-amber-400" aria-label="Starred" />}
+          </span>
         </button>
 
-        <span className="hidden lg:flex gap-1 shrink-0">
+        <span className="hidden lg:flex gap-1 shrink-0 mt-2">
           {topic.tests.map(t => (
             <span key={t} className="text-[11px] text-gray-500 bg-gray-100 rounded px-1.5 py-0.5">{t}</span>
           ))}
         </span>
-        <LevelDot level={topic.level} />
 
         <button type="button" onClick={() => (status === 2 ? onStatus(1) : onSpeak(true))}
           title={status === 2 ? 'You can speak on this. Click to move back to read.' : `Answer out loud (${ANSWER[answerOf(topic)].label.toLowerCase()}) and get feedback`}
-          className={`shrink-0 inline-flex items-center gap-1 text-[12px] font-semibold px-2 py-1 rounded-full border cursor-pointer transition-colors ${status === 2
-            ? 'bg-emerald-500 border-emerald-500 text-white' : 'border-gray-200 text-gray-500 hover:border-brand-300 hover:text-brand-700 bg-white'}`}>
-          <Mic className="w-3 h-3" /> <span className="hidden sm:inline">{status === 2 ? 'Can speak' : 'Speak'}</span>
+          aria-label={status === 2 ? 'Can speak' : 'Speak your answer'}
+          className={`shrink-0 mt-1 inline-flex items-center justify-center gap-1 w-10 h-10 sm:w-auto sm:h-auto sm:px-2.5 sm:py-1 text-[12px] font-semibold rounded-full border cursor-pointer transition-colors ${status === 2
+            ? 'bg-emerald-500 border-emerald-500 text-white' : 'border-gray-200 text-gray-600 hover:border-brand-300 hover:text-brand-700 bg-white'}`}>
+          <Mic className="w-4 h-4 sm:w-3 sm:h-3" /> <span className="hidden sm:inline">{status === 2 ? 'Can speak' : 'Speak'}</span>
         </button>
 
         <button type="button" onClick={onStar} title={p?.starred ? 'Unstar' : 'Star for revision'}
-          className={`shrink-0 cursor-pointer ${p?.starred ? '' : 'sm:opacity-0 sm:group-hover:opacity-100 transition-opacity'}`}>
+          className={`hidden sm:inline-flex shrink-0 mt-2 cursor-pointer ${p?.starred ? '' : 'sm:opacity-0 sm:group-hover:opacity-100 transition-opacity'}`}>
           <Star className={`w-4 h-4 ${p?.starred ? 'fill-amber-400 text-amber-400' : 'text-gray-300 hover:text-amber-400'}`} />
         </button>
-        <button type="button" onClick={onToggle} className="shrink-0 cursor-pointer" aria-label="Open topic">
+        <button type="button" onClick={onToggle} className="hidden sm:inline-flex shrink-0 mt-2 cursor-pointer" aria-label="Open topic">
           <ChevronRight className={`w-4 h-4 text-gray-400 transition-transform ${open ? 'rotate-90' : ''}`} />
         </button>
       </div>
 
       {open && (
-        <div className="ml-[19px] sm:ml-[21px] pl-5 sm:pl-6 border-l-2 border-gray-100 pb-5 pt-2 mb-2">
+        <div className="sm:ml-[21px] px-1 sm:pl-6 sm:border-l-2 border-gray-100 pb-5 pt-2 mb-2">
           <ul className="space-y-1.5">
             {topic.points.map((pt, i) => (
               <li key={i} className="text-base text-gray-700 leading-relaxed flex gap-2.5">
@@ -256,6 +265,12 @@ function TopicRow({ topic, p, open, speaking, serverStt, theme, onToggle, onStat
           )}
 
           {p?.attempt && !speaking && <LastAttempt attempt={p.attempt} />}
+
+          <button type="button" onClick={onStar}
+            className="sm:hidden mt-4 inline-flex items-center gap-2 text-sm font-semibold text-gray-700 border border-gray-200 rounded-full px-4 min-h-[40px] cursor-pointer">
+            <Star className={`w-4 h-4 ${p?.starred ? 'fill-amber-400 text-amber-400' : 'text-gray-400'}`} />
+            {p?.starred ? 'Starred for revision' : 'Star for revision'}
+          </button>
 
           <label className="block mt-4">
             <span className="text-xs font-semibold text-gray-500 flex items-center gap-1.5"><StickyNote className="w-3.5 h-3.5 text-amber-400" /> Your notes</span>
@@ -451,7 +466,7 @@ export default function PrepPage() {
   }
 
   const renderTopics = (topics, theme) => (
-    <ul className="space-y-0.5">
+    <ul className="divide-y divide-gray-50 sm:divide-y-0 sm:space-y-0.5">
       {topics.map(t => {
         const topic = TOPIC_BY_ID[t.id];
         return (
@@ -475,7 +490,7 @@ export default function PrepPage() {
       <SiteNav />
 
       {/* ── Page cover ── */}
-      <div className="relative h-28 sm:h-36 bg-gradient-to-r from-brand-700 via-brand-600 to-indigo-500 overflow-hidden">
+      <div className="relative h-20 sm:h-36 bg-gradient-to-r from-brand-700 via-brand-600 to-indigo-500 overflow-hidden">
         <div className="absolute inset-0 opacity-[0.12]"
           style={{ backgroundImage: 'radial-gradient(circle, #fff 1px, transparent 1px)', backgroundSize: '20px 20px' }} />
         <div className="absolute right-6 sm:right-24 top-4 flex gap-6 opacity-20 text-white" aria-hidden="true">
@@ -486,22 +501,40 @@ export default function PrepPage() {
       </div>
 
       <div className="max-w-6xl mx-auto px-4 sm:px-6 pb-16">
-        <div className="-mt-9 sm:-mt-10 relative">
-          <span className="w-16 h-16 sm:w-20 sm:h-20 rounded-2xl bg-white shadow-lg border border-gray-100 flex items-center justify-center">
-            <ListChecks className="w-8 h-8 sm:w-10 sm:h-10 text-brand-600" />
+        <div className="-mt-7 sm:-mt-10 relative">
+          <span className="w-14 h-14 sm:w-20 sm:h-20 rounded-2xl bg-white shadow-lg border border-gray-100 flex items-center justify-center">
+            <ListChecks className="w-7 h-7 sm:w-10 sm:h-10 text-brand-600" />
           </span>
         </div>
-        <h1 className="mt-4 text-3xl sm:text-4xl font-bold text-gray-900 tracking-tight">SSB Prep Sheet</h1>
-        <p className="mt-2 text-[15px] text-gray-500 max-w-2xl leading-relaxed">
-          {TOPICS.length} topics in {STEPS.length} sections, in the order worth learning them. Tick a topic when you have read it.
-          It is <span className="font-semibold text-gray-700">done when you can answer it out loud without notes</span>.
+        <h1 className="mt-3 sm:mt-4 text-2xl sm:text-4xl font-bold text-gray-900 tracking-tight">SSB Prep Sheet</h1>
+        <p className="mt-1.5 text-sm sm:text-[15px] text-gray-500 max-w-2xl leading-relaxed">
+          {TOPICS.length} topics in {STEPS.length} sections, in the order worth learning them.
         </p>
+
+        {/* Why the sheet exists — the one thing to take away before the list */}
+        <div className="mt-4 max-w-3xl rounded-2xl border border-brand-100 bg-brand-50/70 p-4 sm:p-5 flex gap-3">
+          <span className="w-9 h-9 rounded-xl bg-white text-brand-600 flex items-center justify-center shrink-0"><Lightbulb className="w-5 h-5" /></span>
+          <div>
+            <p className="text-[15px] font-bold text-gray-900">You need to know a little about everything here</p>
+            <p className="mt-1 text-sm text-gray-700 leading-relaxed">
+              Any of these can come up in your interview, GD or lecturette. You do not have to be an expert — but know the basics
+              of each topic and <span className="font-semibold">have your own opinion</span> on it. That is what lets you speak with
+              confidence on any front at the SSB.
+            </p>
+            <p className="mt-2 text-sm text-gray-700 leading-relaxed">
+              Tick a topic when you have read it. It is <span className="font-semibold">done when you can answer it out loud without notes</span>.
+            </p>
+          </div>
+        </div>
+
         <div className="mt-3 flex flex-wrap items-center gap-x-4 gap-y-1.5 text-xs text-gray-500">
           <span className="inline-flex items-center gap-1.5"><span className="w-[14px] h-[14px] rounded-[4px] bg-emerald-100 border-2 border-emerald-400" /> Read</span>
           <span className="inline-flex items-center gap-1.5"><span className="w-[14px] h-[14px] rounded-[4px] bg-emerald-500" /> Can speak</span>
-          {['must', 'good', 'deep'].map(l => (
-            <span key={l} className="inline-flex items-center gap-1.5"><span className={`w-2 h-2 rounded-full ${LEVEL_DOT[l]}`} /> {LEVELS[l].label}</span>
-          ))}
+          <span className="hidden sm:contents">
+            {['must', 'good', 'deep'].map(l => (
+              <span key={l} className="inline-flex items-center gap-1.5"><span className={`w-2 h-2 rounded-full ${LEVEL_DOT[l]}`} /> {LEVELS[l].label}</span>
+            ))}
+          </span>
         </div>
 
         {error && (
@@ -524,7 +557,7 @@ export default function PrepPage() {
         )}
 
         {/* ── Dashboard ── */}
-        <div className="mt-6 grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div className={`mt-5 sm:mt-6 ${user ? 'm-rail md:grid-cols-3' : 'grid grid-cols-1'} md:gap-4`}>
           {user && (
             <section className="bg-white border border-gray-200 rounded-2xl p-5 flex items-center gap-4">
               <div className="relative">
@@ -712,14 +745,14 @@ export default function PrepPage() {
 
           <div className="min-w-0">
             {/* Section chips on smaller screens */}
-            <div className="lg:hidden -mx-4 px-4 mb-4 flex gap-2 overflow-x-auto pb-1">
+            <div className="lg:hidden sticky top-14 z-20 -mx-4 px-4 py-2 mb-3 bg-white/95 backdrop-blur border-b border-gray-100 flex gap-2 overflow-x-auto scrollbar-hide">
               {STEPS.map(step => {
                 const t = themeFor(step.id);
                 const Icon = t.icon;
                 const active = !narrowing && step.id === currentStep.id;
                 return (
-                  <button key={step.id} type="button" onClick={() => { setFilter('all'); setQuery(''); selectStep(step.id); }}
-                    className={`shrink-0 inline-flex items-center gap-1.5 text-xs font-semibold px-3 py-2 rounded-full border cursor-pointer ${active
+                  <button key={step.id} type="button" data-step={step.id} onClick={() => { setFilter('all'); setQuery(''); selectStep(step.id); }}
+                    className={`shrink-0 inline-flex items-center gap-1.5 text-xs font-semibold px-3 min-h-[36px] rounded-full border cursor-pointer ${active
                       ? 'bg-gray-900 border-gray-900 text-white' : 'bg-white border-gray-200 text-gray-600'}`}>
                     <Icon className="w-3.5 h-3.5" /> {step.title}
                   </button>
@@ -739,10 +772,10 @@ export default function PrepPage() {
                   </button>
                 )}
               </div>
-              <div className="flex gap-1.5 overflow-x-auto">
+              <div className="flex gap-1.5 overflow-x-auto scrollbar-hide">
                 {FILTERS.map(f => (
                   <button key={f.id} type="button" onClick={() => setFilter(f.id)}
-                    className={`shrink-0 text-xs font-semibold px-3 py-2 rounded-lg cursor-pointer ${filter === f.id ? 'bg-gray-900 text-white' : 'text-gray-600 hover:bg-gray-100'}`}>
+                    className={`shrink-0 text-xs font-semibold px-3 min-h-[36px] rounded-lg cursor-pointer ${filter === f.id ? 'bg-gray-900 text-white' : 'text-gray-600 hover:bg-gray-100'}`}>
                     {f.label}
                   </button>
                 ))}
