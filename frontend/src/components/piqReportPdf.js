@@ -22,6 +22,19 @@ const MUTED = '#6b7280';
 
 const s = v => String(v ?? '');
 
+// An empty square to tick with a pen, beside one thing to work on. The report
+// is meant to be printed and used as a blueprint, so every point that needs
+// work gets one.
+function checkRow(body, { size = 9, top = 2, gap = 6, margin = [0, 0, 0, 4] } = {}) {
+  return {
+    columns: [
+      { width: size + gap, canvas: [{ type: 'rect', x: 0, y: top, w: size, h: size, r: 1.5, lineWidth: 0.9, lineColor: '#6b7280' }] },
+      { width: '*', stack: Array.isArray(body) ? body : [body] },
+    ],
+    columnGap: 0, margin,
+  };
+}
+
 function docDefinition(analysis, name, analysedAt) {
   const content = [];
   const lead = analysis.leadership;
@@ -32,6 +45,18 @@ function docDefinition(analysis, name, analysedAt) {
   );
   if (analysedAt) content.push({ text: `Analysed ${new Date(analysedAt).toLocaleString('en-IN')}`, style: 'muted' });
   content.push({ canvas: [{ type: 'line', x1: 0, y1: 4, x2: 515, y2: 4, lineWidth: 1.5, lineColor: BRAND }], margin: [0, 0, 0, 10] });
+
+  content.push({
+    table: { widths: ['*'], body: [[{
+      stack: [
+        { text: 'Serious about your SSB? Make this your blueprint.', bold: true, color: '#92400e' },
+        { text: 'Print this report and keep it where you prepare. Tick each box as you work on a point, come back to it every week, and keep improving your weak areas until every box is ticked.', color: '#78350f', fontSize: 9.5, margin: [0, 2, 0, 0] },
+      ],
+      fillColor: '#fffbeb', margin: [8, 6, 8, 6],
+    }]] },
+    layout: { hLineColor: () => '#fde68a', vLineColor: () => '#fde68a' },
+    margin: [0, 0, 0, 10],
+  });
 
   if (analysis.summary) {
     content.push({
@@ -52,7 +77,7 @@ function docDefinition(analysis, name, analysedAt) {
         stack: [
           { text: [{ text: label, bold: true }, { text: `  ${hint}`, color: MUTED, fontSize: 9 }] },
           { text: s(lead[k].seen), margin: [0, 2, 0, 0] },
-          { text: [{ text: 'Grow it: ', bold: true }, s(lead[k].grow)], color: BRAND, margin: [0, 2, 0, 0] },
+          { ...checkRow({ text: [{ text: 'Grow it: ', bold: true }, s(lead[k].grow)], color: BRAND }), margin: [0, 3, 0, 0] },
         ],
       });
     }
@@ -67,14 +92,19 @@ function docDefinition(analysis, name, analysedAt) {
   }
 
   if (analysis.likely_questions?.length) {
-    content.push({ text: 'Questions you are likely to get', style: 'h2' });
-    content.push({ text: 'An IO often asks many questions in one go. Spot the group and answer each part truthfully.', style: 'note' });
+    // The heading travels with the first group, so it is never left alone at
+    // the bottom of a page
+    const heading = [
+      { text: 'Questions you are likely to get', style: 'h2' },
+      { text: 'An IO often asks many questions in one go. Spot the group and answer each part truthfully. Tick a question once you can answer it out loud.', style: 'note' },
+    ];
     analysis.likely_questions.forEach((g, i) => {
       content.push({
         unbreakable: (g.questions || []).length <= 8, margin: [0, 0, 0, 8],
         stack: [
+          ...(i === 0 ? heading : []),
           { text: `${i + 1}. ${s(g.area)}`, style: 'h3' },
-          { ul: (g.questions || []).map(s) },
+          ...(g.questions || []).map(q => checkRow({ text: s(q) }, { margin: [0, 0, 0, 3] })),
           g.tip ? { text: [{ text: 'How to answer: ', bold: true }, s(g.tip)], style: 'small', margin: [0, 3, 0, 0] } : null,
         ].filter(Boolean),
       });
@@ -83,22 +113,25 @@ function docDefinition(analysis, name, analysedAt) {
 
   if (analysis.gaps?.length) {
     content.push({ text: 'Where the IO will press you', style: 'h2' });
+    content.push({ text: 'Your weak areas. Tick each one when you have worked on it.', style: 'note' });
     for (const g of analysis.gaps) {
       content.push({
-        unbreakable: true, margin: [0, 0, 0, 8],
-        stack: [
+        unbreakable: true,
+        ...checkRow([
           { text: s(g.issue), bold: true },
           g.why ? { text: s(g.why), style: 'small', color: MUTED } : null,
           g.fix ? { text: `Do this: ${s(g.fix)}`, style: 'small', color: BRAND } : null,
-        ].filter(Boolean),
+        ].filter(Boolean), { size: 10, top: 1.5, margin: [0, 0, 0, 8] }),
       });
     }
   }
 
   if (analysis.practice?.length) {
     content.push({ text: 'Practice for the coming days', style: 'h2' });
-    content.push({ text: 'Small exercises built on your own life. Do them daily.', style: 'note' });
-    content.push({ ol: analysis.practice.map(p => ({ stack: [{ text: s(p.title), bold: true }, { text: s(p.task), style: 'small' }], margin: [0, 0, 0, 4] })) });
+    content.push({ text: 'Small exercises built on your own life. Do them daily, and tick each once it has become a habit.', style: 'note' });
+    for (const [i, p] of analysis.practice.entries()) {
+      content.push(checkRow([{ text: `${i + 1}. ${s(p.title)}`, bold: true }, { text: s(p.task), style: 'small' }], { size: 10, top: 1.5, margin: [0, 0, 0, 6] }));
+    }
   }
 
   content.push({
