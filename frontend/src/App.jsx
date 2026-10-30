@@ -33,6 +33,7 @@ import { AuthProvider, useAuth } from './context/AuthContext';
 import ProtectedRoute from './components/ProtectedRoute';
 import LandingPage from './components/LandingPage';
 import MobileTabBar from './components/MobileTabBar';
+import AnnouncementPoster from './components/AnnouncementPoster';
 
 // Heavy routes loaded on demand — keeps initial bundle small
 const LoginPage           = lazy(() => import('./components/LoginPage'));
@@ -105,6 +106,7 @@ export default function App() {
             <Route path="*" element={<Navigate to="/" replace />} />
           </Routes>
           <MobileTabBar />
+          <AnnouncementPoster />
         </Suspense>
       </BrowserRouter>
     </AuthProvider>
