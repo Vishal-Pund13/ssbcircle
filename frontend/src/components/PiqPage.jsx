@@ -2,8 +2,8 @@ import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { getPiq, savePiq, deletePiq, analyzePiq } from '../services/api';
 import { SAMPLE_PIQ } from '../data/samplePiq';
-import { Check, AlertCircle, Trash2, Lock, Plus, X, Sparkles, Download, ChevronDown, Lightbulb, Eye, Heart } from 'lucide-react';
-import { downloadPiqReport } from './piqReportPdf';
+import { Check, AlertCircle, Trash2, Lock, Plus, X, Sparkles, ChevronDown, Lightbulb, Eye, Heart } from 'lucide-react';
+import PiqPdfButton from './PiqPdfButton';
 import { trackEvent } from '../analytics';
 import AiFeedback from './AiFeedback';
 
@@ -182,10 +182,9 @@ function AnalysisReport({ analysis, analysedAt, name }) {
             <h2 className="mt-1 text-xl font-bold leading-tight">{name ? `${name}, here is how your PIQ reads` : 'Here is how your PIQ reads'}</h2>
             {analysedAt && <p className="text-xs text-brand-100 mt-1">Analysed {new Date(analysedAt).toLocaleString('en-IN')}</p>}
           </div>
-          <button type="button" onClick={() => { downloadPiqReport(analysis, { name, analysedAt }); trackEvent('piq_pdf'); }}
-            className="shrink-0 inline-flex items-center gap-1.5 text-xs font-semibold text-brand-700 bg-white hover:bg-brand-50 px-3 py-2 rounded-lg cursor-pointer transition-colors">
-            <Download className="w-3.5 h-3.5" /> PDF
-          </button>
+          <div className="shrink-0 text-right">
+            <PiqPdfButton analysis={analysis} name={name} analysedAt={analysedAt} />
+          </div>
         </div>
         <div className="mt-4 flex flex-wrap gap-1.5">
           {sections.map((s, i) => (

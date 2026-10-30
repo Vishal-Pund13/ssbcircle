@@ -1,16 +1,15 @@
-// Turns a PIQ report into a print-ready page and opens the browser's print
-// dialog, where "Save as PDF" gives the aspirant a file.
+// Builds the PIQ report as a real PDF file in the browser, and hands it to the
+// aspirant in the way their device handles best.
 //
-// Printing beats drawing the report onto a canvas: the text stays sharp and
-// selectable, pages break cleanly, and there is no PDF library to ship. The
-// page is built in a hidden iframe so popup blockers never get involved.
+// The first version opened the browser's print dialog from a hidden iframe and
+// relied on "Save as PDF". That never worked on iPhones: iOS Safari does not
+// print a hidden frame, blocks print() that is not directly tied to a tap, and
+// the in-app browsers of WhatsApp and Instagram — where many aspirants open our
+// links — have no print at all. A generated file works everywhere.
 //
-// The ssbcircle.com watermark is position: fixed, which browsers repeat on
-// every printed page.
-
-const esc = v => String(v ?? '')
-  .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
-  .replace(/"/g, '&quot;');
+// pdfmake keeps the text sharp and selectable, breaks pages on its own and
+// draws the ssbcircle.com watermark on every page. It is about 1 MB with its
+// font, so it is loaded only when someone asks for a PDF.
 
 const LEADERSHIP = [
   ['understanding', 'Understanding', 'Seeing a situation fully, from all sides'],
@@ -18,129 +17,159 @@ const LEADERSHIP = [
   ['solutions',     'Solutions',     'Bringing your own ideas to change things'],
 ];
 
-function body(analysis, name, analysedAt) {
-  const parts = [];
+const BRAND = '#1e3a5f';
+const MUTED = '#6b7280';
+
+const s = v => String(v ?? '');
+
+function docDefinition(analysis, name, analysedAt) {
+  const content = [];
   const lead = analysis.leadership;
 
-  parts.push(`
-    <header>
-      <div class="brand">SSBCircle</div>
-      <h1>PIQ Report${name ? ` — ${esc(name)}` : ''}</h1>
-      ${analysedAt ? `<p class="muted">Analysed ${esc(new Date(analysedAt).toLocaleString('en-IN'))}</p>` : ''}
-    </header>`);
+  content.push(
+    { text: 'SSBCIRCLE', style: 'brand' },
+    { text: `PIQ Report${name ? ` — ${s(name)}` : ''}`, style: 'title' },
+  );
+  if (analysedAt) content.push({ text: `Analysed ${new Date(analysedAt).toLocaleString('en-IN')}`, style: 'muted' });
+  content.push({ canvas: [{ type: 'line', x1: 0, y1: 4, x2: 515, y2: 4, lineWidth: 1.5, lineColor: BRAND }], margin: [0, 0, 0, 10] });
 
   if (analysis.summary) {
-    parts.push(`<section class="box"><h3>What an IO will see first</h3><p>${esc(analysis.summary)}</p></section>`);
+    content.push({
+      table: { widths: ['*'], body: [[{
+        stack: [{ text: 'What an IO will see first', style: 'h3' }, { text: s(analysis.summary) }],
+        fillColor: '#eef2ff', margin: [8, 6, 8, 6],
+      }]] },
+      layout: { hLineColor: () => '#e0e7ff', vLineColor: () => '#e0e7ff' },
+    });
   }
 
   if (lead) {
-    parts.push(`<section><h2>Your leadership check</h2>
-      <p class="note">A leader understands a situation, cares enough to feel it must change, and brings a solution.</p>
-      <div class="cards">${LEADERSHIP.filter(([k]) => lead[k]).map(([k, label, hint]) => `
-        <div class="card">
-          <h3>${label}</h3><p class="muted small">${hint}</p>
-          <p>${esc(lead[k].seen)}</p>
-          <p class="grow"><b>Grow it:</b> ${esc(lead[k].grow)}</p>
-        </div>`).join('')}
-      </div></section>`);
+    content.push({ text: 'Your leadership check', style: 'h2' });
+    content.push({ text: 'A leader understands a situation, cares enough to feel it must change, and brings a solution.', style: 'note' });
+    for (const [k, label, hint] of LEADERSHIP.filter(([k]) => lead[k])) {
+      content.push({
+        unbreakable: true, margin: [0, 0, 0, 8],
+        stack: [
+          { text: [{ text: label, bold: true }, { text: `  ${hint}`, color: MUTED, fontSize: 9 }] },
+          { text: s(lead[k].seen), margin: [0, 2, 0, 0] },
+          { text: [{ text: 'Grow it: ', bold: true }, s(lead[k].grow)], color: BRAND, margin: [0, 2, 0, 0] },
+        ],
+      });
+    }
   }
 
   if (analysis.strengths?.length) {
-    parts.push(`<section><h2>Your strong points</h2><ul>${analysis.strengths.map(s => typeof s === 'string'
-      ? `<li>${esc(s)}</li>`
-      : `<li><b>${esc(s.point)}</b>${s.evidence ? `<br><span class="muted small">From your PIQ: ${esc(s.evidence)}</span>` : ''}</li>`
-    ).join('')}</ul></section>`);
+    content.push({ text: 'Your strong points', style: 'h2' });
+    content.push({ ul: analysis.strengths.map(x => typeof x === 'string'
+      ? x
+      : { stack: [{ text: s(x.point), bold: true }, x.evidence ? { text: `From your PIQ: ${s(x.evidence)}`, style: 'small' } : null].filter(Boolean) }),
+      margin: [0, 0, 0, 4] });
   }
 
   if (analysis.likely_questions?.length) {
-    parts.push(`<section><h2>Questions you are likely to get</h2>
-      <p class="note">An IO often asks many questions in one go. Spot the group and answer each part truthfully.</p>
-      ${analysis.likely_questions.map((g, i) => `
-        <div class="group">
-          <h3>${i + 1}. ${esc(g.area)}</h3>
-          <ul>${(g.questions || []).map(q => `<li>${esc(q)}</li>`).join('')}</ul>
-          ${g.tip ? `<p class="small"><b>How to answer:</b> ${esc(g.tip)}</p>` : ''}
-        </div>`).join('')}
-    </section>`);
+    content.push({ text: 'Questions you are likely to get', style: 'h2' });
+    content.push({ text: 'An IO often asks many questions in one go. Spot the group and answer each part truthfully.', style: 'note' });
+    analysis.likely_questions.forEach((g, i) => {
+      content.push({
+        unbreakable: (g.questions || []).length <= 8, margin: [0, 0, 0, 8],
+        stack: [
+          { text: `${i + 1}. ${s(g.area)}`, style: 'h3' },
+          { ul: (g.questions || []).map(s) },
+          g.tip ? { text: [{ text: 'How to answer: ', bold: true }, s(g.tip)], style: 'small', margin: [0, 3, 0, 0] } : null,
+        ].filter(Boolean),
+      });
+    });
   }
 
   if (analysis.gaps?.length) {
-    parts.push(`<section><h2>Where the IO will press you</h2>${analysis.gaps.map(g => `
-      <div class="gap">
-        <b>${esc(g.issue)}</b>
-        ${g.why ? `<p class="muted small">${esc(g.why)}</p>` : ''}
-        ${g.fix ? `<p class="small grow">Do this: ${esc(g.fix)}</p>` : ''}
-      </div>`).join('')}</section>`);
+    content.push({ text: 'Where the IO will press you', style: 'h2' });
+    for (const g of analysis.gaps) {
+      content.push({
+        unbreakable: true, margin: [0, 0, 0, 8],
+        stack: [
+          { text: s(g.issue), bold: true },
+          g.why ? { text: s(g.why), style: 'small', color: MUTED } : null,
+          g.fix ? { text: `Do this: ${s(g.fix)}`, style: 'small', color: BRAND } : null,
+        ].filter(Boolean),
+      });
+    }
   }
 
   if (analysis.practice?.length) {
-    parts.push(`<section><h2>Practice for the coming days</h2>
-      <p class="note">Small exercises built on your own life. Do them daily.</p>
-      <ol>${analysis.practice.map(p => `<li><b>${esc(p.title)}</b><br><span class="small">${esc(p.task)}</span></li>`).join('')}</ol>
-    </section>`);
+    content.push({ text: 'Practice for the coming days', style: 'h2' });
+    content.push({ text: 'Small exercises built on your own life. Do them daily.', style: 'note' });
+    content.push({ ol: analysis.practice.map(p => ({ stack: [{ text: s(p.title), bold: true }, { text: s(p.task), style: 'small' }], margin: [0, 0, 0, 4] })) });
   }
 
-  parts.push(`<footer>Practice guidance based on what you wrote, not a real assessment. Be honest on the day; keep improving.<br>
-    Prepare free at <b>ssbcircle.com</b></footer>`);
+  content.push({
+    margin: [0, 16, 0, 0], style: 'small', color: MUTED,
+    text: ['Practice guidance based on what you wrote, not a real assessment. Be honest on the day; keep improving.\nPrepare free at ', { text: 'ssbcircle.com', bold: true }],
+  });
 
-  return parts.join('\n');
+  return {
+    pageSize: 'A4',
+    pageMargins: [40, 44, 40, 48],
+    info: { title: `SSBCircle PIQ Report${name ? ` - ${s(name)}` : ''}`, author: 'SSBCircle' },
+    watermark: { text: 'ssbcircle.com', color: BRAND, opacity: 0.07, bold: true, angle: -30 },
+    footer: (page, pages) => ({ text: `ssbcircle.com  ·  ${page} / ${pages}`, alignment: 'center', fontSize: 8, color: MUTED, margin: [0, 16, 0, 0] }),
+    content,
+    defaultStyle: { fontSize: 10.5, lineHeight: 1.3, color: '#1f2937' },
+    styles: {
+      brand: { fontSize: 9, bold: true, color: BRAND, characterSpacing: 1.5 },
+      title: { fontSize: 18, bold: true, color: '#111827', margin: [0, 2, 0, 2] },
+      h2:    { fontSize: 13, bold: true, color: BRAND, margin: [0, 14, 0, 4] },
+      h3:    { fontSize: 11, bold: true, color: '#111827', margin: [0, 0, 0, 3] },
+      note:  { fontSize: 9.5, color: MUTED, margin: [0, 0, 0, 6] },
+      muted: { fontSize: 9.5, color: MUTED },
+      small: { fontSize: 9.5 },
+    },
+  };
 }
 
-const STYLES = `
-  @page { size: A4; margin: 16mm 14mm; }
-  * { box-sizing: border-box; }
-  body { font-family: Inter, system-ui, -apple-system, 'Segoe UI', sans-serif; color: #1f2937;
-         font-size: 11.5pt; line-height: 1.5; margin: 0; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
-  .watermark { position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%) rotate(-30deg);
-               font-size: 64pt; font-weight: 800; letter-spacing: 2px; color: #1e3a5f; opacity: 0.09;
-               filter: blur(2px); white-space: nowrap; pointer-events: none; z-index: 0; }
-  main { position: relative; z-index: 1; }
-  header { border-bottom: 2px solid #1e3a5f; padding-bottom: 8px; margin-bottom: 14px; }
-  .brand { color: #1e3a5f; font-weight: 800; font-size: 10pt; letter-spacing: 1.5px; text-transform: uppercase; }
-  h1 { font-size: 18pt; margin: 4px 0 2px; color: #111827; }
-  h2 { font-size: 13pt; color: #1e3a5f; margin: 18px 0 4px; }
-  h3 { font-size: 11.5pt; margin: 0 0 4px; color: #111827; }
-  p { margin: 4px 0; }
-  ul, ol { margin: 6px 0; padding-left: 20px; }
-  li { margin: 3px 0; }
-  .muted { color: #6b7280; }
-  .small { font-size: 10pt; }
-  .note { color: #6b7280; font-size: 10pt; margin-bottom: 8px; }
-  .grow { color: #1e3a5f; }
-  .box { background: #eef2ff; border: 1px solid #e0e7ff; border-radius: 8px; padding: 10px 12px; }
-  .cards { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
-  .card { border: 1px solid #e5e7eb; border-radius: 8px; padding: 8px 10px; font-size: 10pt; }
-  .card .grow { border-top: 1px solid #f3f4f6; padding-top: 4px; margin-top: 6px; }
-  .group { border: 1px solid #e5e7eb; border-radius: 8px; padding: 8px 12px; margin-bottom: 8px; }
-  .gap { border-left: 3px solid #fcd34d; padding-left: 10px; margin-bottom: 8px; }
-  .card, .group, .gap, li { break-inside: avoid; }
-  h2 { break-after: avoid; }
-  footer { margin-top: 20px; border-top: 1px solid #e5e7eb; padding-top: 8px; font-size: 9pt; color: #6b7280; }
-`;
+let pdfMakePromise;
+function loadPdfMake() {
+  pdfMakePromise ??= Promise.all([import('pdfmake/build/pdfmake'), import('pdfmake/build/vfs_fonts')])
+    .then(([pm, fonts]) => {
+      const pdfMake = pm.default || pm;
+      const f = fonts.default || fonts;
+      pdfMake.vfs = f.pdfMake?.vfs || f.vfs || f;
+      return pdfMake;
+    });
+  return pdfMakePromise;
+}
 
-export function downloadPiqReport(analysis, { name = '', analysedAt = null } = {}) {
-  const title = `SSBCircle PIQ Report${name ? ` - ${name}` : ''}`;   // default PDF file name
-  const html = `<!doctype html><html><head><meta charset="utf-8"><title>${esc(title)}</title>
-    <style>${STYLES}</style></head>
-    <body><div class="watermark">ssbcircle.com</div><main>${body(analysis, name, analysedAt)}</main></body></html>`;
+// Returns { file, url } for the finished PDF.
+export async function buildPiqPdf(analysis, { name = '', analysedAt = null } = {}) {
+  const pdfMake = await loadPdfMake();
+  const blob = await new Promise((resolve, reject) => {
+    try { pdfMake.createPdf(docDefinition(analysis, name, analysedAt)).getBlob(resolve); }
+    catch (err) { reject(err); }
+  });
+  const safe = s(name).replace(/[^\w -]+/g, '').trim().replace(/\s+/g, '-');
+  const filename = `SSBCircle-PIQ-Report${safe ? `-${safe}` : ''}.pdf`;
+  const file = new File([blob], filename, { type: 'application/pdf' });
+  return { file, url: URL.createObjectURL(file) };
+}
 
-  const frame = document.createElement('iframe');
-  frame.setAttribute('aria-hidden', 'true');
-  frame.style.cssText = 'position:fixed;right:0;bottom:0;width:0;height:0;border:0;';
-  document.body.appendChild(frame);
+// Phones (and tablets) get the share sheet — "Save to Files", WhatsApp, Mail —
+// which is the only reliable way to keep a file on iOS. It must be called
+// straight from a tap, so the page builds the file first and asks for a
+// second tap to save it.
+export function canSharePdf(file) {
+  const touch = typeof window !== 'undefined' && window.matchMedia?.('(pointer: coarse)').matches;
+  try { return !!(touch && navigator.canShare?.({ files: [file] })); } catch { return false; }
+}
 
-  const doc = frame.contentDocument;
-  doc.open(); doc.write(html); doc.close();
+export async function sharePdf(file) {
+  await navigator.share({ files: [file], title: 'My SSBCircle PIQ report' });
+}
 
-  // Some browsers name the saved PDF after the parent page, so borrow it briefly
-  const pageTitle = document.title;
-  document.title = title;
-  const cleanup = () => { document.title = pageTitle; frame.remove(); };
-
-  setTimeout(() => {
-    frame.contentWindow.focus();
-    frame.contentWindow.print();
-    // print() blocks on desktop; mobile returns early, so give the dialog time
-    setTimeout(cleanup, 1500);
-  }, 250);
+export function downloadPdf({ file, url }) {
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = file.name;
+  a.rel = 'noopener';
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
 }
