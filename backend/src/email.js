@@ -215,7 +215,7 @@ async function sendHostStartReminder({ to, name, topic, category, scheduled_at }
 
 async function sendEventConfirmation(to, name) {
   const body = `
-    <p style="font-size:15px;font-weight:700;color:#111827;margin:0 0 8px;">You're in, ${name}! 🎉</p>
+    <p style="font-size:15px;font-weight:700;color:#111827;margin:0 0 8px;">You're in, ${name}.</p>
     <p style="font-size:14px;color:#374151;line-height:1.7;margin:0 0 24px;">
       You've successfully registered for the <strong>Session by a Recommended Candidate</strong> on SSBCircle.
       A recommended candidate will share real insights, experiences, and tips to help you crack SSB.
@@ -246,7 +246,7 @@ async function sendEventConfirmation(to, name) {
   return resend.emails.send({
     from: FROM, to,
     subject: "You're registered! Session by a Recommended Candidate — 23 May, 10 PM IST",
-    html: baseTemplate({ label: 'Registration Confirmed ✓', body }),
+    html: baseTemplate({ label: 'Registration confirmed', body }),
   });
 }
 
@@ -268,7 +268,7 @@ async function sendEventReminder(to, name, scheduledAt) {
     ${ctaButton('Join the Session Now', 'https://www.ssbcircle.com')}`;
   return resend.emails.send({
     from: FROM, to,
-    subject: "Starting in 30 mins! Session by a Recommended Candidate 🎯",
+    subject: "Starting in 30 minutes: session by a recommended candidate",
     html: baseTemplate({ label: 'Starting Soon', body }),
     scheduledAt,
   });
