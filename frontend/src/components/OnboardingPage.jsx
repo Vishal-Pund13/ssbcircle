@@ -1,9 +1,9 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
-import { Link } from 'react-router-dom';
 import { saveOnboarding } from '../services/api';
-import { Check, AlertCircle, ShieldCheck, Users } from 'lucide-react';
+import { Check, AlertCircle, ShieldCheck, Users, ChevronDown } from 'lucide-react';
+import { STEPS as MOD_STEPS, DUTIES as MOD_DUTIES } from '../data/moderatorProgram';
 import { EXAM_TYPES, SOURCES } from '../data/examTypes';
 
 // Shown once, right after the first Google sign-in.
@@ -43,6 +43,9 @@ export default function OnboardingPage() {
   const [source, setSource] = useState(user?.referral_source || '');
   const [ssbDate, setSsbDate] = useState(user?.ssb_date || '');
   const [modInterest, setModInterest] = useState(false);
+  // "How it works" opens here, not on /moderators: until this form is done,
+  // every other page sends the member straight back to /welcome.
+  const [showHow, setShowHow] = useState(false);
   const [saving, setSaving] = useState(false);
   const [error,  setError]  = useState('');
 
@@ -184,16 +187,38 @@ export default function OnboardingPage() {
           </div>
 
           {/* Moderator programme */}
-          <label className={`flex items-start gap-3 rounded-xl border px-4 py-3.5 cursor-pointer transition-colors ${modInterest ? 'border-emerald-300 bg-emerald-50' : 'border-gray-200 bg-white hover:border-gray-300'}`}>
-            <input type="checkbox" checked={modInterest} onChange={e => setModInterest(e.target.checked)}
-              className="mt-0.5 w-4 h-4 accent-emerald-600 shrink-0" />
-            <span className="text-[13px] text-gray-600 leading-relaxed">
-              <span className="flex items-center gap-1.5 font-bold text-gray-900"><Users className="w-4 h-4 text-emerald-600" /> I'd like to help run SSBCircle as a moderator</span>
-              Moderators host sessions, help new aspirants and keep the community clean. After a two-week trial,
-              the officers who built SSBCircle choose moderators, who earn a stipend and a MOD badge. Tick this and
-              we will reach out. <Link to="/moderators" target="_blank" className="font-semibold text-emerald-700 underline">How it works</Link>
-            </span>
-          </label>
+          <div className={`rounded-xl border transition-colors ${modInterest ? 'border-emerald-300 bg-emerald-50' : 'border-gray-200 bg-white'}`}>
+            <label className="flex items-start gap-3 px-4 pt-3.5 pb-2 cursor-pointer">
+              <input type="checkbox" checked={modInterest} onChange={e => setModInterest(e.target.checked)}
+                className="mt-0.5 w-4 h-4 accent-emerald-600 shrink-0" />
+              <span className="text-[13px] text-gray-600 leading-relaxed">
+                <span className="flex items-center gap-1.5 font-bold text-gray-900"><Users className="w-4 h-4 text-emerald-600" /> I'd like to help run SSBCircle as a moderator</span>
+                Moderators host sessions, help new aspirants and keep the community clean. After a two-week trial,
+                the officers who built SSBCircle choose moderators, who earn a stipend and a MOD badge. Tick this and
+                we will reach out.
+              </span>
+            </label>
+            <button type="button" onClick={() => setShowHow(v => !v)} aria-expanded={showHow}
+              className="ml-11 mb-3 inline-flex items-center gap-1 text-[13px] font-semibold text-emerald-700 cursor-pointer">
+              How it works <ChevronDown className={`w-3.5 h-3.5 transition-transform ${showHow ? 'rotate-180' : ''}`} />
+            </button>
+            {showHow && (
+              <div className="mx-4 mb-4 rounded-lg bg-white border border-gray-200 p-3.5 text-[13px] text-gray-700">
+                <ol className="space-y-2">
+                  {MOD_STEPS.map((st, i) => (
+                    <li key={st.title} className="flex gap-2.5">
+                      <span className="w-5 h-5 rounded-full bg-emerald-600 text-white text-[11px] font-bold flex items-center justify-center shrink-0">{i + 1}</span>
+                      <span><span className="font-semibold text-gray-900">{st.title}.</span> {st.text}</span>
+                    </li>
+                  ))}
+                </ol>
+                <p className="mt-3 font-semibold text-gray-900">What moderators do</p>
+                <ul className="mt-1 space-y-1 list-disc pl-5 text-gray-600">
+                  {MOD_DUTIES.slice(0, 4).map(d => <li key={d}>{d}</li>)}
+                </ul>
+              </div>
+            )}
+          </div>
 
           {error && (
             <p className="text-xs text-red-600 flex items-start gap-1.5">
