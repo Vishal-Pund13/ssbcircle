@@ -14,7 +14,7 @@ export const TOOL_INTROS = {
       { title: 'Use it as your blueprint', text: 'Download the report as a PDF, print it, and tick off each question as you prepare.' },
     ],
     points: [
-      'Private: only you can see your PIQ, and you can delete it any time.',
+      'Private and encrypted: no other member can see your PIQ, and you can delete it any time.',
       'AI analysis has a daily limit, so use it when your PIQ is ready.',
     ],
     faq: [
@@ -23,7 +23,7 @@ export const TOOL_INTROS = {
       { q: 'Why does the PIQ matter so much?',
         a: 'The Interviewing Officer reads your PIQ before the interview and builds most questions from it. If you know your own PIQ well, you walk into the interview prepared.' },
       { q: 'Is my PIQ data safe?',
-        a: 'Your PIQ is never shown to other members and never appears on your profile. When you delete it, it is removed from our database, not just hidden.' },
+        a: 'Your PIQ is encrypted on its way to us and while it is stored. It is never shown to other members and never appears on your profile. When you delete it, it is removed from our database, not just hidden.' },
     ],
     cta: 'Sign in to fill your PIQ',
   },

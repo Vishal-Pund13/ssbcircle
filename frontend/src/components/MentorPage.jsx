@@ -169,7 +169,7 @@ export default function MentorPage() {
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2 mb-2">
                       <MessageCircle className="w-4 h-4 text-amber-300" />
-                      <span className="text-[12px] font-bold text-brand-100 uppercase tracking-widest">WhatsApp · 1:1 Mentoring</span>
+                      <span className="text-[12px] font-bold text-brand-100 uppercase tracking-widest">WhatsApp</span>
                     </div>
                     <p className="text-white font-bold text-base sm:text-lg leading-snug mb-1">
                       Message {mentor.name} directly

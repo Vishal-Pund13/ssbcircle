@@ -507,7 +507,7 @@ function MentorCard({ mentor, onConnect }) {
           {mentor.whatsapp ? (
             <button type="button" onClick={e => { e.stopPropagation(); onConnect(mentor); }}
               className="inline-flex items-center gap-1.5 text-sm font-semibold text-white bg-emerald-600 hover:bg-emerald-700 rounded-lg px-3.5 py-2 cursor-pointer">
-              <MessageCircle className="w-4 h-4" /> Talk one-on-one
+              <MessageCircle className="w-4 h-4" /> Message on WhatsApp
             </button>
           ) : (
             <span className="flex items-center gap-1 text-[11px] text-gray-400">
@@ -524,8 +524,8 @@ function MentorCard({ mentor, onConnect }) {
 }
 
 // Mentors are here for one thing: an aspirant who wants to hear from a real
-// officer — about life in the forces, or for one-on-one guidance on their
-// own preparation — can reach one directly. "Talk one-on-one" opens the same
+// officer — about life in the forces, or for guidance on their own
+// preparation — can reach one directly. "Message on WhatsApp" opens the same
 // form as the mentor's page, which pre-fills a WhatsApp introduction.
 const MENTOR_TOPICS = ['Life in the forces', 'Which entry and branch suits you', 'Your PIQ and SSB prep'];
 
@@ -539,7 +539,7 @@ function MentorsSection() {
           <p className="text-[11px] font-bold uppercase tracking-[0.25em] text-brand-600 flex items-center gap-1.5"><Shield className="w-3.5 h-3.5" /> Verified officers</p>
           <h2 className="mt-1.5 text-xl sm:text-2xl font-bold text-gray-900">Talk to a real officer</h2>
           <p className="text-sm text-gray-600 mt-1 max-w-2xl leading-relaxed">
-            Want to know what life in the forces is really like, or need one-on-one guidance for your preparation?
+            Want to know what life in the forces is really like, or need guidance for your preparation?
             Reach out to our mentors directly — they reply personally on WhatsApp. Slots are limited.
           </p>
           <div className="mt-3 flex flex-wrap gap-1.5">
