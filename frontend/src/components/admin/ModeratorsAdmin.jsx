@@ -173,7 +173,7 @@ export function ModeratorsAdmin({ authHeaders }) {
   );
 }
 
-const KIND_LABEL = { bug: '🐞 Bug', idea: '💡 Idea', content: '📄 Content', other: '💬 Other' };
+const KIND_LABEL = { bug: 'Bug', idea: 'Idea', content: 'Content', other: 'Other' };
 
 export function PlatformFeedbackAdmin({ authHeaders }) {
   const [rows, setRows] = useState(null);

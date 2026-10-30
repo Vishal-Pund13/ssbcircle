@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
-import { Shield, TrendingUp, Landmark, Map, Users, ArrowLeft, Calendar, Tag, ChevronRight, BookOpen, Clock, BarChart2, ArrowRight, CheckCircle } from 'lucide-react';
+import { Shield, TrendingUp, Landmark, Map, Users, ArrowLeft, Calendar, Tag, ChevronRight, BookOpen, Clock, BarChart2, ArrowRight, CheckCircle, Plane, Bell } from 'lucide-react';
 import { getArticles, getArticle } from '../services/api';
 import { SWIPE_SLUGS } from '../data/swipeArticles';
 import ArticleRenderer from './ArticleRenderer';
@@ -144,8 +144,8 @@ function _SessionBannerRemoved() {
               <span className="flex items-center gap-1 text-[10.5px] font-bold text-emerald-300 bg-emerald-500/20 border border-emerald-500/30 px-2 py-0.5 rounded-full uppercase tracking-widest">
                 <span className="w-1.5 h-1.5 bg-emerald-400 rounded-full animate-pulse" /> Live · 23 May
               </span>
-              <span className="text-[10.5px] font-bold text-white/50 bg-white/10 border border-white/15 px-2 py-0.5 rounded-full uppercase tracking-widest">🪖 Army</span>
-              <span className="text-[10.5px] font-bold text-white/50 bg-white/10 border border-white/15 px-2 py-0.5 rounded-full uppercase tracking-widest">✈️ Air Force</span>
+              <span className="text-[10.5px] font-bold text-white/50 bg-white/10 border border-white/15 px-2 py-0.5 rounded-full uppercase tracking-widest inline-flex items-center gap-1"><Shield className="w-3 h-3" /> Army</span>
+              <span className="text-[10.5px] font-bold text-white/50 bg-white/10 border border-white/15 px-2 py-0.5 rounded-full uppercase tracking-widest inline-flex items-center gap-1"><Plane className="w-3 h-3" /> Air Force</span>
             </div>
             <h3 className="text-base sm:text-lg font-bold text-white leading-snug mb-0.5">
               Session by a Recommended Candidate
@@ -263,7 +263,7 @@ function _SessionBannerRemoved() {
                     {status === 'loading' ? 'Registering…' : 'Confirm Registration →'}
                   </button>
 
-                  <p className="text-[11px] text-gray-400 text-center">🔔 You'll receive a confirmation email + reminder 30 min before the session</p>
+                  <p className="text-[11px] text-gray-400 text-center flex items-center justify-center gap-1"><Bell className="w-3 h-3" /> You'll receive a confirmation email + reminder 30 min before the session</p>
                 </form>
               )}
             </div>

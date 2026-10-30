@@ -1,3 +1,5 @@
+import { AlertTriangle } from 'lucide-react';
+
 // Inline SVG data visualizations for the Women in India series cards.
 // Each component is self-contained — no external library needed.
 
@@ -33,8 +35,8 @@ export function FlfprChart() {
           );
         })}
       </div>
-      <p className="text-[10px] text-amber-600 font-semibold mt-3">
-        ⚠ 2023-24 rise is largely unpaid agricultural work — not formal employment
+      <p className="text-[10px] text-amber-600 font-semibold mt-3 flex items-start gap-1">
+        <AlertTriangle className="w-3 h-3 shrink-0 mt-px" aria-hidden="true" /> 2023-24 rise is largely unpaid agricultural work — not formal employment
       </p>
     </div>
   );
@@ -197,7 +199,7 @@ export function HealthDashboard() {
             <div className="flex items-start justify-between mb-0.5">
               <span className="text-lg font-extrabold leading-none" style={{ color: m.color }}>{m.value}</span>
               <span className={`text-[8px] font-bold px-1.5 py-0.5 rounded-full ${m.good ? 'bg-brand-50 text-brand-600' : 'bg-red-50 text-red-600'}`}>
-                {m.good ? '↑ Better' : '⚠ Crisis'}
+                {m.good ? 'Better' : 'Crisis'}
               </span>
             </div>
             {m.unit && <p className="text-[8px] text-gray-400">{m.unit}</p>}

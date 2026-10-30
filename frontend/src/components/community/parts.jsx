@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { ArrowBigUp, BadgeCheck, Share2, Check, Users, ShieldCheck, CalendarDays, ArrowRight } from 'lucide-react';
-import { POST_TYPES, CATEGORY_META } from './CategoryChip';
+import { POST_TYPES, CategoryIcon } from './CategoryChip';
 
 // Pieces shared by the community feed and the post page.
 
@@ -95,7 +95,7 @@ export function CommunitySidebar({ postCount, onCompose, canPost }) {
           {POST_TYPES.slice(0, 3).map(t => (
             <button key={t.value} type="button" onClick={() => canPost && onCompose(t.value)}
               className={`w-full text-left flex items-start gap-3 ${canPost ? 'cursor-pointer group' : 'cursor-default'}`}>
-              <span className="text-xl leading-none mt-0.5" aria-hidden="true">{CATEGORY_META[t.value].emoji}</span>
+              <CategoryIcon category={t.value} />
               <span>
                 <span className="block text-sm font-semibold text-gray-900 group-hover:text-brand-700">{t.title}</span>
                 <span className="block text-xs text-gray-500 leading-relaxed mt-0.5">{t.hint}</span>

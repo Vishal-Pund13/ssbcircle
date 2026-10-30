@@ -1,17 +1,34 @@
+import { Megaphone, Mic, NotebookPen, CalendarDays, CircleHelp, MessagesSquare } from 'lucide-react';
+
 // Shared between the feed, the post page and the home page so a category
 // always looks the same.
 //
 // Announcement is deliberately the loudest: it means the post came from the
 // team, and aspirants cannot give their own posts that label.
 
+// Line icons rather than emoji: they match the rest of the site and render
+// the same on every phone.
 export const CATEGORY_META = {
-  announcement: { label: 'Announcement',  emoji: '📣', cls: 'bg-amber-50  text-amber-700  border-amber-200' },
-  session:      { label: 'Session',       emoji: '🎙️', cls: 'bg-brand-50  text-brand-700  border-brand-100' },
-  experience:   { label: 'SSB Experience', emoji: '📝', cls: 'bg-violet-50 text-violet-700 border-violet-200' },
-  ssb_date:     { label: 'Upcoming SSB',  emoji: '📅', cls: 'bg-sky-50    text-sky-700    border-sky-200' },
-  doubt:        { label: 'Doubt',         emoji: '❓', cls: 'bg-emerald-50 text-emerald-700 border-emerald-200' },
-  discussion:   { label: 'Discussion',    emoji: '💬', cls: 'bg-gray-100  text-gray-600   border-gray-200' },
+  announcement: { label: 'Announcement',  icon: Megaphone,      cls: 'bg-amber-50  text-amber-700  border-amber-200' },
+  session:      { label: 'Session',       icon: Mic,            cls: 'bg-brand-50  text-brand-700  border-brand-100' },
+  experience:   { label: 'SSB Experience', icon: NotebookPen,   cls: 'bg-violet-50 text-violet-700 border-violet-200' },
+  ssb_date:     { label: 'Upcoming SSB',  icon: CalendarDays,   cls: 'bg-sky-50    text-sky-700    border-sky-200' },
+  doubt:        { label: 'Doubt',         icon: CircleHelp,     cls: 'bg-emerald-50 text-emerald-700 border-emerald-200' },
+  discussion:   { label: 'Discussion',    icon: MessagesSquare, cls: 'bg-gray-100  text-gray-600   border-gray-200' },
 };
+
+// A category's icon on its own tinted tile, for pickers and empty states
+export function CategoryIcon({ category, size = 'md' }) {
+  const m = CATEGORY_META[category] || CATEGORY_META.discussion;
+  const Icon = m.icon;
+  const box = { sm: 'w-6 h-6 rounded-md', md: 'w-8 h-8 rounded-lg', lg: 'w-12 h-12 rounded-xl' }[size];
+  const ico = { sm: 'w-3.5 h-3.5', md: 'w-4 h-4', lg: 'w-6 h-6' }[size];
+  return (
+    <span className={`inline-flex items-center justify-center shrink-0 border ${box} ${m.cls}`} aria-hidden="true">
+      <Icon className={ico} />
+    </span>
+  );
+}
 
 // What aspirants can post, with guidance and a fill-in template for each.
 export const POST_TYPES = [
@@ -73,7 +90,7 @@ export default function CategoryChip({ category, size = 'sm' }) {
   return (
     <span className={`inline-flex items-center gap-1 font-semibold rounded-full border whitespace-nowrap ${m.cls} ${
       size === 'sm' ? 'text-[11px] px-2 py-0.5' : 'text-xs px-2.5 py-1'}`}>
-      <span aria-hidden="true">{m.emoji}</span>{m.label}
+      <m.icon className={size === 'sm' ? 'w-3 h-3' : 'w-3.5 h-3.5'} aria-hidden="true" />{m.label}
     </span>
   );
 }

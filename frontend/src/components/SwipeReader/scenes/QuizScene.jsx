@@ -74,7 +74,7 @@ function StarRating({ articleId }) {
           </p>
           {voteCount && voteCount > 1 && (
             <p className="text-[10px] text-gray-400">
-              {avgRating}★ average · {voteCount} {voteCount === 1 ? 'vote' : 'votes'}
+              Rated {avgRating}/5 · {voteCount} {voteCount === 1 ? 'vote' : 'votes'}
             </p>
           )}
         </div>

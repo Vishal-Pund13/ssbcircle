@@ -1600,7 +1600,7 @@ export default function LandingPage() {
 
           {/* Host caution — belongs with the rooms it refers to; only signed-in people host */}
           {user && <div className="mt-6 flex items-start gap-2.5 bg-amber-50 border border-amber-200 rounded-xl px-4 py-3">
-            <span className="shrink-0 text-base mt-0.5">⚠️</span>
+            <AlertTriangle className="w-4 h-4 text-amber-600 shrink-0 mt-0.5" aria-hidden="true" />
             <p className="text-xs text-amber-800 leading-relaxed">
               <span className="font-bold">Hosts — once your session is over, please delete your room</span> using the <span className="font-semibold">"End & Delete Room"</span> button inside the room. This keeps the platform open for others to practise.
             </p>

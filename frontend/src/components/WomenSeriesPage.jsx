@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
-import { CheckCircle, ArrowRight, ArrowLeft } from 'lucide-react';
+import { CheckCircle, ArrowRight, ArrowLeft, Check } from 'lucide-react';
 import IndianWomanOutline from './SwipeReader/scenes/IndianWomanOutline';
 
 const SERIES = [
@@ -181,7 +181,7 @@ export default function WomenSeriesPage() {
                       <span className={`w-6 h-6 rounded-full flex items-center justify-center text-[12px] font-bold shrink-0 ${
                         isDone ? 'bg-emerald-100 text-emerald-700' : 'bg-gray-100 text-gray-500'
                       }`}>
-                        {isDone ? '✓' : card.n}
+                        {isDone ? <Check className="w-3.5 h-3.5" strokeWidth={3} aria-label="Done" /> : card.n}
                       </span>
                     </div>
 

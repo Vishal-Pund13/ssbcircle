@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { X, Check, AlertCircle } from 'lucide-react';
+import { X, Check, AlertCircle, Bug, Lightbulb, FileText, MessageCircle } from 'lucide-react';
 import { sendPlatformFeedback } from '../services/api';
 
 // "Report a problem or idea" — reaches the admin dashboard, and counts towards
@@ -7,10 +7,10 @@ import { sendPlatformFeedback } from '../services/api';
 // a bug report says where it happened.
 
 const KINDS = [
-  { value: 'bug',     label: '🐞 Something is broken' },
-  { value: 'idea',    label: '💡 An idea' },
-  { value: 'content', label: '📄 Wrong or missing content' },
-  { value: 'other',   label: '💬 Other' },
+  { value: 'bug',     label: 'Something is broken',       icon: Bug },
+  { value: 'idea',    label: 'An idea',                   icon: Lightbulb },
+  { value: 'content', label: 'Wrong or missing content',  icon: FileText },
+  { value: 'other',   label: 'Other',                     icon: MessageCircle },
 ];
 
 export default function PlatformFeedbackDialog({ onClose }) {
@@ -51,7 +51,7 @@ export default function PlatformFeedbackDialog({ onClose }) {
               {KINDS.map(k => (
                 <button key={k.value} type="button" onClick={() => setKind(k.value)}
                   className={`text-left text-sm px-3 py-2 rounded-xl border cursor-pointer ${kind === k.value ? 'border-brand-600 bg-brand-50 font-semibold' : 'border-gray-200 hover:border-gray-300'}`}>
-                  {k.label}
+                  <k.icon className="w-4 h-4 shrink-0" aria-hidden="true" /> {k.label}
                 </button>
               ))}
             </div>

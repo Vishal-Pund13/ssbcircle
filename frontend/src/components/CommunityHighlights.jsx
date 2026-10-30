@@ -3,7 +3,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { getCommunityFeed } from '../services/api';
 import { useAuth } from '../context/AuthContext';
 import { MessageSquare, ArrowBigUp, ArrowRight, PenLine, BadgeCheck } from 'lucide-react';
-import CategoryChip, { timeAgo } from './community/CategoryChip';
+import CategoryChip, { CategoryIcon, timeAgo } from './community/CategoryChip';
 
 // The community block on the home page: a place to ask, next to what others
 // are asking.
@@ -19,10 +19,10 @@ import CategoryChip, { timeAgo } from './community/CategoryChip';
 
 const PROMPTS = [
   // label is the button text; title (doubts only) is pre-filled as the post title
-  { category: 'experience', label: '📝 Share how your last SSB went' },
-  { category: 'ssb_date',   label: '📅 Post your SSB date and find batchmates' },
-  { category: 'doubt',      label: '❓ How should I prepare for the OIR test?', title: 'How should I prepare for the OIR test?' },
-  { category: 'doubt',      label: '❓ What do I write in PPDT if the picture is unclear?', title: 'What do I write in PPDT if the picture is unclear?' },
+  { category: 'experience', label: 'Share how your last SSB went' },
+  { category: 'ssb_date',   label: 'Post your SSB date and find batchmates' },
+  { category: 'doubt',      label: 'How should I prepare for the OIR test?', title: 'How should I prepare for the OIR test?' },
+  { category: 'doubt',      label: 'What do I write in PPDT if the picture is unclear?', title: 'What do I write in PPDT if the picture is unclear?' },
 ];
 
 const MAX_POSTS = 4;
@@ -101,7 +101,7 @@ function AskBox({ user }) {
           {PROMPTS.map(p => (
             <button key={p.label} type="button" onClick={() => go(p)}
               className="group w-full flex items-center justify-between gap-2 text-left text-xs font-medium text-gray-700 border border-gray-100 rounded-lg px-3 py-2 hover:border-brand-200 hover:bg-brand-50 hover:text-brand-700 transition-colors cursor-pointer">
-              <span className="line-clamp-1">{p.label}</span>
+              <span className="flex items-center gap-2 min-w-0"><CategoryIcon category={p.category} size="sm" /><span className="line-clamp-1">{p.label}</span></span>
               <ArrowRight className="w-3 h-3 shrink-0 text-gray-300 group-hover:text-brand-600" />
             </button>
           ))}

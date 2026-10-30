@@ -1,4 +1,5 @@
 import { INFOGRAPHICS } from './ArticleInfographics';
+import { Lightbulb } from 'lucide-react';
 
 // Parse **bold** and [label](url) links inline
 function parseInline(text) {
@@ -48,7 +49,7 @@ function parseBlocks(lines, keyPrefix = '') {
       const inner = line.replace('[CALLOUT]', '').replace('[/CALLOUT]', '').trim();
       blocks.push(
         <div key={keyPrefix + i} className="my-6 flex items-start gap-3 bg-brand-50 border border-brand-100 rounded-xl px-4 py-4">
-          <span className="text-brand-600 text-lg shrink-0 mt-0.5">💡</span>
+          <Lightbulb className="w-5 h-5 text-brand-600 shrink-0 mt-0.5" aria-hidden="true" />
           <p className="text-sm text-brand-800 leading-relaxed italic"><Inline text={inner} /></p>
         </div>
       );

@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { ArrowRight, ShieldCheck, Flame } from 'lucide-react';
+import { ArrowRight, ShieldCheck, Flame, Check, X } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { getPrepProgress } from '../services/api';
 import { STEPS, TOPICS } from '../data/prepSheet';
@@ -99,9 +99,9 @@ export default function HomePrepSheet() {
           <p className="text-sm font-bold text-gray-900 flex items-center gap-1.5"><Flame className="w-4 h-4 text-orange-500" /> The most disciplined make it</p>
           <p className="mt-0.5 text-xs text-gray-500">Personality is not built in a day.</p>
           <div className="mt-3 grid grid-cols-2 gap-3">
-            {[['✓ The recommended way', illustration('steady', today), 'text-emerald-700'], ['✗ Last-minute cramming', illustration('cramming', today), 'text-gray-500']].map(([label, data, ink]) => (
+            {[['The recommended way', illustration('steady', today), 'text-emerald-700', Check], ['Last-minute cramming', illustration('cramming', today), 'text-gray-500', X]].map(([label, data, ink, Mark]) => (
               <div key={label} className="min-w-0">
-                <p className={`text-[11px] font-semibold mb-1 ${ink}`}>{label}</p>
+                <p className={`text-[11px] font-semibold mb-1 flex items-center gap-1 ${ink}`}><Mark className="w-3 h-3 shrink-0" strokeWidth={3} aria-hidden="true" />{label}</p>
                 <Heatmap activity={data} weeks={WEEKS} today={today} maxCell={7} />
               </div>
             ))}

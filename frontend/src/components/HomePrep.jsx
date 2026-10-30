@@ -48,8 +48,8 @@ export function PrepPath({ user, liveCount = 0 }) {
   }, [user]);
 
   const streakText = status.prepToday
-    ? `Done today · 🔥 ${status.prepStreak}-day streak`
-    : status.prepStreak ? `🔥 ${status.prepStreak}-day streak — keep it alive today` : status.week ? 'Start your streak today' : null;
+    ? `Done today · ${status.prepStreak}-day streak`
+    : status.prepStreak ? `${status.prepStreak}-day streak — keep it alive today` : status.week ? 'Start your streak today' : null;
   const steps = [
     { to: '/piq',             icon: FileText, title: 'Know yourself',     desc: 'Fill your PIQ and see what your IO will ask', status: status.piq, done: status.piqDone },
     { to: '/tat',             icon: PenLine,  title: 'Write a TAT story', desc: 'See a picture, write in 4 minutes, get feedback', status: status.tat, done: status.tatDone },
@@ -98,7 +98,10 @@ export function PrepPath({ user, liveCount = 0 }) {
                     {s.title}
                     {isNext && <span className="text-[10.5px] font-bold uppercase tracking-wider text-brand-700 bg-white border border-brand-200 px-1.5 py-0.5 rounded-full">{user ? 'Next' : 'Start here'}</span>}
                   </p>
-                  <p className={`text-xs truncate ${s.daily && status.prepStreak ? 'text-orange-600 font-medium' : 'text-gray-500'}`}>{s.status || s.desc}</p>
+                  <p className={`text-xs truncate flex items-center gap-1 ${s.daily && status.prepStreak ? 'text-orange-600 font-medium' : 'text-gray-500'}`}>
+                    {s.daily && status.prepStreak > 0 && <Flame className="w-3.5 h-3.5 shrink-0" aria-hidden="true" />}
+                    <span className="truncate">{s.status || s.desc}</span>
+                  </p>
                 </div>
                 {s.daily && status.week && (
                   <span className="hidden xs:flex gap-[3px] shrink-0" title="Practice this week" aria-hidden="true">

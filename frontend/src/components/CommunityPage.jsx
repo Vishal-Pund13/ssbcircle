@@ -2,8 +2,8 @@ import { useState, useEffect, useMemo, useRef } from 'react';
 import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { getCommunityFeed, createCommunityPost, voteCommunityPost } from '../services/api';
-import { MessageSquare, Pin, Lock, AlertCircle, Flame, Clock, TrendingUp, X, FileText, PenLine } from 'lucide-react';
-import CategoryChip, { CATEGORY_META, POST_TYPES, timeAgo } from './community/CategoryChip';
+import { MessageSquare, Pin, Lock, AlertCircle, Flame, Clock, TrendingUp, X, FileText, PenLine, Users } from 'lucide-react';
+import CategoryChip, { CATEGORY_META, CategoryIcon, POST_TYPES, timeAgo } from './community/CategoryChip';
 import { Avatar, VoteRail, ShareButton, CommunitySidebar, ModBadge } from './community/parts';
 import SiteNav from './SiteNav';
 import { trackEvent } from '../analytics';
@@ -19,11 +19,11 @@ import { trackEvent } from '../analytics';
 const OPEN_CATEGORIES = POST_TYPES.map(t => t.value);
 const FLAIRS = [
   { id: 'all', label: 'All' },
-  { id: 'experience', label: '📝 Experiences' },
-  { id: 'ssb_date', label: '📅 Upcoming SSB' },
-  { id: 'doubt', label: '❓ Doubts' },
-  { id: 'discussion', label: '💬 Discussion' },
-  { id: 'announcement', label: '📣 Announcements' },
+  { id: 'experience', label: 'Experiences' },
+  { id: 'ssb_date', label: 'Upcoming SSB' },
+  { id: 'doubt', label: 'Doubts' },
+  { id: 'discussion', label: 'Discussion' },
+  { id: 'announcement', label: 'Announcements' },
 ];
 const SORTS = [
   { id: 'hot', label: 'Hot', icon: Flame },
@@ -122,7 +122,7 @@ function Composer({ user, initialType, initialTitle, onCancel, onPublished }) {
             <button key={pt.value} type="button" onClick={() => setType(pt.value)}
               className={`text-left px-3 py-2.5 rounded-xl border cursor-pointer transition-colors ${type === pt.value
                 ? 'border-brand-600 bg-brand-50 ring-2 ring-brand-100' : 'border-gray-200 hover:border-gray-300'}`}>
-              <span className="text-lg" aria-hidden="true">{CATEGORY_META[pt.value].emoji}</span>
+              <CategoryIcon category={pt.value} size="sm" />
               <span className="block text-sm font-semibold text-gray-900 mt-0.5">{pt.short}</span>
             </button>
           ))}
@@ -251,7 +251,7 @@ export default function CommunityPage() {
         <div className="max-w-6xl mx-auto px-4 sm:px-6 pb-4">
           {/* Only the badge overlaps the cover; the title stays on white */}
           <div className="flex items-end gap-4">
-            <div className="-mt-8 shrink-0 w-16 h-16 sm:w-[72px] sm:h-[72px] rounded-2xl bg-white border-4 border-white shadow-md flex items-center justify-center text-3xl">🎖️</div>
+            <div className="-mt-8 shrink-0 w-16 h-16 sm:w-[72px] sm:h-[72px] rounded-2xl bg-white border-4 border-white shadow-md flex items-center justify-center text-brand-600"><Users className="w-8 h-8" /></div>
             <div className="pt-3 min-w-0 flex-1">
               <h1 className="text-xl sm:text-2xl font-bold text-gray-900 truncate">SSBCircle Community</h1>
               <p className="text-sm text-gray-500 truncate">Experiences, upcoming SSBs and doubts — from aspirants, for aspirants</p>
@@ -286,7 +286,7 @@ export default function CommunityPage() {
                 {POST_TYPES.slice(0, 3).map(t => (
                   <button key={t.value} type="button" onClick={() => compose(t.value)}
                     className="flex items-center justify-center gap-1.5 text-xs sm:text-sm font-semibold text-gray-600 hover:bg-gray-100 rounded-xl py-2 cursor-pointer">
-                    <span aria-hidden="true">{CATEGORY_META[t.value].emoji}</span>
+                    <CategoryIcon category={t.value} size="sm" />
                     <span className="truncate">{t.short}</span>
                   </button>
                 ))}
@@ -330,9 +330,11 @@ export default function CommunityPage() {
 
           {!loading && shown.length === 0 && (
             <div className="bg-white border border-dashed border-gray-300 rounded-2xl py-12 text-center px-6">
-              <p className="text-3xl" aria-hidden="true">{flair === 'all' ? '🎖️' : CATEGORY_META[flair]?.emoji}</p>
+              <div className="flex justify-center">{flair === 'all'
+                ? <span className="w-12 h-12 rounded-xl bg-brand-50 text-brand-600 flex items-center justify-center" aria-hidden="true"><Users className="w-6 h-6" /></span>
+                : <CategoryIcon category={flair} size="lg" />}</div>
               <p className="text-base font-semibold text-gray-800 mt-2">
-                {flair === 'all' ? 'Nothing here yet' : `No ${FLAIRS.find(f => f.id === flair).label.replace(/^\S+\s/, '').toLowerCase()} yet`}
+                {flair === 'all' ? 'Nothing here yet' : `No ${FLAIRS.find(f => f.id === flair).label.toLowerCase()} yet`}
               </p>
               <p className="text-sm text-gray-500 mt-1">Be the first. Your post helps the next batch.</p>
               {canPost && <button type="button" onClick={() => compose(OPEN_CATEGORIES.includes(flair) ? flair : undefined)} className="btn-primary text-sm px-5 py-2.5 mt-4">Create a post</button>}

@@ -73,12 +73,12 @@ export function ExamTicker() {
     ...upcomingEvents().slice(0, 6).map(ev => {
       const exact = isExact(ev.date) && ev.confirmed;
       return {
-        icon: '📅',
+        icon: CalendarDays,
         text: `${ev.exam.name}: ${ev.label.toLowerCase()} ${exact ? `on ${fmt(ev.date)}` : `expected ${fmt(ev.date)}`}`,
         badge: exact ? `in ${daysLeft(ev.date)} days` : null,
       };
     }),
-    ...RESULTS.slice(0, 2).map(r => ({ icon: '✅', text: `${r.name} out — ${r.note}`, badge: null })),
+    ...RESULTS.slice(0, 2).map(r => ({ icon: CheckCircle2, text: `${r.name} out — ${r.note}`, badge: null })),
   ];
   const track = [...items, ...items];
 
@@ -94,7 +94,7 @@ export function ExamTicker() {
             {track.map((it, i) => (
               <Link key={i} to="/exams?tab=upcoming" aria-hidden={i >= items.length ? 'true' : undefined} tabIndex={i >= items.length ? -1 : undefined}
                 className="flex items-center gap-2 px-5 py-1.5 text-[13px] text-gray-600 hover:text-brand-700 whitespace-nowrap">
-                <span aria-hidden="true">{it.icon}</span>
+                <it.icon className="w-3.5 h-3.5 shrink-0" aria-hidden="true" />
                 <span>{it.text}</span>
                 {it.badge && <span className="text-[11px] font-semibold text-brand-700">· {it.badge}</span>}
                 <span className="text-gray-300 pl-3" aria-hidden="true">•</span>

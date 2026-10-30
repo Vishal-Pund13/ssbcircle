@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Users, Radio, FolderOpen, CalendarDays, Trash2, LogOut, RefreshCw, Calendar, Bell, PlayCircle, Ban, ShieldCheck, Flag, CheckCircle, Edit3, Check, Star, BookOpen, Plus, Eye, EyeOff } from 'lucide-react';
+import { Users, Radio, FolderOpen, CalendarDays, Trash2, LogOut, RefreshCw, Calendar, Bell, PlayCircle, Ban, ShieldCheck, Flag, CheckCircle, Edit3, Check, Star, BookOpen, Plus, Eye, EyeOff, X, Share2 } from 'lucide-react';
 
 import CommunityAdmin from './community/CommunityAdmin';
 import Insights, { INSIGHT_TABS } from './admin/Insights';
@@ -159,8 +159,8 @@ function RoomRow({ r, onClose, onFeature, CATEGORY_COLORS }) {
                   <Check className="w-3.5 h-3.5"/>
                 </button>
                 <button onClick={() => { setEditing(false); setDraft(r.summary || ''); }}
-                  className="p-2 rounded-lg bg-gray-100 hover:bg-gray-200 text-gray-500 transition-colors cursor-pointer text-[12px]">
-                  ✕
+                  className="p-2 rounded-lg bg-gray-100 hover:bg-gray-200 text-gray-500 transition-colors cursor-pointer" aria-label="Cancel">
+                  <X className="w-3.5 h-3.5" />
                 </button>
               </div>
             </div>
@@ -437,7 +437,7 @@ export default function SuperAdminDashboard() {
             <RefreshCw className="w-4 h-4"/>
           </button>
           <a href="/sa/export" className="flex items-center gap-1.5 text-[12px] font-semibold text-brand-600 bg-brand-50 hover:bg-brand-100 border border-brand-100 px-3 py-1.5 rounded-lg transition-colors">
-            📤 Export Cards
+            <Share2 className="w-3.5 h-3.5" /> Export Cards
           </a>
           <button onClick={handleLogout} className="flex items-center gap-1.5 text-[12px] text-gray-400 hover:text-red-500 transition-colors cursor-pointer px-2 py-1.5">
             <LogOut className="w-3.5 h-3.5"/> Sign out

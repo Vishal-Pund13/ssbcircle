@@ -13,8 +13,7 @@ import { RoomEvent, Track } from 'livekit-client';
 import {
   Mic, MicOff, Timer, FileText, MessageSquare, LogOut,
   AlertCircle, Hand, VolumeX, Volume2, UserX, PhoneOff, Settings, Trash2, Flag,
-  ScreenShare, ScreenShareOff, Monitor,
-} from 'lucide-react';
+  ScreenShare, ScreenShareOff, Monitor, X } from 'lucide-react';
 
 // ── Logo (navy, for light header) ───────────────────────────────────────────
 function Logo() {
@@ -285,7 +284,7 @@ function AdminPanel({ participants, roomCode, onMuteAll, onEndRoom, onMutePartic
     <div className="fixed inset-0 z-50 bg-white flex flex-col sm:relative sm:inset-auto sm:z-20 sm:w-64 sm:shrink-0 sm:border-r sm:border-gray-200 shadow-lg">
       <div className="flex items-center justify-between px-4 py-3.5 border-b border-gray-100">
         <span className="text-sm font-semibold text-gray-900">Room Controls</span>
-        <button onClick={onClose} className="text-gray-400 hover:text-gray-600 cursor-pointer text-lg leading-none">✕</button>
+        <button onClick={onClose} aria-label="Close" className="text-gray-400 hover:text-gray-600 cursor-pointer"><X className="w-5 h-5" /></button>
       </div>
 
       <div className="p-3 border-b border-gray-100 space-y-2">
@@ -594,7 +593,7 @@ function VoiceRoomUI({ room, isAdmin, roomCode, showTimer, setShowTimer, showPan
           p.isSpeaking ? 'border-brand-400' : 'border-white/10'
         }`}>
           {handRaised && (
-            <span className="absolute -top-2 -right-1 text-[11px]">✋</span>
+            <span className="absolute -top-2 -right-1 w-4 h-4 rounded-full bg-amber-400 text-white flex items-center justify-center" aria-label="Hand raised"><Hand className="w-2.5 h-2.5" /></span>
           )}
           <div className={`w-7 h-7 rounded-full bg-brand-600 flex items-center justify-center text-[11px] font-bold text-white ${
             p.isSpeaking ? 'ring-2 ring-brand-400' : ''
@@ -609,7 +608,7 @@ function VoiceRoomUI({ room, isAdmin, roomCode, showTimer, setShowTimer, showPan
         p.isSpeaking ? 'border-brand-600 bg-brand-50' : 'border-gray-200 bg-white'
       }`}>
         {handRaised && (
-          <span className="absolute -top-2 -right-1 text-sm">✋</span>
+          <span className="absolute -top-2 -right-1 w-5 h-5 rounded-full bg-amber-400 text-white flex items-center justify-center" aria-label="Hand raised"><Hand className="w-3 h-3" /></span>
         )}
         <div className={`w-9 h-9 rounded-full bg-brand-600 flex items-center justify-center text-[12px] font-bold text-white ${
           p.isSpeaking ? 'ring-2 ring-brand-600/30' : ''
