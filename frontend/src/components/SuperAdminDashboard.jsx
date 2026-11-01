@@ -6,6 +6,7 @@ import CommunityAdmin from './community/CommunityAdmin';
 import Insights, { INSIGHT_TABS } from './admin/Insights';
 import { ModeratorsAdmin, PlatformFeedbackAdmin } from './admin/ModeratorsAdmin';
 import OnlineNow, { useOnline } from './admin/OnlineNow';
+import { NEWS_SECTIONS } from '../data/newsSections';
 import { LayoutDashboard, BarChart3, Sparkles, ThumbsUp } from 'lucide-react';
 
 const API = import.meta.env.VITE_API_URL || 'http://localhost:4000';
@@ -173,13 +174,7 @@ function RoomRow({ r, onClose, onFeature, CATEGORY_COLORS }) {
   );
 }
 
-const ARTICLE_CATEGORIES = [
-  { id: 'defence',        label: 'Defence & Security' },
-  { id: 'economic',       label: 'Economic' },
-  { id: 'polity',         label: 'Polity' },
-  { id: 'geographic',     label: 'Geographic' },
-  { id: 'socio-cultural', label: 'Socio-Cultural' },
-];
+const ARTICLE_CATEGORIES = NEWS_SECTIONS;
 
 function ArticleForm({ initial, onSave, onCancel }) {
   const [form,    setForm]    = useState({ reading_time: '', difficulty: 'Beginner', ssb_relevance: [], ...initial });

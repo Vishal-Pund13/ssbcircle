@@ -15,6 +15,7 @@ import HomeRail from './HomeRail';
 import { HOME_FAQ } from '../data/homeFaq';
 import { Mic, Timer, FileText, CheckSquare, Radio, ArrowRight, Trash2, Zap, Lightbulb, Users, Presentation, Target, Headphones, RefreshCw, X, Calendar, Heart, PlayCircle, Share2, Check, Sparkles, ChevronDown, Shield, Star, Lock, BookOpen, Video, Award, ChevronRight, GraduationCap, ExternalLink, AlertTriangle, HeartHandshake, PenLine, Footprints } from 'lucide-react';
 import Hello, { firstName } from './Hello';
+import { NEWS_SECTIONS } from '../data/newsSections';
 import { todayIST, daysBetween } from './prep/dates';
 
 
@@ -198,13 +199,7 @@ const CATEGORY_COLORS = {
 
 
 // ── Latest Reads — real articles pulled from the API ────────────────────────
-const PILLAR_LABELS = {
-  defence:         'Defence & Security',
-  economic:        'Economic',
-  polity:          'Polity',
-  geographic:      'Geographic',
-  'socio-cultural': 'Society',
-};
+const PILLAR_LABELS = Object.fromEntries(NEWS_SECTIONS.map(s => [s.id, s.label]));
 
 // Published within the last 10 days counts as new
 function isFresh(dateStr) {

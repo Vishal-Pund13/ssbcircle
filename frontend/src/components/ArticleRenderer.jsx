@@ -86,14 +86,19 @@ function parseBlocks(lines, keyPrefix = '') {
 
     // ── [SSB-GD]...[/SSB-GD] ──────────────────────────────────────────────
     if (line.startsWith('[SSB-GD]')) {
-      const collected = [];
-      let txt = line.replace('[SSB-GD]', '');
-      while (i < lines.length && !lines[i].includes('[/SSB-GD]')) {
-        collected.push(lines[i]);
+      // Same shape as the lecturette block: the opening line is taken once,
+      // then the loop starts on the next line (it used to re-read the opening
+      // line, which printed it twice with the raw marker showing).
+      const collected = [line.replace('[SSB-GD]', '')];
+      if (!line.includes('[/SSB-GD]')) {
         i++;
+        while (i < lines.length && !lines[i].includes('[/SSB-GD]')) {
+          collected.push(lines[i]);
+          i++;
+        }
+        collected.push(lines[i] || '');
       }
-      collected.push(lines[i]?.replace('[/SSB-GD]', '') || '');
-      const raw = (txt + '\n' + collected.join('\n')).replace('[/SSB-GD]', '').trim();
+      const raw = collected.join('\n').replace('[/SSB-GD]', '').trim();
       blocks.push(
         <SSBCallout key={keyPrefix + i} type="gd" title="In a Group Discussion">
           {raw}

@@ -25,6 +25,7 @@ import { STEPS as PREP_STEPS, TOPICS as PREP_TOPICS, LEVELS as PREP_LEVELS } fro
 import { EXAMS, RESULTS } from '../src/data/examCalendar.js';
 import { TOOL_INTROS }  from '../src/data/toolIntros.js';
 import * as MODS        from '../src/data/moderatorProgram.js';
+import { sectionLabel } from '../src/data/newsSections.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const ROOT      = path.resolve(__dirname, '..');
@@ -422,10 +423,85 @@ for (const route of STATIC_ROUTES) {
   }
 }
 
+// The list API carries no body, so each article's full text is fetched for the
+// static HTML. A few at a time: the API runs on a small instance.
+async function loadBodies(list) {
+  const bodies = new Map();
+  for (let i = 0; i < list.length; i += 4) {
+    await Promise.all(list.slice(i, i + 4).map(async a => {
+      try {
+        const res = await fetch(`${API}/api/articles/${a.slug}`, { signal: AbortSignal.timeout(30_000) });
+        if (!res.ok) return;
+        const data = await res.json();
+        const body = (data.article || data).content;
+        if (body) bodies.set(a.slug, body);
+      } catch { /* the summary stands in */ }
+    }));
+  }
+  console.log(`  article bodies: ${bodies.size} of ${list.length}`);
+  return bodies;
+}
+
+// The article markup (## headings, **bold**, lists and our [BLOCK] markers)
+// as plain HTML for crawlers that read the page before any script runs.
+function articleHtml(md) {
+  const inline = t => esc(t).replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>').replace(/\*(.+?)\*/g, '<em>$1</em>');
+  const lines = md.split('\n');
+  let out = '', list = null;
+  const close = () => { if (list) { out += `</${list}>`; list = null; } };
+  for (let i = 0; i < lines.length; i++) {
+    const line = lines[i].trim();
+    if (!line) { close(); continue; }
+    let m;
+    if ((m = line.match(/^\[COMPARE:([^|]+)\|(.+)\]$/))) {
+      close();
+      let rows = '';
+      while (++i < lines.length && !lines[i].includes('[/COMPARE]')) {
+        const [l, r] = lines[i].split('|');
+        if (l?.trim()) rows += `<tr><td>${inline(l.trim())}</td><td>${inline((r || '').trim())}</td></tr>`;
+      }
+      out += `<table><tr><th>${esc(m[1])}</th><th>${esc(m[2])}</th></tr>${rows}</table>`;
+      continue;
+    }
+    if (line.startsWith('[KEY-TERMS]')) {
+      close();
+      let rows = '';
+      while (++i < lines.length && !lines[i].includes('[/KEY-TERMS]')) {
+        const [t, d] = lines[i].split('|');
+        if (t?.trim()) rows += `<dt>${esc(t.trim())}</dt><dd>${inline((d || '').trim())}</dd>`;
+      }
+      out += `<h2>Key terms</h2><dl>${rows}</dl>`;
+      continue;
+    }
+    if ((m = line.match(/^\[CTA:([^|]+)\|(.+)\]$/))) { close(); out += `<p><a href="${esc(m[2])}">${esc(m[1])}</a></p>`; continue; }
+    if ((m = line.match(/^\[IMAGE:([^|\]]+)(?:\|(.*))?\]$/))) {
+      close();
+      const src = m[1].startsWith('http') ? m[1] : SITE + m[1];
+      out += `<figure><img src="${esc(src)}" alt="${esc(m[2] || '')}" loading="lazy"><figcaption>${esc(m[2] || '')}</figcaption></figure>`;
+      continue;
+    }
+    if (/^\[(INFOGRAPHIC|DETAILS)[^\]]*\]$|^\[\/DETAILS\]$/.test(line)) continue;
+    // Block markers that wrap ordinary text: keep the text
+    const text = line.replace(/\[\/?(CALLOUT|SSB-GD|SSB-PI|SSB-LECTURETTE|QUOTE)\]/g, '').trim();
+    if (!text) continue;
+    if ((m = text.match(/^(#{2,3})\s+(.+)$/))) { close(); out += `<h${m[1].length}>${inline(m[2])}</h${m[1].length}>`; continue; }
+    if ((m = text.match(/^[-*]\s+(.+)$/))) { if (list !== 'ul') { close(); out += '<ul>'; list = 'ul'; } out += `<li>${inline(m[1])}</li>`; continue; }
+    if ((m = text.match(/^\d+\.\s+(.+)$/))) { if (list !== 'ol') { close(); out += '<ol>'; list = 'ol'; } out += `<li>${inline(m[1])}</li>`; continue; }
+    close();
+    out += `<p>${inline(text)}</p>`;
+  }
+  close();
+  return out;
+}
+
+const bodies = await loadBodies(articles);
+
 for (const a of articles) {
   const routePath = SWIPE_SLUGS.has(a.slug) ? `/read/${a.slug}` : `/article/${a.slug}`;
   const url       = SITE + routePath;
   const lastmod   = (a.published_at || today).slice(0, 10);
+  const body      = bodies.get(a.slug);
+  const section   = a.category ? sectionLabel(a.category) : null;
 
   const html = buildPage(template, {
     path: routePath,
@@ -433,20 +509,38 @@ for (const a of articles) {
     description: a.summary,
     heading: a.title,
     blurb: a.summary,
+    noscriptExtra: body ? articleHtml(body) : '',
     jsonLd: {
       '@context': 'https://schema.org',
-      '@type': 'Article',
-      headline: a.title,
-      description: a.summary,
-      datePublished: a.published_at || undefined,
-      mainEntityOfPage: { '@type': 'WebPage', '@id': url },
-      author:    { '@type': 'Organization', name: 'SSBCircle', url: SITE },
-      publisher: {
-        '@type': 'Organization',
-        name: 'SSBCircle',
-        logo: { '@type': 'ImageObject', url: `${SITE}/og-image.png` },
-      },
-      inLanguage: 'en-IN',
+      '@graph': [
+        {
+          '@type': 'Article',
+          headline: a.title,
+          description: a.summary,
+          datePublished: a.published_at || undefined,
+          dateModified: a.published_at || undefined,
+          articleSection: section || undefined,
+          keywords: (a.tags || []).join(', ') || undefined,
+          wordCount: body ? body.split(/\s+/).length : undefined,
+          image: `${SITE}/og-image.png`,
+          mainEntityOfPage: { '@type': 'WebPage', '@id': url },
+          author:    { '@type': 'Organization', name: 'SSBCircle', url: SITE },
+          publisher: {
+            '@type': 'Organization',
+            name: 'SSBCircle',
+            logo: { '@type': 'ImageObject', url: `${SITE}/og-image.png` },
+          },
+          inLanguage: 'en-IN',
+        },
+        {
+          '@type': 'BreadcrumbList',
+          itemListElement: [
+            { '@type': 'ListItem', position: 1, name: 'SSBCircle', item: `${SITE}/` },
+            { '@type': 'ListItem', position: 2, name: 'News Cards', item: `${SITE}/current-affairs` },
+            { '@type': 'ListItem', position: 3, name: a.title, item: url },
+          ],
+        },
+      ],
     },
   });
 

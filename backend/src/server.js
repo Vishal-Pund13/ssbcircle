@@ -1086,7 +1086,7 @@ The board is not testing how many videos you have watched. It is testing how man
           ssb_relevance = EXCLUDED.ssb_relevance
       `, [
         'Cut the Noise: The Only Two SSB Playlists You Need',
-        'defence',
+        'ssb-tips',
         "Ten thousand SSB videos, and maybe twenty hours worth watching. Col Yudhvir Singh's 5BRCC for personality, a 3D GTO structures playlist for the ground, and a four-week plan for using both.",
         cutNoiseContent,
         ['ssb-preparation', '5BRCC', 'Col Yudhvir Singh', 'GTO', 'PPDT', 'TAT', 'OLQ', 'resources'],
@@ -1500,6 +1500,33 @@ HAL|Hindustan Aeronautics Limited — the government company that builds the Tej
         );
         console.log(`✓ Seeded article: ${art.title}`);
       }
+    }
+
+    // Prep Sheet articles: two per Prep Sheet section, written for interview
+    // use. Upserted on every boot so edits to the seed files reach production;
+    // published_at is set once, on first insert, so the date stays stable.
+    {
+      const prepArticles = [
+        ...require('./seed/prepArticles1'),
+        ...require('./seed/prepArticles2'),
+        ...require('./seed/prepArticles3'),
+      ];
+      for (const a of prepArticles) {
+        await pool.query(`
+          INSERT INTO articles (title, category, summary, content, tags, is_published, published_at, reading_time, difficulty, ssb_relevance, slug)
+          VALUES ($1, $2, $3, $4, $5, true, NOW(), $6, $7, $8, $9)
+          ON CONFLICT (slug) WHERE slug IS NOT NULL DO UPDATE SET
+            title         = EXCLUDED.title,
+            category      = EXCLUDED.category,
+            summary       = EXCLUDED.summary,
+            content       = EXCLUDED.content,
+            tags          = EXCLUDED.tags,
+            reading_time  = EXCLUDED.reading_time,
+            difficulty    = EXCLUDED.difficulty,
+            ssb_relevance = EXCLUDED.ssb_relevance
+        `, [a.title, a.category, a.summary, a.content, a.tags, a.reading_time, a.difficulty, a.ssb_relevance, a.slug]);
+      }
+      console.log(`✓ Prep Sheet articles up to date (${prepArticles.length})`);
     }
 
     await pool.query(`

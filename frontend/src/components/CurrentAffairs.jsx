@@ -1,21 +1,24 @@
 import { useState, useEffect } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
-import { Shield, TrendingUp, Landmark, Map, Users, ArrowLeft, Calendar, Tag, ChevronRight, BookOpen, Clock, BarChart2, ArrowRight, CheckCircle, Plane, Bell } from 'lucide-react';
+import { Shield, TrendingUp, Landmark, Map, Users, Target, Globe, Cpu, ArrowLeft, Calendar, Tag, ChevronRight, BookOpen, Clock, BarChart2, ArrowRight, CheckCircle, Plane, Bell } from 'lucide-react';
 import { getArticles, getArticle } from '../services/api';
 import { SWIPE_SLUGS } from '../data/swipeArticles';
+import { NEWS_SECTIONS } from '../data/newsSections';
 import ArticleRenderer from './ArticleRenderer';
 import SiteNav from './SiteNav';
 import { CoverBand, PageHead } from './PageCover';
 import { useArticleEngagement, EngagementBar, CommentsSection, useScrollToComments, useArticleTracking } from './ArticleEngagement';
 
+const SECTION_ICON = {
+  'ssb-tips': Target, defence: Shield, international: Globe, economic: TrendingUp,
+  polity: Landmark, 'socio-cultural': Users, science: Cpu, geographic: Map,
+};
 const PILLARS = [
-  { id: 'all',            label: 'All',                icon: null },
-  { id: 'defence',        label: 'Defence & Security', icon: Shield     },
-  { id: 'economic',       label: 'Economic',           icon: TrendingUp },
-  { id: 'polity',         label: 'Polity',             icon: Landmark   },
-  { id: 'geographic',     label: 'Geographic',         icon: Map        },
-  { id: 'socio-cultural', label: 'Society',            icon: Users      },
+  { id: 'all', label: 'All', icon: null },
+  ...NEWS_SECTIONS.map(s => ({ ...s, icon: SECTION_ICON[s.id] })),
 ];
+// How many cards a section shows in the All view before "See all"
+const SECTION_PREVIEW = 3;
 
 const WOMEN_SLUGS = new Set([
   'women-workforce-paradox', 'women-proxy-representation', 'women-glass-ceiling',
@@ -275,7 +278,7 @@ function _SessionBannerRemoved() {
   );
 }
 
-function getPillar(id) { return PILLARS.find(p => p.id === id) || PILLARS[1]; }
+function getPillar(id) { return PILLARS.find(p => p.id === id && p.id !== 'all') || null; }
 function fmtDate(d) {
   return new Date(d).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' });
 }
@@ -455,12 +458,16 @@ export default function CurrentAffairs() {
   const [loadingFull, setLoadingFull] = useState(false);
 
   useEffect(() => {
-    setLoading(true);
-    getArticles(pillar === 'all' ? null : pillar)
+    getArticles()
       .then(d => setArticles(d))
       .catch(() => setArticles([]))
       .finally(() => setLoading(false));
-  }, [pillar]);
+  }, []);
+
+  function showSection(id) {
+    setPillar(id);
+    document.getElementById('news-list')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }
 
   // Load the article named in the URL (/article/:slug) so blog posts are
   // linkable, shareable and indexable rather than living in local state only.
@@ -504,20 +511,7 @@ export default function CurrentAffairs() {
           <section className="border-b border-gray-100 px-4 sm:px-6 pb-8">
             <div className="max-w-5xl mx-auto">
               <PageHead icon={BookOpen} title="News Cards"
-                subtitle="Bite-sized explainers across 5 SSB pillars — read a card, understand the issue, then walk into any GD or Lecturette ready to speak." />
-
-              {/* 5 pillar overview */}
-              <div className="flex flex-wrap gap-2 mt-5">
-                {PILLARS.filter(p => p.id !== 'all').map(p => {
-                  const Icon = p.icon;
-                  return (
-                    <button key={p.id} onClick={() => setPillar(p.id)}
-                      className="inline-flex items-center gap-1.5 text-xs font-semibold px-3 py-1.5 rounded-full border border-gray-200 bg-white text-gray-600 hover:border-brand-200 hover:bg-brand-50 hover:text-brand-600 transition-all cursor-pointer">
-                      <Icon className="w-3.5 h-3.5" /> {p.label}
-                    </button>
-                  );
-                })}
-              </div>
+                subtitle="Explainers written for the SSB — read a card, learn the points, and speak on it in your interview, GD or lecturette. Grouped by subject, with SSB tips first." />
             </div>
           </section>
 
@@ -528,7 +522,7 @@ export default function CurrentAffairs() {
                 const Icon = p.icon;
                 const isActive = pillar === p.id;
                 return (
-                  <button key={p.id} onClick={() => setPillar(p.id)}
+                  <button key={p.id} onClick={() => showSection(p.id)}
                     className={`shrink-0 flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-xs font-semibold border transition-all cursor-pointer ${
                       isActive
                         ? 'bg-brand-600 text-white border-brand-600'
@@ -542,8 +536,8 @@ export default function CurrentAffairs() {
             </div>
           </section>
 
-          {/* Articles grid */}
-          <section className="max-w-5xl mx-auto px-4 sm:px-6 py-8">
+          {/* Articles, grouped by section */}
+          <section id="news-list" className="max-w-5xl mx-auto px-4 sm:px-6 py-8 scroll-mt-28">
             {loading ? (
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
                 {[1,2,3,4,5,6].map(i => <Skeleton key={i} />)}
@@ -551,51 +545,57 @@ export default function CurrentAffairs() {
             ) : articles.length === 0 ? (
               <div className="border border-dashed border-gray-200 rounded-xl py-16 text-center px-6">
                 <BookOpen className="w-8 h-8 text-gray-200 mx-auto mb-4" />
-                <p className="text-sm font-medium text-gray-600 mb-1">No articles yet in this category</p>
+                <p className="text-sm font-medium text-gray-600 mb-1">No articles yet</p>
                 <p className="text-xs text-gray-400">Articles will appear here as they are published.</p>
               </div>
-            ) : (() => {
-              const showSociety = pillar === 'all' || pillar === 'socio-cultural';
-              const womenArticles = articles.filter(a => WOMEN_SLUGS.has(a.slug || a.id));
-              const otherArticles = articles.filter(a => !WOMEN_SLUGS.has(a.slug || a.id));
-              return (
-                <div className="space-y-8">
-                  {/* Society → Women series banner */}
-                  {showSociety && womenArticles.length > 0 && (
-                    <div>
-                      <div className="flex items-center gap-3 mb-4">
-                        <div className="flex items-center gap-2">
-                          <Users className="w-4 h-4 text-brand-600" />
-                          <span className="text-xs font-bold text-brand-600 uppercase tracking-widest">Society</span>
+            ) : (
+              <div className="space-y-10">
+                {PILLARS.filter(p => p.id !== 'all' && (pillar === 'all' || pillar === p.id)).map(sec => {
+                  const inSection = articles.filter(a => a.category === sec.id);
+                  // The Women series lives in one banner under Society, whatever each card's own category
+                  const women = sec.id === 'socio-cultural' ? articles.filter(a => WOMEN_SLUGS.has(a.slug || a.id)) : [];
+                  const cards = inSection.filter(a => !WOMEN_SLUGS.has(a.slug || a.id));
+                  if (!cards.length && !women.length) return null;
+                  const preview = pillar === 'all';
+                  const shown = preview ? cards.slice(0, SECTION_PREVIEW) : cards;
+                  const Icon = sec.icon;
+                  return (
+                    <div key={sec.id}>
+                      <div className="flex items-end justify-between gap-3 mb-4">
+                        <div className="min-w-0">
+                          <h2 className="flex items-center gap-2 text-base sm:text-lg font-bold text-gray-900">
+                            <span className="w-8 h-8 rounded-lg bg-brand-50 text-brand-600 flex items-center justify-center shrink-0"><Icon className="w-4 h-4" /></span>
+                            {sec.label}
+                            <span className="text-xs font-semibold text-gray-400">{cards.length + women.length}</span>
+                          </h2>
+                          <p className="mt-1 text-xs sm:text-sm text-gray-500">{sec.blurb}</p>
                         </div>
-                        <div className="h-px flex-1 bg-gray-100" />
-                        <span className="text-[11px] text-gray-400 font-medium">Women · 7 cards</span>
+                        {preview && cards.length > SECTION_PREVIEW && (
+                          <button onClick={() => showSection(sec.id)}
+                            className="shrink-0 inline-flex items-center gap-1 text-sm font-semibold text-brand-600 hover:text-brand-700 cursor-pointer">
+                            See all <ArrowRight className="w-4 h-4" />
+                          </button>
+                        )}
                       </div>
-                      <div className="grid grid-cols-1 gap-4">
-                        <WomenSeriesBanner />
-                      </div>
-                    </div>
-                  )}
-
-                  {/* All other articles */}
-                  {otherArticles.length > 0 && (
-                    <div>
-                      {showSociety && womenArticles.length > 0 && (
-                        <div className="flex items-center gap-3 mb-4">
-                          <span className="text-xs font-bold text-gray-400 uppercase tracking-widest">Other Cards</span>
-                          <div className="h-px flex-1 bg-gray-100" />
+                      {women.length > 0 && (
+                        <div className="grid grid-cols-1 gap-4 mb-4"><WomenSeriesBanner /></div>
+                      )}
+                      {shown.length > 0 && (
+                        <div className={preview ? 'm-rail sm:grid-cols-2 lg:grid-cols-3' : 'grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4'}>
+                          {shown.map(a => <ArticleCard key={a.id} article={a} onClick={() => openArticle(a)} />)}
                         </div>
                       )}
-                      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-                        {otherArticles.map(a => (
-                          <ArticleCard key={a.id} article={a} onClick={() => openArticle(a)} />
-                        ))}
-                      </div>
                     </div>
-                  )}
-                </div>
-              );
-            })()}
+                  );
+                })}
+                {pillar !== 'all' && (
+                  <button onClick={() => showSection('all')}
+                    className="inline-flex items-center gap-1.5 text-sm font-semibold text-gray-600 hover:text-gray-900 cursor-pointer">
+                    <ArrowLeft className="w-4 h-4" /> All sections
+                  </button>
+                )}
+              </div>
+            )}
           </section>
         </>
       )}

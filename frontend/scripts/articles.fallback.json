@@ -1,74 +1,513 @@
 [
   {
+    "slug": "disaster-management-india-armed-forces-ssb",
+    "title": "Disaster Management in India and the Role of the Armed Forces â€” SSB Interview Notes",
+    "summary": "India's disaster risks, the DM Act 2005 and the 2025 amendment, NDMA and NDRF, how the Army, Navy and Air Force help in disasters at home and abroad, and the questions IOs ask.",
+    "published_at": "2026-11-01T05:10:34.777Z",
+    "category": "geographic",
+    "tags": [
+      "disaster-management",
+      "NDMA",
+      "NDRF",
+      "HADR",
+      "armed-forces",
+      "DM-Act",
+      "environment"
+    ]
+  },
+  {
+    "slug": "climate-change-india-targets-ssb-gd",
+    "title": "Climate Change and India: Impacts, Targets and the 2035 Plan â€” SSB GD and Interview Notes",
+    "summary": "How climate change hits India, India's fair-share argument, the 2070 net-zero goal, the updated 2035 targets, renewable progress, the security angle for the forces, and a balanced GD structure.",
+    "published_at": "2026-11-01T05:10:34.685Z",
+    "category": "geographic",
+    "tags": [
+      "climate-change",
+      "net-zero-2070",
+      "NDC",
+      "renewable-energy",
+      "COP30",
+      "environment",
+      "climate-security"
+    ]
+  },
+  {
+    "slug": "artificial-intelligence-india-defence-ssb",
+    "title": "Artificial Intelligence and India: IndiaAI Mission, Military AI and the Debate â€” SSB Notes",
+    "summary": "AI in plain English, India's IndiaAI Mission and the 2026 AI Impact Summit, how the forces use AI, the risks â€” jobs, deepfakes, autonomous weapons â€” and a balanced structure for GD and interview.",
+    "published_at": "2026-11-01T05:10:34.592Z",
+    "category": "science",
+    "tags": [
+      "artificial-intelligence",
+      "IndiaAI-mission",
+      "military-AI",
+      "deepfakes",
+      "technology",
+      "AI-impact-summit"
+    ]
+  },
+  {
+    "slug": "isro-space-journey-gaganyaan-ssb-interview",
+    "title": "ISRO and India's Space Journey: Key Missions, Gaganyaan and What's Next â€” SSB Notes",
+    "summary": "ISRO's milestones from Aryabhata to Chandrayaan-3, SpaDeX and Shubhanshu Shukla's flight, the Gaganyaan plan and its IAF astronauts, the space station, private space firms and the defence angle.",
+    "published_at": "2026-11-01T05:10:34.500Z",
+    "category": "science",
+    "tags": [
+      "ISRO",
+      "gaganyaan",
+      "chandrayaan",
+      "space",
+      "shubhanshu-shukla",
+      "space-station",
+      "science-technology"
+    ]
+  },
+  {
+    "slug": "social-media-and-youth-ssb-gd-topic",
+    "title": "Social Media and Youth: Boon or Bane? â€” Facts, Rules and Points for SSB GD",
+    "summary": "Benefits and harms of social media for young people, India's rules on children's data, the 2026 debate on age limits, the security angle for the forces, and a balanced structure for GD and interview.",
+    "published_at": "2026-11-01T05:10:34.406Z",
+    "category": "socio-cultural",
+    "tags": [
+      "social-media",
+      "youth",
+      "mental-health",
+      "DPDP-Act",
+      "fake-news",
+      "cyber-safety",
+      "GD-topic"
+    ]
+  },
+  {
+    "slug": "demographic-dividend-india-explained-ssb",
+    "title": "India's Demographic Dividend Explained: Opportunity or Burden? â€” SSB GD Notes",
+    "summary": "What the demographic dividend is, why India's window is open now but will close, the North-South difference, what turns young people into an asset, and how to argue it in a GD.",
+    "published_at": "2026-11-01T05:10:34.312Z",
+    "category": "socio-cultural",
+    "tags": [
+      "demographic-dividend",
+      "population",
+      "youth",
+      "fertility-rate",
+      "census-2027",
+      "skills"
+    ]
+  },
+  {
+    "slug": "one-nation-one-election-explained-ssb-gd",
+    "title": "One Nation One Election Explained: The Bill, the Debate and Where It Stands (2026)",
+    "summary": "What simultaneous elections mean, India's history with them, the Kovind committee, the 129th Amendment Bill and the JPC, arguments for and against, and how to argue it in a GD.",
+    "published_at": "2026-11-01T05:10:34.218Z",
+    "category": "polity",
+    "tags": [
+      "one-nation-one-election",
+      "simultaneous-elections",
+      "kovind-committee",
+      "constitution-amendment",
+      "elections",
+      "federalism"
+    ]
+  },
+  {
+    "slug": "indian-constitution-basics-ssb-interview",
+    "title": "Indian Constitution Basics for the SSB Interview: Preamble, Rights, Duties and the Armed Forces",
+    "summary": "The Constitution in plain English: how it was made, the Preamble, Fundamental Rights, Duties and Directive Principles, basic structure, and the articles every future officer should know.",
+    "published_at": "2026-11-01T05:10:34.123Z",
+    "category": "polity",
+    "tags": [
+      "constitution",
+      "preamble",
+      "fundamental-rights",
+      "fundamental-duties",
+      "polity",
+      "armed-forces"
+    ]
+  },
+  {
+    "slug": "unemployment-in-india-explained-ssb-gd",
+    "title": "Unemployment in India Explained: Facts, Causes and Solutions for SSB GD and Interview",
+    "summary": "Why India grows fast but jobs lag, what the 2026 PLFS numbers say about youth unemployment, the real causes, what the government is doing, and a balanced way to discuss it in GD and PI.",
+    "published_at": "2026-11-01T05:10:34.029Z",
+    "category": "economic",
+    "tags": [
+      "unemployment",
+      "jobs",
+      "PLFS",
+      "youth",
+      "skill-india",
+      "labour-codes",
+      "economy"
+    ]
+  },
+  {
+    "slug": "upi-digital-india-explained-ssb-gd",
+    "title": "UPI and Digital India Explained: How India Built the World's Biggest Payment System",
+    "summary": "How UPI works, the 2026 numbers, the JAM trinity behind it, UPI abroad, the real problems â€” fraud, two-app dominance, the digital divide â€” and how to use it in GD and interview answers.",
+    "published_at": "2026-11-01T05:10:33.936Z",
+    "category": "economic",
+    "tags": [
+      "UPI",
+      "digital-india",
+      "NPCI",
+      "digital-public-infrastructure",
+      "fintech",
+      "JAM-trinity"
+    ]
+  },
+  {
+    "slug": "quad-indo-pacific-explained-ssb-interview",
+    "title": "The Quad and the Indo-Pacific Explained: India, US, Japan, Australia â€” SSB Notes",
+    "summary": "What the Quad is (and is not), how it began, what it actually does â€” maritime awareness, Malabar, vaccines, tech â€” India's role, the 2026 meetings, and how to answer the IO.",
+    "published_at": "2026-11-01T05:10:33.844Z",
+    "category": "international",
+    "tags": [
+      "quad",
+      "indo-pacific",
+      "malabar",
+      "maritime-security",
+      "india-us",
+      "india-japan",
+      "india-australia"
+    ]
+  },
+  {
+    "slug": "india-strategic-autonomy-explained-ssb",
+    "title": "India's Strategic Autonomy Explained: US, Russia and the Art of Multi-Alignment",
+    "summary": "What strategic autonomy means, how India keeps ties with the US, Russia, Europe and the Global South at the same time, the 2025-26 tariff and oil story, and how to answer IO questions on it.",
+    "published_at": "2026-11-01T05:10:33.750Z",
+    "category": "international",
+    "tags": [
+      "strategic-autonomy",
+      "foreign-policy",
+      "india-us",
+      "india-russia",
+      "multi-alignment",
+      "non-alignment"
+    ]
+  },
+  {
+    "slug": "pakistan-cross-border-terrorism-operation-sindoor-ssb",
+    "title": "Pakistan and Cross-Border Terrorism: From Uri to Operation Sindoor â€” SSB Interview Notes",
+    "summary": "Major attacks and India's responses â€” Uri and the surgical strikes, Pulwama and Balakot, Pahalgam and Operation Sindoor â€” plus the Indus Waters Treaty decision and how to answer IO questions calmly.",
+    "published_at": "2026-11-01T05:10:33.655Z",
+    "category": "defence",
+    "tags": [
+      "pakistan",
+      "terrorism",
+      "operation-sindoor",
+      "balakot",
+      "surgical-strikes",
+      "indus-waters-treaty",
+      "national-security"
+    ]
+  },
+  {
+    "slug": "india-china-lac-border-dispute-explained-ssb",
+    "title": "India-China Border (LAC) Explained: From Galwan to the 2026 Talks â€” SSB Interview Notes",
+    "summary": "What the LAC is, the three sectors, what happened at Galwan in 2020, the October 2024 patrolling deal, the August 2026 border talks, and how to discuss China calmly in your SSB interview.",
+    "published_at": "2026-11-01T05:10:33.558Z",
+    "category": "defence",
+    "tags": [
+      "LAC",
+      "india-china",
+      "galwan",
+      "border-dispute",
+      "ladakh",
+      "arunachal",
+      "national-security"
+    ]
+  },
+  {
+    "slug": "indian-army-navy-air-force-ranks-equivalent-table",
+    "title": "Indian Army, Navy and Air Force Ranks and Their Equivalents: The Complete Table",
+    "summary": "All officer, JCO and other ranks of the Indian Army, Navy and Air Force side by side, how insignia work, how a young officer moves up, and the rank questions IOs actually ask.",
+    "published_at": "2026-11-01T05:10:33.461Z",
+    "category": "defence",
+    "tags": [
+      "ranks",
+      "insignia",
+      "indian-army",
+      "indian-navy",
+      "indian-air-force",
+      "armed-forces-basics"
+    ]
+  },
+  {
+    "slug": "agnipath-scheme-explained-ssb-interview",
+    "title": "Agnipath Scheme Explained for the SSB Interview: Facts, Debate and the First Batch Exit",
+    "summary": "What Agnipath is, how Agniveers are recruited and paid, why the first batch exit in late 2026 matters, the debate on 25% retention, and how to give a balanced answer when the IO asks.",
+    "published_at": "2026-11-01T05:10:33.358Z",
+    "category": "defence",
+    "tags": [
+      "agnipath",
+      "agniveer",
+      "armed-forces-reform",
+      "recruitment",
+      "SSB-interview",
+      "GD-topic"
+    ]
+  },
+  {
+    "slug": "know-your-hometown-district-ssb-interview-questions",
+    "title": "Your Home Town and District in the SSB Interview: What to Know and How to Prepare",
+    "summary": "IOs ask about your home town in almost every interview. A one-page checklist of facts to collect, how to talk about its problems and solutions, and the follow-up questions to expect.",
+    "published_at": "2026-11-01T05:10:33.256Z",
+    "category": "ssb-tips",
+    "tags": [
+      "SSB-interview",
+      "hometown",
+      "district",
+      "PIQ",
+      "personal-interview",
+      "IO-questions"
+    ]
+  },
+  {
+    "slug": "why-do-you-want-to-join-the-armed-forces-ssb-answer",
+    "title": "Why Do You Want to Join the Armed Forces? How to Answer It in the SSB Interview",
+    "summary": "The question every IO asks. Why \"I want to serve the nation\" fails, the three parts of a strong answer, worked examples, follow-up questions and the mistakes that get candidates caught.",
+    "published_at": "2026-11-01T05:10:33.077Z",
+    "category": "ssb-tips",
+    "tags": [
+      "SSB-interview",
+      "IO-questions",
+      "motivation",
+      "personal-interview",
+      "officer-like-qualities"
+    ]
+  },
+  {
+    "slug": "military-modernisation-cohesion",
+    "title": "India's Military Modernisation: The Cohesion Problem",
+    "summary": "India spends huge sums on defence. But the equipment often does not work together. A simple guide to cohesion, jointness, and why purchases take so long.",
+    "published_at": "2026-10-23T13:43:53.003Z",
+    "category": "defence",
+    "tags": [
+      "military-modernisation",
+      "jointness",
+      "theatre-commands",
+      "defence-procurement",
+      "DRDO",
+      "Atmanirbhar Bharat",
+      "GD-topics",
+      "lecturette",
+      "current-affairs"
+    ]
+  },
+  {
+    "slug": "iaf-mirage-simulator-startup-deal",
+    "title": "Indian Startup Wins IAF Deal to Train Mirage 2000 Pilots",
+    "summary": "The IAF has signed a â‚¹135 crore deal with Indian startup Threye Interactive for Mirage 2000 part task simulators. What these simulators do, and why startups in defence is a strong GD topic.",
+    "published_at": "2026-10-22T13:08:22.311Z",
+    "category": "defence",
+    "tags": [
+      "IAF",
+      "mirage-2000",
+      "simulators",
+      "defence-startups",
+      "threye",
+      "newspace",
+      "atmanirbhar-bharat",
+      "AFSB"
+    ]
+  },
+  {
+    "slug": "defence-budget-2026-27",
+    "title": "Defence Budget 2026-27: The 7.85 Lakh Crore Question",
+    "summary": "India's biggest ever defence allocation, up 15 percent â€” and the new budget head quietly absorbing a third of the increase. What the number hides, in plain language.",
+    "published_at": "2026-09-16T12:26:36.399Z",
+    "category": "defence",
+    "tags": [
+      "defence-budget",
+      "economics",
+      "DRDO",
+      "Atmanirbhar Bharat",
+      "Finance Commission",
+      "GD-topics",
+      "lecturette",
+      "current-affairs"
+    ]
+  },
+  {
     "slug": "cut-the-noise-ssb-sources",
     "title": "Cut the Noise: The Only Two SSB Playlists You Need",
     "summary": "Ten thousand SSB videos, and maybe twenty hours worth watching. Col Yudhvir Singh's 5BRCC for personality, a 3D GTO structures playlist for the ground, and a four-week plan for using both.",
-    "published_at": "2026-09-02T13:55:25.207Z"
+    "published_at": "2026-09-02T13:55:25.207Z",
+    "category": "ssb-tips",
+    "tags": [
+      "ssb-preparation",
+      "5BRCC",
+      "Col Yudhvir Singh",
+      "GTO",
+      "PPDT",
+      "TAT",
+      "OLQ",
+      "resources"
+    ]
   },
   {
     "slug": "terrier-cyber-quest-2026",
     "title": "Terrier Cyber Quest 2026: The Army Wants Your Code",
     "summary": "The Territorial Army's national hackathon is free, open to students, and closes 31 August. Why entering gives you something for your PIQ that no amount of preparation can fake.",
-    "published_at": "2026-08-29T03:44:15.839Z"
+    "published_at": "2026-08-29T03:44:15.839Z",
+    "category": "defence",
+    "tags": [
+      "terrier-cyber-quest",
+      "territorial-army",
+      "cybersecurity",
+      "hackathon",
+      "AI",
+      "PIQ",
+      "OLQ",
+      "opportunity"
+    ]
   },
   {
     "slug": "ins-sudarshini-lokayan-2026",
     "title": "INS Sudarshini's Voyage of Soft Power",
     "summary": "An unarmed Navy training ship just made her 15th goodwill port call in seven months. Hard power vs soft power â€” the one framework that unlocks a dozen GD topics.",
-    "published_at": "2026-08-24T13:57:44.983Z"
+    "published_at": "2026-08-24T13:57:44.983Z",
+    "category": "polity",
+    "tags": [
+      "geopolitics",
+      "soft-power",
+      "hard-power",
+      "naval-diplomacy",
+      "indian-navy",
+      "lokayan",
+      "foreign-policy"
+    ]
   },
   {
     "slug": "women-health-india",
     "title": "The Health Silence",
     "summary": "India loses a woman every 2 minutes to preventable causes. Maternal mortality, anaemia, malnutrition, and missing women â€” the health crisis nobody talks about loudly enough.",
-    "published_at": "2026-05-20T10:56:15.307Z"
+    "published_at": "2026-05-20T10:56:15.307Z",
+    "category": "socio-cultural",
+    "tags": [
+      "maternal-mortality",
+      "anaemia",
+      "missing-women",
+      "sex-ratio",
+      "women-health"
+    ]
   },
   {
     "slug": "women-education-gap",
     "title": "Education's Broken Promise",
     "summary": "Girls are enrolling in schools at record rates. Then they disappear before Class 10. The education-to-employment pipeline for women in India â€” where it works and where it breaks.",
-    "published_at": "2026-05-20T10:56:14.980Z"
+    "published_at": "2026-05-20T10:56:14.980Z",
+    "category": "socio-cultural",
+    "tags": [
+      "female-education",
+      "dropout-rate",
+      "STEM-gender-gap",
+      "NEP-2020",
+      "child-marriage"
+    ]
   },
   {
     "slug": "women-safety-economy",
     "title": "Safety Is an Economic Problem",
     "summary": "An unsafe city doesn't just endanger women â€” it locks them out of the economy. The direct link between women's safety, workforce participation, and India's GDP.",
-    "published_at": "2026-05-20T10:56:14.653Z"
+    "published_at": "2026-05-20T10:56:14.653Z",
+    "category": "socio-cultural",
+    "tags": [
+      "women-safety",
+      "nirbhaya-fund",
+      "POCSO",
+      "safe-cities",
+      "POSH-act"
+    ]
   },
   {
     "slug": "women-gender-pay-gap",
     "title": "The Pay Gap Nobody Talks About",
     "summary": "For every â‚¹100 a man earns, a woman earns â‚¹76 in urban India â€” and less in rural areas. The gender pay gap is real, measurable, and getting worse at the top.",
-    "published_at": "2026-05-20T10:40:56.810Z"
+    "published_at": "2026-05-20T10:40:56.810Z",
+    "category": "economic",
+    "tags": [
+      "gender-pay-gap",
+      "equal-remuneration",
+      "unpaid-care-work",
+      "wage-discrimination",
+      "women-economy"
+    ]
   },
   {
     "slug": "women-glass-ceiling",
     "title": "The Invisible Ceiling",
     "summary": "Women make up half the entry-level workforce. Only 17% reach the C-suite. The glass ceiling, glass cliff, and broken rung â€” three invisible forces that stop women at the top.",
-    "published_at": "2026-05-20T10:40:56.487Z"
+    "published_at": "2026-05-20T10:40:56.487Z",
+    "category": "economic",
+    "tags": [
+      "glass-ceiling",
+      "glass-cliff",
+      "broken-rung",
+      "corporate-leadership",
+      "gender-gap"
+    ]
   },
   {
     "slug": "women-proxy-representation",
     "title": "Power Without Authority",
     "summary": "46.6% of panchayat seats are held by women. But in thousands of villages, their husbands run the office. Meet the Sarpanch Pati â€” democracy's most stubborn loophole.",
-    "published_at": "2026-05-20T10:40:56.166Z"
+    "published_at": "2026-05-20T10:40:56.166Z",
+    "category": "polity",
+    "tags": [
+      "sarpanch-pati",
+      "proxy-representation",
+      "panchayati-raj",
+      "73rd-amendment",
+      "women-in-politics"
+    ]
   },
   {
     "slug": "women-workforce-paradox",
     "title": "The Workforce Paradox",
     "summary": "India is growing richer â€” but women are working less. The story behind India's female labour force participation puzzle, and what it means for our economy.",
-    "published_at": "2026-05-20T10:40:55.807Z"
+    "published_at": "2026-05-20T10:40:55.807Z",
+    "category": "economic",
+    "tags": [
+      "FLFPR",
+      "pink-collar",
+      "women-employment",
+      "economy",
+      "care-economy"
+    ]
   },
   {
     "slug": "super-el-nino",
     "title": "Super El NiÃ±o: When the Pacific Runs a Fever, India Pays the Price",
     "summary": "A Super El NiÃ±o is forming in the Pacific â€” potentially the strongest since the 1870s. Here's what it means for India's monsoon, food prices, and 600 million farmers.",
-    "published_at": "2026-05-19T20:49:37.672Z"
+    "published_at": "2026-05-19T20:49:37.672Z",
+    "category": "geographic",
+    "tags": [
+      "el-nino",
+      "monsoon",
+      "climate",
+      "food-security",
+      "ENSO",
+      "pacific",
+      "IMD",
+      "geography"
+    ]
   },
   {
     "slug": "rupee-depreciation",
     "title": "The Rupee Story: Why India's Currency Falls â€” and Why That's Not Always Bad",
     "summary": "India's rupee hit â‚¹90 per dollar in 2025. But is a falling rupee always bad? This beginner-friendly explainer breaks down currency depreciation, its causes, who wins and who loses â€” and how to discuss it confidently in SSB GD, Lecturette and PI.",
-    "published_at": "2026-05-19T19:09:31.405Z"
+    "published_at": "2026-05-19T19:09:31.405Z",
+    "category": "economic",
+    "tags": [
+      "economy",
+      "rupee",
+      "RBI",
+      "forex",
+      "current-affairs",
+      "GD-topics",
+      "lecturette",
+      "PI-prep"
+    ]
   }
 ]

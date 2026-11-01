@@ -381,7 +381,7 @@ router.post('/articles', adminGuard, async (req, res) => {
     const { title, category, summary, content, tags, is_published } = req.body;
     if (!title?.trim() || !category || !summary?.trim() || !content?.trim())
       return res.status(400).json({ error: 'title, category, summary and content are required' });
-    const validCategories = ['defence', 'economic', 'polity', 'geographic', 'socio-cultural'];
+    const validCategories = ['ssb-tips', 'defence', 'international', 'economic', 'polity', 'socio-cultural', 'science', 'geographic'];
     if (!validCategories.includes(category))
       return res.status(400).json({ error: 'Invalid category' });
     const publish = !!is_published;

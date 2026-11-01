@@ -118,7 +118,8 @@ export const reportUser = async (payload) => {
 
 // Articles
 export const getArticles = async (category) => {
-  const params = category ? `?category=${category}` : '';
+  // The list API pages at 20 by default; News Cards shows every section at once
+  const params = `?limit=100${category ? `&category=${category}` : ''}`;
   const { data } = await api.get(`/api/articles${params}`);
   return data.articles;
 };

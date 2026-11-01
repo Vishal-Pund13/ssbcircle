@@ -54,6 +54,7 @@ export const STEPS = [
         topics: [
           { id: 'self-hometown', level: 'must', tests: ['PI'],
             title: 'Your home town and district',
+            article: 'know-your-hometown-district-ssb-interview-questions',
             points: [
               'Population, main crops or industry, famous places, and one big problem it faces.',
               'Who is your MP, MLA and District Collector?',
@@ -92,6 +93,7 @@ export const STEPS = [
         topics: [
           { id: 'self-why-forces', level: 'must', tests: ['PI'],
             title: 'Why do you want to join the forces?',
+            article: 'why-do-you-want-to-join-the-armed-forces-ssb-answer',
             points: [
               'Your real reason, in your own words. Not "to serve the nation" alone.',
               'When did the idea start? What have you done about it since?',
@@ -155,6 +157,7 @@ export const STEPS = [
             answer: 'medium', ask: 'What does the CDS do, and why was the post created?' },
           { id: 'forces-ranks', level: 'must', tests: ['PI'],
             title: 'Ranks and their equivalents',
+            article: 'indian-army-navy-air-force-ranks-equivalent-table',
             points: [
               'Lieutenant (Army) = Sub Lieutenant (Navy) = Flying Officer (Air Force).',
               'Know the full officer ladder of your chosen service, and its equivalent in the other two.',
@@ -220,6 +223,7 @@ export const STEPS = [
         topics: [
           { id: 'forces-agnipath', level: 'must', tests: ['GD', 'PI'],
             title: 'Agnipath scheme',
+            article: 'agnipath-scheme-explained-ssb-interview',
             points: [
               'Started 2022. Young soldiers (Agniveers) join for four years; up to a quarter can stay on.',
               'For: younger force, lower pension bill, trained youth go back to society.',
@@ -258,6 +262,7 @@ export const STEPS = [
         topics: [
           { id: 'def-china-lac', level: 'must', tests: ['GD', 'Lecturette', 'PI'],
             title: 'India–China border (LAC)',
+            article: 'india-china-lac-border-dispute-explained-ssb',
             points: [
               'The Line of Actual Control is not agreed on the ground. Both sides patrol to different lines.',
               'Galwan 2020 was the first deadly clash in decades.',
@@ -267,6 +272,7 @@ export const STEPS = [
             ask: 'How should India deal with China — talk, compete, or both?' },
           { id: 'def-pakistan-terror', level: 'must', tests: ['GD', 'PI'],
             title: 'Pakistan and cross-border terrorism',
+            article: 'pakistan-cross-border-terrorism-operation-sindoor-ssb',
             points: [
               'Line of Control in J&K; ceasefire agreed in 2021 but broken at times.',
               'India\'s position: terror and talks cannot go together.',
@@ -403,6 +409,7 @@ export const STEPS = [
             ask: 'Why has India not condemned Russia over Ukraine?' },
           { id: 'ir-autonomy', level: 'must', tests: ['GD', 'Lecturette', 'PI'],
             title: 'Strategic autonomy',
+            article: 'india-strategic-autonomy-explained-ssb',
             points: [
               'India makes its own choices and does not join any one camp.',
               'Grew out of Non-Alignment, but today India works with many sides at once.',
@@ -458,6 +465,7 @@ export const STEPS = [
         topics: [
           { id: 'ir-quad', level: 'must', tests: ['GD', 'PI'],
             title: 'Quad and the Indo-Pacific',
+            article: 'quad-indo-pacific-explained-ssb-interview',
             points: [
               'India, US, Japan, Australia.',
               'Works on sea security, vaccines, tech and disaster help — not a military alliance.',
@@ -584,6 +592,7 @@ export const STEPS = [
         topics: [
           { id: 'eco-jobs', level: 'must', tests: ['GD', 'Lecturette'],
             title: 'Unemployment and jobs',
+            article: 'unemployment-in-india-explained-ssb-gd',
             points: [
               'Many young people, not enough good jobs. Many graduates lack job skills.',
               'Most workers are in the informal sector with no job security.',
@@ -621,6 +630,7 @@ export const STEPS = [
             ask: 'Can India replace China as the world\'s factory?' },
           { id: 'eco-upi', level: 'must', tests: ['GD', 'Lecturette', 'PI'],
             title: 'Digital India and UPI',
+            article: 'upi-digital-india-explained-ssb-gd',
             points: [
               'UPI made instant phone payments normal, even for street vendors.',
               'Aadhaar, Jan Dhan accounts and UPI together let money reach people directly.',
@@ -668,6 +678,7 @@ export const STEPS = [
         topics: [
           { id: 'pol-constitution', level: 'must', tests: ['PI', 'GD'],
             title: 'Constitution basics',
+            article: 'indian-constitution-basics-ssb-interview',
             points: [
               'Came into force on 26 January 1950. Dr B. R. Ambedkar chaired the Drafting Committee.',
               'Preamble: sovereign, socialist, secular, democratic republic; justice, liberty, equality, fraternity.',
@@ -697,6 +708,7 @@ export const STEPS = [
         topics: [
           { id: 'pol-elections', level: 'must', tests: ['GD', 'PI'],
             title: 'Elections and One Nation One Election',
+            article: 'one-nation-one-election-explained-ssb-gd',
             points: [
               'The world\'s largest election. Run by the Election Commission.',
               'One Nation One Election: hold Lok Sabha and state polls together to save money and time.',
@@ -797,6 +809,7 @@ export const STEPS = [
             ask: 'What is wrong with India\'s education system?' },
           { id: 'soc-demographic', level: 'must', tests: ['GD', 'Lecturette'],
             title: 'Population and the demographic dividend',
+            article: 'demographic-dividend-india-explained-ssb',
             points: [
               'India is the most populous country (since 2023). Most people are young.',
               'Young population can be a big gift — only if they are healthy, skilled and employed.',
@@ -805,6 +818,7 @@ export const STEPS = [
             ask: 'Is India\'s large population a strength or a burden?' },
           { id: 'soc-social-media', level: 'must', tests: ['GD', 'Lecturette'],
             title: 'Social media and youth',
+            article: 'social-media-and-youth-ssb-gd-topic',
             points: [
               'Connects people and spreads learning; also fake news, addiction and anxiety.',
               'Reels shorten attention spans; trolling and online bullying hurt.',
@@ -887,6 +901,7 @@ export const STEPS = [
         topics: [
           { id: 'sci-isro', level: 'must', tests: ['GD', 'Lecturette', 'PI'],
             title: 'ISRO and India\'s space journey',
+            article: 'isro-space-journey-gaganyaan-ssb-interview',
             points: [
               'Chandrayaan-3 (2023): first landing near the Moon\'s south pole.',
               'Mangalyaan reached Mars on the first try. Aditya-L1 studies the Sun.',
@@ -901,6 +916,7 @@ export const STEPS = [
         topics: [
           { id: 'sci-ai', level: 'must', tests: ['GD', 'Lecturette'],
             title: 'Artificial Intelligence',
+            article: 'artificial-intelligence-india-defence-ssb',
             points: [
               'AI can write, see, speak and decide. Used in health, farming, defence.',
               'Fears: lost jobs, fake videos (deepfakes), bias, weapons that choose targets.',
@@ -982,6 +998,7 @@ export const STEPS = [
         topics: [
           { id: 'env-climate', level: 'must', tests: ['GD', 'Lecturette', 'PI'],
             title: 'Climate change and India',
+            article: 'climate-change-india-targets-ssb-gd',
             points: [
               'Hotter summers, floods, cyclones and melting glaciers.',
               'India\'s position: rich countries polluted first, so they must pay and cut more.',
@@ -1026,6 +1043,7 @@ export const STEPS = [
         topics: [
           { id: 'env-disasters', level: 'must', tests: ['GD', 'PI'],
             title: 'Disaster management',
+            article: 'disaster-management-india-armed-forces-ssb',
             points: [
               'India faces floods, cyclones, earthquakes, landslides and heatwaves.',
               'NDMA plans; NDRF responds. The forces are often first on the scene.',
