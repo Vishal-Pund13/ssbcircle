@@ -1,6 +1,6 @@
 import { INFOGRAPHICS } from './ArticleInfographics';
 import ArticleVisual from './ArticleVisuals';
-import { Quiz, Flashcards, MindMap } from './LearningTools';
+import { Quiz, Flashcards, MindMap, StudyPath } from './LearningTools';
 import { Lightbulb } from 'lucide-react';
 
 // Parse **bold** and [label](url) links inline
@@ -309,7 +309,17 @@ export default function ArticleRenderer({ content }) {
   // file, so every line arrived with a trailing \r — which made the $-anchored
   // blocks below ([COMPARE:...], [CTA:...], [IMAGE:...], [INFOGRAPHIC:N],
   // [DETAILS:...]) fail to match and render as raw text instead.
-  return <div className="article-body">{parseBlocks(content.split(/\r?\n/))}</div>;
+  const lines = content.split(/\r?\n/);
+  // Articles that carry the learning tools open with a short study path
+  const hasQuiz = lines.some(l => l.trim() === '[QUIZ]');
+  const hasMap = lines.some(l => l.trim() === '[MINDMAP]');
+  const hasCards = lines.some(l => l.startsWith('[KEY-TERMS]'));
+  return (
+    <div className="article-body">
+      {(hasQuiz || hasMap) && <StudyPath hasMap={hasMap} hasCards={hasCards} hasQuiz={hasQuiz} />}
+      {parseBlocks(lines)}
+    </div>
+  );
 }
 
 // SSB Callout cards — all use the same brand-50 base, differentiated by label only

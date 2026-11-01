@@ -16,6 +16,20 @@ import { fsrs, createEmptyCard, Rating } from 'ts-fsrs';
 
 const shell = 'my-8 rounded-2xl border border-gray-200 bg-white p-4 sm:p-6';
 
+// Numbered how-to steps shown under a tool's heading
+function HowTo({ steps }) {
+  return (
+    <ol className="mb-4 -mt-1 flex flex-wrap gap-x-4 gap-y-1.5 rounded-xl bg-gray-50 border border-gray-100 px-3.5 py-2.5 text-[13px] text-gray-600">
+      <li className="font-semibold text-gray-800">How to use:</li>
+      {steps.map((t, i) => (
+        <li key={i} className="flex items-start gap-1.5">
+          <span className="w-4 h-4 mt-0.5 rounded-full bg-brand-600 text-white text-[10px] font-bold flex items-center justify-center shrink-0">{i + 1}</span>{t}
+        </li>
+      ))}
+    </ol>
+  );
+}
+
 function Heading({ icon: Icon, title, sub }) {
   return (
     <div className="flex items-start gap-3 mb-4">
@@ -51,8 +65,9 @@ export function Quiz({ rows }) {
   const score = questions.filter((x, i) => picked[i] === x.right).length;
 
   return (
-    <section className={shell} aria-label="Test yourself">
+    <section id="test-yourself" className={`${shell} scroll-mt-24`} aria-label="Test yourself">
       <Heading icon={ListChecks} title="Test yourself" sub="Answer from memory first. It is the fastest way to make it stick." />
+      <HowTo steps={['Think of the answer before you look at the options', 'Tap your choice', 'Read why — right or wrong', 'Missed some? Re-read that part and try again']} />
       <ol className="space-y-5">
         {questions.map((x, i) => {
           const done = picked[i] !== undefined;
@@ -149,9 +164,10 @@ export function Flashcards({ terms }) {
 
   const learned = ids.filter(id => deck[id].reps > 0).length;
   return (
-    <section className={shell} aria-label="Flashcards">
+    <section id="flashcards" className={`${shell} scroll-mt-24`} aria-label="Flashcards">
       <Heading icon={Layers} title="Flashcards"
         sub={`${terms.length} key terms · ${learned} learned · cards come back just before you would forget them`} />
+      <HowTo steps={['Read the word and say its meaning out loud', 'Tap the card to check', 'Rate yourself honestly — "Forgot" brings it back in minutes, "Easy" in days', 'Come back tomorrow: cards that are due will be waiting here']} />
       {current ? (
         <>
           <button type="button" onClick={() => setFlipped(f => !f)} className="block w-full [perspective:1000px] cursor-pointer" aria-live="polite">
@@ -223,9 +239,9 @@ export function MindMap({ markdown }) {
   const outline = markdown.split('\n').filter(l => /^\s*[-#]/.test(l));
 
   return (
-    <section ref={holder} className={shell} aria-label="Mind map">
+    <section ref={holder} id="mind-map" className={`${shell} scroll-mt-24`} aria-label="Mind map">
       <div className="flex items-start justify-between gap-3">
-        <Heading icon={Network} title="Mind map" sub="The whole topic in one picture. Tap a branch to open or close it; drag to move." />
+        <Heading icon={Network} title="Mind map" sub="The whole topic in one picture." />
         {ready && (
           <button type="button" onClick={() => mm.current?.fit()} title="Fit to view"
             className="shrink-0 w-9 h-9 rounded-lg border border-gray-200 flex items-center justify-center text-gray-500 hover:text-gray-800 cursor-pointer">
@@ -233,6 +249,7 @@ export function MindMap({ markdown }) {
           </button>
         )}
       </div>
+      <HowTo steps={['Read the map once, branch by branch', 'Tap a circle to fold or open a branch; drag to move, pinch or scroll to zoom', 'Close your eyes and redraw it from memory on paper']} />
       {failed ? (
         <ul className="text-sm text-gray-700 space-y-1">{outline.map((l, i) => <li key={i} style={{ paddingLeft: `${(l.match(/^\s*/)[0].length / 2) * 12}px` }}>{l.replace(/^\s*[-#]+\s*/, '')}</li>)}</ul>
       ) : (
@@ -242,5 +259,42 @@ export function MindMap({ markdown }) {
         </div>
       )}
     </section>
+  );
+}
+
+// ── How to learn this topic — shown at the top of articles with the tools ──
+export function StudyPath({ hasMap, hasCards, hasQuiz }) {
+  const steps = [
+    { label: 'Read it once', text: 'Look at the pictures and numbers as you go', href: null },
+    hasMap && { label: 'See the mind map', text: 'The whole topic in one picture', href: '#mind-map' },
+    hasCards && { label: 'Do the flashcards', text: 'Lock in the key terms', href: '#flashcards' },
+    hasQuiz && { label: 'Test yourself', text: '4 quick questions', href: '#test-yourself' },
+    { label: 'Say it out loud', text: 'Explain it in 2 minutes, as in the interview', href: null },
+  ].filter(Boolean);
+  return (
+    <nav aria-label="How to learn this topic" className="mb-8 rounded-2xl border border-brand-100 bg-brand-50/60 p-4 sm:p-5">
+      <p className="text-sm font-bold text-gray-900">How to learn this topic</p>
+      <ol className="mt-3 flex flex-wrap gap-2 sm:grid sm:grid-cols-5">
+        {steps.map((st, i) => {
+          const inner = (
+            <>
+              <span className="w-6 h-6 rounded-full bg-brand-600 text-white text-xs font-bold flex items-center justify-center shrink-0">{i + 1}</span>
+              <span className="min-w-0">
+                <span className={`block text-[13px] font-bold leading-snug ${st.href ? 'text-brand-700' : 'text-gray-900'}`}>{st.label}</span>
+                <span className="hidden sm:block text-xs text-gray-500 leading-snug">{st.text}</span>
+              </span>
+            </>
+          );
+          return (
+            <li key={st.label}>
+              {st.href
+                ? <a href={st.href} onClick={e => { e.preventDefault(); document.querySelector(st.href)?.scrollIntoView({ behavior: 'smooth' }); }}
+                    className="flex items-center sm:items-start sm:flex-col gap-2 rounded-xl bg-white border border-gray-200 px-2.5 py-1.5 sm:p-3 h-full hover:border-brand-600/40">{inner}</a>
+                : <span className="flex items-center sm:items-start sm:flex-col gap-2 rounded-xl bg-white border border-gray-200 px-2.5 py-1.5 sm:p-3 h-full">{inner}</span>}
+            </li>
+          );
+        })}
+      </ol>
+    </nav>
   );
 }

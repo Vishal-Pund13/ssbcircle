@@ -291,7 +291,129 @@ function Hub({ title, args, rows }) {
   );
 }
 
-const TYPES = { timeline: Timeline, stats: Stats, flow: Flow, bars: Bars, icons: IconCards, dots: Dots, hub: Hub };
+// ── Schematic maps: [VISUAL:map|Title|preset] ───────────────────────────────
+// Places, routes and relationships only — never border outlines. Publishing a
+// map of India whose boundaries differ from the Survey of India's is an
+// offence, and free map data draws them the way other countries claim them.
+// So these are diagrams in a map's arrangement, and say so on the figure.
+
+const SCHEMATIC_NOTE = 'Schematic diagram, not to scale. Not an official map of India.';
+
+function Pin({ x, y, label, dy = -10, anchor = 'middle', shown, i, ring = false }) {
+  return (
+    <g style={{ opacity: shown ? 1 : 0, transition: `opacity 400ms ease-out ${600 + i * 120}ms` }}>
+      <circle cx={x} cy={y} r="4.5" fill={ring ? '#fff' : INK} stroke={INK} strokeWidth="2" />
+      <text x={x} y={y + dy} textAnchor={anchor} fontSize="11" fontWeight="600" fill="#1f2937">{label}</text>
+    </g>
+  );
+}
+
+function LacMap({ shown }) {
+  // Sector widths follow the official lengths: 1,597 + 545 + 1,346 = 3,488 km
+  const x0 = 20, W = 380;
+  const xm = x0 + W * (1597 / 3488), xe = xm + W * (545 / 3488), x1 = x0 + W;
+  const line = `M${x0},128 C70,112 120,146 170,126 S${xm + 20},${118} ${xm + 40},128 S${xe + 30},140 ${xe + 60},126 S350,112 ${x1},130`;
+  return (
+    <svg viewBox="0 0 420 250" className="w-full" role="img"
+      aria-label="Schematic of the Line of Actual Control: Western sector in Ladakh, 1,597 km; Middle sector in Himachal Pradesh and Uttarakhand, 545 km; Eastern sector in Sikkim and Arunachal Pradesh, 1,346 km.">
+      <text x="210" y="22" textAnchor="middle" fontSize="12" fontWeight="700" fill="#6b7280" letterSpacing="2">CHINA (TIBET)</text>
+      <text x="210" y="238" textAnchor="middle" fontSize="12" fontWeight="700" fill="#6b7280" letterSpacing="2">INDIA</text>
+      <text x="95" y="48" textAnchor="middle" fontSize="10.5" fontWeight="600" fill="#4b5563">Aksai Chin</text>
+      <text x="95" y="62" textAnchor="middle" fontSize="10" fill="#6b7280">held by China, claimed by India</text>
+      <text x="335" y="48" textAnchor="middle" fontSize="10.5" fontWeight="600" fill="#4b5563">Arunachal Pradesh</text>
+      <text x="335" y="62" textAnchor="middle" fontSize="10" fill="#6b7280">China claims ~90,000 sq km</text>
+      <path d={line} fill="none" stroke={INK} strokeWidth="3" strokeLinecap="round" pathLength="1"
+        strokeDasharray="1" strokeDashoffset={shown ? 0 : 1} style={{ transition: 'stroke-dashoffset 1400ms ease-out' }} />
+      {[xm, xe].map(x => <line key={x} x1={x} y1="104" x2={x} y2="152" stroke={INK_SOFT} strokeWidth="1.5" strokeDasharray="3 3" />)}
+      <Pin x={38} y={124} label="Depsang" shown={shown} i={0} />
+      <Pin x={78} y={121} label="Galwan" dy={22} shown={shown} i={1} />
+      <Pin x={120} y={135} label="Pangong Tso" shown={shown} i={2} />
+      <Pin x={165} y={127} label="Demchok" dy={22} shown={shown} i={3} />
+      <Pin x={xe + 14} y={135} label="Doklam (Bhutan)" dy={22} anchor="start" shown={shown} i={4} ring />
+      <Pin x={330} y={118} label="Tawang" shown={shown} i={5} />
+      {[[(x0 + xm) / 2, 'Western · Ladakh', '1,597 km'], [(xm + xe) / 2, 'Middle', '545 km'], [(xe + x1) / 2, 'Eastern · Sikkim, Arunachal', '1,346 km']]
+        .map(([x, a, b], i) => (
+          <g key={a} style={{ opacity: shown ? 1 : 0, transition: `opacity 400ms ease-out ${1200 + i * 150}ms` }}>
+            <text x={x} y="184" textAnchor="middle" fontSize="11" fontWeight="700" fill={INK}>{a}</text>
+            <text x={x} y="199" textAnchor="middle" fontSize="11" fill="#4b5563">{b}</text>
+          </g>
+        ))}
+      <text x={(xm + xe) / 2} y="213" textAnchor="middle" fontSize="10" fill="#6b7280">HP, Uttarakhand</text>
+    </svg>
+  );
+}
+
+function IndoPacificMap({ shown }) {
+  const lane = 'M70,92 C110,120 130,150 160,150 S230,160 258,150 S300,118 320,104 S370,70 392,62';
+  const quad = [[160, 118, 'India', 0], [392, 62, 'Japan', 22], [330, 214, 'Australia', 22]];
+  const choke = [[70, 92, 'Strait of Hormuz', -10], [36, 140, 'Bab-el-Mandeb', 22], [258, 150, 'Malacca Strait', 22]];
+  return (
+    <svg viewBox="0 0 440 260" className="w-full" role="img"
+      aria-label="Schematic of the Indo-Pacific: the sea route from the Gulf past India through the Malacca Strait to Japan, with the choke points Hormuz, Bab-el-Mandeb and Malacca, and the Quad countries India, Japan, Australia and the USA.">
+      <rect x="0" y="0" width="440" height="260" rx="12" fill="#f1f5f9" />
+      <text x="140" y="228" textAnchor="middle" fontSize="13" fontStyle="italic" fill="#94a3b8">Indian Ocean</text>
+      <text x="380" y="150" textAnchor="middle" fontSize="13" fontStyle="italic" fill="#94a3b8">Pacific Ocean</text>
+      <text x="290" y="88" textAnchor="middle" fontSize="10.5" fill="#94a3b8">South China Sea</text>
+      <path d={lane} fill="none" stroke={INK_SOFT} strokeWidth="2.5" strokeDasharray="6 5"
+        style={{ opacity: shown ? 1 : 0, transition: 'opacity 900ms ease-out' }} />
+      <g style={{ opacity: shown ? 1 : 0, transition: 'opacity 500ms ease-out 1300ms' }}>
+        <text x="185" y="196" textAnchor="middle" fontSize="10.5" fill="#475569">- - - Main sea route: oil, gas and trade</text>
+      </g>
+      {choke.map(([x, y, l, dy], i) => <Pin key={l} x={x} y={y} label={l} dy={dy} anchor={x < 60 ? 'start' : 'middle'} shown={shown} i={i} ring />)}
+      {quad.map(([x, y, l, dy], i) => <Pin key={l} x={x} y={y} label={l} dy={dy || -10} shown={shown} i={i + 3} />)}
+      <g style={{ opacity: shown ? 1 : 0, transition: 'opacity 400ms ease-out 1100ms' }}>
+        <circle cx="428" cy="120" r="4.5" fill={INK} />
+        <text x="420" y="108" textAnchor="end" fontSize="11" fontWeight="600" fill="#1f2937">USA →</text>
+      </g>
+    </svg>
+  );
+}
+
+function IndusMap({ shown }) {
+  const west = [['Indus', 60], ['Jhelum', 105], ['Chenab', 150]];
+  const east = [['Ravi', 215], ['Beas', 260], ['Sutlej', 305]];
+  const river = x => `M${x},40 C${x},120 ${x - (x - 60) * 0.4},170 ${60 + (x - 60) * 0.25},215 L60,232`;
+  return (
+    <svg viewBox="0 0 360 270" className="w-full max-w-[420px] mx-auto" role="img"
+      aria-label="Schematic of the Indus river system: the western rivers Indus, Jhelum and Chenab are mostly for Pakistan's use; the eastern rivers Ravi, Beas and Sutlej are for India's full use. All join the Indus, which flows to the Arabian Sea.">
+      <text x="180" y="18" textAnchor="middle" fontSize="11" fontWeight="700" fill="#6b7280" letterSpacing="2">HIMALAYAS</text>
+      {[...west, ...east].map(([name, x], i) => (
+        <g key={name}>
+          <path d={river(x)} fill="none" stroke={i < 3 ? INK_SOFT : INK} strokeWidth={name === 'Indus' ? 4 : 2.5} strokeLinecap="round"
+            pathLength="1" strokeDasharray="1" strokeDashoffset={shown ? 0 : 1} style={{ transition: `stroke-dashoffset 1200ms ease-out ${i * 120}ms` }} />
+          <text x={x} y="34" textAnchor="middle" fontSize="11.5" fontWeight="700" fill="#1f2937"
+            style={{ opacity: shown ? 1 : 0, transition: `opacity 300ms ease-out ${i * 120}ms` }}>{name}</text>
+        </g>
+      ))}
+      <g style={{ opacity: shown ? 1 : 0, transition: 'opacity 500ms ease-out 1200ms' }}>
+        {/* Legend in the empty corner, so no label sits on a river */}
+        <line x1="222" y1="186" x2="244" y2="186" stroke={INK_SOFT} strokeWidth="3" strokeLinecap="round" />
+        <text x="250" y="190" fontSize="10.5" fontWeight="700" fill="#1f2937">Western rivers</text>
+        <text x="250" y="204" fontSize="10" fill="#4b5563">Mostly Pakistan's use</text>
+        <line x1="222" y1="222" x2="244" y2="222" stroke={INK} strokeWidth="3" strokeLinecap="round" />
+        <text x="250" y="226" fontSize="10.5" fontWeight="700" fill="#1f2937">Eastern rivers</text>
+        <text x="250" y="240" fontSize="10" fill="#4b5563">India's full use</text>
+        <text x="70" y="256" fontSize="11" fontWeight="600" fill="#1f2937">→ Indus flows to the Arabian Sea</text>
+      </g>
+    </svg>
+  );
+}
+
+const MAPS = { lac: LacMap, 'indo-pacific': IndoPacificMap, indus: IndusMap };
+
+function SchematicMap({ title, args }) {
+  const [ref, shown] = useReveal();
+  const [preset, note] = args;
+  const M = MAPS[preset];
+  if (!M) return null;
+  return (
+    <Frame title={title} note={[note, SCHEMATIC_NOTE].filter(Boolean).join(' ')} frameRef={ref}>
+      <M shown={shown} />
+    </Frame>
+  );
+}
+
+const TYPES = { timeline: Timeline, stats: Stats, flow: Flow, bars: Bars, icons: IconCards, dots: Dots, hub: Hub, map: SchematicMap };
 
 export default function ArticleVisual({ type, title, args, rows }) {
   const V = TYPES[type];

@@ -482,7 +482,8 @@ function articleHtml(md) {
         const cells = lines[i].split('|').map(c => c.trim()).filter(c => c && c !== '*');
         if (cells.length) rows += `<tr>${cells.map(c => `<td>${inline(c)}</td>`).join('')}</tr>`;
       }
-      out += `${m[1] ? `<h3>${esc(m[1])}</h3>` : ''}<table>${rows}</table>`;
+      // Schematic maps carry no rows; their title is enough
+      out += `${m[1] ? `<h3>${esc(m[1])}</h3>` : ''}${rows ? `<table>${rows}</table>` : ''}`;
       continue;
     }
     if (line === '[QUIZ]') {
