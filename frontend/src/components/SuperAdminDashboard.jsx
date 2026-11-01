@@ -5,6 +5,7 @@ import { Users, Radio, FolderOpen, CalendarDays, Trash2, LogOut, RefreshCw, Cale
 import CommunityAdmin from './community/CommunityAdmin';
 import Insights, { INSIGHT_TABS } from './admin/Insights';
 import { ModeratorsAdmin, PlatformFeedbackAdmin } from './admin/ModeratorsAdmin';
+import OnlineNow, { useOnline } from './admin/OnlineNow';
 import { LayoutDashboard, BarChart3, Sparkles, ThumbsUp } from 'lucide-react';
 
 const API = import.meta.env.VITE_API_URL || 'http://localhost:4000';
@@ -278,6 +279,7 @@ function ArticleForm({ initial, onSave, onCancel }) {
 
 export default function SuperAdminDashboard() {
   const navigate = useNavigate();
+  const online = useOnline(authHeaders, () => { sessionStorage.removeItem('sa_token'); navigate('/sa'); });
   const [stats,    setStats]    = useState(null);
   const [rooms,    setRooms]    = useState([]);
   const [users,    setUsers]    = useState([]);
@@ -454,6 +456,14 @@ export default function SuperAdminDashboard() {
         <div className="lg:grid lg:grid-cols-[210px_1fr] lg:gap-8">
           <aside className="mb-5 lg:mb-0">
             <div className="lg:sticky lg:top-6 flex lg:flex-col gap-1 overflow-x-auto lg:overflow-visible pb-1 lg:pb-0">
+              <button onClick={() => setTab('online')}
+                className={`shrink-0 flex items-center justify-between gap-2 px-3 py-2 mb-1 rounded-xl text-[14px] font-semibold text-left cursor-pointer transition-colors ${
+                  tab === 'online' ? 'bg-emerald-600 text-white' : 'text-gray-700 bg-white border border-gray-200 hover:border-emerald-300'}`}>
+                <span className="flex items-center gap-2">
+                  <span className={`w-2 h-2 rounded-full animate-pulse ${tab === 'online' ? 'bg-white' : 'bg-emerald-500'}`} /> Online now
+                </span>
+                <span className={`text-[12px] font-bold tabular-nums ${tab === 'online' ? 'text-white' : 'text-emerald-700'}`}>{online.data ? online.data.total : '…'}</span>
+              </button>
               <p className="hidden lg:block px-3 pt-1 pb-1.5 text-[10px] font-bold uppercase tracking-widest text-gray-400">Insights</p>
               {INSIGHT_TABS.map(t => {
                 const Icon = { overview: LayoutDashboard, features: BarChart3, ai: Sparkles, feedback: ThumbsUp }[t.id];
@@ -480,6 +490,7 @@ export default function SuperAdminDashboard() {
           </aside>
 
           <div className="min-w-0">
+        {tab === 'online' && <OnlineNow online={online} />}
         {tab === 'moderators' && <ModeratorsAdmin authHeaders={authHeaders} />}
         {tab === 'pfeedback' && <PlatformFeedbackAdmin authHeaders={authHeaders} />}
 

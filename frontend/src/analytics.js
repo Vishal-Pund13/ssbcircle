@@ -61,4 +61,34 @@ export function trackEvent(event, meta) {
 export const trackPageView = (path) => {
   ReactGA.send({ hitType: 'pageview', page: path });
   trackEvent('page_view');
+  ping();
 };
+
+// ── Presence: who is on the site right now ──────────────────────────────────
+// A visible tab tells the server it is here once a minute (and straight away
+// on each page change), so the admin dashboard can show who is online. A tab
+// in the background sends nothing and drops off after two minutes.
+
+const PING_MS = 60_000;
+let lastPing = 0;
+
+function ping() {
+  if (import.meta.env.DEV && import.meta.env.VITE_TRACK_DEV !== '1') return;
+  if (document.visibilityState !== 'visible') return;
+  if (Date.now() - lastPing < 10_000) return;   // page changes in quick succession
+  const id = visitorId();
+  if (!id) return;
+  lastPing = Date.now();
+  let token = null;
+  try { token = localStorage.getItem('token'); } catch {}
+  fetch(`${API}/api/track/ping`, {
+    method: 'POST',
+    headers: { 'content-type': 'application/json', ...(token && { authorization: `Bearer ${token}` }) },
+    body: JSON.stringify({ visitor_id: id, path: window.location.pathname }),
+  }).catch(() => {});
+}
+
+if (typeof document !== 'undefined') {
+  setInterval(ping, PING_MS);
+  document.addEventListener('visibilitychange', ping);
+}

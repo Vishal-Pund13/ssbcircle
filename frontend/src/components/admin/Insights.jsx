@@ -12,7 +12,7 @@ import {
 const API = import.meta.env.VITE_API_URL || 'http://localhost:4000';
 const NAVY = '#1e3a5f';
 
-const SECTION_LABEL = {
+export const SECTION_LABEL = {
   home: 'Home', piq: 'PIQ', tat: 'TAT practice', prep: 'Prep Sheet', exams: 'Exam calendar',
   news: 'News cards', community: 'Community', rooms: 'Live rooms', mentors: 'Mentors',
   profile: 'Profile', signup: 'Sign in / up', start: 'Become an officer guide', other: 'Other',

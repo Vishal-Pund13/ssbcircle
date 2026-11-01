@@ -320,6 +320,18 @@ async function start() {
     `);
     await pool.query(`CREATE INDEX IF NOT EXISTS idx_app_events_created ON app_events(created_at)`);
     await pool.query(`CREATE INDEX IF NOT EXISTS idx_app_events_event ON app_events(event, created_at)`);
+    // Who is on the site now: one row per browser, refreshed by a ping each
+    // minute while a tab is visible. Rows older than a day are swept away.
+    await pool.query(`
+      CREATE TABLE IF NOT EXISTS presence (
+        visitor_id VARCHAR(64) PRIMARY KEY,
+        user_id    UUID,
+        path       VARCHAR(200),
+        section    VARCHAR(20),
+        last_seen  TIMESTAMPTZ DEFAULT NOW()
+      )
+    `);
+    await pool.query(`CREATE INDEX IF NOT EXISTS idx_presence_seen ON presence(last_seen)`);
     // Moderator programme: one row per person who opted in or was invited.
     // status: trial | review | invited | approved | declined | withdrawn | removed
     await pool.query(`

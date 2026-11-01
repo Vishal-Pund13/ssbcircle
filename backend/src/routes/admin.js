@@ -127,6 +127,44 @@ router.get('/rooms', adminGuard, async (_req, res) => {
   }
 });
 
+// Who is on the site now: browsers that pinged in the last two minutes (a
+// visible tab pings every minute). Signed-in people are listed by name;
+// guests are only counted.
+router.get('/online', adminGuard, async (_req, res) => {
+  try {
+    const { rows } = await pool.query(`
+      SELECT p.visitor_id, p.user_id, p.path, p.section, p.last_seen,
+             u.display_name, u.avatar_url, u.exam_type
+      FROM presence p
+      LEFT JOIN users u ON u.id = p.user_id
+      WHERE p.last_seen > NOW() - INTERVAL '2 minutes'
+      ORDER BY p.last_seen DESC
+    `);
+    // One person with two tabs or devices is still one person
+    const people = new Map();
+    let guests = 0;
+    for (const r of rows) {
+      if (!r.user_id) { guests += 1; continue; }
+      if (!people.has(r.user_id)) people.set(r.user_id, r);
+    }
+    const sections = {};
+    for (const r of rows) sections[r.section] = (sections[r.section] || 0) + 1;
+    res.json({
+      total: people.size + guests,
+      signed_in: people.size,
+      guests,
+      sections,
+      users: [...people.values()].map(r => ({
+        id: r.user_id, display_name: r.display_name, avatar_url: r.avatar_url, exam_type: r.exam_type,
+        path: r.path, section: r.section, last_seen: r.last_seen,
+      })),
+    });
+  } catch (err) {
+    console.error('Admin online error:', err);
+    res.status(500).json({ error: 'Could not load who is online' });
+  }
+});
+
 // All users
 router.get('/users', adminGuard, async (_req, res) => {
   try {

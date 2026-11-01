@@ -61,6 +61,28 @@ router.post('/', async (req, res) => {
   }
 });
 
+// Presence ping, sent once a minute while a tab is visible. Upserts one row
+// per browser, so the admin dashboard can show who is on the site right now.
+router.post('/ping', async (req, res) => {
+  res.status(204).end();
+  try {
+    const visitorId = String(req.body?.visitor_id || '').slice(0, 64);
+    if (!/^[\w-]{8,64}$/.test(visitorId)) return;
+    const path = String(req.body?.path || '/').split('?')[0].slice(0, 200);
+    if (path.startsWith('/sa')) return;   // the admin watching the dashboard is not a visitor
+    await pool.query(
+      `INSERT INTO presence (visitor_id, user_id, path, section, last_seen)
+       VALUES ($1, $2, $3, $4, NOW())
+       ON CONFLICT (visitor_id) DO UPDATE
+         SET user_id = EXCLUDED.user_id, path = EXCLUDED.path, section = EXCLUDED.section, last_seen = NOW()`,
+      [visitorId, readUser(req), path, sectionOf(path)]
+    );
+    if (Math.random() < 0.01) await pool.query(`DELETE FROM presence WHERE last_seen < NOW() - INTERVAL '1 day'`);
+  } catch (err) {
+    console.error('[track] ping failed:', err.message);
+  }
+});
+
 // "Was this useful?" on AI reports. One answer per person per report; a
 // second answer replaces the first.
 const FEATURES = new Set(['piq', 'tat', 'prep_speak']);
