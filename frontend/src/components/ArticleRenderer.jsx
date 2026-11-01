@@ -1,4 +1,6 @@
 import { INFOGRAPHICS } from './ArticleInfographics';
+import ArticleVisual from './ArticleVisuals';
+import { Quiz, Flashcards, MindMap } from './LearningTools';
 import { Lightbulb } from 'lucide-react';
 
 // Parse **bold** and [label](url) links inline
@@ -145,6 +147,43 @@ function parseBlocks(lines, keyPrefix = '') {
         i++;
       }
       blocks.push(<KeyTermsBlock key={keyPrefix + i} terms={terms} />);
+      // The same terms become a flashcard deck, so they can be revised later
+      if (terms.length >= 3) blocks.push(<Flashcards key={keyPrefix + i + 'fc'} terms={terms.map(t => [t.term, t.def])} />);
+      i++; continue;
+    }
+
+    // ── [VISUAL:type|title|args…] rows [/VISUAL] — see ArticleVisuals ──────
+    const visMatch = line.match(/^\[VISUAL:([a-z]+)(?:\|(.*))?\]$/);
+    if (visMatch) {
+      const [title = '', ...args] = (visMatch[2] || '').split('|').map(x => x.trim());
+      const rows = [];
+      i++;
+      while (i < lines.length && lines[i].trim() !== '[/VISUAL]') {
+        if (lines[i].trim()) rows.push(lines[i].split('|').map(x => x.trim()));
+        i++;
+      }
+      blocks.push(<ArticleVisual key={keyPrefix + i} type={visMatch[1]} title={title} args={args} rows={rows} />);
+      i++; continue;
+    }
+
+    // ── [QUIZ] question|right|wrong|wrong|why [/QUIZ] ──────────────────────
+    if (line.trim() === '[QUIZ]') {
+      const rows = [];
+      i++;
+      while (i < lines.length && lines[i].trim() !== '[/QUIZ]') {
+        if (lines[i].trim()) rows.push(lines[i].split('|').map(x => x.trim()));
+        i++;
+      }
+      blocks.push(<Quiz key={keyPrefix + i} rows={rows} />);
+      i++; continue;
+    }
+
+    // ── [MINDMAP] markdown outline [/MINDMAP] ──────────────────────────────
+    if (line.trim() === '[MINDMAP]') {
+      const md = [];
+      i++;
+      while (i < lines.length && lines[i].trim() !== '[/MINDMAP]') { md.push(lines[i]); i++; }
+      blocks.push(<MindMap key={keyPrefix + i} markdown={md.join('\n')} />);
       i++; continue;
     }
 

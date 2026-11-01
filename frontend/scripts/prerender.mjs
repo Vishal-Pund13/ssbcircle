@@ -473,6 +473,39 @@ function articleHtml(md) {
       out += `<h2>Key terms</h2><dl>${rows}</dl>`;
       continue;
     }
+    // Visuals, quizzes and mind maps are pictures and widgets on the page;
+    // here they become a table, questions with answers, and a nested list.
+    if ((m = line.match(/^\[VISUAL:[a-z]+(?:\|([^|\]]*))?.*\]$/))) {
+      close();
+      let rows = '';
+      while (++i < lines.length && lines[i].trim() !== '[/VISUAL]') {
+        const cells = lines[i].split('|').map(c => c.trim()).filter(c => c && c !== '*');
+        if (cells.length) rows += `<tr>${cells.map(c => `<td>${inline(c)}</td>`).join('')}</tr>`;
+      }
+      out += `${m[1] ? `<h3>${esc(m[1])}</h3>` : ''}<table>${rows}</table>`;
+      continue;
+    }
+    if (line === '[QUIZ]') {
+      close();
+      out += '<h2>Test yourself</h2>';
+      while (++i < lines.length && lines[i].trim() !== '[/QUIZ]') {
+        const [q, right, ...rest] = lines[i].split('|').map(c => c.trim());
+        if (!q) continue;
+        const why = rest.length > 2 ? rest[rest.length - 1] : '';
+        out += `<h3>${esc(q)}</h3><p>Answer: ${esc(right)}.${why ? ` ${esc(why)}` : ''}</p>`;
+      }
+      continue;
+    }
+    if (line === '[MINDMAP]') {
+      close();
+      const items = [];
+      while (++i < lines.length && lines[i].trim() !== '[/MINDMAP]') {
+        const mm = lines[i].match(/^\s*-\s+(.+)$/);
+        if (mm) items.push(`<li>${inline(mm[1])}</li>`);
+      }
+      out += `<h2>Mind map</h2><ul>${items.join('')}</ul>`;
+      continue;
+    }
     if ((m = line.match(/^\[CTA:([^|]+)\|(.+)\]$/))) { close(); out += `<p><a href="${esc(m[2])}">${esc(m[1])}</a></p>`; continue; }
     if ((m = line.match(/^\[IMAGE:([^|\]]+)(?:\|(.*))?\]$/))) {
       close();
