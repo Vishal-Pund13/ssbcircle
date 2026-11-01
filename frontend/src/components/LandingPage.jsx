@@ -1355,9 +1355,21 @@ export default function LandingPage() {
                 </button>
               </div>
 
+              {/* Start here — the way in for anyone unsure what to do first */}
               <Link to="/how-it-works" onClick={() => trackEvent('home_cta', { which: 'how_it_works' })}
-                className="mb-3 flex sm:inline-flex items-center gap-1.5 text-sm font-semibold text-brand-700 hover:text-brand-900">
-                <Signpost className="w-4 h-4" /> Not sure where to start? See how SSBCircle works <ArrowRight className="w-4 h-4" />
+                className="group mb-5 flex items-center gap-4 w-full sm:max-w-md rounded-2xl border-2 border-amber-300 bg-amber-50 px-4 py-3.5 shadow-sm hover:border-amber-400 hover:shadow-md transition-all">
+                <span className="relative w-12 h-12 rounded-xl bg-amber-400 text-white flex items-center justify-center shrink-0">
+                  <Signpost className="w-6 h-6" />
+                  <span className="absolute -top-1 -right-1 w-3 h-3 rounded-full bg-amber-500 ring-2 ring-amber-50 animate-pulse" aria-hidden="true" />
+                </span>
+                <span className="min-w-0 flex-1 text-left">
+                  <span className="block text-[11px] font-bold uppercase tracking-wider text-amber-700">New here?</span>
+                  <span className="block text-base font-bold text-gray-900 leading-snug">See what to do first on SSBCircle</span>
+                  <span className="block text-xs text-gray-600 mt-0.5">A 2-minute guide to every tool, for where you are</span>
+                </span>
+                <span className="w-9 h-9 rounded-full bg-white border border-amber-200 text-amber-700 flex items-center justify-center shrink-0 group-hover:translate-x-0.5 transition-transform">
+                  <ArrowRight className="w-5 h-5" />
+                </span>
               </Link>
 
               {!user && (
@@ -1368,7 +1380,7 @@ export default function LandingPage() {
               )}
 
               <div className="flex flex-wrap items-center gap-x-4 gap-y-2 text-xs text-gray-500">
-                <span className="inline-flex items-center gap-1.5"><Check className="w-3.5 h-3.5 text-emerald-600" /> No fees, no download</span>
+                <span className="inline-flex items-center gap-1.5"><Check className="w-3.5 h-3.5 text-emerald-600" /> No download needed</span>
                 <span className="inline-flex items-center gap-1.5"><Check className="w-3.5 h-3.5 text-emerald-600" /> NDA, CDS, AFCAT, TES and more</span>
                 {!loading && rooms.length > 0 && (
                   <span className="inline-flex items-center gap-1.5">
