@@ -321,7 +321,8 @@ async function start() {
     await pool.query(`CREATE INDEX IF NOT EXISTS idx_app_events_created ON app_events(created_at)`);
     await pool.query(`CREATE INDEX IF NOT EXISTS idx_app_events_event ON app_events(event, created_at)`);
     // Who is on the site now: one row per browser, refreshed by a ping each
-    // minute while a tab is visible. Rows older than a day are swept away.
+    // minute while a tab is visible. Rows older than 30 days are swept away,
+    // which also bounds the "last seen" shown in the admin users table.
     await pool.query(`
       CREATE TABLE IF NOT EXISTS presence (
         visitor_id VARCHAR(64) PRIMARY KEY,
@@ -332,6 +333,7 @@ async function start() {
       )
     `);
     await pool.query(`CREATE INDEX IF NOT EXISTS idx_presence_seen ON presence(last_seen)`);
+    await pool.query(`CREATE INDEX IF NOT EXISTS idx_presence_user ON presence(user_id)`);
     // Moderator programme: one row per person who opted in or was invited.
     // status: trial | review | invited | approved | declined | withdrawn | removed
     await pool.query(`

@@ -77,7 +77,7 @@ router.post('/ping', async (req, res) => {
          SET user_id = EXCLUDED.user_id, path = EXCLUDED.path, section = EXCLUDED.section, last_seen = NOW()`,
       [visitorId, readUser(req), path, sectionOf(path)]
     );
-    if (Math.random() < 0.01) await pool.query(`DELETE FROM presence WHERE last_seen < NOW() - INTERVAL '1 day'`);
+    if (Math.random() < 0.01) await pool.query(`DELETE FROM presence WHERE last_seen < NOW() - INTERVAL '30 days'`);
   } catch (err) {
     console.error('[track] ping failed:', err.message);
   }

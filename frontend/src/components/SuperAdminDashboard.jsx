@@ -288,6 +288,7 @@ export default function SuperAdminDashboard() {
   const [articles,      setArticles]      = useState([]);
   const [registrations, setRegistrations] = useState([]);
   const [tab,           setTab]           = useState('overview');
+  const [userFilter,    setUserFilter]    = useState('all');
   const [articleForm, setArticleForm] = useState(null);
   const [loading,  setLoading]  = useState(true);
   const [error,    setError]    = useState('');
@@ -400,6 +401,19 @@ export default function SuperAdminDashboard() {
     await fetch(`${API}/api/admin/articles/${id}`, { method: 'DELETE', headers: authHeaders() });
     setArticles(p => p.filter(a => a.id !== id));
   }
+
+  // Presence tracking started on 1 Nov 2026 and keeps 30 days, so "not seen"
+  // means not since then, or not in the last month.
+  const onlineIds = new Set((online.data?.users || []).map(u => u.id));
+  const DAY = 86400000;
+  const seenWithin = (u, ms) => u.last_seen && Date.now() - new Date(u.last_seen) < ms;
+  const USER_FILTERS = [
+    { id: 'all',    label: 'All',                 test: () => true },
+    { id: 'online', label: 'Online now',          test: u => onlineIds.has(u.id) },
+    { id: 'week',   label: 'Seen this week',      test: u => seenWithin(u, 7 * DAY) },
+    { id: 'quiet',  label: 'Not seen lately', test: u => !onlineIds.has(u.id) && !seenWithin(u, 30 * DAY) },
+  ];
+  const shownUsers = users.filter((USER_FILTERS.find(f => f.id === userFilter) || USER_FILTERS[0]).test);
 
   const pendingReports = reports.filter(r => r.status === 'pending').length;
   const TABS = [
@@ -867,6 +881,17 @@ export default function SuperAdminDashboard() {
 
         {/* ── Users ── */}
         {tab === 'users' && (
+          <>
+          <div className="mb-3 flex flex-wrap gap-2">
+            {USER_FILTERS.map(f => (
+              <button key={f.id} onClick={() => setUserFilter(f.id)}
+                className={`text-[12px] font-semibold px-3 py-1.5 rounded-full border cursor-pointer transition-colors ${userFilter === f.id
+                  ? 'bg-gray-900 text-white border-gray-900' : 'bg-white text-gray-600 border-gray-200 hover:border-gray-300'}`}>
+                {f.id === 'online' && <span className="inline-block w-1.5 h-1.5 rounded-full bg-emerald-500 mr-1.5 align-middle" />}
+                {f.label} <span className={userFilter === f.id ? 'text-white/60' : 'text-gray-400'}>{users.filter(f.test).length}</span>
+              </button>
+            ))}
+          </div>
           <div className="bg-white border border-gray-200 rounded-xl overflow-hidden">
             <div className="overflow-x-auto">
               <table className="w-full text-[14px]">
@@ -898,20 +923,25 @@ export default function SuperAdminDashboard() {
                         <td className="px-4 py-3"/>
                       </tr>
                     ))
-                  ) : users.map(u => (
+                  ) : shownUsers.map(u => (
                     <tr key={u.id} className={`hover:bg-gray-50 transition-colors ${u.is_banned ? 'opacity-60' : ''}`}>
                       <td className="px-4 py-3">
                         <div className="flex items-center gap-2.5">
-                          {u.avatar_url ? (
-                            <img src={u.avatar_url} referrerPolicy="no-referrer" alt={u.display_name} className="w-7 h-7 rounded-full object-cover shrink-0"/>
-                          ) : (
-                            <div className="w-7 h-7 rounded-full bg-brand-600 flex items-center justify-center text-[10px] font-bold text-white shrink-0">
-                              {u.display_name?.split(' ').map(w => w[0]).join('').slice(0,2).toUpperCase() || '?'}
-                            </div>
-                          )}
+                          <span className="relative shrink-0">
+                            {u.avatar_url ? (
+                              <img src={u.avatar_url} referrerPolicy="no-referrer" alt={u.display_name} className="w-7 h-7 rounded-full object-cover"/>
+                            ) : (
+                              <div className="w-7 h-7 rounded-full bg-brand-600 flex items-center justify-center text-[10px] font-bold text-white">
+                                {u.display_name?.split(' ').map(w => w[0]).join('').slice(0,2).toUpperCase() || '?'}
+                              </div>
+                            )}
+                            {onlineIds.has(u.id) && <span className="absolute -bottom-0.5 -right-0.5 w-2.5 h-2.5 rounded-full bg-emerald-500 ring-2 ring-white" title="Online now" />}
+                          </span>
                           <div>
                             <p className="font-medium text-gray-900 text-[14px]">{u.display_name}</p>
-                            <span className="text-[10px] font-semibold px-1.5 py-0.5 rounded-full bg-blue-50 text-blue-700">Google</span>
+                            {onlineIds.has(u.id)
+                              ? <span className="text-[11px] font-semibold text-emerald-700">Online now</span>
+                              : <span className="text-[11px] text-gray-400">{u.last_seen ? `Seen ${timeAgo(u.last_seen)}` : 'Not seen lately'}</span>}
                           </div>
                         </div>
                       </td>
@@ -957,8 +987,12 @@ export default function SuperAdminDashboard() {
               {!loading && users.length === 0 && (
                 <p className="text-[14px] text-gray-400 text-center py-10">No users yet</p>
               )}
+              {!loading && users.length > 0 && shownUsers.length === 0 && (
+                <p className="text-[14px] text-gray-400 text-center py-10">No one in this list right now</p>
+              )}
             </div>
           </div>
+          </>
         )}
           </div>
         </div>
