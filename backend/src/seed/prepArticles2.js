@@ -39,6 +39,15 @@ China | Rival on the border, but still a major trading partner
 
 India is a member of the **Quad** (with the US, Japan and Australia) **and** of **BRICS** and the **SCO** (with Russia and China). Few countries sit in all these groups. That is multi-alignment in action.
 
+[VISUAL:hub|One India, many partners|India|Multi-alignment: different partners for different needs]
+USA|Technology, defence, the Quad
+Russia|Defence supplies, energy
+France / EU|Rafale jets, trade talks
+Gulf|Energy, jobs for Indians
+Global South|India as their voice
+Japan|Infrastructure, the Quad
+[/VISUAL]
+
 ## The test: the Ukraine war and Russian oil
 
 - After Russia attacked Ukraine in **2022**, Western countries put sanctions on Russia. India **did not join** the sanctions and **abstained** in several UN votes, while calling for **dialogue and diplomacy**. Prime Minister Modi told President Putin in 2022 that **"today's era is not of war"**.
@@ -47,6 +56,12 @@ India is a member of the **Quad** (with the US, Japan and Australia) **and** of 
 - In **February 2026**, India and the US announced a **framework for a trade deal**. The US said it would cut the tariff to **18%** and remove the extra oil penalty. The US said India would stop buying Russian oil; India said energy decisions are based on **market conditions and national interest**. Russian oil imports had already fallen sharply.
 
 [CALLOUT]This episode shows strategic autonomy is not free. Keeping your independence can have a cost. The skill is to protect national interest while keeping relations with all sides working.[/CALLOUT]
+
+[VISUAL:timeline|The Russian oil story]
+2022|Ukraine war begins|India buys discounted Russian oil, calls for dialogue
+Aug 2025|US tariffs on Indian goods reach 50%|Part of it a penalty for Russian oil
+Feb 2026|India-US trade framework|US says tariff will fall to 18%
+[/VISUAL]
 
 ## Why India follows this path
 
@@ -106,6 +121,27 @@ Multipolar world|A world with several major powers rather than one or two
 Global South|Developing countries of Asia, Africa and Latin America
 [/KEY-TERMS]
 
+[MINDMAP]
+# Strategic autonomy
+## Idea
+- Own decisions
+- National interest
+## History
+- Non-alignment (1961)
+- Multi-alignment (today)
+## Examples
+- Quad + BRICS + SCO
+- S-400 from Russia
+- Rafale from France
+## The test
+- Russian oil
+- US tariffs 2025
+## Why
+- Defence needs
+- Cheap energy
+- Many partners
+[/MINDMAP]
+
 ## Quick revision before your interview
 
 - **Non-alignment** (Cold War) → **multi-alignment** (today).
@@ -113,6 +149,13 @@ Global South|Developing countries of Asia, Africa and Latin America
 - Ukraine war: India **abstained**, called for dialogue, **bought Russian oil**.
 - **Aug 2025**: 50% US tariff; **Feb 2026**: framework, tariff to 18%.
 - Always end with **national interest** and **balance**.
+
+[QUIZ]
+What does multi-alignment mean?|Working with many countries at once, on different issues|Joining one military bloc|Staying away from all countries|It replaced Cold War non-alignment.
+When was the Non-Aligned Movement founded?|1961|1947|1991|At Belgrade; India was a founding member.
+Which groups is India part of at the same time?|The Quad and BRICS|NATO and the Warsaw Pact|AUKUS and NATO|That mix is multi-alignment in action.
+What did PM Modi tell President Putin in 2022?|"Today's era is not of war"|"India will join the sanctions"|"India stands with Russia"|India called for dialogue and diplomacy.
+[/QUIZ]
 
 *Sources: Ministry of External Affairs statements; White House fact sheet on the US-India trade framework (February 2026); Al Jazeera and S&P Global reporting; InsightsIAS and Drishti IAS notes on India's foreign policy.*`,
   },
@@ -139,12 +182,30 @@ The **Indo-Pacific** is where most of the world's trade moves and where China is
 
 [CALLOUT]Quad is a partnership, not an alliance like NATO. This difference matters for India, which follows strategic autonomy and does not join military blocs.[/CALLOUT]
 
+[VISUAL:hub|Four democracies, one aim|Quad|A partnership for a free and open Indo-Pacific — not a military alliance]
+India|Indian Ocean, maritime awareness
+USA|Technology, naval reach
+Japan|Infrastructure, funding
+Australia|Southern waters, minerals
+[/VISUAL]
+
 ## What is the Indo-Pacific?
 
 Earlier, people spoke of the "Asia-Pacific". The **Indo-Pacific** joins the **Indian Ocean and the Pacific Ocean** into one region — from the east coast of Africa to the west coast of the Americas. India prefers this idea because it puts the **Indian Ocean at the centre**.
 
 - Much of the world's trade and energy passes through narrow sea routes like the **Strait of Malacca**.
 - About **95% of India's trade by volume** (and about 70% by value) travels by sea.
+
+[VISUAL:map|The Indo-Pacific: India's sea routes|indo-pacific|Most of India's oil and trade moves along this route.]
+[/VISUAL]
+
+[VISUAL:timeline|How the Quad grew]
+2004|Tsunami relief brings four navies together|
+2007|First Quad meeting|Then it went quiet
+2017|Quad revived|
+2021|First leaders' summit|Online in March, in person in September
+May 2026|Foreign ministers meet in New Delhi|Maritime surveillance and energy security
+[/VISUAL]
 
 ## What the Quad actually does
 
@@ -164,6 +225,13 @@ Infrastructure and climate | Ports, undersea cables, clean energy
 - The **leaders' summit** that India was due to host in **2025** was **delayed**.
 - Quad **foreign ministers met in New Delhi in May 2026** and launched new work on **maritime surveillance** and **energy security**.
 - Quad ministers met again in **October 2026** and said they look forward to the next leaders' summit. Check the latest news before your SSB for its date and place.
+
+[VISUAL:stats|Why the sea matters to India]
+95%|Of India's trade by volume moves by sea
+70%|Of India's trade by value moves by sea
+1992|Malabar exercise begins (India-US)
+2020|All four Quad navies in Malabar
+[/VISUAL]
 
 ## Why the Quad matters for India
 
@@ -229,6 +297,23 @@ AUKUS|Separate defence pact of Australia, the UK and the US
 SAGAR / MAHASAGAR|India's vision of security and growth for all in the Indian Ocean region
 [/KEY-TERMS]
 
+[MINDMAP]
+# Quad
+## Members
+- India and USA
+- Japan and Australia
+## Origin
+- 2004 tsunami
+- Revived 2017
+## Work
+- Malabar
+- IPMDA
+- Vaccines and tech
+## Not
+- Not an alliance
+- Not AUKUS
+[/MINDMAP]
+
 ## Quick revision before your interview
 
 - **India, US, Japan, Australia**. Born after the **2004 tsunami**; revived **2017**.
@@ -236,6 +321,13 @@ SAGAR / MAHASAGAR|India's vision of security and growth for all in the Indian Oc
 - Real work: **Malabar**, **IPMDA**, vaccines, tech.
 - **2025** leaders' summit in India delayed; FMs met in **Delhi (May 2026)**.
 - Don't confuse **Quad** with **AUKUS**.
+
+[QUIZ]
+Which of these is NOT a Quad member?|The United Kingdom|Japan|Australia|The UK is in AUKUS with Australia and the US.
+What first brought the four navies together?|The 2004 Indian Ocean tsunami|The Kargil war|The 2008 Mumbai attacks|They worked together on relief.
+Is the Quad a military alliance?|No — a partnership without a defence treaty|Yes, like NATO|Only for the Navy|India does not join military blocs.
+What does IPMDA do?|Shares satellite data to track ships at sea|Builds roads in Asia|Supplies vaccines|It helps track illegal fishing and dark ships.
+[/QUIZ]
 
 *Sources: US State Department releases on the 2026 Quad foreign ministers' meetings; Ministry of External Affairs; Indian Navy; Vision IAS and Drishti IAS notes on the Quad.*`,
   },
@@ -276,6 +368,17 @@ Top two apps' share (August 2026) | About 78% (PhonePe + Google Pay)
 
 The IMF has described UPI as the **largest retail fast-payment system in the world by transaction volume**.
 
+[VISUAL:bars|UPI payments per year|billion transactions, by financial year|Source: NPCI annual figures.]
+2017-18|0.9
+2018-19|5.4
+2019-20|12.5
+2020-21|22.3
+2021-22|46.0
+2022-23|83.8
+2023-24|131.1
+2024-25|185.9|*
+[/VISUAL]
+
 ## What made UPI possible — the JAM trinity
 
 UPI stands on three earlier building blocks, together called **JAM**:
@@ -285,6 +388,13 @@ UPI stands on three earlier building blocks, together called **JAM**:
 3. **M — Mobile:** cheap smartphones and some of the world's lowest data prices.
 
 Together, they are part of India's **Digital Public Infrastructure (DPI)** — public digital systems that anyone can build on, like roads that anyone can drive on. Other examples: **DigiLocker**, **CoWIN** (vaccines), **ONDC** (online shopping) and **Account Aggregator**.
+
+[VISUAL:flow|How JAM made UPI possible]
+Jan Dhan|Bank accounts for the poor — 55+ crore
+Aadhaar|Cheap, quick identity checks
+Mobile|Cheap phones and data
+UPI|Instant payments for everyone
+[/VISUAL]
 
 ## UPI abroad
 
@@ -306,6 +416,12 @@ A balanced answer must mention these:
 - **Who pays for it?** UPI is free for users and small merchants. Banks and apps say running it costs money. The question of how to fund it long-term is still open.
 - **Digital divide:** older people, many women and people in remote areas still struggle with smartphones, internet or digital literacy.
 - **Outages:** when the system slows, millions of payments fail — showing how much we now depend on it.
+
+[VISUAL:icons|Stay safe with UPI]
+Lock|Never share your PIN or OTP|Not even with "bank staff"
+QrCode|You never need a PIN to receive money|A PIN request means you are paying
+Siren|Report fraud fast|Call 1930 or use cybercrime.gov.in
+[/VISUAL]
 
 ## Questions the IO may ask you
 
@@ -358,6 +474,27 @@ DBT|Direct Benefit Transfer — sending subsidies straight into bank accounts
 1930|National cyber crime helpline number
 [/KEY-TERMS]
 
+[MINDMAP]
+# UPI
+## What
+- Instant and free
+- Run by NPCI
+- Since 2016
+## Scale
+- 24.5 billion a month (Aug 2026)
+## Built on JAM
+- Jan Dhan
+- Aadhaar
+- Mobile
+## Abroad
+- UAE, Singapore, France
+- Nepal, Bhutan, Sri Lanka
+## Problems
+- Fraud
+- Two apps dominate
+- Digital divide
+[/MINDMAP]
+
 ## Quick revision before your interview
 
 - UPI: **2016**, **NPCI**, free, instant, works across apps.
@@ -365,6 +502,13 @@ DBT|Direct Benefit Transfer — sending subsidies straight into bank accounts
 - Built on **JAM**; part of India's **DPI**.
 - Abroad: **UAE, Singapore, France, Nepal, Bhutan, Sri Lanka, Mauritius**.
 - Problems: **fraud, two-app dominance, digital divide**.
+
+[QUIZ]
+Who runs UPI?|NPCI|The RBI directly|Google|NPCI was set up by the RBI and banks.
+What does the "M" in JAM stand for?|Mobile|Money|Market|Jan Dhan, Aadhaar, Mobile.
+Someone asks for your UPI PIN to "send you a refund". What is true?|You never need a PIN to receive money|You must enter it to get the refund|Share it only on a phone call|Entering a PIN means you are paying.
+What is the national cyber crime helpline number?|1930|100|108|Report quickly on 1930 or at cybercrime.gov.in.
+[/QUIZ]
 
 *Sources: NPCI monthly data via Business Standard and Medianama (September–October 2026); IMF note on fast-payment systems; Ministry of Finance; Vision IAS notes on Digital Public Infrastructure.*`,
   },
@@ -406,6 +550,12 @@ Three facts to remember:
 2. **Educated youth** (graduates) often have higher unemployment than the less educated — because they wait for jobs that match their degree.
 3. Many women are **not in the labour force at all**, so they don't even count as unemployed.
 
+[VISUAL:bars|Who is hit hardest|unemployment rate, %|Source: PLFS, MoSPI. All workers: July 2026. Youth: April–June 2026.]
+All workers (15+)|5.1
+Youth (15–29)|15.9|*
+Young women (15–29)|19.6|*
+[/VISUAL]
+
 ## The causes
 
 ### 1. Too many people still in farming
@@ -427,6 +577,14 @@ About **90% of workers** are in the **informal sector** — no contract, no soci
 ### 5. Low participation of women
 
 Social norms, safety, lack of childcare and lack of nearby jobs keep many women out of paid work.
+
+[VISUAL:icons|Five causes in one look]
+Tractor|Too many in farming|Close to half the workers, much less of the output
+Factory|Too few factory jobs|Manufacturing stuck around 15–17% of the economy
+GraduationCap|Skill gap|Degrees without job-ready skills
+Briefcase|Informal work|About 90% without contracts or social security
+Users|Few women at work|Safety, childcare and social norms keep many out
+[/VISUAL]
 
 ## What the government is doing
 
@@ -499,6 +657,27 @@ Labour force|People who are working or looking for work
 PLI|Production Linked Incentive — rewards companies for producing more in India
 [/KEY-TERMS]
 
+[MINDMAP]
+# Unemployment
+## Numbers
+- Overall about 5%
+- Youth about 16%
+## Causes
+- Farm dependence
+- Weak manufacturing
+- Skill gap
+- Informal work
+- Women left out
+## Government
+- Skill India
+- PM Internship
+- PLI and labour codes
+## Fixes
+- Labour-heavy factories
+- Industry-linked skills
+- Help small firms
+[/MINDMAP]
+
 ## Quick revision before your interview
 
 - Overall unemployment **~5%**; youth (15–29) **~15–16%** in 2026.
@@ -506,6 +685,13 @@ PLI|Production Linked Incentive — rewards companies for producing more in Indi
 - Schemes: **Skill India, PM Internship, ELI, PLI, labour codes, MGNREGA**.
 - Solutions: **labour-heavy manufacturing, skills, small firms, women's participation**.
 - Be **balanced and practical**.
+
+[QUIZ]
+Which survey gives India's official job numbers?|PLFS — Periodic Labour Force Survey|The Census|NFHS|It is run by the Ministry of Statistics (MoSPI).
+How does youth unemployment compare with the overall rate?|About three times higher|About the same|Lower|Around 15–16% against about 5% in 2026.
+What is disguised unemployment?|More people on a task than needed, so some add nothing|Having two jobs|Hiding one's income|It is common in Indian farming.
+Which scheme rewards companies for making more in India?|PLI — Production Linked Incentive|MGNREGA|Jan Dhan|PLI covers electronics, mobiles, pharma and more.
+[/QUIZ]
 
 *Sources: MoSPI PLFS monthly bulletins (2026) and press notes on PIB; The Policy Edge analysis of Q1 2026 PLFS; Union Budget documents; Drishti IAS and Vision IAS notes on employment.*`,
   },
@@ -533,6 +719,14 @@ You don't need to be a lawyer. You need the **main ideas, a few key articles, an
 - It took **2 years, 11 months and 18 days**.
 - It was **adopted on 26 November 1949** (now **Constitution Day**) and **came into force on 26 January 1950** (**Republic Day**).
 - It is the **longest written constitution** in the world. It began with **395 articles and 8 schedules**; today it has **12 schedules** and more than **100 amendments**.
+
+[VISUAL:timeline|How the Constitution came to be]
+9 Dec 1946|Constituent Assembly first meets|
+26 Nov 1949|Constitution adopted|Now Constitution Day
+26 Jan 1950|Comes into force|Republic Day
+1973|Kesavananda Bharati case|The basic structure cannot be changed
+1976|42nd Amendment|Socialist, Secular and Fundamental Duties added
+[/VISUAL]
 
 ## The Preamble
 
@@ -571,6 +765,13 @@ Amendment (Art. 368) | How the Constitution can be changed
 - **Article 33:** Parliament can **restrict the Fundamental Rights of members of the armed forces** to ensure discipline. This is why soldiers cannot form unions, go on strike or join political activity.
 - **Article 51A(d):** a fundamental duty of every citizen to **defend the country and render national service** when called upon.
 - **Article 352:** National Emergency on grounds of **war, external aggression or armed rebellion**.
+
+[VISUAL:icons|Four articles every future officer should know]
+Award|Article 53(2)|Supreme command of the forces is with the President
+Lock|Article 33|Parliament can limit soldiers' rights for discipline
+Flag|Article 51A(d)|Duty of every citizen to defend the country
+AlertTriangle|Article 352|National Emergency for war, aggression or armed rebellion
+[/VISUAL]
 
 ## Basic structure — the idea that protects the Constitution
 
@@ -628,6 +829,28 @@ Basic structure|Core features of the Constitution that cannot be amended away
 Writ|A court order to protect rights — such as habeas corpus
 [/KEY-TERMS]
 
+[MINDMAP]
+# The Constitution
+## Making
+- Adopted 26 Nov 1949
+- In force 26 Jan 1950
+- Dr Ambedkar
+## Preamble
+- Sovereign, Socialist
+- Secular, Democratic Republic
+- Justice, Liberty, Equality, Fraternity
+## Parts
+- Fundamental Rights
+- Directive Principles
+- Fundamental Duties
+## For the forces
+- Art. 53(2)
+- Art. 33
+- Art. 51A(d)
+## Basic structure
+- Kesavananda Bharati, 1973
+[/MINDMAP]
+
 ## Quick revision before your interview
 
 - Adopted **26 Nov 1949**, in force **26 Jan 1950**; **Dr Ambedkar** — Drafting Committee.
@@ -635,6 +858,13 @@ Writ|A court order to protect rights — such as habeas corpus
 - **6 Fundamental Rights**; **Art. 32** = heart and soul.
 - Forces: **Art. 53(2)** (President supreme commander), **Art. 33** (restricted rights), **Art. 51A(d)** (duty to defend).
 - **Kesavananda Bharati (1973)** → basic structure.
+
+[QUIZ]
+When did the Constitution come into force?|26 January 1950|26 November 1949|15 August 1947|It was adopted on 26 November 1949.
+Which article did Dr Ambedkar call the "heart and soul" of the Constitution?|Article 32|Article 21|Article 368|It lets you go to the Supreme Court to protect your rights.
+Which article lets Parliament restrict the rights of armed forces members?|Article 33|Article 14|Article 51A|That is why soldiers cannot form unions or strike.
+Which case gave India the basic structure idea?|Kesavananda Bharati (1973)|Maneka Gandhi (1978)|Golaknath (1967)|Parliament cannot change the Constitution's core.
+[/QUIZ]
 
 *Sources: The Constitution of India (Legislative Department, Government of India); Drishti IAS and Vision IAS polity notes.*`,
   },
@@ -671,11 +901,26 @@ Writ|A court order to protect rights — such as habeas corpus
 - In **December 2024**, two bills were introduced in the Lok Sabha: the **Constitution (129th Amendment) Bill, 2024** and the **Union Territories Laws (Amendment) Bill, 2024**.
 - They were sent to a **Joint Parliamentary Committee (JPC)**. The JPC has held many consultations, and its term was extended — most recently to the **Winter Session of 2026**. As of late October 2026, the bills had **not been passed**.
 
+[VISUAL:timeline|One Nation One Election — the story so far]
+1951–67|Elections held together|
+1968–70|The cycle breaks|Early dissolutions of assemblies and the Lok Sabha
+Sep 2023|Kovind committee set up|
+Mar 2024|Committee report|Two steps; local bodies within 100 days
+Dec 2024|Two bills introduced|Sent to a Joint Parliamentary Committee
+2026|JPC still examining|Term extended to the Winter Session
+[/VISUAL]
+
 ## How it would work
 
 - The President would notify an **"appointed date"** after a Lok Sabha election.
 - From then on, state assemblies would have terms that **end together with the Lok Sabha**.
 - If a Lok Sabha or an assembly is **dissolved early**, a fresh election would be held only for the **remaining (unexpired) term**, so the cycle stays aligned.
+
+[VISUAL:flow|How the cycle would be aligned]
+Appointed date|Notified after a Lok Sabha election
+Terms line up|State assembly terms end with the Lok Sabha's
+Early dissolution|Fresh election only for the remaining term
+[/VISUAL]
 
 ## Arguments for
 
@@ -741,12 +986,39 @@ Unexpired term|The remaining part of a five-year term after an early dissolution
 EVM / VVPAT|Electronic Voting Machine / the paper slip machine that verifies your vote
 [/KEY-TERMS]
 
+[MINDMAP]
+# One Nation One Election
+## Idea
+- Lok Sabha and states together
+- Local bodies within 100 days
+## History
+- Together till 1967
+## Status
+- Kovind report 2024
+- 129th Amendment Bill
+- JPC (2026)
+## For
+- Saves money
+- Less Model Code freeze
+## Against
+- Federalism
+- Short remainder terms
+- Logistics
+[/MINDMAP]
+
 ## Quick revision before your interview
 
 - Simultaneous elections **1951–1967**, then broke.
 - **Kovind committee** (2023–24) → **129th Amendment Bill** (Dec 2024) → **JPC** (term to Winter Session 2026).
 - **For:** cost, governance, fewer deployments. **Against:** federalism, early dissolution, logistics.
 - Not yet law (Oct 2026).
+
+[QUIZ]
+Till when were Lok Sabha and state elections held together?|1967|1990|2004|The cycle broke after early dissolutions.
+Who headed the High-Level Committee on simultaneous elections?|Ram Nath Kovind|Ranjan Gogoi|Venkaiah Naidu|Its report came in March 2024.
+Where were the ONOE bills sent in December 2024?|A Joint Parliamentary Committee|The Supreme Court|The Election Commission|As of late October 2026, they had not been passed.
+What is the strongest argument against ONOE?|It may weaken federalism and state issues|It costs more money|It needs fewer EVMs|National campaigns could drown out state issues.
+[/QUIZ]
 
 *Sources: Report of the High-Level Committee on Simultaneous Elections (2024); All India Radio News and The Statesman on the JPC's term (2026); The Leaflet; Drishti IAS and InsightsIAS notes.*`,
   },

@@ -40,6 +40,12 @@ The SSB looks for **Officer Like Qualities (OLQs)** — 15 qualities such as sen
 
 A good answer has three parts. Keep it to about **one minute**.
 
+[VISUAL:flow|A strong answer in three steps|Keep the whole answer near one minute]
+The spark|One or two real moments that drew you in
+The reasons|Two or three ways this life suits you
+The proof|What you have already done about it
+[/VISUAL]
+
 ### 1. The spark — where it started
 
 One or two real experiences that pulled you towards the forces. Be specific: a person, a place, a moment.
@@ -125,6 +131,13 @@ The first answer only opens the door. Prepare honest answers to these:
 - **Don't make up a family background or an incident.** The IO will cross-check it with your PIQ and other questions.
 - **Don't change your answer** between the IO, the psychologist and the GTO. Your motivation should be the same everywhere.
 
+[VISUAL:icons|What your answer tells the IO]
+Heart|Motivation|Is the wish real, or copied from a video?
+Search|Self-awareness|Do you know yourself and the job?
+Eye|Honesty|Does it match your PIQ and your life?
+Footprints|Action|Have you already taken steps towards it?
+[/VISUAL]
+
 ## Prepare your answer in 20 minutes
 
 Sit with a notebook and write down:
@@ -143,6 +156,29 @@ PIQ|Personal Information Questionnaire — the form you fill on day one; the IO 
 Recommended|Selected by the SSB board, subject to a medical exam and the merit list
 [/KEY-TERMS]
 
+[MINDMAP]
+# Why join the forces?
+## The spark
+- A person
+- A place or event
+## The reasons
+- Leadership
+- Active life
+- Purpose and respect
+## The proof
+- NCC and sports
+- Previous attempts
+- Reading, meeting officers
+## Follow-ups
+- Why not a private job?
+- Why this service?
+- What if not recommended?
+## Avoid
+- Speeches
+- Only "serve the nation"
+- Made-up stories
+[/MINDMAP]
+
 ## Quick revision before your interview
 
 - Avoid the empty line "to serve the nation" on its own.
@@ -151,6 +187,13 @@ Recommended|Selected by the SSB board, subject to a medical exam and the merit l
 - Every claim must be **true and checkable**.
 - Prepare follow-ups: why not private job, why this service, what if not recommended.
 - Your motivation must be the **same** in front of the IO, psychologist and GTO.
+
+[QUIZ]
+Which line is weakest as a full answer?|"I want to serve my nation."|"I led my college fest team and want leading people to be my main work."|"After the 2019 floods I saw a young officer lead relief work for two days."|Serving the nation is true of many jobs. The IO wants how and why you.
+Which part of the answer do most candidates forget?|The proof — what you have already done|A long patriotic speech|Salary and perks|Action shows the wish is real.
+How long should your first answer be?|About one minute|About five minutes|One sentence|Short and honest. Let the IO ask follow-ups.
+The IO asks what you will do if you are not recommended. The best approach?|A calm plan: find what to improve and try again, while continuing studies or work|Say you have never thought about it|Say you will forget the forces|It shows determination with maturity.
+[/QUIZ]
 
 *Written with inputs from recommended candidates. Practise speaking your answer on the SSBCircle Prep Sheet.*`,
   },
@@ -180,6 +223,15 @@ Many candidates know the capital of Brazil but not the name of their own Distric
 ## The one-page checklist
 
 Collect these facts in a notebook. Use your district's official website (most are at **district-name.nic.in**), the Census, local newspapers, and talk to elders.
+
+[VISUAL:icons|Your one-page checklist]
+MapPin|Basic facts|Location, population, rivers, how to reach
+Landmark|Who runs it|DM, SP, MP, MLA and your local body
+Wheat|Economy|Crops, industries and famous products
+Medal|History and heroes|Freedom fighters, soldiers, festivals
+Wrench|Problems and fixes|Two or three issues, one practical step each
+Shield|Forces link|Nearest cantonment, regiment from your area
+[/VISUAL]
 
 ### Basic facts
 
@@ -226,6 +278,12 @@ A strong answer has three parts:
 
 [CALLOUT]Notice the solution is small, realistic and specific. Avoid "the government should..." with nothing after it. Also avoid huge promises like "I will end poverty".[/CALLOUT]
 
+[VISUAL:flow|How to talk about a problem]
+Problem with a fact|"Borewells now go below 300 feet."
+The cause|"Paddy needs a lot of water and pumping is cheap."
+A small practical step|"Drip irrigation, millets with an assured price, and reviving ponds."
+[/VISUAL]
+
 ## Follow-up questions to expect
 
 - "Who is your District Collector? What do you think is their biggest challenge?"
@@ -264,6 +322,26 @@ GI tag|Geographical Indication — a label for a product linked to a particular 
 MGNREGA|The rural job scheme that guarantees 100 days of paid work, often used to build ponds and roads
 [/KEY-TERMS]
 
+[MINDMAP]
+# My home town
+## Facts
+- Location and size
+- Rivers and climate
+## Who runs it
+- DM and SP
+- MP and MLA
+## Economy
+- Crops
+- Industries
+## Pride
+- Heroes
+- Festivals and food
+## Problems
+- Fact
+- Cause
+- Practical step
+[/MINDMAP]
+
 ## Quick revision before your interview
 
 - Fill the **one-page checklist**: location, administration, economy, history, problems.
@@ -271,6 +349,13 @@ MGNREGA|The rural job scheme that guarantees 100 days of paid work, often used t
 - Know **one hero** from your district.
 - For each problem: **fact → cause → small practical step**.
 - Prepare a **2-minute structured answer** and stop there.
+
+[QUIZ]
+What is a GI tag?|A label for a product linked to one region|A government ID card|A type of farm loan|Examples: Darjeeling tea, Banarasi saree.
+The best way to answer "What is your district's biggest problem?"|Give a fact, the cause, then one practical step|Blame the government|Say there are no problems|It shows awareness and practical thinking.
+You don't remember your district's exact population. What do you say?|"I am not sure of the exact figure, sir, but it is around…"|Say a confident number anyway|Change the topic|Honesty beats a confident wrong answer.
+How long should "Tell me about your home town" take?|About two minutes, then stop|Ten minutes covering everything|Two sentences|A short, organised answer invites good follow-ups.
+[/QUIZ]
 
 *Prepared with inputs from recommended candidates. Track this topic on the SSBCircle Prep Sheet.*`,
   },
@@ -302,6 +387,11 @@ The topic is also in the news right now. The **first batch of Agniveers is compl
 5. Those who leave get a lump sum called **Seva Nidhi** — about **₹11.71 lakh**, made up of their own savings and an equal amount from the government, tax-free.
 6. Agniveers who leave do **not** get a pension, but many central and state jobs (like CAPFs, Assam Rifles and some state police forces) **reserve seats** for former Agniveers.
 
+[VISUAL:dots|Out of every 100 Agniveers|Up to 25 can be kept under the current rule. The forces have asked for more — check the latest decision before your SSB.]
+25|Can be kept for regular service
+75|Leave after four years with Seva Nidhi (about ₹11.71 lakh)
+[/VISUAL]
+
 ## Why the government brought it in
 
 The government gave three main reasons:
@@ -321,6 +411,14 @@ The first Agniveers joined training in late 2022 and early 2023. As per reports 
 
 [CALLOUT]If the IO asks about this, give the facts with "as per recent reports" and don't claim a decision that has not been announced. Facts in this area change quickly — check the latest news a week before your SSB.[/CALLOUT]
 
+[VISUAL:timeline|Agnipath so far]
+Jun 2022|Scheme announced|For the Army, Navy and Air Force
+Late 2022|First Agniveers begin training|
+Nov 2026|Navy's first batch leaves|Around 21 November
+Dec 2026|Air Force's first batch leaves|
+Jan 2027|Army's first batch leaves|
+[/VISUAL]
+
 ## Numbers worth remembering
 
 [COMPARE:What|Fact]
@@ -331,6 +429,13 @@ Kept for regular service | Up to 25% of each batch
 Seva Nidhi on exit | About ₹11.71 lakh, tax-free
 First batch exit | Nov 2026 (Navy) to Jan 2027 (Army)
 [/COMPARE]
+
+[VISUAL:stats|Agnipath in four numbers]
+4 years|Term of service, including training
+25%|Kept for regular service (current rule)
+₹11.71 lakh|Seva Nidhi on leaving, tax-free
+17.5|Youngest entry age (upper limit 21)
+[/VISUAL]
 
 ## Both sides of the debate
 
@@ -395,6 +500,24 @@ Retention|Keeping a person in permanent service after the four-year term
 CAPF|Central Armed Police Forces — such as BSF, CRPF, CISF, ITBP and SSB
 [/KEY-TERMS]
 
+[MINDMAP]
+# Agnipath
+## What
+- 4 years
+- Age 17.5 to 21
+- Up to 25% kept
+## Why
+- Younger forces
+- Lower pension bill
+- Skilled youth for society
+## 2026
+- First batch leaves
+- Forces want more kept
+## Debate
+- For: young, modern forces
+- Against: short training, jobs after
+[/MINDMAP]
+
 ## Quick revision before your interview
 
 - Launched **June 2022**, **4 years**, ages **17.5–21**.
@@ -402,6 +525,13 @@ CAPF|Central Armed Police Forces — such as BSF, CRPF, CISF, ITBP and SSB
 - First batch exits **Nov 2026 – Jan 2027**; forces want **higher retention**; no final change announced as of Oct 2026.
 - Give **both sides**, end with a **reasoned view**.
 - Officer selection is **not** affected.
+
+[QUIZ]
+How long is an Agniveer's term?|Four years, including training|Two years|Fifteen years|After that, up to 25% may be kept.
+What is Seva Nidhi?|A tax-free lump sum of about ₹11.71 lakh on leaving|A monthly pension|A training academy|Agniveers who leave get no pension, but get this sum.
+Does Agnipath change how officers are selected?|No — officers still come through the SSB|Yes, officers now join as Agniveers|Only in the Navy|Agnipath covers soldiers, sailors and airmen.
+What have the forces asked for in 2026?|Keeping more than 25% of each batch|Ending the scheme at once|Cutting the term to two years|As of late October 2026, no change had been notified.
+[/QUIZ]
 
 *Sources: Ministry of Defence announcements on Agnipath (2022); reports by The Tribune, India TV and SSBCrack (October–November 2026) on the first batch exit and retention review.*`,
   },
@@ -438,6 +568,14 @@ Lieutenant | Sub Lieutenant / Flying Officer
 [/COMPARE]
 
 [CALLOUT]Watch out for the word "Captain". An Army Captain is a junior officer. A Navy Captain is equal to an Army Colonel. Many candidates mix this up.[/CALLOUT]
+
+[VISUAL:timeline|Where you start and how you climb (Army names)|Navy and Air Force names in brackets. Years are typical, from commissioning.]
+Start|Lieutenant|(Sub Lieutenant / Flying Officer) — where most officers begin
+~2 years|Captain|(Lieutenant / Flight Lieutenant)
+~6 years|Major|(Lieutenant Commander / Squadron Leader)
+~13 years|Lieutenant Colonel|(Commander / Wing Commander)
+Selection|Colonel and above|Promotion by selection boards
+[/VISUAL]
 
 ### The five-star ranks
 
@@ -485,6 +623,12 @@ You don't need to draw them, but know the idea:
 - **Navy:** gold **stripes** on the shoulder or sleeve, with a curl on the top stripe.
 - **Air Force:** blue-grey **stripes** (rings) of different widths.
 
+[VISUAL:icons|Spot the rank on the shoulder]
+Star|Army — stars and emblem|Lieutenant two stars, Captain three, Major the Ashoka emblem
+Anchor|Navy — gold stripes|Stripes, with a curl on the top one
+Plane|Air Force — rings|Blue-grey stripes of different widths
+[/VISUAL]
+
 ## Questions the IO may ask
 
 - "What will be your rank on commissioning? And after two years?"
@@ -508,6 +652,27 @@ Pip|The star worn on the shoulder by Army officers
 CDS|Chief of Defence Staff — the senior-most military officer, who heads the Department of Military Affairs
 [/KEY-TERMS]
 
+[MINDMAP]
+# Ranks
+## Start
+- Lieutenant
+- Sub Lieutenant
+- Flying Officer
+## Middle
+- Major = Lt Cdr = Sqn Ldr
+- Colonel = Captain (Navy) = Group Captain
+## Top
+- General = Admiral = Air Chief Marshal
+## Five-star
+- Manekshaw
+- Cariappa
+- Arjan Singh
+## JCOs
+- Naib Subedar
+- Subedar
+- Subedar Major
+[/MINDMAP]
+
 ## Quick revision before your interview
 
 - Lieutenant = **Sub Lieutenant** = **Flying Officer** (where you start).
@@ -516,6 +681,13 @@ CDS|Chief of Defence Staff — the senior-most military officer, who heads the D
 - Brigadier = **Commodore** = **Air Commodore**.
 - Five-star: **Manekshaw, Cariappa, Arjan Singh**.
 - JCOs: **Naib Subedar → Subedar → Subedar Major**.
+
+[QUIZ]
+What is a Major called in the Air Force?|Squadron Leader|Wing Commander|Flight Lieutenant|Major = Lieutenant Commander (Navy) = Squadron Leader.
+Who is senior: an Army Captain or a Navy Captain?|A Navy Captain — equal to an Army Colonel|An Army Captain|They are equal|A common trap in interviews.
+Which of these officers did NOT hold a five-star rank?|General Bipin Rawat|Sam Manekshaw|Arjan Singh|General Rawat was a four-star officer and India's first CDS.
+At what rank do most Army officers start?|Lieutenant|Major|Subedar|Subedar is a JCO rank, not an officer entry rank.
+[/QUIZ]
 
 *Sources: official rank structures of the Indian Army, Navy and Air Force; Bharat Rakshak reference material.*`,
   },
@@ -544,6 +716,16 @@ The facts are serious but not complicated. Learn the basics, the timeline and th
 4. China claims about **90,000 sq km** of Arunachal Pradesh (it calls it "South Tibet"). India says **Aksai Chin** (about 38,000 sq km, held by China) is Indian territory.
 5. India and China fought a **war in 1962**. Since then, there have been clashes in **1967 (Nathu La and Cho La)**, the **2017 Doklam stand-off**, and **Galwan in 2020**.
 
+[VISUAL:stats|The LAC in numbers]
+3,488 km|Length of the LAC (India's figure)
+3|Sectors: Western, Middle, Eastern
+20|Indian soldiers killed at Galwan, 2020
+1962|The India-China war
+[/VISUAL]
+
+[VISUAL:map|The LAC and its three sectors|lac|Sector lengths are India's official figures.]
+[/VISUAL]
+
 ## What happened in 2020
 
 - In **April–May 2020**, Chinese troops moved forward at several points in **eastern Ladakh**, including Pangong Tso, Galwan and Depsang.
@@ -568,6 +750,15 @@ In **August 2026**, the **Special Representatives** — India's National Securit
 - The **next round** is due in **India in 2027**.
 
 This is progress, but **not a final settlement**. The core dispute remains, and both armies still keep large forces near the LAC.
+
+[VISUAL:timeline|From war to talks]
+1962|India-China war|
+1967|Clashes at Nathu La and Cho La|
+2017|Doklam stand-off|73 days, near the Bhutan tri-junction
+2020|Galwan clash, 15 June|20 Indian soldiers killed
+Oct 2024|Depsang and Demchok deal|Patrolling resumed in November
+Aug 2026|Special Representatives talks|"Early harvest" on less disputed parts
+[/VISUAL]
 
 ## Numbers worth remembering
 
@@ -638,6 +829,25 @@ Special Representatives|Senior officials (NSA Ajit Doval for India, Wang Yi for 
 Vibrant Villages Programme|A scheme to develop villages along the northern border
 [/KEY-TERMS]
 
+[MINDMAP]
+# India-China LAC
+## Basics
+- 3,488 km
+- Not marked on the ground
+- 3 sectors
+## Flashpoints
+- 1962 war
+- Doklam 2017
+- Galwan 2020
+## Easing
+- 2024 patrolling deal
+- 2026 talks
+## India's plan
+- Roads and tunnels
+- Vibrant Villages
+- Talks with readiness
+[/MINDMAP]
+
 ## Quick revision before your interview
 
 - LAC: **~3,488 km**, **3 sectors**, not marked on the ground.
@@ -645,6 +855,13 @@ Vibrant Villages Programme|A scheme to develop villages along the northern borde
 - **21 Oct 2024**: Depsang and Demchok deal; patrolling resumed.
 - **Aug 2026**: Special Representatives talks — "early harvest", more hotlines.
 - Stay **calm and balanced**: talk + preparedness.
+
+[QUIZ]
+What does LAC stand for?|Line of Actual Control|Line of Control|Line of Armed Conflict|The LoC is with Pakistan; the LAC is with China.
+When did the Galwan clash take place?|15 June 2020|26 January 2019|15 August 2017|20 Indian soldiers, including Col B. Santosh Babu, were killed.
+Which two friction points did the October 2024 deal cover?|Depsang and Demchok|Doklam and Siachen|Kargil and Drass|Patrolling resumed there in November 2024.
+Why was there no firing at Galwan?|Old agreements stop troops using firearms near the LAC|Both sides ran out of ammunition|It was a training exercise|The clash was fought with rods, stones and clubs.
+[/QUIZ]
 
 *Sources: Ministry of External Affairs statements (October 2024); All India Radio News; The Diplomat and India TV reports on the August 2026 Special Representatives talks; UPSC current-affairs notes from Drishti IAS and Vision IAS.*`,
   },
@@ -675,6 +892,12 @@ You need three things: the **timeline**, the **change in India's approach**, and
 
 [CALLOUT]See the pattern: after 2016, India started answering major attacks with direct military action. Each time, the response went a step further.[/CALLOUT]
 
+[VISUAL:flow|Each response went a step further]
+2016 — Surgical strikes|Ground raids across the LoC after Uri
+2019 — Balakot|Air strike inside Pakistan after Pulwama
+2025 — Operation Sindoor|Strikes on 9 terror sites, then on Pakistani air bases
+[/VISUAL]
+
 ## Operation Sindoor in simple words
 
 - On **22 April 2025**, terrorists attacked tourists at **Baisaran meadow near Pahalgam** in Jammu and Kashmir and killed **26 people**, mostly tourists. A group called **The Resistance Front (TRF)**, seen as a front of **Lashkar-e-Taiba**, was blamed.
@@ -683,11 +906,21 @@ You need three things: the **timeline**, the **change in India's approach**, and
 - Pakistan responded with drone and missile attacks. India hit back at several Pakistani **air bases and military sites**. After four days of fighting, both sides agreed to **stop military action on 10 May 2025**.
 - The briefings to the media were led by two women officers — **Col Sofiya Qureshi** and **Wing Commander Vyomika Singh** — along with the Foreign Secretary.
 
+[VISUAL:stats|Operation Sindoor at a glance]
+26|People killed at Pahalgam, 22 April 2025
+9|Terror sites struck on 7 May 2025
+4|Days of fighting before the halt on 10 May
+1960|Indus Waters Treaty — put on hold in April 2025
+[/VISUAL]
+
 ## The Indus Waters Treaty decision
 
 - The **Indus Waters Treaty (1960)**, signed with World Bank help, divides the six rivers of the Indus system. India controls the **eastern rivers** (Ravi, Beas, Sutlej); Pakistan gets most of the water of the **western rivers** (Indus, Jhelum, Chenab).
 - After the Pahalgam attack, on **23 April 2025**, India put the treaty **"in abeyance"** (on hold) until Pakistan stops supporting cross-border terrorism.
 - Other steps included closing the **Attari** border post, cancelling visas for Pakistani nationals, and reducing diplomatic staff.
+
+[VISUAL:map|The Indus rivers and who uses them|indus|Under the 1960 treaty, the western rivers carry about 80% of the system's water.]
+[/VISUAL]
 
 ## What changed in India's approach
 
@@ -698,6 +931,12 @@ Experts describe a **new doctrine** after Operation Sindoor. In simple terms:
 3. India will **not separate the terrorists from the government that supports them**.
 
 India also sent **all-party delegations** of MPs to many countries to explain its position — showing a **united national stand**.
+
+[VISUAL:icons|India's new approach, in three ideas]
+Crosshair|Terror is an act of war|India will respond on its own terms
+Ban|No nuclear blackmail|Threats will not stop a response
+Target|No difference|Terrorists and their sponsors are treated alike
+[/VISUAL]
 
 ## Questions the IO may ask you
 
@@ -760,6 +999,26 @@ In abeyance|Put on hold, not cancelled
 Non-escalatory|Planned so as not to widen the conflict
 [/KEY-TERMS]
 
+[MINDMAP]
+# Pakistan and terror
+## Attacks
+- 2001 Parliament
+- 2008 Mumbai
+- 2016 Uri
+- 2019 Pulwama
+- 2025 Pahalgam
+## Responses
+- Surgical strikes
+- Balakot
+- Operation Sindoor
+## Other steps
+- Indus Waters Treaty on hold
+- Attari closed
+## Doctrine
+- Terror is an act of war
+- No nuclear blackmail
+[/MINDMAP]
+
 ## Quick revision before your interview
 
 - **Uri 2016 → surgical strikes**; **Pulwama 2019 → Balakot**; **Pahalgam 2025 → Operation Sindoor**.
@@ -767,6 +1026,13 @@ Non-escalatory|Planned so as not to widen the conflict
 - **Indus Waters Treaty** in abeyance from **23 April 2025**.
 - New approach: **terror = act of war**, **no nuclear blackmail**.
 - Always calm, factual and balanced.
+
+[QUIZ]
+What triggered Operation Sindoor?|The Pahalgam attack of 22 April 2025|The Pulwama attack|The Uri attack|26 people, mostly tourists, were killed.
+What was India's response after Pulwama (2019)?|An air strike on a terror camp at Balakot|Surgical strikes across the LoC|Operation Parakram|The surgical strikes followed Uri in 2016.
+What does "in abeyance" mean for the Indus Waters Treaty?|Put on hold, not cancelled|Cancelled for ever|Handed to the World Bank|India put it on hold on 23 April 2025.
+Which line separates India and Pakistan in Jammu and Kashmir?|The LoC — Line of Control|The LAC — Line of Actual Control|The McMahon Line|The LAC and the McMahon Line relate to China.
+[/QUIZ]
 
 *Sources: Press Information Bureau briefings on Operation Sindoor (May 2025); Observer Research Foundation and RUSI analysis; All India Radio News; UPSC current-affairs notes.*`,
   },

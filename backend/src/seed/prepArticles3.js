@@ -35,11 +35,23 @@ Next Census | Census 2027 — the first full caste count since 1931
 
 The **replacement level (2.1)** is the number of children per woman needed to keep the population stable. India is now just below it, so population growth is slowing and will peak in the coming decades.
 
+[VISUAL:dots|Out of every 100 Indians|Approximate shares, UN estimates]
+68|Working age (15–64)
+32|Children and elderly (dependants)
+[/VISUAL]
+
 ## The window will close
 
 India's dividend window opened in the mid-2000s. Experts estimate it will last till around the **2050s**. After that, the share of elderly people will rise quickly. By **2050**, about **one in five Indians** is expected to be over 60.
 
 So the next **25–30 years** decide whether India grows rich before it grows old — something China and Japan managed, and many countries did not.
+
+[VISUAL:timeline|India's dividend window]
+Mid-2000s|Window opens|The working-age share rises fast
+2023|Most populous country|India overtakes China
+2027|Next Census|
+2050s|Window closes|About 1 in 5 Indians over 60 by 2050
+[/VISUAL]
 
 ## North and South are different
 
@@ -103,6 +115,26 @@ Median age|The age that divides the population into two equal halves
 Delimitation|Redrawing constituencies and seats based on population
 [/KEY-TERMS]
 
+[MINDMAP]
+# Demographic dividend
+## Meaning
+- More workers
+- Fewer dependants
+## India
+- About 146 crore
+- 68% working age
+- Fertility 2.0
+## Window
+- Till the 2050s
+## Make it count
+- Skills
+- Health
+- Jobs
+- Women at work
+## Risk
+- Demographic disaster
+[/MINDMAP]
+
 ## Quick revision before your interview
 
 - About **146 crore** people; **68%** working age; median age **~28–29**.
@@ -110,6 +142,13 @@ Delimitation|Redrawing constituencies and seats based on population
 - Window till around the **2050s**; **1 in 5** over 60 by 2050.
 - Make it an asset: **skills, health, jobs, women in work**.
 - **Census 2027** is coming.
+
+[QUIZ]
+What is the replacement level of fertility?|About 2.1 children per woman|1.0|3.5|India's rate (NFHS-5) is 2.0 — just below it.
+About what share of Indians are of working age (15–64)?|About 68%|About 30%|About 95%|That is the base of the dividend.
+When is India's dividend window expected to close?|Around the 2050s|Next year|It closed in 2000|After that the elderly share rises fast.
+What is the biggest untapped part of India's dividend?|Women in the workforce|More farm workers|Fewer cities|Female workforce participation is still low.
+[/QUIZ]
 
 *Sources: UNFPA State of World Population 2025; NFHS-5 (2019–21); UNFPA India Ageing Report 2023; Drishti IAS and Vision IAS notes on population.*`,
   },
@@ -146,6 +185,15 @@ Because everyone uses social media, everyone has an opinion. What stands out is 
 
 [CALLOUT]The tool is not good or bad by itself. The same app can teach you or waste your day. The real question is how we use it and what rules protect the young.[/CALLOUT]
 
+[VISUAL:icons|Boon and bane at a glance]
+BookOpen|Boon: learning|Free courses, news and explainers
+Megaphone|Boon: voice|Raise local issues, help in disasters
+Briefcase|Boon: livelihood|Small businesses and creators earn online
+Clock|Bane: lost time|Scrolling eats study, sleep and exercise
+AlertTriangle|Bane: fake news|False content and deepfakes spread fast
+ShieldAlert|Bane: security risk|Careless posts and honey traps help hostile agencies
+[/VISUAL]
+
 ## India's rules (as of 2026)
 
 - **Digital Personal Data Protection (DPDP) Act, 2023:** platforms must get **verifiable parental consent** before processing the personal data of anyone **under 18**. They cannot track children or target ads at them.
@@ -160,6 +208,13 @@ Because everyone uses social media, everyone has an opinion. What stands out is 
 - In **2020**, the Army asked its personnel to remove **89 apps**, including popular social media apps, from their phones for security reasons.
 
 [CALLOUT]Before your SSB, check your own profiles. Remove anything you would be embarrassed to explain to an IO. A clean, sensible digital footprint is part of being officer-like.[/CALLOUT]
+
+[VISUAL:flow|Before you post — the officer's habit]
+Pause|Is it true? Check before you share
+Protect|No uniform, location or unit details
+Think|Would you be happy to explain it to an IO?
+Post|Only then
+[/VISUAL]
 
 ## Solutions (for GD)
 
@@ -218,6 +273,30 @@ Honey trap|Using a fake online relationship to get secret information
 Digital footprint|Everything you post or share online that others can find
 [/KEY-TERMS]
 
+[MINDMAP]
+# Social media and youth
+## Boon
+- Learning
+- Voice
+- Livelihood
+## Bane
+- Addiction
+- Mental health
+- Fake news
+- Security risks
+## Rules
+- DPDP Act 2023
+- Parental consent under 18
+- Australia's under-16 ban
+## Forces
+- No uniform or location posts
+- Honey traps
+## Fixes
+- Self-control
+- Digital literacy
+- Platform duty
+[/MINDMAP]
+
 ## Quick revision before your interview
 
 - **Benefits:** learning, voice, livelihood, connection.
@@ -225,6 +304,13 @@ Digital footprint|Everything you post or share online that others can find
 - **DPDP Act 2023:** parental consent for under-18s; Rules notified **Nov 2025**.
 - **Australia:** under-16 ban from **Dec 2025**; India debating rules in **2026**.
 - Forces: **strict social media rules**, honey-trap risk.
+
+[QUIZ]
+Under the DPDP Act, whose consent is needed to process a child's data?|A parent's — for anyone under 18|No one's|The school's|Platforms also cannot track children or target ads at them.
+Which country banned social media accounts for under-16s from December 2025?|Australia|India|Japan|Many countries are watching how it works.
+What is a "honey trap"?|A fake online relationship used to get secret information|A sweet-shop scam|A type of drone|Hostile agencies have used it against personnel.
+In a GD, which stand is the most balanced?|Keep it, with digital literacy and age-safe rules|Ban it completely|No rules at all|Extreme answers sound unrealistic.
+[/QUIZ]
 
 *Sources: DPDP Act, 2023 and DPDP Rules, 2025 (MeitY); Medianama and Outlook reporting on the 2026 Supreme Court matter; StudyIQ and Drishti IAS notes.*`,
   },
@@ -262,6 +348,13 @@ ISRO is one of India's proudest institutions and a common topic in the interview
 
 [CALLOUT]23 August is now celebrated as National Space Day, marking Chandrayaan-3's landing.[/CALLOUT]
 
+[VISUAL:stats|ISRO's proudest numbers]
+104|Satellites on one PSLV launch (2017)
+1st|Attempt success at Mars (2014)
+4th|Country to dock two satellites in space (2025)
+23 Aug|National Space Day — Chandrayaan-3's landing
+[/VISUAL]
+
 ## Gaganyaan — India's human spaceflight
 
 - **Goal:** send Indian astronauts to space on an Indian rocket and bring them back safely.
@@ -270,11 +363,25 @@ ISRO is one of India's proudest institutions and a common topic in the interview
 - **Plan:** first an **uncrewed test flight (G1)** carrying a humanoid robot called **Vyommitra**; then the first **crewed flight**, targeted for **2027**.
 - As of October 2026, ISRO had completed key tests for G1 and was aiming to launch it **late in 2026**. Check the latest news before your SSB — space dates often move.
 
+[VISUAL:icons|The four IAF test pilots chosen for Gaganyaan]
+Plane|Gp Capt Prasanth Balakrishnan Nair|
+Plane|Gp Capt Ajit Krishnan|
+Plane|Gp Capt Angad Pratap|
+Plane|Gp Capt Shubhanshu Shukla|First Indian on the International Space Station (2025)
+[/VISUAL]
+
 ## What comes next
 
 - **Bharatiya Antariksh Station** (India's space station): first module targeted around **2028**, full station by **2035**.
 - **Chandrayaan-4:** a mission to **bring Moon samples back to Earth**, approved by the government.
 - **An Indian on the Moon by 2040** — the long-term goal.
+
+[VISUAL:flow|India's human spaceflight roadmap]
+Gaganyaan G1|Uncrewed test with the robot Vyommitra
+Crewed Gaganyaan|First Indian crew — target 2027
+Space station|First module around 2028, full by 2035
+The Moon|An Indian on the Moon by 2040
+[/VISUAL]
 
 ## Private companies in space
 
@@ -342,6 +449,28 @@ IN-SPACe|Agency that authorises and supports private space companies
 NavIC|India's own satellite navigation system
 [/KEY-TERMS]
 
+[MINDMAP]
+# ISRO
+## Firsts
+- Mars on the first try, 2014
+- Moon's south pole, 2023
+- Docking, 2025
+## People
+- Vikram Sarabhai
+- Shubhanshu Shukla
+## Gaganyaan
+- G1 with Vyommitra
+- Crew in 2027
+- 4 IAF test pilots
+## Next
+- Space station by 2035
+- Moon by 2040
+## Defence
+- Mission Shakti 2019
+- Defence Space Agency
+- NavIC
+[/MINDMAP]
+
 ## Quick revision before your interview
 
 - ISRO **1969**; **Vikram Sarabhai**.
@@ -349,6 +478,13 @@ NavIC|India's own satellite navigation system
 - **SpaDeX** docking and **Shubhanshu Shukla** on the ISS — **2025**.
 - **Gaganyaan:** G1 (Vyommitra) first, crewed **2027**; four **IAF** test pilots.
 - Space station **2035**; Indian on the Moon **2040**.
+
+[QUIZ]
+Where did Chandrayaan-3 land in August 2023?|Near the Moon's south pole|On Mars|Near the Moon's north pole|India was the first country to land there.
+Who was the first Indian to visit the International Space Station?|Shubhanshu Shukla|Rakesh Sharma|Kalpana Chawla|Rakesh Sharma was the first Indian in space (1984).
+What will fly on Gaganyaan's first uncrewed test?|A humanoid robot called Vyommitra|A monkey|Four astronauts|The crewed flight is targeted for 2027.
+What did Mission Shakti (2019) show?|India can destroy a satellite in orbit|India can land on Mars|India can build a space station|It was an anti-satellite (ASAT) test.
+[/QUIZ]
 
 *Sources: ISRO mission pages; All India Radio News; The Week (October 2026) on Gaganyaan tests; Vision IAS and Drishti IAS science and technology notes.*`,
   },
@@ -375,6 +511,12 @@ AI is the most talked-about technology of our time. GD topics like **"AI: friend
 
 [CALLOUT]AI does not "think" like a human. It finds patterns in data. That is why it can be very useful and also confidently wrong.[/CALLOUT]
 
+[VISUAL:flow|How AI works, in three steps]
+Data|Millions of examples — text, images, numbers
+Learning|The computer finds patterns in them
+Output|Predicts, answers or creates — and can be wrong
+[/VISUAL]
+
 ## What India is doing
 
 - **IndiaAI Mission** (approved **March 2024**, about **₹10,000 crore**): to build computing power, Indian AI models, datasets, skills and startups.
@@ -382,6 +524,12 @@ AI is the most talked-about technology of our time. GD topics like **"AI: friend
 - **Indian models:** companies like **Sarvam AI** were chosen to build **sovereign** (Indian-made) AI models that understand Indian languages. Government projects like **BharatGen** and **Bhashini** focus on Indian languages too.
 - **India AI Impact Summit (February 2026, New Delhi):** the first global AI summit hosted in the Global South. It ended with the **New Delhi Declaration** on safe and inclusive AI, backed by many countries, and large investment pledges.
 - India's approach to rules is **"pro-innovation"** — guidelines and existing laws rather than a single strict AI law, for now.
+
+[VISUAL:stats|India's AI push]
+₹10,000 cr|IndiaAI Mission (approved March 2024)
+38,000|GPUs made available by early 2026
+New Delhi|Hosted the AI Impact Summit, February 2026
+[/VISUAL]
 
 ## How the forces use AI
 
@@ -393,6 +541,15 @@ AI is the most talked-about technology of our time. GD topics like **"AI: friend
 - **Logistics and training:** smarter supply chains and realistic simulators.
 
 [CALLOUT]Recent conflicts — including Operation Sindoor in 2025 — showed how important drones, air defence networks and fast data are. AI sits behind many of these.[/CALLOUT]
+
+[VISUAL:icons|AI in the forces]
+Eye|Surveillance|Scans drone and satellite images
+Radar|Drones and counter-drones|Navigation and detection
+Wrench|Predictive maintenance|Fixes parts before they fail
+Brain|Decision support|Sorts large data fast for commanders
+Lock|Cyber defence|Spots unusual network activity
+Truck|Logistics and training|Smarter supply chains and simulators
+[/VISUAL]
 
 ## The risks
 
@@ -454,6 +611,31 @@ Sovereign AI|AI models built and controlled within one's own country
 Deepfake|A fake video or audio made with AI
 [/KEY-TERMS]
 
+[MINDMAP]
+# Artificial Intelligence
+## Basics
+- Data
+- Patterns
+- Predictions
+## India
+- IndiaAI Mission
+- GPUs
+- Indian-language models
+- Summit 2026
+## Forces
+- Surveillance
+- Drones
+- Maintenance
+- Cyber
+## Risks
+- Jobs
+- Deepfakes
+- Bias
+- Autonomous weapons
+## Rule
+- Human control
+[/MINDMAP]
+
 ## Quick revision before your interview
 
 - **IndiaAI Mission** (2024, ~₹10,000 crore): GPUs, Indian models, skills.
@@ -461,6 +643,13 @@ Deepfake|A fake video or audio made with AI
 - Forces: **surveillance, drones, maintenance, decision support, cyber**.
 - Risks: **jobs, deepfakes, bias, privacy, autonomous weapons**.
 - Always: **human control** and **reskilling**.
+
+[QUIZ]
+What is a GPU in AI?|The powerful chip used to train and run AI|A government AI law|An Indian chatbot|India gives startups low-cost access to GPUs.
+Where was the AI Impact Summit held in February 2026?|New Delhi|Paris|Tokyo|The first global AI summit hosted in the Global South.
+What is a deepfake?|A fake video or audio made with AI|A deep-sea drone|A cyber law|Deepfakes can spread panic and harm reputations.
+On AI weapons, which principle should an officer stress?|Meaningful human control over the use of force|Full autonomy for speed|No rules at all|Someone must take responsibility.
+[/QUIZ]
 
 *Sources: Press Information Bureau releases on the India AI Impact Summit 2026; IndiaAI Mission (MeitY); Nature and IAPS analysis of summit outcomes; Drishti IAS notes.*`,
   },
@@ -495,6 +684,13 @@ Deepfake|A fake video or audio made with AI
 
 [CALLOUT]This is the heart of India's climate diplomacy: India will act, and is acting, but development and fairness matter. Learn to explain this calmly in two lines.[/CALLOUT]
 
+[VISUAL:bars|Carbon dioxide per person, per year|tonnes of CO2, approx. 2023|Source: Global Carbon Project via Our World in Data. Rounded figures.]
+United States|14.3
+China|8.9
+World average|4.7
+India|2.0|*
+[/VISUAL]
+
 ## India's targets
 
 [COMPARE:Target|Details]
@@ -506,6 +702,14 @@ Carbon sink | Extra 3.5–4 billion tonnes CO2 through forests and trees
 [/COMPARE]
 
 **NDC** means **Nationally Determined Contribution** — each country's own climate plan under the **Paris Agreement (2015)**. India's updated plan for 2035 was approved in **2026**.
+
+[VISUAL:timeline|India's climate milestones]
+2015|Paris Agreement; International Solar Alliance founded|
+2021|Net zero by 2070 announced at COP26|
+2025|50% non-fossil power capacity reached|Five years early
+2026|Updated plan (NDC) for 2035|47% intensity cut, 60% non-fossil capacity
+2070|Net zero|
+[/VISUAL]
 
 ## What India is doing
 
@@ -530,6 +734,13 @@ Carbon sink | Extra 3.5–4 billion tonnes CO2 through forests and trees
 - More **floods, cyclones and landslides** mean more **disaster relief** work for the forces.
 - **Water stress** can increase tension between countries sharing rivers.
 - Rising seas threaten **coastal bases and island territories**.
+
+[VISUAL:icons|Why soldiers care about climate]
+Mountain|Glaciers|Siachen and Ladakh get harder and riskier
+CloudRain|More disasters|More rescue and relief work
+Droplets|Water stress|Tension over shared rivers
+Waves|Rising seas|Coastal bases and islands at risk
+[/VISUAL]
 
 ## Questions the IO may ask you
 
@@ -572,6 +783,30 @@ Carbon sink|Forests, soil or oceans that absorb carbon dioxide
 COP|Conference of the Parties — the yearly UN climate meeting
 [/KEY-TERMS]
 
+[MINDMAP]
+# Climate change and India
+## Impacts
+- Heatwaves
+- Erratic monsoon
+- Melting glaciers
+- Cyclones
+## India's case
+- 3rd in total
+- Low per person
+- CBDR
+## Targets
+- Net zero 2070
+- 50% non-fossil done
+- 2035 NDC
+## Actions
+- Solar and wind
+- ISA
+- Green hydrogen
+- LiFE
+## Security
+- Threat multiplier
+[/MINDMAP]
+
 ## Quick revision before your interview
 
 - India: **3rd** in total emissions, **low per person**.
@@ -579,6 +814,13 @@ COP|Conference of the Parties — the yearly UN climate meeting
 - **2035 NDC:** **47%** intensity cut, **60%** non-fossil capacity.
 - **ISA (2015)**, **Green Hydrogen Mission**, **LiFE**, **CDRI**.
 - Security: **threat multiplier**, glaciers, disasters, water.
+
+[QUIZ]
+By when does India aim to reach net zero?|2070|2050|2030|Announced at COP26 in Glasgow, 2021.
+What does CBDR stand for?|Common But Differentiated Responsibilities|Carbon Budget for Developing Regions|Climate Bank for Disaster Relief|All must act, rich countries more.
+Which target did India reach five years early, in 2025?|50% of power capacity from non-fossil sources|Net zero emissions|Ending all coal use|The original deadline was 2030.
+Which alliance did India start with France in 2015?|The International Solar Alliance|The Quad|AUKUS|It promotes solar energy worldwide.
+[/QUIZ]
 
 *Sources: India's updated NDC (2026) as reported by Down To Earth, Mongabay and Climate Action Tracker; Ministry of Environment, Forest and Climate Change; InsightsIAS notes.*`,
   },
@@ -599,13 +841,12 @@ When floods, earthquakes or cyclones strike, the **armed forces** are often the 
 
 As per the National Disaster Management Authority (NDMA):
 
-[COMPARE:Hazard|Share of India at risk]
-Earthquakes | About 59% of the land area
-Floods | About 12% of the land (over 4 crore hectares)
-Cyclones and tsunamis | About 5,700 km of the 7,516 km coastline
-Droughts | About 68% of the cultivable area
-Landslides | Hilly areas of the Himalayas and the Western Ghats
-[/COMPARE]
+[VISUAL:stats|How exposed India is|Landslides add to this in the Himalayas and the Western Ghats.]
+59%|Of the land is prone to earthquakes
+68%|Of farmland is prone to drought
+5,700 km|Of the 7,516 km coastline faces cyclones and tsunamis
+12%|Of the land (over 4 crore hectares) is prone to floods
+[/VISUAL]
 
 Climate change is making floods, heatwaves and cyclones more frequent and more intense.
 
@@ -616,6 +857,13 @@ Climate change is making floods, heatwaves and cyclones more frequent and more i
 - **SDMA** (State, headed by the Chief Minister) and **DDMA** (District, headed by the Collector).
 - **NDRF** — the **National Disaster Response Force**, a specialised force drawn from the CAPFs. It began in **2006** and now has **16 battalions**.
 - **NIDM** — trains people in disaster management.
+
+[VISUAL:flow|Who does what]
+NDMA|National plans — headed by the Prime Minister
+SDMA|State plans — headed by the Chief Minister
+DDMA|District action — headed by the Collector
+NDRF|16 battalions of trained rescuers
+[/VISUAL]
 
 ### What changed in 2025
 
@@ -652,6 +900,15 @@ India is often the **first responder** in its neighbourhood:
 - **Operation Brahma (2025)** — earthquake in Myanmar.
 
 **HADR** means **Humanitarian Assistance and Disaster Relief**. It builds goodwill and shows India as a responsible regional power.
+
+[VISUAL:timeline|The forces in action]
+2013|Operation Rahat|Uttarakhand floods — a huge air rescue
+2013|Cyclone Phailin|Odisha's evacuation kept deaths very low
+2015|Operation Maitri|Nepal earthquake
+2023|Operation Dost|Turkey and Syria earthquake
+2024|Wayanad landslides|Army Bailey bridge in about 30 hours
+2025|Operation Brahma|Myanmar earthquake
+[/VISUAL]
 
 ## The challenges
 
@@ -712,6 +969,29 @@ Aid to civil authority|When the armed forces help the civil administration on re
 Sendai Framework|UN plan (2015–2030) to reduce disaster risk
 [/KEY-TERMS]
 
+[MINDMAP]
+# Disaster management
+## Risks
+- Earthquakes
+- Floods
+- Cyclones
+- Droughts
+## Set-up
+- DM Act 2005
+- NDMA, SDMA, DDMA
+- NDRF
+## 2025 changes
+- Plans by NDMA
+- Databases
+- Urban authorities
+## Forces
+- Aid to civil authority
+- Rahat 2013
+- Wayanad 2024
+## Abroad
+- Maitri, Dost, Brahma
+[/MINDMAP]
+
 ## Quick revision before your interview
 
 - **DM Act 2005** (after the 2004 tsunami); **amended 2025** — plans, databases, urban authorities, SDRF.
@@ -719,6 +999,13 @@ Sendai Framework|UN plan (2015–2030) to reduce disaster risk
 - Forces = **aid to civil authority**: Rahat 2013, Wayanad 2024.
 - Abroad: **Maitri 2015, Dost 2023, Brahma 2025**.
 - Focus shifting from **relief to risk reduction**.
+
+[QUIZ]
+Who heads the NDMA?|The Prime Minister|The Home Secretary|The Army Chief|States have SDMAs under their Chief Ministers.
+Which law set up India's disaster management system?|The Disaster Management Act, 2005|The Army Act, 1950|The Environment Protection Act, 1986|It came after the 2004 tsunami and was amended in 2025.
+What is HADR?|Humanitarian Assistance and Disaster Relief|A helicopter model|A disaster fund|Operations like Maitri, Dost and Brahma.
+In what role do the forces help in disasters at home?|Aid to civil authority|Martial law|Operation Parakram|They support the civil administration on request.
+[/QUIZ]
 
 *Sources: NDMA hazard profile; Disaster Management (Amendment) Act, 2025 (India Code); Vision IAS and Drishti IAS notes; Ministry of Defence and Ministry of External Affairs releases on HADR operations.*`,
   },
