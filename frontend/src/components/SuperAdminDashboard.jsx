@@ -864,6 +864,7 @@ export default function SuperAdminDashboard() {
                     <th className="px-4 py-3 text-[11px] font-semibold text-gray-500 uppercase tracking-wide">User</th>
                     <th className="px-4 py-3 text-[11px] font-semibold text-gray-500 uppercase tracking-wide">Preparing for</th>
                     <th className="px-4 py-3 text-[11px] font-semibold text-gray-500 uppercase tracking-wide">Phone</th>
+                    <th className="px-4 py-3 text-[11px] font-semibold text-gray-500 uppercase tracking-wide">Heard from</th>
                     <th className="px-4 py-3 text-[11px] font-semibold text-gray-500 uppercase tracking-wide">SSB date</th>
                     <th className="px-4 py-3 text-[11px] font-semibold text-gray-500 uppercase tracking-wide hidden sm:table-cell">Email</th>
                     <th className="px-4 py-3 text-[11px] font-semibold text-gray-500 uppercase tracking-wide hidden sm:table-cell">Joined</th>
@@ -878,6 +879,7 @@ export default function SuperAdminDashboard() {
                         <td className="px-4 py-3"><div className="h-4 bg-gray-100 rounded w-32"/></td>
                         <td className="px-4 py-3"><div className="h-4 bg-gray-100 rounded w-20"/></td>
                         <td className="px-4 py-3"><div className="h-4 bg-gray-100 rounded w-24"/></td>
+                        <td className="px-4 py-3"><div className="h-4 bg-gray-100 rounded w-20"/></td>
                         <td className="px-4 py-3"><div className="h-4 bg-gray-100 rounded w-20"/></td>
                         <td className="px-4 py-3 hidden sm:table-cell"><div className="h-4 bg-gray-100 rounded w-40"/></td>
                         <td className="px-4 py-3 hidden sm:table-cell"><div className="h-4 bg-gray-100 rounded w-16"/></td>
@@ -913,6 +915,9 @@ export default function SuperAdminDashboard() {
                         {u.phone
                           ? <a href={`tel:${u.phone}`} className="font-medium text-brand-600 hover:underline whitespace-nowrap">{u.phone}</a>
                           : <span className="text-gray-300">—</span>}
+                      </td>
+                      <td className="px-4 py-3 text-[12px] text-gray-700 max-w-[160px] truncate" title={u.referral_source || ''}>
+                        {u.referral_source || <span className="text-gray-300">—</span>}
                       </td>
                       <td className="px-4 py-3 text-[12px] whitespace-nowrap">
                         {u.ssb_date
