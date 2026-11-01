@@ -49,6 +49,7 @@ const OnboardingPage      = lazy(() => import('./components/OnboardingPage'));
 const PiqPage             = lazy(() => import('./components/PiqPage'));
 const TatPage             = lazy(() => import('./components/TatPage'));
 const ToolIntro           = lazy(() => import('./components/ToolIntro'));
+const HowItWorks          = lazy(() => import('./components/HowItWorks'));
 const ExamCalendarPage    = lazy(() => import('./components/ExamCalendar'));
 const BeginnerGuide       = lazy(() => import('./components/BeginnerGuide'));
 const ModeratorProgram    = lazy(() => import('./components/ModeratorProgram'));
@@ -88,6 +89,7 @@ export default function App() {
             <Route path="/become-an-officer"     element={<BeginnerGuide />} />
             <Route path="/start"                 element={<Navigate to="/become-an-officer" replace />} />
             <Route path="/moderators"            element={<ModeratorProgram />} />
+            <Route path="/how-it-works"          element={<HowItWorks />} />
             <Route path="/prep"                  element={<PrepPage />} />
             <Route path="/community"             element={<CommunityPage />} />
             <Route path="/community/:id"         element={<PostPage />} />

@@ -7,6 +7,7 @@ import { NEWS_SECTIONS } from '../data/newsSections';
 import ArticleRenderer from './ArticleRenderer';
 import SiteNav from './SiteNav';
 import { CoverBand, PageHead } from './PageCover';
+import MentorNudge from './MentorNudge';
 import { useArticleEngagement, EngagementBar, CommentsSection, useScrollToComments, useArticleTracking } from './ArticleEngagement';
 
 const SECTION_ICON = {
@@ -423,6 +424,11 @@ function ArticleDetail({ article, onBack }) {
             </span>
           ))}
         </div>
+      )}
+
+      {article.category === 'ssb-tips' && (
+        <MentorNudge source="article" className="mt-8" title="Want to practise this with an officer?"
+          text="Reading helps. Saying it out loud to someone who has sat on the other side of the table helps more." />
       )}
 
       {article.slug && <CommentsSection engagement={engagement} inputRef={inputRef} />}

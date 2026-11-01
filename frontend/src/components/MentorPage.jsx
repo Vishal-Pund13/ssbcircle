@@ -15,6 +15,7 @@ export default function MentorPage() {
   const navigate = useNavigate();
   const mentor = MENTORS.find(m => m.slug === slug);
   const [showConnect, setShowConnect] = useState(false);
+  const firstName = mentor ? (mentor.name.split(' ').slice(0, -1).join(' ') || mentor.name) : '';
   const [lightboxIndex, setLightboxIndex] = useState(null);
 
   if (!mentor) return <Navigate to="/" replace />;
@@ -24,7 +25,7 @@ export default function MentorPage() {
 
       <SiteNav />
 
-      <div className="max-w-3xl mx-auto px-4 sm:px-6 py-8 sm:py-12">
+      <div className="max-w-3xl mx-auto px-4 sm:px-6 pt-8 sm:pt-12 pb-28 md:pb-12">
 
         {/* ── Back link ── */}
         <button onClick={() => navigate(-1)}
@@ -85,6 +86,32 @@ export default function MentorPage() {
             </div>
           </div>
         </div>
+
+        {/* ── How mentoring works ── */}
+        {mentor.whatsapp && (
+          <section className="mb-8 rounded-2xl border border-emerald-200 bg-gradient-to-br from-emerald-50 to-white p-5 sm:p-6">
+            <h2 className="text-lg font-bold text-gray-900">How mentoring works</h2>
+            <ol className="mt-4 grid sm:grid-cols-4 gap-3">
+              {[
+                ['Tell us about you', 'Your entry, SSB date and what you are stuck on. Takes a minute.'],
+                ['WhatsApp opens', 'Your introduction is written for you. Just press send.'],
+                [`${firstName} replies`, 'Personally, with available slots and how the session works.'],
+                ['Talk and get a plan', 'Honest guidance on your PIQ, interview, mindset and what to fix.'],
+              ].map(([t, d], i) => (
+                <li key={t} className="rounded-xl bg-white border border-emerald-100 p-3.5">
+                  <span className="w-7 h-7 rounded-full bg-emerald-600 text-white text-xs font-bold flex items-center justify-center">{i + 1}</span>
+                  <p className="mt-2 text-sm font-bold text-gray-900 leading-snug">{t}</p>
+                  <p className="mt-1 text-[13px] text-gray-600 leading-relaxed">{d}</p>
+                </li>
+              ))}
+            </ol>
+            <p className="mt-4 text-sm text-gray-700"><span className="font-semibold">Good to bring up:</span> {mentor.specialties.join(', ')}, your PIQ, and your previous SSB if you have had one.</p>
+            <button onClick={() => setShowConnect(true)}
+              className="mt-4 w-full sm:w-auto inline-flex items-center justify-center gap-2 bg-emerald-600 hover:bg-emerald-700 text-white text-sm font-bold px-6 py-3 rounded-xl cursor-pointer">
+              <MessageCircle className="w-4 h-4" /> Message {firstName} on WhatsApp
+            </button>
+          </section>
+        )}
 
         {/* ── About ── */}
         <section className="mb-8">
@@ -218,7 +245,15 @@ export default function MentorPage() {
         </p>
       </div>
 
-      {showConnect && <MentorConnectModal mentor={mentor} onClose={() => setShowConnect(false)} />}
+      {mentor.whatsapp && !showConnect && (
+        <div className="md:hidden fixed inset-x-0 z-40 px-4 pb-2" style={{ bottom: 'calc(4rem + env(safe-area-inset-bottom))' }}>
+          <button onClick={() => setShowConnect(true)}
+            className="w-full flex items-center justify-center gap-2 bg-emerald-600 text-white text-sm font-bold py-3 rounded-xl shadow-lg cursor-pointer">
+            <MessageCircle className="w-4 h-4" /> Message {firstName} on WhatsApp
+          </button>
+        </div>
+      )}
+      {showConnect && <MentorConnectModal mentor={mentor} source="mentor_page" onClose={() => setShowConnect(false)} />}
 
       {lightboxIndex !== null && mentor.testimonialScreenshots && (
         <div className="fixed inset-0 z-[200] flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm"

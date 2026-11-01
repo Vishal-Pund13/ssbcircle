@@ -8,6 +8,7 @@ import AiFeedback from './AiFeedback';
 import AiWaitPanel from './AiWaitPanel';
 import { AlertCircle, Clock, Eye, PenLine, Sparkles, ChevronRight, RotateCcw, Quote, User } from 'lucide-react';
 import { CoverBand, PageHead } from './PageCover';
+import MentorNudge from './MentorNudge';
 
 // TAT practice, run the way the real test runs: the picture shows for 30
 // seconds and disappears, then there are 4 minutes to write. The feedback
@@ -412,6 +413,8 @@ export default function TatPage() {
           <>
             <Report attempt={current} />
             <AiFeedback key={current.id} feature="tat" refId={current.id} prompt="Was this feedback on your story useful?" />
+            <MentorNudge source="tat_report" title="Stuck on your stories?"
+              text="Psychology tests are where many aspirants get stuck. An officer can read your stories with you and help you write in your own natural way." />
             <div className="flex flex-wrap gap-3">
               <button onClick={() => start()} className="btn-primary text-sm px-5 py-2.5 inline-flex items-center gap-2">
                 <Eye className="w-4 h-4" /> Next picture

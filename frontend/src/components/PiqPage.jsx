@@ -7,6 +7,7 @@ import AiWaitPanel from './AiWaitPanel';
 import { SoldierLoader } from './SoldierRunner';
 import { trackEvent } from '../analytics';
 import AiFeedback from './AiFeedback';
+import MentorNudge from './MentorNudge';
 import { firstName } from './Hello';
 import { CoverBand, PageHead } from './PageCover';
 import SiteNav from './SiteNav';
@@ -332,6 +333,9 @@ function AnalysisReport({ analysis, analysedAt, name }) {
       )}
 
       <AiFeedback feature="piq" refId={analysedAt} prompt="Was this PIQ report useful?" />
+
+      <MentorNudge source="piq_report" title="Want an officer to go through your PIQ with you?"
+        text="This report shows the questions your IO may ask. An officer who has been through it can show you how to answer them honestly, and where your PIQ needs work." />
 
       <p className="text-[12px] text-gray-400 leading-relaxed px-1">
         This is practice guidance based on what you wrote, not a real assessment. Be honest on the day:

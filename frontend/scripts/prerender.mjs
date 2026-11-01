@@ -25,6 +25,7 @@ import { STEPS as PREP_STEPS, TOPICS as PREP_TOPICS, LEVELS as PREP_LEVELS } fro
 import { EXAMS, RESULTS } from '../src/data/examCalendar.js';
 import { TOOL_INTROS }  from '../src/data/toolIntros.js';
 import * as MODS        from '../src/data/moderatorProgram.js';
+import * as GUIDE_APP   from '../src/data/platformGuide.js';
 import { sectionLabel } from '../src/data/newsSections.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -156,7 +157,29 @@ const modsNoscript = () => H2('What moderators get') + UL(MODS.PERKS.map(p => `<
   + H2('How it works') + OL(MODS.STEPS)
   + H2('Questions people ask') + MODS.FAQ.map(f => H3(f.q) + P(f.a)).join('');
 
+// "How SSBCircle works": the stage paths, the daily routine and every tool
+function howItWorksNoscript() {
+  const T = GUIDE_APP.TOOLS;
+  let out = H2('Where are you right now?');
+  for (const s of GUIDE_APP.STAGES) {
+    out += H3(`${s.label} — ${s.sub}`) + '<ol>' + s.steps.map(id => `<li><a href="${SITE}${T[id].to}">${esc(T[id].name)}</a>: ${esc(T[id].what)}</li>`).join('') + '</ol>';
+  }
+  out += H2('A 20-minute daily routine') + UL(GUIDE_APP.DAILY.map(d => `${esc(d.text)} (${esc(d.time)})`));
+  out += H2('Everything on SSBCircle') + UL(Object.values(T).map(t => `<strong><a href="${SITE}${t.to}">${esc(t.name)}</a></strong>: ${esc(t.what)} When: ${esc(t.when)}`));
+  return out;
+}
+
 const TOOL_ROUTES = [
+  {
+    path: '/how-it-works',
+    title: 'How SSBCircle Works — Your SSB Preparation Plan, Step by Step | SSBCircle',
+    description: 'What to do first on SSBCircle for where you are — just starting, written exam coming or SSB coming up — a 20-minute daily routine, and every tool explained: PIQ, TAT, Prep Sheet, News Cards, live rooms and mentors.',
+    priority: '0.8', changefreq: 'monthly',
+    heading: 'How SSBCircle works',
+    blurb: 'Everything on SSBCircle, and what to do first — based on where you are in your journey to becoming an officer.',
+    get noscriptExtra() { return howItWorksNoscript(); },
+    jsonLd: { '@context': 'https://schema.org', '@graph': [crumbs('How SSBCircle works', '/how-it-works')] },
+  },
   {
     path: '/prep',
     title: `SSB Interview Prep Sheet — ${PREP_TOPICS.length} Must-Know Topics with Questions | SSBCircle`,

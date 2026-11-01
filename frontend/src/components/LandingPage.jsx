@@ -13,7 +13,7 @@ import { PrepPath, SsbStages } from './HomePrep';
 import { ExamTicker } from './ExamCalendar';
 import HomeRail from './HomeRail';
 import { HOME_FAQ } from '../data/homeFaq';
-import { Mic, Timer, FileText, CheckSquare, Radio, ArrowRight, Trash2, Zap, Lightbulb, Users, Presentation, Target, Headphones, RefreshCw, X, Calendar, Heart, PlayCircle, Share2, Check, Sparkles, ChevronDown, Shield, Star, Lock, BookOpen, Video, Award, ChevronRight, GraduationCap, ExternalLink, AlertTriangle, HeartHandshake, PenLine, Footprints } from 'lucide-react';
+import { Mic, Timer, FileText, CheckSquare, Radio, ArrowRight, Trash2, Zap, Lightbulb, Users, Presentation, Target, Headphones, RefreshCw, X, Calendar, Heart, PlayCircle, Share2, Check, Sparkles, ChevronDown, Shield, Star, Lock, BookOpen, Video, Award, ChevronRight, GraduationCap, ExternalLink, AlertTriangle, HeartHandshake, PenLine, Footprints, Signpost } from 'lucide-react';
 import Hello, { firstName } from './Hello';
 import { NEWS_SECTIONS } from '../data/newsSections';
 import { todayIST, daysBetween } from './prep/dates';
@@ -1354,6 +1354,11 @@ export default function LandingPage() {
                   Try a TAT story
                 </button>
               </div>
+
+              <Link to="/how-it-works" onClick={() => trackEvent('home_cta', { which: 'how_it_works' })}
+                className="mb-3 flex sm:inline-flex items-center gap-1.5 text-sm font-semibold text-brand-700 hover:text-brand-900">
+                <Signpost className="w-4 h-4" /> Not sure where to start? See how SSBCircle works <ArrowRight className="w-4 h-4" />
+              </Link>
 
               {!user && (
                 <Link to="/become-an-officer" onClick={() => trackEvent('home_cta', { which: 'start_guide' })}

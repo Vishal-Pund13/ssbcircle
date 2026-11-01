@@ -83,6 +83,27 @@ router.post('/ping', async (req, res) => {
   }
 });
 
+// A tap on "Continue to WhatsApp" with a mentor. Logged with the reference
+// code that goes into the WhatsApp message, for matching referrals later.
+router.post('/mentor-referral', async (req, res) => {
+  res.status(204).end();
+  try {
+    const code = String(req.body?.code || '');
+    const mentor = String(req.body?.mentor || '');
+    if (!/^SSBC-[A-Z0-9]{4,8}$/.test(code) || !/^[a-z0-9-]{2,80}$/.test(mentor)) return;
+    const source = String(req.body?.source || '').replace(/[^a-z0-9_]/g, '').slice(0, 40) || null;
+    const entry = String(req.body?.entry || '').slice(0, 30) || null;
+    const visitorId = /^[\w-]{8,64}$/.test(String(req.body?.visitor_id || '')) ? req.body.visitor_id : null;
+    await pool.query(
+      `INSERT INTO mentor_referrals (code, mentor_slug, source, entry, user_id, visitor_id)
+       VALUES ($1, $2, $3, $4, $5, $6) ON CONFLICT (code) DO NOTHING`,
+      [code, mentor, source, entry, readUser(req), visitorId]
+    );
+  } catch (err) {
+    console.error('[track] mentor referral failed:', err.message);
+  }
+});
+
 // "Was this useful?" on AI reports. One answer per person per report; a
 // second answer replaces the first.
 const FEATURES = new Set(['piq', 'tat', 'prep_speak']);

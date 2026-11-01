@@ -18,7 +18,7 @@ let queue = [];
 let timer = null;
 
 // Same id the article view counter uses, so one browser is one visitor
-function visitorId() {
+export function visitorId() {
   try {
     let id = localStorage.getItem('ssbc_visitor');
     if (!id) {

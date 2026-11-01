@@ -6,6 +6,7 @@ import CommunityAdmin from './community/CommunityAdmin';
 import Insights, { INSIGHT_TABS } from './admin/Insights';
 import { ModeratorsAdmin, PlatformFeedbackAdmin } from './admin/ModeratorsAdmin';
 import OnlineNow, { useOnline } from './admin/OnlineNow';
+import MentorReferrals from './admin/MentorReferrals';
 import { NEWS_SECTIONS } from '../data/newsSections';
 import { LayoutDashboard, BarChart3, Sparkles, ThumbsUp } from 'lucide-react';
 
@@ -422,6 +423,7 @@ export default function SuperAdminDashboard() {
     // as nothing rather than the word "undefined".
     { id: 'community',     label: 'Community' },
     { id: 'moderators',    label: 'Moderators' },
+    { id: 'referrals',     label: 'Mentor referrals' },
     { id: 'pfeedback',     label: 'Platform feedback' },
   ];
 
@@ -500,6 +502,7 @@ export default function SuperAdminDashboard() {
 
           <div className="min-w-0">
         {tab === 'online' && <OnlineNow online={online} />}
+        {tab === 'referrals' && <MentorReferrals authHeaders={authHeaders} />}
         {tab === 'moderators' && <ModeratorsAdmin authHeaders={authHeaders} />}
         {tab === 'pfeedback' && <PlatformFeedbackAdmin authHeaders={authHeaders} />}
 

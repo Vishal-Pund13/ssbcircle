@@ -15,6 +15,7 @@ import Heatmap from './Heatmap';
 import { todayIST, addDays, buildPlan, dueReviews, streak, topicOfTheDay } from './plan';
 import { firstName } from '../Hello';
 import { CoverBand, PageHead } from '../PageCover';
+import MentorNudge from '../MentorNudge';
 
 // The SSB Prep Sheet: every topic worth being able to talk about, in order,
 // with a two-stage tick per topic — "Read" and "Can speak". Reading is the easy
@@ -959,6 +960,9 @@ export default function PrepPage() {
                 </div>
               );
             })()}
+
+            <MentorNudge source="prep_sheet" className="mt-8" title="Not sure how ready you are?"
+              text="Talk to an officer about your preparation. You get an honest view of where you stand and what to do in the days before your SSB." />
 
             <p className="mt-8 text-[12px] text-gray-400">
               Facts change. Check the latest news on a topic before your SSB — the views and the questions stay useful longer.

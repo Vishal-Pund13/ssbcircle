@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
-import { FileText, PenLine, CheckSquare, BookOpen, Users, Radio, ChevronDown, X, LogOut, User, Plus, LogIn, CalendarDays, Compass, ShieldCheck, MessageSquareWarning } from 'lucide-react';
+import { FileText, PenLine, CheckSquare, BookOpen, Users, Radio, ChevronDown, X, LogOut, User, Plus, LogIn, CalendarDays, Compass, ShieldCheck, MessageSquareWarning, Signpost } from 'lucide-react';
 import PlatformFeedbackDialog from './PlatformFeedbackDialog';
 
 // The site's main navigation, shared by the home page and the prep tools.
@@ -12,6 +12,7 @@ import PlatformFeedbackDialog from './PlatformFeedbackDialog';
 // row of buttons competing with the navigation.
 
 export const PREP_TOOLS = [
+  { to: '/how-it-works',    icon: Signpost,    title: 'How SSBCircle works', desc: 'What to do first, and every tool explained' },
   { to: '/become-an-officer', icon: Compass,   title: 'Become an officer', desc: 'Army, Navy, Air Force roles and how to join' },
   { to: '/piq',             icon: FileText,    title: 'PIQ Analyzer', desc: 'See what your IO is likely to ask' },
   { to: '/tat',             icon: PenLine,     title: 'TAT Practice', desc: 'Write a story, get feedback' },

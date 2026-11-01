@@ -165,6 +165,29 @@ router.get('/online', adminGuard, async (_req, res) => {
   }
 });
 
+// Aspirants sent to mentors, with the code each WhatsApp message carried
+router.get('/mentor-referrals', adminGuard, async (_req, res) => {
+  try {
+    const [{ rows: list }, { rows: bySource }, { rows: totals }] = await Promise.all([
+      pool.query(`
+        SELECT r.code, r.mentor_slug, r.source, r.entry, r.created_at,
+               u.display_name, u.email, u.phone
+        FROM mentor_referrals r LEFT JOIN users u ON u.id = r.user_id
+        ORDER BY r.created_at DESC LIMIT 300`),
+      pool.query(`SELECT COALESCE(source, 'unknown') AS source, COUNT(*)::int AS n
+                  FROM mentor_referrals GROUP BY 1 ORDER BY n DESC`),
+      pool.query(`SELECT mentor_slug,
+                         COUNT(*)::int AS total,
+                         COUNT(*) FILTER (WHERE created_at > NOW() - INTERVAL '30 days')::int AS last_30_days
+                  FROM mentor_referrals GROUP BY 1 ORDER BY total DESC`),
+    ]);
+    res.json({ referrals: list, by_source: bySource, by_mentor: totals });
+  } catch (err) {
+    console.error('Admin mentor referrals error:', err);
+    res.status(500).json({ error: 'Could not load mentor referrals' });
+  }
+});
+
 // All users
 router.get('/users', adminGuard, async (_req, res) => {
   try {

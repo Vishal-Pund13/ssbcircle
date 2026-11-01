@@ -334,6 +334,22 @@ async function start() {
     `);
     await pool.query(`CREATE INDEX IF NOT EXISTS idx_presence_seen ON presence(last_seen)`);
     await pool.query(`CREATE INDEX IF NOT EXISTS idx_presence_user ON presence(user_id)`);
+    // Aspirants sent to a mentor. Each WhatsApp introduction carries a short
+    // reference code (SSBC-XXXXX) that is also stored here, so referrals can
+    // be matched with the mentor for commission. No message text is stored.
+    await pool.query(`
+      CREATE TABLE IF NOT EXISTS mentor_referrals (
+        id          BIGSERIAL PRIMARY KEY,
+        code        VARCHAR(16) UNIQUE NOT NULL,
+        mentor_slug VARCHAR(80) NOT NULL,
+        source      VARCHAR(40),
+        entry       VARCHAR(30),
+        user_id     UUID,
+        visitor_id  VARCHAR(64),
+        created_at  TIMESTAMPTZ DEFAULT NOW()
+      )
+    `);
+    await pool.query(`CREATE INDEX IF NOT EXISTS idx_mentor_referrals_created ON mentor_referrals(created_at DESC)`);
     // Moderator programme: one row per person who opted in or was invited.
     // status: trial | review | invited | approved | declined | withdrawn | removed
     await pool.query(`
