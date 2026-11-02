@@ -8,7 +8,7 @@ import { firstName } from './Hello';
 
 // "Prepare for the SSB smartly" — an announcement poster for the AI tools.
 //
-// Shown on the home page only. Pages people reach from search (the officer
+// Shown on the home page only, and only from a visitor's second visit. Pages people reach from search (the officer
 // guide, articles) are left alone: Google ranks pages down when a pop-up
 // covers them for mobile visitors. Once closed it stays away for two weeks;
 // once someone taps through it never comes back. Bump KEY to show a new
@@ -27,7 +27,22 @@ const FEATURES = [
     text: 'Answer Prep Sheet questions out loud and see how you really come across.' },
 ];
 
+// Counts visits (one per browser session). The poster waits for a second
+// visit: a first-time visitor, often arriving from Google search, should land
+// on the page itself, not on a pop-up.
+const VISITS = 'ssbc:visits';
+function countVisit() {
+  try {
+    if (sessionStorage.getItem(VISITS)) return Number(localStorage.getItem(VISITS) || 1);
+    sessionStorage.setItem(VISITS, '1');
+    const n = Number(localStorage.getItem(VISITS) || 0) + 1;
+    localStorage.setItem(VISITS, String(n));
+    return n;
+  } catch { return 1; }
+}
+
 function shouldShow() {
+  if (countVisit() < 2) return false;
   try {
     const v = JSON.parse(localStorage.getItem(KEY) || 'null');
     if (!v) return true;
