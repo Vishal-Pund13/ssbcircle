@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { getCommunityFeed, getCommunityPulse } from '../services/api';
 import { useAuth } from '../context/AuthContext';
-import { MessageSquare, ArrowBigUp, ArrowRight, PenLine, BadgeCheck, Users, UserPlus, Radio } from 'lucide-react';
+import { MessageSquare, ArrowBigUp, ArrowRight, PenLine, BadgeCheck } from 'lucide-react';
 import CategoryChip, { CategoryIcon, timeAgo } from './community/CategoryChip';
 import StayNotified from './StayNotified';
 
@@ -33,13 +33,8 @@ const PROMPTS = [
 const MAX_POSTS = 4;
 const AVATAR_BG = ['bg-blue-600', 'bg-emerald-600', 'bg-purple-600', 'bg-rose-600', 'bg-teal-600', 'bg-amber-600'];
 
-// A number is only shown once it is big enough to impress rather than worry
-const STATS = [
-  { key: 'members',      min: 50, icon: Users,         text: n => `${n} aspirants on SSBCircle` },
-  { key: 'joined_week',  min: 5,  icon: UserPlus,      text: n => `${n} joined this week` },
-  { key: 'replies_week', min: 5,  icon: MessageSquare, text: n => `${n} replies this week` },
-  { key: 'active_week',  min: 10, icon: Radio,         text: n => `${n} active this week` },
-];
+// "300+" rounded down to the hundred, so it is always true and grows by itself
+const membersLabel = n => (n >= 100 ? `${Math.floor(n / 100) * 100}+` : null);
 
 const short = t => (t && t.length > 48 ? t.slice(0, 46) + '…' : t);
 const Topic = ({ t }) => <span className="font-semibold text-gray-800">“{short(t)}”</span>;
@@ -209,7 +204,7 @@ export default function CommunityHighlights() {
     .slice(0, MAX_POSTS);
 
   const events = pulse?.events || [];
-  const stats  = STATS.filter(st => (pulse?.stats?.[st.key] || 0) >= st.min);
+  const members = membersLabel(pulse?.stats?.members || 0);
 
   return (
     <section className="border-t border-gray-100 bg-gray-50 px-4 sm:px-6 py-10 sm:py-14">
@@ -220,8 +215,12 @@ export default function CommunityHighlights() {
               <span className="w-2 h-2 rounded-full bg-emerald-500" /> Community is active
             </p>
             <h2 className="mt-1.5 text-xl sm:text-2xl font-bold text-gray-900 leading-tight">
-              Real aspirants, preparing together
+              Come up and speak. Learn together.
             </h2>
+            <p className="mt-2 text-sm sm:text-base text-gray-600 leading-relaxed max-w-2xl">
+              {members && <><span className="font-bold text-gray-900">{members} aspirants</span> are preparing here. </>}
+              Ask your doubt, share how your SSB went, and help the next aspirant. Every question you ask helps someone else too.
+            </p>
           </div>
           <Link to="/community"
             className="shrink-0 inline-flex items-center gap-1.5 text-xs font-bold text-brand-600 hover:text-brand-700">
@@ -229,15 +228,6 @@ export default function CommunityHighlights() {
           </Link>
         </div>
 
-        {stats.length > 0 && (
-          <div className="mt-4 flex flex-wrap gap-2">
-            {stats.map(({ key, icon: Icon, text }) => (
-              <span key={key} className="inline-flex items-center gap-1.5 bg-white border border-gray-200 rounded-full px-3 py-1.5 text-xs font-semibold text-gray-700">
-                <Icon className="w-3.5 h-3.5 text-brand-600" /> {text(pulse.stats[key])}
-              </span>
-            ))}
-          </div>
-        )}
 
         {/* Desktop: what is happening | the posts and a way to join in | stay notified */}
         <div className="mt-5 grid grid-cols-1 lg:grid-cols-3 gap-4 items-start">
