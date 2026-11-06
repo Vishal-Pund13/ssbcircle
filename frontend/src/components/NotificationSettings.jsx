@@ -24,7 +24,7 @@ export default function NotificationSettings() {
   const support = pushSupport();
 
   useEffect(() => {
-    getNotifyPrefs().then(setPrefs).catch(() => setPrefs({ replies_push: true, replies_email: true, rooms_push: true, rooms_email: true }));
+    getNotifyPrefs().then(setPrefs).catch(() => setPrefs({ replies_push: true, replies_email: true, rooms_push: true, rooms_email: true, new_rooms_push: false, new_posts_push: false }));
     isPushOn().then(setPush).catch(() => {});
     if (new URLSearchParams(window.location.search).get('notifications') === 'email-off') setNote('Email notifications are now off.');
     if (window.location.hash === '#notifications') document.getElementById('notifications')?.scrollIntoView();
@@ -63,6 +63,9 @@ export default function NotificationSettings() {
   const rows = [
     { key: 'replies', title: 'Replies', desc: 'Someone replies to your post, or to a post you commented on' },
     { key: 'rooms', title: 'Rooms', desc: 'Someone joins your room, and rooms you are in start or go live' },
+    // Site-wide news: phone and bell only, never email
+    { key: 'new_rooms', title: 'New rooms', desc: 'Someone starts or schedules a room', noEmail: true },
+    { key: 'new_posts', title: 'New community posts', desc: 'Experiences, SSB dates and doubts as they are posted', noEmail: true },
   ];
 
   return (
@@ -103,9 +106,9 @@ export default function NotificationSettings() {
                 <label className="flex items-center gap-2 text-sm text-gray-700">
                   <Toggle on={prefs[`${r.key}_push`]} onChange={v => setPref(`${r.key}_push`, v)} label={`${r.title}: phone`} /> <Smartphone className="w-4 h-4 text-gray-400" /> Phone
                 </label>
-                <label className="flex items-center gap-2 text-sm text-gray-700">
+                {!r.noEmail && <label className="flex items-center gap-2 text-sm text-gray-700">
                   <Toggle on={prefs[`${r.key}_email`]} onChange={v => setPref(`${r.key}_email`, v)} label={`${r.title}: email`} /> <Mail className="w-4 h-4 text-gray-400" /> Email
-                </label>
+                </label>}
               </div>
             </div>
           ))}

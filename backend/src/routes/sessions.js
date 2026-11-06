@@ -4,7 +4,7 @@ const pool    = require('../db');
 const auth    = require('../middleware/auth');
 const { createRoomWithCode, generateUniqueRoomCode } = require('../models/Room');
 const { sendInterestConfirmation, sendRoomLive } = require('../email');
-const { notify }  = require('../notify');
+const { notify, notifySubscribers } = require('../notify');
 const { shortIST } = require('../time');
 
 // List upcoming sessions (auth optional — needed for is_interested)
@@ -73,6 +73,13 @@ router.post('/', auth, async (req, res) => {
     `, [topic.trim(), description?.trim() || null, category || 'GD', subcategory || null,
         scheduledDate, req.userId, req.displayName, roomCode]);
     res.json({ session: rows[0] });
+
+    notifySubscribers({
+      type: 'new_room', actorId: req.userId, groupKey: `new-room:${rows[0].id}`,
+      title: `New room on ${shortIST(scheduledDate)}: "${topic.trim()}"`,
+      body: `Tap "I'm in" and we will remind you when it starts.`,
+      link: '/?tab=upcoming',
+    });
   } catch (err) {
     console.error(err);
     res.status(500).json({ error: 'Failed to create session' });
@@ -106,7 +113,7 @@ router.post('/:id/interest', auth, async (req, res) => {
             title: `${who} is in for your room "${s.topic}"`,
             bundleTitle: n => `${n} more aspirants are in for "${s.topic}"`,
             body: `${s.n} going · ${shortIST(s.scheduled_at)}`,
-            link: '/?tab=live',
+            link: '/?tab=upcoming',
           });
         }).catch(() => {});
       // Send confirmation email (best-effort, non-blocking)

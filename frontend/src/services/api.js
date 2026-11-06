@@ -274,6 +274,7 @@ export const reviewPrepTopic = async (topicId, recalled) => {
 };
 
 // Community — reading works signed out, writing does not.
+export const getCommunityPulse = async () => (await api.get('/api/community/pulse')).data;
 export const getCommunityFeed = async ({ limit = 30, offset = 0 } = {}) => {
   const { data } = await api.get(`/api/community?limit=${limit}&offset=${offset}`);
   return data;             // { posts, can_post }

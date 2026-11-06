@@ -1,5 +1,6 @@
 const express = require('express');
-const { notify } = require('../notify');
+const pool = require('../db');
+const { notify, notifySubscribers } = require('../notify');
 const router = express.Router();
 const jwt = require('jsonwebtoken');
 const authMiddleware = require('../middleware/auth');
@@ -61,6 +62,56 @@ router.get('/', async (req, res) => {
   }
 });
 
+// What is happening on the site, for the home page: real counts and the
+// latest things people did. First names only. Cached for a minute.
+let pulseCache = { at: 0, data: null };
+router.get('/pulse', async (_req, res) => {
+  try {
+    if (Date.now() - pulseCache.at < 60_000) return res.json(pulseCache.data);
+    const first = `split_part(COALESCE(u.display_name, 'Someone'), ' ', 1)`;
+    const [{ rows: [stats] }, { rows: events }] = await Promise.all([
+      pool.query(`
+        SELECT (SELECT count(*)::int FROM users WHERE is_banned = false) AS members,
+               (SELECT count(*)::int FROM users WHERE created_at > NOW() - INTERVAL '7 days') AS joined_week,
+               (SELECT count(*)::int FROM post_comments WHERE deleted_at IS NULL AND created_at > NOW() - INTERVAL '7 days') AS replies_week,
+               (SELECT count(DISTINCT uid)::int FROM (
+                  SELECT author_id AS uid FROM posts WHERE created_at > NOW() - INTERVAL '7 days'
+                  UNION SELECT author_id FROM post_comments WHERE created_at > NOW() - INTERVAL '7 days'
+                  UNION SELECT user_id FROM session_interests WHERE created_at > NOW() - INTERVAL '7 days'
+                  UNION SELECT created_by FROM rooms WHERE created_at > NOW() - INTERVAL '7 days'
+               ) a WHERE uid IS NOT NULL) AS active_week`),
+      pool.query(`
+        SELECT * FROM (
+          (SELECT 'reply' AS kind, ${first} AS name, u.avatar_url AS avatar, p.title AS topic, '/community/' || p.id AS link, c.created_at AS at
+             FROM post_comments c JOIN posts p ON p.id = c.post_id AND p.deleted_at IS NULL
+             JOIN users u ON u.id = c.author_id
+            WHERE c.deleted_at IS NULL AND u.is_banned = false ORDER BY c.created_at DESC LIMIT 8)
+          UNION ALL
+          (SELECT 'post', ${first}, u.avatar_url, p.title, '/community/' || p.id, p.created_at
+             FROM posts p JOIN users u ON u.id = p.author_id
+            WHERE p.deleted_at IS NULL AND u.is_banned = false ORDER BY p.created_at DESC LIMIT 4)
+          UNION ALL
+          (SELECT 'going', ${first}, u.avatar_url, s.topic, '/?tab=upcoming', si.created_at
+             FROM session_interests si JOIN scheduled_sessions s ON s.id = si.session_id
+             JOIN users u ON u.id = si.user_id
+            WHERE u.is_banned = false ORDER BY si.created_at DESC LIMIT 4)
+          UNION ALL
+          (SELECT 'room', ${first}, u.avatar_url, r.topic, '/?tab=live', r.created_at
+             FROM rooms r JOIN users u ON u.id = r.created_by
+            WHERE u.is_banned = false ORDER BY r.created_at DESC LIMIT 4)
+          UNION ALL
+          (SELECT 'join', ${first}, u.avatar_url, NULL, NULL, u.created_at
+             FROM users u WHERE u.is_banned = false ORDER BY u.created_at DESC LIMIT 6)
+        ) e ORDER BY at DESC LIMIT 8`),
+    ]);
+    pulseCache = { at: Date.now(), data: { stats, events } };
+    res.json(pulseCache.data);
+  } catch (err) {
+    console.error('Community pulse error:', err);
+    res.status(500).json({ error: 'Could not load activity' });
+  }
+});
+
 router.get('/:id', async (req, res) => {
   try {
     const post = await Community.getPost(req.params.id, readViewer(req));
@@ -89,6 +140,13 @@ router.post('/', authMiddleware, async (req, res) => {
 
     const post = await Community.createPost({ authorId: req.userId, title, body, category: safeCategory });
     res.status(201).json({ post });
+
+    notifySubscribers({
+      type: 'new_post', actorId: req.userId, groupKey: `new-post:${post.id}`,
+      title: `New post: "${title.length > 70 ? title.slice(0, 67) + '…' : title}"`,
+      body: `${(post.author_name || 'An aspirant').split(' ')[0]} posted in the community. Tap to read and reply.`,
+      link: `/community/${post.id}`,
+    });
   } catch (err) {
     console.error('Community create error:', err);
     res.status(500).json({ error: 'Could not publish your post' });

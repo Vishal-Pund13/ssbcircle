@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
-import { Bell, MessageCircle, Radio, Users, Smartphone, Settings } from 'lucide-react';
+import { Bell, MessageCircle, Radio, Users, Smartphone, Settings, FileText } from 'lucide-react';
 import { getNotifications, getUnreadCount, markNotificationsRead } from '../services/api';
 import { isPushOn, pushSupport, turnOnPush } from '../lib/push';
 import { trackEvent } from '../analytics';
@@ -10,7 +10,7 @@ import { trackEvent } from '../analytics';
 // whenever the tab comes back into view.
 
 const POLL_MS = 60_000;
-const ICON = { reply: MessageCircle, room_live: Radio, room_soon: Radio, room_interest: Users };
+const ICON = { reply: MessageCircle, room_live: Radio, room_soon: Radio, room_interest: Users, new_room: Radio, new_post: FileText };
 
 function ago(ts) {
   const s = Math.max(0, (Date.now() - new Date(ts)) / 1000);

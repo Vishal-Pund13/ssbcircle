@@ -4,6 +4,7 @@ const { AccessToken, RoomServiceClient } = require('livekit-server-sdk');
 const pool = require('../db');
 const { createRoom, getRoomByCode, getActiveRooms, closeRoom } = require('../models/Room');
 const authMiddleware = require('../middleware/auth');
+const { notifySubscribers } = require('../notify');
 const { createRoomLimiter } = require('../middleware/rateLimit');
 
 const VALID_CATEGORIES = ['GD', 'PPDT', 'Lecturette', 'IO Practice'];
@@ -74,6 +75,13 @@ router.post('/', authMiddleware, createRoomLimiter, async (req, res) => {
       req.userId, req.displayName, maxP, slug
     );
     res.status(201).json({ room });
+
+    notifySubscribers({
+      type: 'new_room', actorId: req.userId, groupKey: `new-room:${room.room_code}`,
+      title: `Live room: "${title.trim()}"`,
+      body: `${(req.displayName || 'An aspirant').split(' ')[0]} started a ${category} room. Join now.`,
+      link: `/room/${room.room_code}`,
+    });
   } catch (err) {
     console.error('Create room error:', err);
     res.status(500).json({ error: 'Failed to create room' });

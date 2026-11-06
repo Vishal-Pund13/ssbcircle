@@ -1,9 +1,10 @@
 import { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { getCommunityFeed } from '../services/api';
+import { getCommunityFeed, getCommunityPulse } from '../services/api';
 import { useAuth } from '../context/AuthContext';
-import { MessageSquare, ArrowBigUp, ArrowRight, PenLine, BadgeCheck } from 'lucide-react';
+import { MessageSquare, ArrowBigUp, ArrowRight, PenLine, BadgeCheck, Users, UserPlus, Radio } from 'lucide-react';
 import CategoryChip, { CategoryIcon, timeAgo } from './community/CategoryChip';
+import StayNotified from './StayNotified';
 
 // The community block on the home page: a place to ask, next to what others
 // are asking.
@@ -13,6 +14,10 @@ import CategoryChip, { CategoryIcon, timeAgo } from './community/CategoryChip';
 // narrow prompt gets typed into, an empty box gets scrolled past. And posts are
 // a plain list rather than a moving strip, because a list can be read, and an
 // unanswered post says "be the first to reply", which is the easiest way in.
+//
+// It sits near the top of the home page, led by what real aspirants did in
+// the last hours (the pulse), because that tells a first-time visitor the site
+// is alive and worth joining. Every name and number is real.
 //
 // Renders nothing when there is nothing to show and nothing anyone may post:
 // an empty block advertises an empty site.
@@ -26,6 +31,70 @@ const PROMPTS = [
 ];
 
 const MAX_POSTS = 4;
+const AVATAR_BG = ['bg-blue-600', 'bg-emerald-600', 'bg-purple-600', 'bg-rose-600', 'bg-teal-600', 'bg-amber-600'];
+
+// A number is only shown once it is big enough to impress rather than worry
+const STATS = [
+  { key: 'members',      min: 50, icon: Users,         text: n => `${n} aspirants on SSBCircle` },
+  { key: 'joined_week',  min: 5,  icon: UserPlus,      text: n => `${n} joined this week` },
+  { key: 'replies_week', min: 5,  icon: MessageSquare, text: n => `${n} replies this week` },
+  { key: 'active_week',  min: 10, icon: Radio,         text: n => `${n} active this week` },
+];
+
+const short = t => (t && t.length > 48 ? t.slice(0, 46) + '…' : t);
+const Topic = ({ t }) => <span className="font-semibold text-gray-800">“{short(t)}”</span>;
+const ACTION = {
+  reply: e => <>replied on <Topic t={e.topic} /></>,
+  post:  e => <>posted <Topic t={e.topic} /></>,
+  going: e => <>is in for <Topic t={e.topic} /></>,
+  room:  e => <>started a room: <Topic t={e.topic} /></>,
+  join:  () => <>joined SSBCircle</>,
+};
+
+function Face({ name, avatar }) {
+  if (avatar) return <img src={avatar} alt="" referrerPolicy="no-referrer" className="w-8 h-8 rounded-full object-cover shrink-0" />;
+  const bg = AVATAR_BG[(name || '?').charCodeAt(0) % AVATAR_BG.length];
+  return <span className={`w-8 h-8 rounded-full ${bg} text-white text-xs font-bold flex items-center justify-center shrink-0`}>{(name || '?')[0].toUpperCase()}</span>;
+}
+
+function ActivityFeed({ events }) {
+  // Two replies in a row from one person on one post read as one thing
+  const list = events.filter((e, i) => {
+    const p = events[i - 1];
+    return !p || p.kind !== e.kind || p.name !== e.name || p.topic !== e.topic;
+  }).slice(0, 6);
+  return (
+    <div className="bg-white border border-gray-200 rounded-2xl p-4 sm:p-5 h-full">
+      <p className="flex items-center gap-2 text-sm font-bold text-gray-900">
+        <span className="relative flex w-2.5 h-2.5">
+          <span className="absolute inline-flex w-full h-full rounded-full bg-emerald-400 opacity-75 animate-ping" />
+          <span className="relative inline-flex w-2.5 h-2.5 rounded-full bg-emerald-500" />
+        </span>
+        Happening now
+      </p>
+      <ul className="mt-3 flex flex-col gap-2">
+        {list.map((e, i) => {
+          const row = (
+            <>
+              <Face name={e.name} avatar={e.avatar} />
+              <span className="min-w-0 flex-1 text-[13px] text-gray-600 leading-snug">
+                <span className="font-bold text-gray-900">{e.name}</span> {ACTION[e.kind]?.(e)}
+                <span className="block text-[11px] text-gray-400 mt-0.5">{timeAgo(e.at)}</span>
+              </span>
+            </>
+          );
+          return (
+            <li key={i}>
+              {e.link
+                ? <Link to={e.link} className="flex items-start gap-2.5 rounded-lg -mx-1.5 px-1.5 py-1 hover:bg-gray-50">{row}</Link>
+                : <div className="flex items-start gap-2.5 py-1">{row}</div>}
+            </li>
+          );
+        })}
+      </ul>
+    </div>
+  );
+}
 
 function composeHref({ category, title } = {}) {
   const q = new URLSearchParams({ compose: '1' });
@@ -115,6 +184,7 @@ export default function CommunityHighlights() {
   const { user } = useAuth();
   const [posts,   setPosts]   = useState([]);
   const [canPost, setCanPost] = useState(false);
+  const [pulse,   setPulse]   = useState(null);
 
   useEffect(() => {
     let cancelled = false;
@@ -125,6 +195,7 @@ export default function CommunityHighlights() {
         setCanPost(!!can_post);
       })
       .catch(() => {});       // the home page should never break over this
+    getCommunityPulse().then(p => { if (!cancelled) setPulse(p); }).catch(() => {});
     return () => { cancelled = true; };
   }, []);
 
@@ -137,16 +208,19 @@ export default function CommunityHighlights() {
     .sort((a, b) => (rank(b) - rank(a)) || (new Date(b.created_at) - new Date(a.created_at)))
     .slice(0, MAX_POSTS);
 
+  const events = pulse?.events || [];
+  const stats  = STATS.filter(st => (pulse?.stats?.[st.key] || 0) >= st.min);
+
   return (
     <section className="border-t border-gray-100 bg-gray-50 px-4 sm:px-6 py-10 sm:py-14">
       <div className="max-w-5xl mx-auto">
-        <div className="flex items-end justify-between gap-4 mb-5">
+        <div className="flex items-end justify-between gap-4">
           <div>
-            <p className="text-[11px] font-bold uppercase tracking-[0.25em] text-brand-600">
-              Community
+            <p className="flex items-center gap-2 text-[11px] font-bold uppercase tracking-[0.25em] text-brand-600">
+              <span className="w-2 h-2 rounded-full bg-emerald-500" /> Community is active
             </p>
             <h2 className="mt-1.5 text-xl sm:text-2xl font-bold text-gray-900 leading-tight">
-              Ask, answer, prepare together
+              Real aspirants, preparing together
             </h2>
           </div>
           <Link to="/community"
@@ -155,14 +229,26 @@ export default function CommunityHighlights() {
           </Link>
         </div>
 
-        <div className={`grid grid-cols-1 gap-4 ${canPost && shown.length > 0 ? 'lg:grid-cols-2' : ''}`}>
-          {canPost && <AskBox user={user} />}
+        {stats.length > 0 && (
+          <div className="mt-4 flex flex-wrap gap-2">
+            {stats.map(({ key, icon: Icon, text }) => (
+              <span key={key} className="inline-flex items-center gap-1.5 bg-white border border-gray-200 rounded-full px-3 py-1.5 text-xs font-semibold text-gray-700">
+                <Icon className="w-3.5 h-3.5 text-brand-600" /> {text(pulse.stats[key])}
+              </span>
+            ))}
+          </div>
+        )}
 
-          {shown.length > 0 && (
-            <div className={`flex flex-col gap-3 ${!canPost ? 'sm:grid sm:grid-cols-2' : ''}`}>
+        {/* Desktop: what is happening | the posts and a way to join in | stay notified */}
+        <div className="mt-5 grid grid-cols-1 lg:grid-cols-3 gap-4 items-start">
+          {events.length > 0 && <ActivityFeed events={events} />}
+          {(shown.length > 0 || canPost) && (
+            <div className="flex flex-col gap-3">
               {shown.map(post => <PostRow key={post.id} post={post} />)}
+              {canPost && <AskBox user={user} />}
             </div>
           )}
+          <StayNotified />
         </div>
       </div>
     </section>

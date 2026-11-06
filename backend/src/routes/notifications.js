@@ -7,7 +7,8 @@ const { notify, PUSH_READY } = require('../notify');
 
 // The bell, phone-push subscriptions, and notification preferences.
 
-const PREF_KEYS = ['replies_push', 'replies_email', 'rooms_push', 'rooms_email'];
+const PREF_KEYS = ['replies_push', 'replies_email', 'rooms_push', 'rooms_email', 'new_posts_push', 'new_rooms_push'];
+const OPT_IN_KEYS = new Set(['new_posts_push', 'new_rooms_push']);   // off until chosen
 
 // Public: the key a browser needs to subscribe to push. Empty when push is off.
 router.get('/vapid-public-key', (_req, res) => res.json({ key: process.env.VAPID_PUBLIC_KEY || '' }));
@@ -108,7 +109,7 @@ router.get('/prefs', async (req, res) => {
   try {
     const { rows } = await pool.query('SELECT notify_prefs FROM users WHERE id = $1', [req.userId]);
     const p = rows[0]?.notify_prefs || {};
-    res.json({ prefs: Object.fromEntries(PREF_KEYS.map(k => [k, p[k] !== false])) });
+    res.json({ prefs: Object.fromEntries(PREF_KEYS.map(k => [k, OPT_IN_KEYS.has(k) ? p[k] === true : p[k] !== false])) });
   } catch {
     res.status(500).json({ error: 'Could not load preferences' });
   }

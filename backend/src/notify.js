@@ -31,9 +31,15 @@ if (PUSH_READY) {
   console.log('[notify] VAPID keys not set — phone push is off; bell and email still work');
 }
 
-// Preference keys stored in users.notify_prefs; missing means on
-const PREF = { reply: 'replies', room: 'rooms' };
-const wants = (prefs, type, channel) => (prefs || {})[`${PREF[type] || type}_${channel}`] !== false;
+// Preference keys stored in users.notify_prefs. Things about you (replies,
+// your rooms) are on unless turned off; site-wide news (every new post or
+// room) is off unless the person chose it.
+const PREF = { reply: 'replies', room: 'rooms', new_post: 'new_posts', new_room: 'new_rooms' };
+const OPT_IN = new Set(['new_posts', 'new_rooms']);
+function wants(prefs, type, channel) {
+  const v = (prefs || {})[`${PREF[type] || type}_${channel}`];
+  return OPT_IN.has(PREF[type] || type) ? v === true : v !== false;
+}
 
 function unsubscribeUrl(userId) {
   const t = jwt.sign({ uid: userId, purpose: 'email-unsub' }, process.env.JWT_SECRET, { expiresIn: '180d' });
@@ -116,4 +122,11 @@ function notify({ userIds, actorId, kind, type, groupKey, title, bundleTitle, bo
   )).catch(() => {});
 }
 
-module.exports = { notify, PUSH_READY };
+// Site-wide news to everyone who opted in: type 'new_post' | 'new_room'
+function notifySubscribers({ type, ...rest }) {
+  pool.query(`SELECT id FROM users WHERE notify_prefs->>$1 = 'true'`, [`${PREF[type]}_push`])
+    .then(({ rows }) => notify({ ...rest, type, kind: type, userIds: rows.map(r => r.id), email: false }))
+    .catch(err => console.error('[notify] subscribers failed:', err.message));
+}
+
+module.exports = { notify, notifySubscribers, PUSH_READY };

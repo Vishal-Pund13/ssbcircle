@@ -165,11 +165,11 @@ const HomePrepSheet = lazy(() => import('./HomePrepSheet'));
 // The home page is long; HomeRail shows where you are on it. Page order.
 const HOME_SECTIONS = [
   { id: 'top',       label: 'Start' },
+  { id: 'community', label: 'Community' },
   { id: 'stages',    label: 'SSB stages' },
   { id: 'prep',      label: 'Prep Sheet' },
   { id: 'news',      label: 'News cards' },
   { id: 'rooms',     label: 'Live rooms' },
-  { id: 'community', label: 'Community' },
   { id: 'mentors',   label: 'Mentors' },
   { id: 'faq',       label: 'FAQ' },
 ];
@@ -1398,6 +1398,9 @@ export default function LandingPage() {
         {/* ── Days to your SSB — personal, so it leads; renders nothing unless a date is saved ── */}
         <SsbCountdown user={user} />
 
+        {/* ── Community — right under the hero: real people active here is the best proof the site is worth joining ── */}
+        <div id="community" className="scroll-mt-16"><CommunityHighlights /></div>
+
         {/* The page runs: where to start → every stage → read → practise live → discuss */}
         <div id="stages"><SsbStages /></div>
         <div id="prep"><Suspense fallback={<div className="h-[300px] border-t border-gray-100" />}><HomePrepSheet /></Suspense></div>
@@ -1603,8 +1606,6 @@ export default function LandingPage() {
           </div>
         </section>
 
-        {/* ── Community — ask box + recent posts; renders nothing if empty and closed to posting ── */}
-        <div id="community"><CommunityHighlights /></div>
 
 
         {/* ── Notable Sessions — social proof, sits with the rooms zone ── */}
