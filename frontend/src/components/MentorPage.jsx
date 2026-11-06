@@ -6,7 +6,7 @@ import MentorConnectModal from './MentorConnectModal';
 import SiteNav from './SiteNav';
 
 function formatDate(dateStr) {
-  return new Date(dateStr).toLocaleDateString('en-IN', { day: 'numeric', month: 'long', year: 'numeric' });
+  return new Date(dateStr).toLocaleDateString('en-IN', { timeZone: 'Asia/Kolkata', day: 'numeric', month: 'long', year: 'numeric' });
 }
 
 

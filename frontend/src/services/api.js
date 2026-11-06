@@ -308,3 +308,14 @@ export const deleteCommunityComment = async (id) => {
   const { data } = await api.delete(`/api/community/comments/${id}`);
   return data;
 };
+
+// ── Notifications ────────────────────────────────────────────────────────────
+export const getNotifications = async () => (await api.get('/api/notifications')).data;
+export const getUnreadCount = async () => (await api.get('/api/notifications/unread-count')).data.unread;
+export const markNotificationsRead = async (ids) => (await api.post('/api/notifications/read', ids ? { ids } : {})).data;
+export const getPushPublicKey = async () => (await api.get('/api/notifications/vapid-public-key')).data.key;
+export const savePushSubscription = async (subscription) => (await api.post('/api/notifications/push/subscribe', { subscription })).data;
+export const deletePushSubscription = async (endpoint) => (await api.post('/api/notifications/push/unsubscribe', { endpoint })).data;
+export const getNotifyPrefs = async () => (await api.get('/api/notifications/prefs')).data.prefs;
+export const saveNotifyPrefs = async (patch) => (await api.put('/api/notifications/prefs', patch)).data;
+export const sendTestNotification = async () => (await api.post('/api/notifications/test')).data;

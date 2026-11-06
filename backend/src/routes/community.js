@@ -1,4 +1,5 @@
 const express = require('express');
+const { notify } = require('../notify');
 const router = express.Router();
 const jwt = require('jsonwebtoken');
 const authMiddleware = require('../middleware/auth');
@@ -104,7 +105,21 @@ router.post('/:id/comments', authMiddleware, async (req, res) => {
     if (!body) return res.status(400).json({ error: 'Write something first.' });
 
     await Community.addComment({ postId: post.id, authorId: req.userId, body });
-    res.status(201).json({ comments: await Community.listComments(post.id) });
+    const comments = await Community.listComments(post.id);
+    res.status(201).json({ comments });
+
+    // Tell the post's author and everyone else in the thread
+    const me = comments.filter(c => c.author_id === req.userId).pop();
+    const actor = (me?.author_name || 'Someone').split(' ')[0];
+    const topic = post.title.length > 60 ? post.title.slice(0, 57) + '…' : post.title;
+    notify({
+      userIds: [post.author_id, ...comments.map(c => c.author_id)],
+      actorId: req.userId, kind: 'reply', type: 'reply', groupKey: `post:${post.id}`,
+      title: uid => uid === post.author_id ? `${actor} replied to your post "${topic}"` : `${actor} replied on "${topic}"`,
+      bundleTitle: n => `${n} new replies on "${topic}"`,
+      body: body.length > 140 ? body.slice(0, 137) + '…' : body,
+      link: `/community/${post.id}`,
+    });
   } catch (err) {
     console.error('Community comment error:', err);
     res.status(500).json({ error: 'Could not post your comment' });

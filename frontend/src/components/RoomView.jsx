@@ -530,7 +530,7 @@ function VoiceRoomUI({ room, isAdmin, roomCode, showTimer, setShowTimer, showPan
       type: 'CHAT',
       sender: localParticipant.name || localParticipant.identity,
       text,
-      ts: new Date().toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' }),
+      ts: new Date().toLocaleTimeString('en-IN', { timeZone: 'Asia/Kolkata', hour: '2-digit', minute: '2-digit' }),
     };
     setChatMessages(prev => [...prev, { ...msg, id: Date.now(), isMe: true }]);
     publish(msg);
@@ -949,9 +949,9 @@ export default function RoomView() {
           </span>
           <h2 className="text-lg font-semibold text-gray-900 mt-3 mb-1">{pendingSession.topic}</h2>
           <p className="text-sm text-gray-400 mb-1">
-            {dt.toLocaleDateString('en-IN', { weekday: 'short', day: 'numeric', month: 'short' })}
+            {dt.toLocaleDateString('en-IN', { timeZone: 'Asia/Kolkata', weekday: 'short', day: 'numeric', month: 'short' })}
             {' · '}
-            {dt.toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' })}
+            {dt.toLocaleTimeString('en-IN', { timeZone: 'Asia/Kolkata', hour: '2-digit', minute: '2-digit' })}
           </p>
           <p className="text-sm font-semibold text-brand-600 mb-2">{timeStr}</p>
           {pendingSession.host_display_name && (

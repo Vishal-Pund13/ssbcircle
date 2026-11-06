@@ -14,6 +14,9 @@ const eventRouter    = require('./routes/event');
 const piqRouter      = require('./routes/piq');
 const tatRouter      = require('./routes/tat');
 const trackRouter    = require('./routes/track');
+const notificationsRouter = require('./routes/notifications');
+const { notify } = require('./notify');
+const { timeIST } = require('./time');
 const modRouter      = require('./routes/moderators');
 const communityRouter = require('./routes/community');
 const prepRouter     = require('./routes/prep');
@@ -53,6 +56,7 @@ app.use('/api/tat', generalLimiter, express.json({ limit: '32kb' }), tatRouter);
 
 // Usage events and AI-report feedback, for the admin dashboard.
 app.use('/api/track', generalLimiter, express.json({ limit: '16kb' }), trackRouter);
+app.use('/api/notifications', generalLimiter, express.json({ limit: '8kb' }), notificationsRouter);
 
 // Moderator programme and platform feedback
 app.use('/api/moderators', generalLimiter, express.json({ limit: '16kb' }), modRouter);
@@ -195,6 +199,13 @@ async function sendSessionReminders() {
           }).catch(err => console.error(`[reminders] Reminder failed for ${u.email}:`, err.message));
         }
       }
+      // Phone push too (the email went above)
+      const { rows: ids } = await pool.query('SELECT user_id FROM session_interests WHERE session_id = $1', [session.id]);
+      notify({
+        userIds: ids.map(r => r.user_id), kind: 'room_soon', type: 'room', groupKey: `room-soon:${session.id}`,
+        title: `Starting at ${timeIST(session.scheduled_at)}: "${session.topic}"`,
+        body: 'Your room starts in about 30 minutes.', link: '/?tab=live', email: false,
+      });
       await pool.query('UPDATE scheduled_sessions SET reminder_sent=true WHERE id=$1', [session.id]);
       console.log(`[reminders] Sent reminders for session: ${session.topic}`);
     }
@@ -334,6 +345,44 @@ async function start() {
     `);
     await pool.query(`CREATE INDEX IF NOT EXISTS idx_presence_seen ON presence(last_seen)`);
     await pool.query(`CREATE INDEX IF NOT EXISTS idx_presence_user ON presence(user_id)`);
+    // Notifications (see notify.js): one row per thing to tell someone, bundled
+    // per group_key (e.g. all replies on one post). The bell reads these;
+    // pushed_at / emailed_at stop the same bundle alerting twice too fast.
+    await pool.query(`
+      CREATE TABLE IF NOT EXISTS notifications (
+        id         BIGSERIAL PRIMARY KEY,
+        user_id    UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+        actor_id   UUID,
+        kind       VARCHAR(30) NOT NULL,
+        group_key  VARCHAR(120) NOT NULL,
+        title      TEXT NOT NULL,
+        body       TEXT,
+        link       TEXT NOT NULL,
+        count      INT NOT NULL DEFAULT 1,
+        read_at    TIMESTAMPTZ,
+        pushed_at  TIMESTAMPTZ,
+        emailed_at TIMESTAMPTZ,
+        created_at TIMESTAMPTZ DEFAULT NOW(),
+        updated_at TIMESTAMPTZ DEFAULT NOW()
+      )
+    `);
+    await pool.query(`CREATE INDEX IF NOT EXISTS idx_notifications_user ON notifications(user_id, updated_at DESC)`);
+    // A browser that agreed to phone notifications (one person may have several)
+    await pool.query(`
+      CREATE TABLE IF NOT EXISTS push_subscriptions (
+        id           BIGSERIAL PRIMARY KEY,
+        user_id      UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+        endpoint     TEXT UNIQUE NOT NULL,
+        p256dh       TEXT NOT NULL,
+        auth         TEXT NOT NULL,
+        user_agent   VARCHAR(200),
+        created_at   TIMESTAMPTZ DEFAULT NOW(),
+        last_used_at TIMESTAMPTZ
+      )
+    `);
+    // { replies_push, replies_email, rooms_push, rooms_email } — missing means on
+    await pool.query(`ALTER TABLE users ADD COLUMN IF NOT EXISTS notify_prefs JSONB NOT NULL DEFAULT '{}'`);
+
     // Aspirants sent to a mentor. Each WhatsApp introduction carries a short
     // reference code (SSBC-XXXXX) that is also stored here, so referrals can
     // be matched with the mentor for commission. No message text is stored.

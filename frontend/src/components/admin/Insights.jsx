@@ -30,7 +30,7 @@ const EVENT_LABEL = {
 const fmt = n => (n ?? 0).toLocaleString('en-IN');
 const pct = (a, b) => (b ? Math.round((a / b) * 100) : 0);
 const secs = ms => (ms ? `${(ms / 1000).toFixed(1)}s` : '—');
-const shortDay = d => new Date(d + 'T00:00:00').toLocaleDateString('en-IN', { day: 'numeric', month: 'short' });
+const shortDay = d => new Date(d + 'T00:00:00+05:30').toLocaleDateString('en-IN', { timeZone: 'Asia/Kolkata', day: 'numeric', month: 'short' });
 
 // ── Building blocks ─────────────────────────────────────────────────────────
 
@@ -393,7 +393,7 @@ function Feedback({ d }) {
                       : <span className="inline-flex items-center gap-1 font-semibold text-red-700"><XCircle className="w-3.5 h-3.5" /> Not useful</span>}
                     <span className="text-gray-400">· {FEATURE_LABEL[r.feature] || r.feature} · {r.display_name}</span>
                   </span>
-                  <span className="text-gray-400">{new Date(r.created_at).toLocaleString('en-IN', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' })}</span>
+                  <span className="text-gray-400">{new Date(r.created_at).toLocaleString('en-IN', { timeZone: 'Asia/Kolkata', day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' })}</span>
                 </div>
                 {r.comment && <p className="mt-2 text-sm text-gray-900 font-medium">"{r.comment}"</p>}
                 {r.story && (
@@ -453,7 +453,7 @@ export default function Insights({ tab, authHeaders, onAuthFail, live }) {
       <div className="flex flex-wrap items-center justify-between gap-3 mb-4">
         <div>
           <h1 className="text-xl font-bold text-gray-900">{INSIGHT_TABS.find(t => t.id === tab)?.label}</h1>
-          <p className="text-xs text-gray-500 mt-0.5">Last {days} days, Indian time{data && ` · updated ${new Date(data.generated_at).toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' })}`}</p>
+          <p className="text-xs text-gray-500 mt-0.5">Last {days} days, Indian time{data && ` · updated ${new Date(data.generated_at).toLocaleTimeString('en-IN', { timeZone: 'Asia/Kolkata', hour: '2-digit', minute: '2-digit' })}`}</p>
         </div>
         <div className="flex items-center gap-2">
           <div className="flex bg-white border border-gray-200 rounded-xl p-1">

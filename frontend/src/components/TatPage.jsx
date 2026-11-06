@@ -437,7 +437,7 @@ export default function TatPage() {
                   <Picture id={a.picture_id} className="w-16 h-12 shrink-0 text-[8px]" />
                   <div className="min-w-0 flex-1">
                     <p className="text-xs text-gray-700 line-clamp-2">{a.story}</p>
-                    <p className="text-[11px] text-gray-400 mt-0.5">{new Date(a.created_at).toLocaleString('en-IN')}</p>
+                    <p className="text-[11px] text-gray-400 mt-0.5">{new Date(a.created_at).toLocaleString('en-IN', { timeZone: 'Asia/Kolkata' })}</p>
                   </div>
                   <ChevronRight className="w-4 h-4 text-gray-300 shrink-0" />
                 </button>

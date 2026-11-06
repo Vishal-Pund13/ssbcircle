@@ -106,7 +106,7 @@ function LastAttempt({ attempt }) {
         <Sparkles className="w-3.5 h-3.5 text-brand-600" />
         <span className="text-xs font-bold text-gray-700">Your last attempt</span>
         <span className="text-xs text-gray-500 tabular-nums">· {f.score}/10</span>
-        <span className="text-[12px] text-gray-400">· {new Date(attempt.at).toLocaleDateString('en-IN', { day: 'numeric', month: 'short' })}</span>
+        <span className="text-[12px] text-gray-400">· {new Date(attempt.at).toLocaleDateString('en-IN', { timeZone: 'Asia/Kolkata', day: 'numeric', month: 'short' })}</span>
         <ChevronDown className={`w-4 h-4 text-gray-400 ml-auto transition-transform ${show ? 'rotate-180' : ''}`} />
       </button>
       {show && (

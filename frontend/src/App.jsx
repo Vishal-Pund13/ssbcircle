@@ -29,6 +29,7 @@ import LandingPage from './components/LandingPage';
 import MobileTabBar from './components/MobileTabBar';
 import { SoldierLoader } from './components/SoldierRunner';
 import AnnouncementPoster from './components/AnnouncementPoster';
+import NotifyPrompt from './components/NotifyPrompt';
 
 // Heavy routes loaded on demand — keeps initial bundle small
 const LoginPage           = lazy(() => import('./components/LoginPage'));
@@ -100,6 +101,7 @@ export default function App() {
           </Routes>
           <MobileTabBar />
           <AnnouncementPoster />
+          <NotifyPrompt />
         </Suspense>
       </BrowserRouter>
     </AuthProvider>

@@ -281,7 +281,7 @@ function _SessionBannerRemoved() {
 
 function getPillar(id) { return PILLARS.find(p => p.id === id && p.id !== 'all') || null; }
 function fmtDate(d) {
-  return new Date(d).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' });
+  return new Date(d).toLocaleDateString('en-IN', { timeZone: 'Asia/Kolkata', day: 'numeric', month: 'short', year: 'numeric' });
 }
 
 
@@ -401,7 +401,7 @@ function ArticleDetail({ article, onBack }) {
         <div className="flex flex-wrap items-center justify-between gap-3 pb-6 border-b border-gray-100">
           <div className="flex items-center gap-1.5 text-xs text-gray-400">
             <Calendar className="w-3.5 h-3.5" />
-            {new Date(article.published_at).toLocaleDateString('en-IN', {
+            {new Date(article.published_at).toLocaleDateString('en-IN', { timeZone: 'Asia/Kolkata',
               weekday: 'long', day: 'numeric', month: 'long', year: 'numeric'
             })}
           </div>

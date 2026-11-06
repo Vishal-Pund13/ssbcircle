@@ -10,6 +10,7 @@ import CategoryChip, { timeAgo } from './community/CategoryChip';
 import { Avatar, VoteRail, ShareButton, CommunitySidebar, ModBadge } from './community/parts';
 import SiteNav from './SiteNav';
 import { trackEvent } from '../analytics';
+import { askForNotifications } from './NotifyPrompt';
 
 // One community post with its replies, in the same Reddit-like style as the
 // feed. The reply box says what kind of reply helps for each kind of post.
@@ -63,6 +64,7 @@ export default function PostPage() {
       setComments(await addCommunityComment(post.id, body.trim()));
       setBody('');
       trackEvent('community_comment', { type: post.category });
+      askForNotifications('reply');
     } catch (err) {
       setError(err.message || 'Could not post your comment.');
     } finally {

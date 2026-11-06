@@ -4,6 +4,8 @@ const pool    = require('../db');
 const auth    = require('../middleware/auth');
 const { createRoomWithCode, generateUniqueRoomCode } = require('../models/Room');
 const { sendInterestConfirmation, sendRoomLive } = require('../email');
+const { notify }  = require('../notify');
+const { shortIST } = require('../time');
 
 // List upcoming sessions (auth optional — needed for is_interested)
 router.get('/', async (req, res) => {
@@ -92,6 +94,21 @@ router.post('/:id/interest', auth, async (req, res) => {
       await pool.query('INSERT INTO session_interests (session_id, user_id) VALUES ($1,$2)',
         [req.params.id, req.userId]);
       res.json({ interested: true });
+      // Tell the host someone is coming
+      pool.query(`SELECT s.created_by, s.topic, s.scheduled_at, (SELECT COUNT(*)::int FROM session_interests WHERE session_id = s.id) AS n,
+                         u.display_name FROM scheduled_sessions s JOIN users u ON u.id = $2 WHERE s.id = $1`, [req.params.id, req.userId])
+        .then(({ rows: [s] }) => {
+          if (!s) return;
+          const who = (s.display_name || 'Someone').split(' ')[0];
+          notify({
+            userIds: [s.created_by], actorId: req.userId, kind: 'room_interest', type: 'room',
+            groupKey: `room-interest:${req.params.id}`,
+            title: `${who} is in for your room "${s.topic}"`,
+            bundleTitle: n => `${n} more aspirants are in for "${s.topic}"`,
+            body: `${s.n} going · ${shortIST(s.scheduled_at)}`,
+            link: '/?tab=live',
+          });
+        }).catch(() => {});
       // Send confirmation email (best-effort, non-blocking)
       pool.query(`
         SELECT s.topic, s.category, s.scheduled_at, u.email, u.display_name
@@ -140,6 +157,16 @@ router.post('/:id/start', auth, async (req, res) => {
       session.category, session.subcategory, req.userId, req.displayName
     );
     res.json({ room });
+    // Bell + phone push for everyone who said "I'm in" (the email follows below)
+    pool.query('SELECT user_id FROM session_interests WHERE session_id = $1', [session.id]).then(({ rows }) => {
+      notify({
+        userIds: rows.map(r => r.user_id), actorId: req.userId, kind: 'room_live', type: 'room',
+        groupKey: `room-live:${session.id}`,
+        title: `Live now: "${session.topic}"`,
+        body: 'The room you joined has started. Tap to join.',
+        link: `/room/${room.room_code}`, email: false,
+      });
+    }).catch(() => {});
     // Notify all interested users (best-effort)
     pool.query(`
       SELECT u.email, u.display_name FROM session_interests si

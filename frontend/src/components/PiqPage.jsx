@@ -186,7 +186,7 @@ function AnalysisReport({ analysis, analysedAt, name }) {
           <div>
             <p className="text-[11px] font-bold uppercase tracking-[0.25em] text-brand-100">Your PIQ report</p>
             <h2 className="mt-1 text-xl font-bold leading-tight">{name ? `${name}, here is how your PIQ reads` : 'Here is how your PIQ reads'}</h2>
-            {analysedAt && <p className="text-xs text-brand-100 mt-1">Analysed {new Date(analysedAt).toLocaleString('en-IN')}</p>}
+            {analysedAt && <p className="text-xs text-brand-100 mt-1">Analysed {new Date(analysedAt).toLocaleString('en-IN', { timeZone: 'Asia/Kolkata' })}</p>}
           </div>
           <div className="shrink-0 text-right">
             <PiqPdfButton analysis={analysis} name={name} analysedAt={analysedAt} />
@@ -479,7 +479,7 @@ export default function PiqPage() {
           )}
           {updated && (
             <p className="mt-2 text-[12px] text-gray-400">
-              Last saved {new Date(updated).toLocaleString('en-IN')}
+              Last saved {new Date(updated).toLocaleString('en-IN', { timeZone: 'Asia/Kolkata' })}
             </p>
           )}
         </PageHead>
@@ -504,7 +504,7 @@ export default function PiqPage() {
               <div className="min-w-0 flex-1">
                 <p className="text-sm font-bold text-gray-900">Your PIQ report is ready</p>
                 <p className="text-xs text-gray-500 mt-0.5">
-                  {analysedAt && <>Analysed {new Date(analysedAt).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' })}</>}
+                  {analysedAt && <>Analysed {new Date(analysedAt).toLocaleDateString('en-IN', { timeZone: 'Asia/Kolkata', day: 'numeric', month: 'short', year: 'numeric' })}</>}
                   {analysis.likely_questions?.length > 0 && <> · {analysis.likely_questions.length} question groups</>}
                   {analysis.gaps?.length > 0 && <> · {analysis.gaps.length} points the IO may press</>}
                 </p>

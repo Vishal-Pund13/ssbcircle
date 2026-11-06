@@ -3,6 +3,7 @@ import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { FileText, PenLine, CheckSquare, BookOpen, Users, Radio, ChevronDown, X, LogOut, User, Plus, LogIn, CalendarDays, Compass, ShieldCheck, MessageSquareWarning, Signpost } from 'lucide-react';
 import PlatformFeedbackDialog from './PlatformFeedbackDialog';
+import NotificationBell from './NotificationBell';
 
 // The site's main navigation, shared by the home page and the prep tools.
 //
@@ -125,6 +126,7 @@ export default function SiteNav() {
         </nav>
 
         <div className="hidden md:flex items-center gap-2">
+          {user && <NotificationBell only="desktop" />}
           {user ? (
             <div ref={userRef} className="relative">
               <button onClick={() => setUserOpen(v => !v)} aria-expanded={userOpen}
@@ -159,6 +161,7 @@ export default function SiteNav() {
         {/* ── Mobile ── */}
         <div className="md:hidden flex items-center gap-2">
           {!user && <Link to="/register" className="btn-primary py-1.5 px-3 text-xs">Get started</Link>}
+          {user && <NotificationBell only="phone" />}
           <button onClick={() => setMenuOpen(v => !v)} aria-label="Menu" aria-expanded={menuOpen}
             className="flex items-center justify-center w-9 h-9 rounded-xl border border-gray-200 bg-white hover:bg-gray-50 transition-colors cursor-pointer">
             {menuOpen ? <X className="w-4 h-4 text-gray-600" /> : (

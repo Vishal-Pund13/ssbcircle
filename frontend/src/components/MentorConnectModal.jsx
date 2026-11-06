@@ -18,7 +18,7 @@ function entryFrom(exam = '') {
 function readableDate(iso) {
   if (!iso) return '';
   const d = new Date(iso);
-  return isNaN(d) ? iso : d.toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' });
+  return isNaN(d) ? iso : d.toLocaleDateString('en-IN', { timeZone: 'Asia/Kolkata', day: 'numeric', month: 'short', year: 'numeric' });
 }
 
 // A short code that rides in the WhatsApp message and is logged with the

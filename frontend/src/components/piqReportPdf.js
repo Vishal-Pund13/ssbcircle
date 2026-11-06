@@ -43,7 +43,7 @@ function docDefinition(analysis, name, analysedAt) {
     { text: 'SSBCIRCLE', style: 'brand' },
     { text: `PIQ Report${name ? ` — ${s(name)}` : ''}`, style: 'title' },
   );
-  if (analysedAt) content.push({ text: `Analysed ${new Date(analysedAt).toLocaleString('en-IN')}`, style: 'muted' });
+  if (analysedAt) content.push({ text: `Analysed ${new Date(analysedAt).toLocaleString('en-IN', { timeZone: 'Asia/Kolkata' })}`, style: 'muted' });
   content.push({ canvas: [{ type: 'line', x1: 0, y1: 4, x2: 515, y2: 4, lineWidth: 1.5, lineColor: BRAND }], margin: [0, 0, 0, 10] });
 
   content.push({

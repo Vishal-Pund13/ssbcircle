@@ -17,6 +17,7 @@ import { Mic, Timer, FileText, CheckSquare, Radio, ArrowRight, Trash2, Zap, Ligh
 import Hello, { firstName } from './Hello';
 import { NEWS_SECTIONS } from '../data/newsSections';
 import { todayIST, daysBetween } from './prep/dates';
+import { askForNotifications } from './NotifyPrompt';
 
 
 const HERO_CARDS = [
@@ -909,14 +910,14 @@ function UpcomingTab({ sessions, loading, user, onRefresh, navigate, onInterest,
                       )}
                       <ShareButton
                         title={s.topic}
-                        text={`Join "${s.topic}" (${s.category}) on SSBCircle — ${dt.toLocaleDateString('en-IN', { day:'numeric', month:'short' })} at ${dt.toLocaleTimeString('en-IN', { hour:'2-digit', minute:'2-digit' })}. Room code: ${s.room_code}`}
+                        text={`Join "${s.topic}" (${s.category}) on SSBCircle — ${dt.toLocaleDateString('en-IN', { timeZone: 'Asia/Kolkata', day:'numeric', month:'short' })} at ${dt.toLocaleTimeString('en-IN', { timeZone: 'Asia/Kolkata', hour:'2-digit', minute:'2-digit' })}. Room code: ${s.room_code}`}
                         url={`${window.location.origin}/room/${s.room_code}`}
                       />
                     </div>
                   </div>
                   <p className="text-sm font-semibold text-gray-800 leading-snug flex-1">{s.topic}</p>
                   <div className="text-xs text-gray-400">
-                    <p className="font-medium text-gray-600">{dt.toLocaleDateString('en-IN', { weekday:'short', day:'numeric', month:'short' })} · {dt.toLocaleTimeString('en-IN', { hour:'2-digit', minute:'2-digit' })}</p>
+                    <p className="font-medium text-gray-600">{dt.toLocaleDateString('en-IN', { timeZone: 'Asia/Kolkata', weekday:'short', day:'numeric', month:'short' })} · {dt.toLocaleTimeString('en-IN', { timeZone: 'Asia/Kolkata', hour:'2-digit', minute:'2-digit' })}</p>
                     {s.host_display_name && <p className="mt-0.5">by {isHost ? <span className="text-brand-600 font-medium">You</span> : s.host_display_name}</p>}
                   </div>
                   <div className="flex items-center gap-2">
@@ -1137,7 +1138,7 @@ function MentorAnnouncementBanner() {
   if (!mentor) return null;
 
   const availableFromLabel = mentor.availableFrom && new Date(mentor.availableFrom) > new Date()
-    ? new Date(mentor.availableFrom).toLocaleDateString('en-IN', { day: 'numeric', month: 'long', year: 'numeric' })
+    ? new Date(mentor.availableFrom).toLocaleDateString('en-IN', { timeZone: 'Asia/Kolkata', day: 'numeric', month: 'long', year: 'numeric' })
     : null;
 
   return (
@@ -1473,6 +1474,7 @@ export default function LandingPage() {
               onInterest={async (id) => {
                 if (!user) { navigate('/login'); return; }
                 const res = await toggleInterest(id).catch(() => null);
+                if (res?.interested) askForNotifications('room');
                 if (res) setSessions(prev => prev.map(s => s.id === id ? {
                   ...s,
                   is_interested: res.interested,
@@ -1627,7 +1629,7 @@ export default function LandingPage() {
                           {s.category}
                         </span>
                         <span className="text-[12px] text-gray-300">
-                          {dt.toLocaleDateString('en-IN', { day: 'numeric', month: 'short' })}
+                          {dt.toLocaleDateString('en-IN', { timeZone: 'Asia/Kolkata', day: 'numeric', month: 'short' })}
                         </span>
                       </div>
                       <p className="text-sm font-semibold text-gray-800 leading-snug flex-1">{s.topic}</p>

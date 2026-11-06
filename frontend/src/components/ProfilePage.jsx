@@ -9,6 +9,7 @@ import { saveOnboarding } from '../services/api';
 import { EXAM_TYPES, otherChoice, otherText } from '../data/examTypes';
 import SiteNav from './SiteNav';
 import PlatformFeedbackDialog from './PlatformFeedbackDialog';
+import NotificationSettings from './NotificationSettings';
 
 // The "Me" tab on phones: who you are, your prep tools, rooms, and account
 // actions in one place. The details form is the one from the welcome screen,
@@ -103,7 +104,7 @@ export default function ProfilePage() {
 
   if (!user) return null;
 
-  const memberSince = new Date(user.created_at).toLocaleDateString('en-IN', {
+  const memberSince = new Date(user.created_at).toLocaleDateString('en-IN', { timeZone: 'Asia/Kolkata',
     year: 'numeric', month: 'long',
   });
   const labelCls = 'block text-sm font-bold text-gray-800 mt-5 mb-1.5';
@@ -207,6 +208,8 @@ export default function ProfilePage() {
             </form>
           )}
         </section>
+
+        <NotificationSettings />
 
         {/* Community and account */}
         <section className="bg-white border border-gray-200 rounded-2xl divide-y divide-gray-100 overflow-hidden">

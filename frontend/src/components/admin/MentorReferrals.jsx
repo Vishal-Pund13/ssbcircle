@@ -70,7 +70,7 @@ export default function MentorReferrals({ authHeaders }) {
                 <td className="px-4 py-2.5 text-gray-600">{r.entry || '—'}</td>
                 <td className="px-4 py-2.5 text-gray-600 whitespace-nowrap">{SOURCE_LABEL[r.source] || r.source || '—'}</td>
                 <td className="px-4 py-2.5 text-gray-600 whitespace-nowrap">{mentorName(r.mentor_slug)}</td>
-                <td className="px-4 py-2.5 text-gray-500 whitespace-nowrap">{new Date(r.created_at).toLocaleString('en-IN', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' })}</td>
+                <td className="px-4 py-2.5 text-gray-500 whitespace-nowrap">{new Date(r.created_at).toLocaleString('en-IN', { timeZone: 'Asia/Kolkata', day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' })}</td>
               </tr>
             ))}
           </tbody>

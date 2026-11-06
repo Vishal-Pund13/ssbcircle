@@ -1,15 +1,13 @@
 const { Resend } = require('resend');
+const { dateIST, timeIST } = require('./time');
 
 const resend = new Resend(process.env.RESEND_API_KEY);
 const FROM   = 'SSBCircle <noreply@ssbcircle.com>';
 const BASE   = 'https://www.ssbcircle.com';
 
+// Always Indian time, whatever the server's clock zone (see time.js)
 function formatDt(dateStr) {
-  const d = new Date(dateStr);
-  return {
-    date: d.toLocaleDateString('en-IN', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' }),
-    time: d.toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit', hour12: true }),
-  };
+  return { date: dateIST(dateStr), time: timeIST(dateStr) };
 }
 
 // Email-safe HTML — all styles inline, table-based layout (Gmail compatible)
@@ -274,4 +272,20 @@ async function sendEventReminder(to, name, scheduledAt) {
   });
 }
 
-module.exports = { sendInterestConfirmation, sendReminder, sendRoomLive, sendHostStartReminder, sendEventConfirmation, sendEventReminder };
+// 7. A notification (a reply, someone joining your room…) for someone who is
+// not on the site. One email per bundle; the footer links to switch them off.
+const esc = s => String(s ?? '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+async function sendNotificationEmail({ to, name, title, body, link, unsubscribeUrl }) {
+  const html = baseTemplate({ label: 'New on SSBCircle', body: `
+    <p style="font-size:14px;color:#374151;line-height:1.7;margin:0 0 6px;">Hi ${esc(name || 'Aspirant')},</p>
+    <p style="font-size:18px;font-weight:700;color:#111827;line-height:1.4;margin:0 0 12px;">${esc(title)}</p>
+    ${body ? `<p style="font-size:15px;color:#374151;line-height:1.7;margin:0;padding:12px 16px;background:#f3f4f6;border-radius:10px;">${esc(body)}</p>` : ''}
+    ${ctaButton('Open on SSBCircle', BASE + link)}
+    <p style="font-size:12px;color:#9ca3af;line-height:1.6;margin:24px 0 0;">
+      You get these emails for replies and rooms you joined.
+      <a href="${unsubscribeUrl}" style="color:#6b7280;">Turn off email notifications</a>
+    </p>` });
+  return resend.emails.send({ from: FROM, to, subject: title, html });
+}
+
+module.exports = { sendInterestConfirmation, sendReminder, sendRoomLive, sendHostStartReminder, sendEventConfirmation, sendEventReminder, sendNotificationEmail };

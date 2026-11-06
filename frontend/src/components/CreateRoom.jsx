@@ -103,14 +103,8 @@ export default function CreateRoom() {
         const sess = await createSession({
           topic: title.trim(), description: description.trim(),
           category, subcategory: subcategory || null,
-          scheduled_at: (() => {
-            // datetime-local gives no timezone — append local offset so UTC conversion is correct
-            const offset = -new Date().getTimezoneOffset();
-            const sign = offset >= 0 ? '+' : '-';
-            const hh = String(Math.floor(Math.abs(offset) / 60)).padStart(2, '0');
-            const mm = String(Math.abs(offset) % 60).padStart(2, '0');
-            return new Date(`${scheduledAt}:00${sign}${hh}:${mm}`).toISOString();
-          })(),
+          // The time picked is Indian time, whatever the device's clock zone
+          scheduled_at: new Date(`${scheduledAt}:00+05:30`).toISOString(),
         });
         setScheduled(sess);
       } else {
@@ -222,7 +216,7 @@ export default function CreateRoom() {
           <h2 className="text-xl font-bold text-gray-900 mb-1">Session Scheduled!</h2>
           <p className="text-gray-400 text-sm mb-1 font-medium">{scheduled.topic}</p>
           <p className="text-brand-600 font-semibold text-sm mb-5">
-            {dt.toLocaleDateString('en-IN', { weekday:'short', day:'numeric', month:'short' })} · {dt.toLocaleTimeString('en-IN', { hour:'2-digit', minute:'2-digit' })}
+            {dt.toLocaleDateString('en-IN', { timeZone: 'Asia/Kolkata', weekday:'short', day:'numeric', month:'short' })} · {dt.toLocaleTimeString('en-IN', { timeZone: 'Asia/Kolkata', hour:'2-digit', minute:'2-digit' })}
           </p>
           <p className="text-xs text-gray-400 mb-6">Aspirants can mark interest from the Upcoming tab on the home page. Come back at the scheduled time to start the room.</p>
           <button onClick={() => navigate('/')} className="btn-primary w-full py-2.5 mb-3 flex items-center justify-center gap-2">
@@ -533,13 +527,13 @@ export default function CreateRoom() {
             {mode === 'schedule' && (
               <div>
                 <label className="text-xs font-semibold text-gray-600 block mb-1.5">
-                  Date & Time <span className="text-red-400">*</span>
+                  Date & Time (IST) <span className="text-red-400">*</span>
                 </label>
                 <input
                   type="datetime-local"
                   className={`input-base ${errors.scheduledAt ? 'border-red-300' : ''}`}
                   value={scheduledAt}
-                  min={(() => { const d = new Date(Date.now() + 5 * 60000); return new Date(d.getTime() - d.getTimezoneOffset() * 60000).toISOString().slice(0, 16); })()}
+                  min={new Date(Date.now() + 5 * 60000 + 5.5 * 3600000).toISOString().slice(0, 16)}
                   onChange={e => { setScheduledAt(e.target.value); setErrors(p => ({ ...p, scheduledAt: '' })); }}
                   disabled={loading}
                 />

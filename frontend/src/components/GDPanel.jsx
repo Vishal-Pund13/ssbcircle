@@ -85,7 +85,7 @@ function TranscriptTab({ onStateChange }) {
       for (let i = e.resultIndex; i < e.results.length; i++) {
         const t = e.results[i][0].transcript;
         if (e.results[i].isFinal) {
-          const ts = new Date().toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' });
+          const ts = new Date().toLocaleTimeString('en-IN', { timeZone: 'Asia/Kolkata', hour: '2-digit', minute: '2-digit' });
           setEntries(prev => [...prev, { ts, text: t.trim() }]);
           setInterim('');
         } else {

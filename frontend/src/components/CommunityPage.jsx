@@ -8,6 +8,7 @@ import { Avatar, VoteRail, ShareButton, CommunitySidebar, ModBadge } from './com
 import SiteNav from './SiteNav';
 import { CoverBand } from './PageCover';
 import { trackEvent } from '../analytics';
+import { askForNotifications } from './NotifyPrompt';
 
 // The community feed, laid out like Reddit and Facebook because most
 // aspirants already know how to use those: a composer at the top, sort tabs,
@@ -100,6 +101,7 @@ function Composer({ user, initialType, initialTitle, onCancel, onPublished }) {
       const post = await createCommunityPost({ title: title.trim(), body: body.trim(), category: type });
       trackEvent('community_post', { type });
       onPublished(post);
+      askForNotifications('reply');
     } catch (err) {
       setError(err.message || 'Could not publish your post.');
     } finally {

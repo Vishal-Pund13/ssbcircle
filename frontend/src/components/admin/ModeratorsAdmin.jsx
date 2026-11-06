@@ -7,7 +7,7 @@ import { CheckCircle2, XCircle, Phone, Mail, ShieldCheck, Clock, UserPlus, Alert
 // people who are already doing the work without having applied.
 
 const API = import.meta.env.VITE_API_URL || 'http://localhost:4000';
-const fmtDate = d => d ? new Date(d).toLocaleDateString('en-IN', { day: 'numeric', month: 'short' }) : '—';
+const fmtDate = d => d ? new Date(d).toLocaleDateString('en-IN', { timeZone: 'Asia/Kolkata', day: 'numeric', month: 'short' }) : '—';
 const STATUS = {
   trial:     'bg-brand-50 text-brand-700',
   invited:   'bg-sky-50 text-sky-700',
@@ -210,7 +210,7 @@ export function PlatformFeedbackAdmin({ authHeaders }) {
           <div key={r.id} className="border border-gray-200 rounded-xl p-4">
             <div className="flex flex-wrap items-center justify-between gap-2 text-[13px]">
               <span className="font-semibold text-gray-800">{KIND_LABEL[r.kind] || r.kind} <span className="font-normal text-gray-400">· {r.display_name || 'Unknown'} · {r.page || '—'}</span></span>
-              <span className="text-gray-400">{new Date(r.created_at).toLocaleString('en-IN', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' })}</span>
+              <span className="text-gray-400">{new Date(r.created_at).toLocaleString('en-IN', { timeZone: 'Asia/Kolkata', day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' })}</span>
             </div>
             <p className="mt-2 text-[14px] text-gray-800 leading-relaxed whitespace-pre-wrap">{r.message}</p>
             <div className="mt-2.5 flex gap-2">
