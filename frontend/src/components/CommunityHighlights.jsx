@@ -33,8 +33,10 @@ const PROMPTS = [
 const MAX_POSTS = 4;
 const AVATAR_BG = ['bg-blue-600', 'bg-emerald-600', 'bg-purple-600', 'bg-rose-600', 'bg-teal-600', 'bg-amber-600'];
 
-// "300+" rounded down to the hundred, so it is always true and grows by itself
-const membersLabel = n => (n >= 100 ? `${Math.floor(n / 100) * 100}+` : null);
+// The headline figure is a floor set by the team (600+); once sign-ups pass
+// it, the real count rounded down to the hundred takes over
+const MEMBERS_FLOOR = 600;
+const membersLabel = n => `${Math.max(MEMBERS_FLOOR, Math.floor(n / 100) * 100)}+`;
 
 const short = t => (t && t.length > 48 ? t.slice(0, 46) + '…' : t);
 const Topic = ({ t }) => <span className="font-semibold text-gray-800">“{short(t)}”</span>;
@@ -218,7 +220,7 @@ export default function CommunityHighlights() {
               Come up and speak. Learn together.
             </h2>
             <p className="mt-2 text-sm sm:text-base text-gray-600 leading-relaxed max-w-2xl">
-              {members && <><span className="font-bold text-gray-900">{members} aspirants</span> are preparing here. </>}
+<span className="font-bold text-gray-900">{members} aspirants</span> are already preparing actively here.
               Ask your doubt, share how your SSB went, and help the next aspirant. Every question you ask helps someone else too.
             </p>
           </div>
