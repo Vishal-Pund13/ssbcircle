@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState, lazy, Suspense } from 'react';
-import { useNavigate, Link, useSearchParams } from 'react-router-dom';
+import { useNavigate, Link, useSearchParams, useLocation } from 'react-router-dom';
 import { getActiveRooms, closeRoom, getSessions, toggleInterest, cancelSession, startSession, getFeatured, getPastSessions, getArticles } from '../services/api';
 import { useAuth } from '../context/AuthContext';
 import { MENTORS } from '../data/mentors';
@@ -1233,18 +1233,23 @@ export default function LandingPage() {
       .catch(() => setArticles([]))
       .finally(() => setArticlesLoading(false));
 
-    // Scroll to tabs section if URL has ?tab= param
-    if (searchParams.get('tab')) {
-      setTimeout(() => {
-        tabsSectionRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
-      }, 300);
-    }
-
     // Background refresh — silent (no skeleton flash)
     const roomTimer    = setInterval(() => fetchRooms(false), 20_000);
     const sessionTimer = setInterval(() => fetchSessions(false), 45_000);
     return () => { clearInterval(roomTimer); clearInterval(sessionTimer); };
   }, []);
+
+  // ?tab=live|upcoming opens that tab and scrolls to the rooms — on arrival,
+  // and on every later link to it from this page (location.key changes even
+  // when the URL is the same)
+  const location = useLocation();
+  useEffect(() => {
+    const t = searchParams.get('tab');
+    if (!t) return;
+    setTab(t === 'upcoming' ? 'upcoming' : 'live');
+    const id = setTimeout(() => tabsSectionRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' }), 300);
+    return () => clearTimeout(id);
+  }, [location.key]);
 
   // Reset visible count when filter changes
   function handleCatFilter(cat) {

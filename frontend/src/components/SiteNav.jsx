@@ -92,6 +92,15 @@ export default function SiteNav() {
   const linkCls = active =>
     `text-sm font-medium px-3 py-2 rounded-lg transition-colors ${active ? 'text-gray-900 bg-gray-100' : 'text-gray-500 hover:text-gray-900 hover:bg-gray-50'}`;
 
+  // The Prep Sheet is the most used tool, so it also gets its own pill in the bar
+  const onPrepSheet = pathname.startsWith('/prep');
+  const prepSheetPill = (
+    <Link to="/prep" aria-label="Prep Sheet"
+      className={`inline-flex items-center gap-1 sm:gap-1.5 whitespace-nowrap rounded-xl border px-2 sm:px-2.5 h-9 text-[12px] sm:text-[13px] font-bold transition-colors ${onPrepSheet ? 'bg-brand-600 border-brand-600 text-white' : 'bg-brand-50 border-brand-100 text-brand-700 hover:bg-brand-100'}`}>
+      <CheckSquare className="w-4 h-4" /> Prep Sheet
+    </Link>
+  );
+
   return (
     <header className="border-b border-gray-100 sticky top-0 z-50 bg-white/95 backdrop-blur-md">
       <div className="max-w-5xl mx-auto px-4 sm:px-6 h-14 flex items-center justify-between gap-3">
@@ -126,6 +135,7 @@ export default function SiteNav() {
         </nav>
 
         <div className="hidden md:flex items-center gap-2">
+          {prepSheetPill}
           {user && <NotificationBell only="desktop" />}
           {user ? (
             <div ref={userRef} className="relative">
@@ -159,8 +169,14 @@ export default function SiteNav() {
         </div>
 
         {/* ── Mobile ── */}
-        <div className="md:hidden flex items-center gap-2">
-          {!user && <Link to="/register" className="btn-primary py-1.5 px-3 text-xs">Get started</Link>}
+        <div className="md:hidden flex items-center gap-1.5">
+          {prepSheetPill}
+          {!user && (
+            <Link to="/register" className="btn-primary py-1.5 px-3 text-xs whitespace-nowrap">
+              {/* Small phones: the logo, Prep Sheet and this must share one line */}
+              <span className="max-[400px]:hidden">Get started</span><span className="min-[401px]:hidden">Join</span>
+            </Link>
+          )}
           {user && <NotificationBell only="phone" />}
           <button onClick={() => setMenuOpen(v => !v)} aria-label="Menu" aria-expanded={menuOpen}
             className="flex items-center justify-center w-9 h-9 rounded-xl border border-gray-200 bg-white hover:bg-gray-50 transition-colors cursor-pointer">
