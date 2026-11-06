@@ -63,45 +63,45 @@ export default function NotifyPrompt() {
     if (r === 'on') setTimeout(() => setReason(null), 2500);
   }
 
+  // A centred dialog over a dimmed page: a corner card is easy to ignore
   return (
-    <div className="fixed inset-x-3 sm:inset-x-auto sm:right-5 z-[60] sm:w-[380px] bottom-[calc(4.75rem+env(safe-area-inset-bottom))] md:bottom-5"
-      role="dialog" aria-label="Phone notifications">
-      <div className="rounded-2xl bg-white border border-gray-200 shadow-2xl p-4">
-        <div className="flex items-start gap-3">
-          <span className="w-10 h-10 rounded-xl bg-brand-600 text-white flex items-center justify-center shrink-0">
-            {state === 'done' ? <Check className="w-5 h-5" /> : <Bell className="w-5 h-5" />}
-          </span>
-          <div className="min-w-0 flex-1">
-            {state === 'done' ? (
-              <p className="text-sm font-bold text-gray-900 pt-2">Done — you will get notifications on this device.</p>
-            ) : state === 'blocked' ? (
-              <>
-                <p className="text-sm font-bold text-gray-900">Notifications are blocked</p>
-                <p className="mt-1 text-[13px] text-gray-600 leading-snug">Allow them for ssbcircle.com in your browser settings. Meanwhile we will email you.</p>
-              </>
-            ) : support === 'ios-needs-home-screen' ? (
-              <>
-                <p className="text-sm font-bold text-gray-900">Want alerts on your iPhone?</p>
-                <p className="mt-1 text-[13px] text-gray-600 leading-snug">
-                  Tap <b>Share</b> <Smartphone className="inline w-3.5 h-3.5 -mt-0.5" /> → <b>Add to Home Screen</b>, then open SSBCircle from your home screen and allow notifications. Until then, we will email you.
-                </p>
-              </>
-            ) : (
-              <>
-                <p className="text-sm font-bold text-gray-900">Don't miss the reply</p>
-                <p className="mt-1 text-[13px] text-gray-600 leading-snug">{COPY[reason] || COPY.reply}</p>
-                <div className="mt-3 flex items-center gap-3">
-                  <button type="button" onClick={turnOn} disabled={state === 'working'}
-                    className="btn-primary text-sm px-4 py-2">{state === 'working' ? 'Turning on…' : 'Turn on notifications'}</button>
-                  <button type="button" onClick={() => close(true)} className="text-sm font-semibold text-gray-500 hover:text-gray-800 cursor-pointer">Not now</button>
-                </div>
-              </>
-            )}
-          </div>
-          <button type="button" onClick={() => close(state !== 'done')} aria-label="Close" className="text-gray-300 hover:text-gray-500 cursor-pointer shrink-0">
-            <X className="w-5 h-5" />
-          </button>
-        </div>
+    <div className="fixed inset-0 z-[70] flex items-center justify-center p-4 bg-gray-900/50 backdrop-blur-[2px]"
+      onClick={e => { if (e.target === e.currentTarget) close(state !== 'done'); }}>
+      <div role="dialog" aria-modal="true" aria-label="Phone notifications"
+        className="relative w-full max-w-sm rounded-3xl bg-white shadow-2xl px-6 pt-8 pb-6 text-center">
+        <button type="button" onClick={() => close(state !== 'done')} aria-label="Close"
+          className="absolute top-3 right-3 p-1 text-gray-300 hover:text-gray-500 cursor-pointer">
+          <X className="w-5 h-5" />
+        </button>
+        <span className={`mx-auto w-16 h-16 rounded-2xl text-white flex items-center justify-center shadow-lg ${state === 'done' ? 'bg-emerald-500' : 'bg-brand-600'}`}>
+          {state === 'done' ? <Check className="w-8 h-8" /> : <Bell className="w-8 h-8" />}
+        </span>
+        {state === 'done' ? (
+          <p className="mt-5 text-lg font-bold text-gray-900">Done! You will get notifications on this device.</p>
+        ) : state === 'blocked' ? (
+          <>
+            <p className="mt-5 text-lg font-bold text-gray-900">Notifications are blocked</p>
+            <p className="mt-2 text-sm text-gray-600 leading-relaxed">Allow them for ssbcircle.com in your browser settings. Meanwhile we will email you.</p>
+            <button type="button" onClick={() => close(false)} className="btn-primary w-full mt-5 py-3">OK</button>
+          </>
+        ) : support === 'ios-needs-home-screen' ? (
+          <>
+            <p className="mt-5 text-lg font-bold text-gray-900">Want alerts on your iPhone?</p>
+            <p className="mt-2 text-sm text-gray-600 leading-relaxed">
+              Tap <b>Share</b> <Smartphone className="inline w-4 h-4 -mt-0.5" /> → <b>Add to Home Screen</b>, then open SSBCircle from your home screen and allow notifications. Until then, we will email you.
+            </p>
+            <button type="button" onClick={() => close(true)} className="btn-primary w-full mt-5 py-3">Got it</button>
+          </>
+        ) : (
+          <>
+            <p className="mt-5 text-xl font-bold text-gray-900">Don't miss the reply</p>
+            <p className="mt-2 text-sm text-gray-600 leading-relaxed">{COPY[reason] || COPY.reply}</p>
+            <button type="button" onClick={turnOn} disabled={state === 'working'}
+              className="btn-primary w-full mt-6 py-3 text-base">{state === 'working' ? 'Turning on…' : 'Turn on notifications'}</button>
+            <button type="button" onClick={() => close(true)}
+              className="mt-3 w-full py-2 text-sm font-semibold text-gray-500 hover:text-gray-800 cursor-pointer">Not now</button>
+          </>
+        )}
       </div>
     </div>
   );
