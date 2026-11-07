@@ -72,12 +72,15 @@ function DateTile({ date }) {
 
 export function ExamTicker() {
   const items = [
+    ...EXAMS.filter(e => e.notice && !isPast(e.noticeUntil))
+      .map(e => ({ icon: Megaphone, text: e.notice, badge: 'New', to: e.article })),
     ...upcomingEvents().slice(0, 6).map(ev => {
       const exact = isExact(ev.date) && ev.confirmed;
       return {
         icon: CalendarDays,
         text: `${ev.exam.name}: ${ev.label.toLowerCase()} ${exact ? `on ${fmt(ev.date)}` : `expected ${fmt(ev.date)}`}`,
         badge: exact ? `in ${daysLeft(ev.date)} days` : null,
+        to: ev.exam.article,
       };
     }),
     ...RESULTS.slice(0, 2).map(r => ({ icon: CheckCircle2, text: `${r.name} out — ${r.note}`, badge: null })),
@@ -94,11 +97,13 @@ export function ExamTicker() {
         <div className="relative flex-1 overflow-hidden group">
           <div className="flex w-max animate-marquee group-hover:[animation-play-state:paused] motion-reduce:animate-none" style={{ animationDuration: '90s' }}>
             {track.map((it, i) => (
-              <Link key={i} to="/exams?tab=upcoming" aria-hidden={i >= items.length ? 'true' : undefined} tabIndex={i >= items.length ? -1 : undefined}
+              <Link key={i} to={it.to || '/exams?tab=upcoming'} aria-hidden={i >= items.length ? 'true' : undefined} tabIndex={i >= items.length ? -1 : undefined}
                 className="flex items-center gap-2 px-5 py-1.5 text-[13px] text-gray-600 hover:text-brand-700 whitespace-nowrap">
                 <it.icon className="w-3.5 h-3.5 shrink-0" aria-hidden="true" />
                 <span>{it.text}</span>
-                {it.badge && <span className="text-[11px] font-semibold text-brand-700">· {it.badge}</span>}
+                {it.badge === 'New'
+                  ? <span className="text-[10px] font-bold uppercase text-white bg-red-500 rounded px-1.5 py-0.5">New</span>
+                  : it.badge && <span className="text-[11px] font-semibold text-brand-700">· {it.badge}</span>}
                 <span className="text-gray-300 pl-3" aria-hidden="true">•</span>
               </Link>
             ))}
@@ -472,6 +477,11 @@ function AllEntries() {
               <p className="text-base font-bold text-gray-900">{e.name}</p>
               <p className="text-xs text-gray-500 mt-0.5">{e.body} · {e.service}</p>
               <p className="text-xs text-gray-400 mt-0.5">Who can apply: {e.who}</p>
+              {e.article && (
+                <Link to={e.article} className="mt-2 inline-flex items-center gap-1 text-[12px] font-bold text-emerald-700 hover:text-emerald-800">
+                  Notification out: read the full guide <ArrowRight className="w-3 h-3" />
+                </Link>
+              )}
             </div>
             <a href={e.link} target="_blank" rel="noopener noreferrer"
               className="shrink-0 inline-flex items-center gap-1 text-[12px] font-semibold text-brand-600 hover:text-brand-800">

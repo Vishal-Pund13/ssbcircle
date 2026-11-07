@@ -8,8 +8,11 @@
 //
 // date:  'YYYY-MM-DD' for an exact day, 'YYYY-MM' for an expected month.
 // kind:  'notification' | 'apply' | 'exam' | 'result' | 'ssb'
+//
+// notice + article: a fresh notification. The notice leads the home page
+// ticker (with a "New" badge) until noticeUntil, and links to the article.
 
-export const CALENDAR_CHECKED = '2026-10-30';
+export const CALENDAR_CHECKED = '2026-11-07';
 
 export const EXAMS = [
   {
@@ -34,10 +37,14 @@ export const EXAMS = [
   },
   {
     id: 'afcat1-2027', name: 'AFCAT (01/2027)', body: 'Indian Air Force', service: 'Flying · Ground Duty',
-    who: 'Graduates (age 20–24 flying, 20–26 ground)', link: 'https://afcat.cdac.in',
+    who: 'Graduates (age 20–24 flying, 20–26 ground)', link: 'https://afcat.edcil.co.in',
+    article: '/article/afcat-1-2027-notification-dates-eligibility-exam-pattern',
+    notice: 'AFCAT 1 2027 notification out — apply 12 Nov to 11 Dec 2026', noticeUntil: '2026-12-11',
     events: [
-      { kind: 'notification', label: 'Notification', date: '2026-11' },
-      { kind: 'exam',         label: 'Online exam',  date: '2027-02' },
+      { kind: 'notification', label: 'Notification (short notice)', date: '2026-11-02', confirmed: true },
+      { kind: 'apply',        label: 'Apply online opens',          date: '2026-11-12', confirmed: true },
+      { kind: 'apply',        label: 'Last date to apply',          date: '2026-12-11', confirmed: true },
+      { kind: 'exam',         label: 'Online exam',                 date: '2027-02' },
     ],
   },
   {
@@ -58,7 +65,7 @@ export const EXAMS = [
   },
   {
     id: 'afcat2-2027', name: 'AFCAT (02/2027)', body: 'Indian Air Force', service: 'Flying · Ground Duty',
-    who: 'Graduates', link: 'https://afcat.cdac.in',
+    who: 'Graduates', link: 'https://afcat.edcil.co.in',
     events: [
       { kind: 'notification', label: 'Notification', date: '2027-06' },
       { kind: 'exam',         label: 'Online exam',  date: '2027-08' },

@@ -1575,6 +1575,7 @@ HAL|Hindustan Aeronautics Limited — the government company that builds the Tej
         ...require('./seed/prepArticles1'),
         ...require('./seed/prepArticles2'),
         ...require('./seed/prepArticles3'),
+        ...require('./seed/examArticles'),
       ];
       for (const a of prepArticles) {
         await pool.query(`
