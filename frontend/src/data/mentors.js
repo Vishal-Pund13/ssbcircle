@@ -33,7 +33,6 @@ She believes SSB is not about trying to become someone you are not; it is about 
       '/priyanka_Oswal_Feedback/testimonial-7.jpg',
       '/priyanka_Oswal_Feedback/testimonial-8.jpg',
     ],
-    whatsapp: '919420125440',
     availableFrom: '2026-09-01',
     avatarInitials: 'PO',
     isActive: true,
